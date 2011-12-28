@@ -32,12 +32,12 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 
 Misc
 ====
--update autocomplete -- https://gist.github.com/1150840
--trsn cat edit (from in modify transaction) error, line 202 area (edit line removed for now)
--adapt for phones - https://developer.palm.com/distribution/viewtopic.php?f=109&t=18757&hilit=enyo+pre
+* update autocomplete -- https://gist.github.com/1150840
+* trsn cat edit (from in modify transaction) error, line 202 area (edit line removed for now)
+* adapt for phones - https://developer.palm.com/distribution/viewtopic.php?f=109&t=18757&hilit=enyo+pre
 
 =========
 Completed
 =========
-Style consistency fix
-Import date format issue fix
+* Style consistency fix
+* Import date format issue fix

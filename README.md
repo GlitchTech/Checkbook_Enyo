@@ -3,7 +3,6 @@ Checkbook HD
 
 Customer Support
 ----------------
-
 Email Address: glitchtechscience@gmail.com
 Website: http://forums.webosnation.com/glitchtech-science/
 
