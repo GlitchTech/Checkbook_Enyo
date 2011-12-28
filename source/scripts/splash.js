@@ -731,8 +731,13 @@ enyo.kind({
 
 				this.versionCheck = 20;
 			case 20:
+				//GTS Sync System
+				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
+				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER );" );
 
 				//this.versionCheck = 21;
+			case 21:
+				//this.versionCheck = 22;
 		}
 
 		querySet.push(
