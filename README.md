@@ -1,8 +1,6 @@
 Checkbook HD
 ============
 
-#Package ID#: com.glitchtechscience.enyo.checkbook
-
 Customer Support
 ----------------
 
