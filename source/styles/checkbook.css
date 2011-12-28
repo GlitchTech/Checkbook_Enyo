@@ -1,0 +1,108 @@
+.hiddenAccount {
+	display: none;
+}
+
+.maskedAccount .accountName {
+	color: #0000cc;
+}
+
+.accountLockIcon,
+.accountIcon {
+	height: 32px;
+	width: 32px;
+}
+
+.accountIcon {
+	margin-right: 10px;
+}
+
+.accountLockIcon {
+	margin-left: -42px;
+}
+
+.accountLockIcon.unlocked {
+	display: none;
+}
+
+.account-item {
+	padding: 0px;
+}
+
+.account-item .account {
+	border-top: 1px solid rgba(255, 255, 255, 0.5);
+
+	padding: 8px 14px;
+}
+
+.account-item .note {
+	padding: 0px 14px 5px 14px;
+}
+
+/*****************/
+
+.transactionItemTop {
+	margin-left: -25px;
+	padding-left: 10px;
+
+	margin-top: -5px;
+	padding-top: 5px;
+}
+
+.repeatIcon {
+	background-image: url('../images/calendar.png');
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.repeatTransferIcon {
+	background-image: url('../images/future_transfer_1.png');
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.transferIcon {
+	background-image: url('../images/transfer_3.png');
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.expenseIcon {
+	background-image: url('../images/icon-expense.png');
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.incomeIcon {
+	background-image: url('../images/icon-income.png');
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.futureTransaction .date {
+	color: #000000;
+}
+
+.date,
+.futureTransaction .description {
+	color: #0000cc;
+}
+
+/*****************/
+
+.enyo-item.selected,
+.enyo-popup-menu .selected .enyo-item {
+	padding-right: 40px;
+
+	background-image: url( '../images/sort_icons/status.png' );
+	background-repeat: no-repeat;
+	background-position: right center;
+}
+
+.enyo-item.normal,
+.enyo-popup-menu .normal .enyo-item {
+	padding-right: 40px;
+
+	background-image: url( '../images/sort_icons/empty.png' );
+	background-repeat: no-repeat;
+	background-position: right center;
+}

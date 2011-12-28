@@ -1,0 +1,29 @@
+{
+	"title": "Checkbook HD Beta",
+	"id": "com.glitchtechscience.enyo.checkbookbeta",
+	"version": "0.9.014",
+
+	"vendor": "GlitchTech Science",
+	"vendorurl": "http://www.glitchtechscience.com",
+	"vendoremail": "GlitchTechScience@gmail.com",
+
+	"copyright": "&copy; Copyright 2009 and forward GlitchTech Science. All rights reserved.",
+
+	"keywords": [
+		"Checkbook",
+		"Checkbook HD",
+		"finance",
+		"budget",
+		"money",
+		"cash"
+	],
+
+	"type": "web",
+	"uiRevision": 2,
+
+	"main": "index.html",
+	"icon": "source/images/icon_1.png",
+	"miniicon": "source/images/icon_1_32x32.png",
+
+	"noDeprecatedStyles": true
+}

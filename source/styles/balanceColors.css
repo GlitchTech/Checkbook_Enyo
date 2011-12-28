@@ -1,0 +1,32 @@
+.negativeBalance,
+.enyo-item .negativeFunds {
+	color: #cc0000;
+}
+.negativeBalanceLight {
+
+	color: #ff0000;
+}
+
+.positiveBalance,
+.enyo-item .positiveFunds {
+	color: #006600;
+}
+.positiveBalanceLight {
+	color: #009900;
+}
+
+.neutralFunds,
+.enyo-item .neutralFunds {
+	color: #00009c;
+}
+.neutralBalanceLight {
+	color: #4981CE;
+}
+
+.equalFunds,
+.enyo-item .equalFunds {
+	color: #86832c;
+}
+.equalBalanceLight {
+	color: #ffdf0f;
+}
