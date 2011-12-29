@@ -2,7 +2,6 @@
 
 enyo.kind({
 	name: "Checkbook.preferences",
-
 	kind: enyo.VFlexBox,
 
 	style: "height: 100%;",
@@ -275,12 +274,6 @@ enyo.kind({
 		enyo.application.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
 
 		this.$['entries'].renderAccountList();
-	},
-
-	doClose: function() {
-		//Handles scrim taps
-
-		this.doFinish();
 	},
 
 	/** PIN Controls **/

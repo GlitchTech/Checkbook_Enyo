@@ -12,6 +12,8 @@ enyo.kind( {
 		onModify: "",//Add/Edit Transaction
 		onChanged: "",//Edit Made
 		onBalanceViewChanged: "",//Balance mode changed
+
+		onBudgetView: "",//Show Budget Pane
 	},
 
 	components: [
@@ -514,10 +516,9 @@ enyo.kind( {
 
 				enyo.nextTick(
 						this,
-						this.doModify,
+						this.doBudgetView,
+						null,
 						{
-							name: "budgetSystem",
-							kind: "Checkbook.budget.view",
 							accountObj: this.account
 						}
 					);

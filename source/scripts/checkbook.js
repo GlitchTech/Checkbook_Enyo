@@ -32,9 +32,12 @@ enyo.kind({
 							name: "transactions",
 							kind: "Checkbook.transactions.view",
 							flex: 2,
+
 							onModify: "showPanePopup",
 							onChanged: "accountBalanceChanged",
 							onBalanceViewChanged: "tranasactionBalanceViewChanged",
+
+							onBudgetView: "openBudget"
 						}
 					]
 				}
@@ -62,23 +65,19 @@ enyo.kind({
 						}
 					]
 				}, {
-					showing: false,
-
-
 					caption: $L( "Finance Information" ),
 					components: [
 						{
+							showing: false,
 							caption: $L( "Search" ),
-							onclick: "showPopup",
-							popup: "search"
+							onclick: "openSearch"
 						}, {
 							caption: $L( "Budget" ),
-							onclick: "showPopup",
-							popup: "budget"
+							onclick: "openBudget"
 						}, {
+							showing: false,
 							caption: $L( "Reports" ),
-							onclick: "showPopup",
-							popup: "reports"
+							onclick: "openReports"
 						}
 					]
 				}, {
@@ -99,16 +98,6 @@ enyo.kind({
 			kind: "Checkbook.export",
 			onFinish: "closePopup"
 		}, {
-		/*
-			name: "search",
-			kind: "Checkbook.search"
-		}, {
-			name: "budget",
-			kind: "Checkbook.budget"
-		}, {
-			name: "reports",
-			kind: "Checkbook.reports"
-		}, {*/
 			name: "about",
 			kind: "Checkbook.about",
 			onClose: "closePopup"
@@ -263,6 +252,8 @@ enyo.kind({
 					"source/images/warning-icon.png"
 				);
 		}
+
+		this.openBudget();//TEMP - REMOVE
 	},
 
 	/** PopUp Controls **/
@@ -312,12 +303,12 @@ enyo.kind({
 
 	/** PopUp Pane Controls **/
 
-	showPanePopup: function( inCaller, inPaneArgs ) {
+	showPanePopup: function( inSender, inPaneArgs ) {
 
 		var paneArgs = enyo.mixin(
 				inPaneArgs,
 				{
-					name: ( enyo.isString( inPaneArgs['name'] ) ? inPaneArgs['onFinish'] : "panePopup" ),
+					name: ( enyo.isString( inPaneArgs['name'] ) ? inPaneArgs['name'] : "panePopup" ),
 					flex: 1,
 					onFinish: "hidePanePopup",
 					onFinishFollower: ( enyo.isFunction( inPaneArgs['onFinish'] ) ? inPaneArgs['onFinish'] : null )
@@ -362,6 +353,24 @@ enyo.kind({
 			this.$['appMenu'].setAutomatic( true );
 			this.$['container'].selectView( this.$['mainPane'] );
 		}
+	},
+
+	/** Checkbook.budget.* **/
+
+	openBudget: function( inSender, inEvent, args ) {
+
+		var budgetArgs = enyo.mixin(
+				{
+					name: "budget",
+					kind: "Checkbook.budget.view"
+				},
+				args
+			);
+
+		this.showPanePopup(
+				null,
+				budgetArgs
+			);
 	},
 
 	/** Checkbook.preferences && ( Checkbook.preferences --> Checkbook.accounts.view ) Communication Channels **/

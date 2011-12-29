@@ -52,13 +52,9 @@
 
 .force-left-padding {
 	padding-left: 10px !important;
-},
+}
 
 /*****************/
-
-.enyo-progress-bar.red .enyo-progress-bar-inner {
-	-webkit-border-image: url( '../images/progress_bar/red.png' ) 0 5 0 5 repeat repeat;
-}
 
 .enyo-progress-bar.green .enyo-progress-bar-inner {
 	-webkit-border-image: url( '../images/progress_bar/green.png' ) 0 5 0 5 repeat repeat;
@@ -66,6 +62,10 @@
 
 .enyo-progress-bar.yellow .enyo-progress-bar-inner {
 	-webkit-border-image: url( '../images/progress_bar/yellow.png' ) 0 5 0 5 repeat repeat;
+}
+
+.enyo-progress-bar.red .enyo-progress-bar-inner {
+	-webkit-border-image: url( '../images/progress_bar/red.png' ) 0 5 0 5 repeat repeat;
 }
 
 /*****************/
