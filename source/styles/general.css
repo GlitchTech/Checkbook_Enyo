@@ -56,16 +56,40 @@
 
 /*****************/
 
+.enyo-progress-bar.big {
+	height: 25px;
+	border-width: 0px 5px;
+
+	-webkit-border-image: url( '../images/progress_bar/progress-bar-big.png' ) 0 5 0 5 repeat repeat;
+}
+
+.enyo-progress-bar.big .enyo-progress-bar-inner {
+	margin: 0 -5px;
+	height: 25px;
+	border-width: 0 5px;
+
+	-webkit-border-image: url( '../images/progress_bar/blue-big.png' ) 0 5 0 5 repeat repeat;
+}
+
 .enyo-progress-bar.green .enyo-progress-bar-inner {
 	-webkit-border-image: url( '../images/progress_bar/green.png' ) 0 5 0 5 repeat repeat;
+}
+.enyo-progress-bar.big.green .enyo-progress-bar-inner {
+	-webkit-border-image: url( '../images/progress_bar/green-big.png' ) 0 5 0 5 repeat repeat;
 }
 
 .enyo-progress-bar.yellow .enyo-progress-bar-inner {
 	-webkit-border-image: url( '../images/progress_bar/yellow.png' ) 0 5 0 5 repeat repeat;
 }
+.enyo-progress-bar.big.yellow .enyo-progress-bar-inner {
+	-webkit-border-image: url( '../images/progress_bar/yellow-big.png' ) 0 5 0 5 repeat repeat;
+}
 
 .enyo-progress-bar.red .enyo-progress-bar-inner {
 	-webkit-border-image: url( '../images/progress_bar/red.png' ) 0 5 0 5 repeat repeat;
+}
+.enyo-progress-bar.big.red .enyo-progress-bar-inner {
+	-webkit-border-image: url( '../images/progress_bar/red-big.png' ) 0 5 0 5 repeat repeat;
 }
 
 /*****************/
