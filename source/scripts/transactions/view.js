@@ -175,8 +175,6 @@ enyo.kind( {
 							icon: "source/images/menu_icons/config.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}, {
-							showing: false,
-
 							onclick: "searchButtonClicked",
 							icon: "source/images/menu_icons/search.png",
 							className: "enyo-grouped-toolbutton-dark"
@@ -243,12 +241,16 @@ enyo.kind( {
 			kind: "GTS.menu",
 			components: [
 				{
+					showing: false,
+
 					caption: "Reports",
 					menuParent: "searchMenu"
 				}, {
 					caption: "Budget",
 					menuParent: "searchMenu"
 				}, {
+					showing: false,
+
 					caption: "Search",
 					menuParent: "searchMenu"
 				}
@@ -506,9 +508,26 @@ enyo.kind( {
 
 			this.log( "functionMenu", arguments );
 		} else if( inSender.menuParent.toLowerCase() === "searchmenu" ) {
-			//Search Menu
+			//Tool Menu
 
-			this.log( "searchMenu", arguments );
+			if( inSender.value.toLowerCase() === "budget" ) {
+
+				enyo.nextTick(
+						this,
+						this.doModify,
+						{
+							name: "budgetSystem",
+							kind: "Checkbook.budget.view",
+							accountObj: this.account
+						}
+					);
+			} else if( inSender.value.toLowerCase() === "reports" ) {
+
+				this.log( "Report system go" );
+			} else if( inSender.value.toLowerCase() === "search" ) {
+
+				this.log( "Search system go" );
+			}
 		} else if( inSender.menuParent.toLowerCase() === "transactonmenu" ) {
 			//Transction Menu
 

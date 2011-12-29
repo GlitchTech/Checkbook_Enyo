@@ -2,8 +2,12 @@
 
 enyo.depends(
 	"manager.js",
+
 	"view.js",
 	"single.js",
+
+	"search.js",
+
 	"modify.js",
 	"autocomplete.js"
 );

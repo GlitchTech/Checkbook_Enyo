@@ -4,4 +4,5 @@ enyo.kind({
 
 	name: "Checkbook.budget.modify",
 	kind: enyo.Component
+	//Popup, see import for proper code
 });
