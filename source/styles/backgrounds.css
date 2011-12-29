@@ -63,6 +63,26 @@
 		);
 }
 
+.tardis-blue {
+	background-color #272D70;
+}
+
+.tardis-blue-gradient {
+	/* Horizontal, Center based */
+	/* .rich-brown to .default to .deep-green */
+	background-image: -webkit-gradient(
+			linear,
+			left top,
+			right top,
+			from( #272D70 ),
+			color-stop( 0.1, #272D70 ),
+			color-stop( 0.4, #f1f1f1 ),
+			color-stop( 0.6, #f1f1f1 ),
+			color-stop( 0.9, #272D70 ),
+			to( #272D70 )
+		);
+}
+
 /* Checkbook Stamp Background */
 .checkbook-stamp {
 	background-image: url( '../images/trans_bg.png' );

@@ -719,7 +719,7 @@ enyo.kind({
 				querySet.push( "CREATE TABLE transactionSplit( transId INTEGER, genCat TEXT, specCat TEXT, amount REAL, last_sync TEXT );" );
 
 				//Add secondary trans cat to system
-				querySet.push( "ALTER TABLE transactions ADD COLUMN category2 INTEGER;" );
+				querySet.push( "ALTER TABLE transactions ADD COLUMN category2 TEXT;" );
 
 				//Repeat System (ignore cleared, checknum)
 				querySet.push( "DROP TABLE IF EXISTS repeats;" );
@@ -742,6 +742,9 @@ enyo.kind({
 								}
 							)
 					);
+
+				//Add secondary trans cat to budget system
+				querySet.push( "ALTER TABLE budgets ADD COLUMN category2 TEXT;" );
 
 				this.versionCheck = 21;
 			case 21:

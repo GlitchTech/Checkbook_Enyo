@@ -8,6 +8,9 @@ enyo.kind({
 	flex: 1,
 	style: "height: 100%;",
 
+	sort: 0,
+	budgets: [],
+
 	published: {
 		accountObj: {}
 	},
@@ -41,8 +44,26 @@ enyo.kind({
 				}, {
 					content: $L( "Budget System" ),
 					className: "bigger",
-					style: "margin-top: -6px;",
+					style: "margin-top: -6px;"
+				}, {
+					kind: enyo.Spacer,
 					flex: 1
+				}, {
+					name: "totalCurrent",
+					style: "margin-top: -5px;"
+				}, {
+					name: "totalProgress",
+					kind: enyo.ProgressBar,
+
+					className: "big",
+					style: "width: 200px; margin-left: 10px; margin-right: 10px;",
+
+					minimum: 0,
+					maximum: 100,
+					position: 0
+				}, {
+					name: "totalMax",
+					style: "margin-top: -5px;"
 				}
 			]
 		},
@@ -51,10 +72,13 @@ enyo.kind({
 			name: "entries",
 			kind: "ReorderableVirtualList",
 
-			className: "light narrow-column",
+			className: "light narrow-column",//Should this be narrow-column?
 			style: "padding-left: 0px; padding-right: 0px;",
 			flex: 1,
 
+			reorderable: true,
+
+			onclick: "tapped",
 			onReorder: "reorder",
 			onSetupRow: "setupRow",
 			onAcquirePage: "acquirePage",
@@ -68,7 +92,6 @@ enyo.kind({
 					tapHighlight: true,
 					//onclick: "itemTapped",
 
-					//Vertical Layout
 					components: [
 						{
 							layoutKind: enyo.HFlexLayout,
@@ -77,20 +100,41 @@ enyo.kind({
 							components: [
 								{
 									name: "category",
+
+									flex: 1
 								}, {
+									name: "current"
+								}, {
+									content: $L( "of" ),
+									style: "padding-left: 5px; padding-right: 5px;"
+								}, {
+									name: "total"
+								}
+							]
+						}, {
+							layoutKind: enyo.HFlexLayout,
+							align: "center",
+
+							components: [
+								{
 									name: "progress",
 									kind: enyo.ProgressBar,
+
 									flex: 1,
+									className: "big",
+									style: "margin-right: 10px;",
 
 									minimum: 0,
 									maximum: 100,
 									position: 0
 								}, {
-									name: "total"
-								}, {
+									name: "config",
 									kind: enyo.Image,
-									src: "source/images/search.png",
-									className: "img-icon"
+									src: "source/images/config.png"
+								}, {
+									name: "search",
+									kind: enyo.Image,
+									src: "source/images/search.png"
 								}
 							]
 						}
@@ -101,25 +145,82 @@ enyo.kind({
 
 		{
 			kind: enyo.Toolbar,
-			className: "enyo-toolbar-light",
+			className: "tardis-blue",
 			components: [
 				{
-					kind: enyo.Button,
-
-					caption: $L( "Back" ),
-					onclick: "doFinish"
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							caption: $L( "Back" ),
+							className: "enyo-grouped-toolbutton-dark",
+							onclick: "doFinish"
+						}, {
+							icon: "source/images/menu_icons/sort.png",
+							className: "enyo-grouped-toolbutton-dark",
+							onclick: "sortButtonClicked"
+						}
+					]
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					kind: enyo.Button,
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							onclick: "dateBack",
+							className: "enyo-grouped-toolbutton-dark",
+							icon: "source/images/menu_icons/back.png"
+						}
+					]
+				}, {
+					name: "date",
+					kind: enyo.DatePicker,
 
-					className: "enyo-button-affirmative deep-green",
+					className: "enyo-grouped-toolbutton-dark",
 
-					caption: $L( "Add New" ),
-					onclick: "addBudget"
+					label: "",
+					hideDay: true,
+					onChange: "dateChanged"
+				}, {
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							onclick: "dateForward",
+							className: "enyo-grouped-toolbutton-dark",
+							icon: "source/images/menu_icons/forward.png"
+						}
+					]
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							name: "editModeToggle",
+							toggling: true,
+							className: "enyo-grouped-toolbutton-dark",
+							icon: "source/images/menu_icons/lock.png",
+							onclick: "toggleEdit"
+						}, {
+							icon: "source/images/menu_icons/new.png",
+							className: "enyo-grouped-toolbutton-dark",
+							onclick: "addBudget"
+						}
+					]
 				}
 			]
+		},
+
+		{
+			name: "sortMenu",
+			kind: "Checkbook.selectedMenu",
+			components: budgetSortOptions
+		},
+
+		{
+			name: "manager",
+			kind: "Checkbook.budget.manager"
 		}
 	],
 
@@ -127,7 +228,109 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.log( "GO" );
+		this.budgets = [];
+
+		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeader ) } );
+	},
+
+	colorize: function( inSender, progress ) {
+
+		//blue from  0% to 24.99%
+		inSender.addRemoveClass( "blue", ( progress < 25 ) );
+		//green from 25% to 74.99%
+		inSender.addRemoveClass( "green", ( progress >= 25 && progress < 75 ) );
+		//yellow from 75% to 99.99%
+		inSender.addRemoveClass( "yellow", ( progress >= 75 && progress < 100 ) );
+		//red over 100%
+		inSender.addRemoveClass( "red", ( progress >= 100 ) );
+	},
+
+	menuItemClick: function() {
+		//All menu items come here
+
+		var inSender = arguments[arguments.length === 2 ? 0 : 1];
+
+		if( inSender.menuParent.toLowerCase() === "budgetsortoptions" ) {
+			//Sort menu
+
+			console.log( inSender );
+
+			if( this.sort === inSender.value ) {
+				//No change, abort
+				return;
+			}
+
+			this.sort = inSender.value;
+
+			this.budgets = [];
+			this.$['entries'].punt();
+		}
+	},
+
+	/** Header Controls **/
+
+	buildHeader: function( result ) {
+
+//result['budgetCount']: 1
+
+		var progress = result['spent'] / result['spending_limit'] * 100;
+
+		this.$['totalCurrent'].setContent( formatAmount( result['spent'] ) );
+		this.$['totalMax'].setContent( formatAmount( result['spending_limit'] ) );
+
+		this.$['totalProgress'].setPosition( progress );
+
+		this.colorize( this.$['totalProgress'], progress );
+		this.colorize( this.$['totalCurrent'], progress );
+	},
+
+	/** Footer Controls **/
+
+	sortButtonClicked: function( inSender, inEvent ) {
+
+		this.$['sortMenu'].openAtControl( inSender, this.sort );
+	},
+
+	dateBack: function() {
+
+		var date = this.$['date'].getValue();
+
+		date.setDate( 5 );
+		date.setMonth( date.getMonth() - 1 );
+
+		this.$['date'].setValue( date );
+
+		this.dateChanged( null, date );
+	},
+
+	dateForward: function() {
+
+		var date = this.$['date'].getValue();
+
+		date.setDate( 5 );
+		date.setMonth( date.getMonth() + 1 );
+
+		this.$['date'].setValue( date );
+
+		this.dateChanged( null, date );
+	},
+
+	dateChanged: function( inSender, date) {
+
+		this.log( date.toString() );
+	},
+
+	toggleEdit: function() {
+
+		if( this.$['editModeToggle'].getDepressed() ) {
+
+			this.$['editModeToggle'].setIcon( "source/images/menu_icons/unlock.png" );
+		} else {
+
+			this.$['editModeToggle'].setIcon( "source/images/menu_icons/lock.png" );
+		}
+
+		this.$['entries'].refresh();
 	},
 
 	addBudget: function() {
@@ -137,26 +340,36 @@ enyo.kind({
 
 	/** List Control **/
 
-	reorder: function() {
+	tapped: function( inSender, inEvent ) {
+
+		console.log( arguments );
+	},
+
+	reorder: function( inSender, newIndex, oldIndex ) {
+
+		console.log( arguments );
 	},
 
 	setupRow: function( inSender, inIndex ) {
 
-		//var row = this.transactions[inIndex];
+		var row = this.budgets[inIndex];
 
-		if( inIndex < 100 && inIndex >= 0 ) {
+		if( row ) {
 
-			this.$['category'].setContent( inIndex );
+			var progress = 100 * row['spent'] / row['spending_limit'];
 
-			var progress = Math.random() * 100 + 10;
+			this.$['category'].setContent( row['category'] + ( row['category2'] !== "%" ? " >> " + row['category2'] : "" ) );
 
-			this.$['progress'].addRemoveClass( "green", ( progress >= 25 && progress < 75 ) );
-			this.$['progress'].addRemoveClass( "yellow", ( progress >= 75 && progress < 100 ) );
-			this.$['progress'].addRemoveClass( "red", ( progress >= 100 ) );
+			this.$['current'].setContent( formatAmount( row['spent'] ) );
+			this.$['total'].setContent( formatAmount( row['spending_limit'] ) );
+
+			this.colorize( this.$['progress'], progress );
+			this.colorize( this.$['current'], progress );
 
 			this.$['progress'].setPosition( progress );
 
-			this.$['total'].setContent( "$" + inIndex * 100 );
+			this.$['search'].setShowing( !this.$['editModeToggle'].getDepressed() );
+			this.$['config'].setShowing( this.$['editModeToggle'].getDepressed() );
 
 			return true;
 		}
@@ -165,7 +378,6 @@ enyo.kind({
 	acquirePage: function( inSender, inPage ) {
 
 		var index = inPage * inSender.getPageSize();
-			return;
 
 		if( index < 0 ) {
 			//No indexes below zero, don't bother calling
@@ -173,17 +385,53 @@ enyo.kind({
 			return;
 		}
 
-		if( !this.transactions[index] ) {
+		if( !this.budgets[index] ) {
 
-			//this.loadingDisplay( true );
+			this.loadingDisplay( true );
 
-			//fetch
+			this.$['manager'].fetchBudgets(
+					this.$['date'].getValue().setStartOfMonth(),
+					this.$['date'].getValue().setEndOfMonth(),
+					{
+						"onSuccess": enyo.bind( this, this.buildPage, index )
+					},
+					this.sort,
+					inSender.getPageSize(),//Limit
+					index//Offset
+				);
 		}
+	},
+
+	buildPage: function( offset, results ) {
+		//Parse page data
+
+		for( var i = 0; i < results.length; i++ ) {
+/*
+results = {
+	budgetId: 2
+	budgetOrder: null
+	category: "Auto & Transport"
+	category2: "Gas & Fuel"
+	rollOver: null
+	span: null
+	spending_limit: 30
+	spent: 98.4
+}
+*/
+			this.budgets[offset + i] =  results[i];
+
+			this.budgets[offset + i]['category'] = this.budgets[offset + i]['category'].dirtyString();
+			this.budgets[offset + i]['category2'] = this.budgets[offset + i]['category2'].dirtyString();
+		}
+
+		this.$['entries'].refresh();
+
+		this.loadingDisplay( false );
 	},
 
 	loadingDisplay: function( status ) {
 
 		this.$['loadingSpinner'].setShowing( status );
-		this.$['acctTypeIcon'].setShowing( !status );
+		this.$['systemIcon'].setShowing( !status );
 	}
 });
