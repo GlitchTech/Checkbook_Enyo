@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical">
+	<!-- App PIN Code content needed -->
+	<TextView
+		android:text="Add/Edit Categories"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:padding="5dip"
+		android:layout_marginTop="3dip"
+		android:layout_marginBottom="1dip"
+		style="?android:attr/listSeparatorTextViewStyle"></TextView>
+	<Button
+		android:id="@+id/prefAEAcctCat"
+		android:text="Account Categories"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="10dip"></Button>
+	<Button
+		android:id="@+id/prefAETransCat"
+		android:text="Transaction Categories"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:layout_marginLeft="10dip"
+		android:layout_marginBottom="3dip"></Button>
+	<TextView
+		android:text="Default Account"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:padding="5dip"
+		android:layout_marginTop="3dip"
+		android:layout_marginBottom="1dip"
+		style="?android:attr/listSeparatorTextViewStyle"
+		android:visibility="gone"></TextView>
+	<Button
+		android:id="@+id/prefDefaultAcct"
+		android:text="DEFAULT ACCT"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="10dip"
+		android:visibility="gone"></Button>
+	<TextView
+		android:text="Accounts"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:padding="5dip"
+		android:layout_marginTop="3dip"
+		android:layout_marginBottom="1dip"
+		style="?android:attr/listSeparatorTextViewStyle"></TextView>
+	<Button
+		android:id="@+id/prefAddAcct"
+		android:text="Add Account"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:layout_marginLeft="10dip"></Button>
+	<ListView
+		android:id="@+id/prefAcctList"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:padding="3dip"
+		android:layout_marginLeft="7dip"></ListView>
+</LinearLayout>

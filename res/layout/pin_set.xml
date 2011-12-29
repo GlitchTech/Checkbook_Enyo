@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:padding="3dip">
+	<TextView
+		android:id="@+id/pin_title"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentLeft="true"
+		android:textSize="25dip"
+		android:textStyle="bold"
+		android:text="Change PIN Code" />
+	<View
+		android:layout_width="fill_parent"
+		android:layout_height="1dip"
+		android:layout_below="@id/pin_title"
+		android:background="@drawable/div_grad" />
+	<TextView
+		android:id="@+id/pin_1L"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@id/pin_title"
+		android:paddingTop="5dip"
+		android:paddingRight="5dip"
+		android:layout_marginTop="3dip"
+		android:text="PIN Code" />
+	<EditText
+		android:id="@+id/pin_1"
+		android:hint="10 digits max"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/pin_1L"
+		android:layout_below="@id/pin_title"
+		android:layout_marginTop="3dip"
+		android:singleLine="true"
+		android:password="true"
+		android:numeric="integer" />
+	<TextView
+		android:id="@+id/pin_2L"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@id/pin_1"
+		android:paddingTop="10dip"
+		android:paddingRight="5dip"
+		android:text="Confirm" />
+	<EditText
+		android:id="@+id/pin_2"
+		android:hint="10 digits max"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_toRightOf="@id/pin_1L"
+		android:layout_below="@id/pin_1"
+		android:paddingTop="5dip"
+		android:singleLine="true"
+		android:password="true"
+		android:numeric="integer" />
+	<View
+		android:layout_width="fill_parent"
+		android:layout_height="1dip"
+		android:background="@drawable/div_grad"
+		android:layout_below="@id/pin_2" />
+	<TextView
+		android:id="@+id/pin_error"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@id/pin_2"
+		android:padding="10dip"
+		android:layout_marginTop="2dip"
+		android:visibility="gone"
+		android:text="" />
+	<View
+		android:layout_width="fill_parent"
+		android:layout_height="1dip"
+		android:background="@drawable/div_grad"
+		android:layout_below="@id/pin_error" />
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/pin_error"
+		android:textStyle="bold"
+		android:layout_marginTop="2dip">
+		<Button
+			android:id="@+id/okButton"
+			android:layout_width="0dip"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="OK"
+			android:textColor="#ffffff"
+			android:textStyle="bold">
+		</Button>
+		<Button
+			android:id="@+id/cancelButton"
+			android:layout_width="0dip"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="Cancel"
+			android:textColor="#ffffff"
+			android:textStyle="bold">
+		</Button>
+	</LinearLayout>
+</RelativeLayout>
