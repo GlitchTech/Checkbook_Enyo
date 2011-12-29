@@ -139,7 +139,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 20;
+		this.versionCheck = 21;
 
 		if( currVersion === this.versionCheck ) {
 
@@ -731,13 +731,27 @@ enyo.kind({
 
 				this.versionCheck = 20;
 			case 20:
+				querySet.push(
+						enyo.application.gts_db.getUpdate(
+								"acctTrsnSortOptn",
+								{
+									"qry": "IFNULL( NULLIF( checkNum, '' ), ( SELECT IFNULL( MAX( checkNum ), 0 ) FROM transactions LIMIT 1 ) ) ASC, itemId ASC"
+								},
+								{
+									"sortId": 9
+								}
+							)
+					);
+
+				this.versionCheck = 21;
+			case 21:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER );" );
 
-				//this.versionCheck = 21;
-			case 21:
 				//this.versionCheck = 22;
+			case 22:
+				//this.versionCheck = 23;
 		}
 
 		querySet.push(
