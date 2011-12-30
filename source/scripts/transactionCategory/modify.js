@@ -127,11 +127,6 @@ enyo.kind({
 			name: "autocomplete",
 			kind: "Checkbook.transactionCategory.autocomplete",
 			onSelect: "generalAutoSuggestComplete"
-		},
-
-		{
-			name: "manager",
-			kind: "Checkbook.transactionCategory.manager"
 		}
 	],
 
@@ -213,6 +208,13 @@ enyo.kind({
 			return;
 		}
 
+		if( newSpecific === $L( "All Sub Categories" ) ) {
+
+			this.$['errorMessage'].setContent( $L( "Invalid category." ) );
+			this.$['errorMessageContainer'].setShowing( true );
+			return;
+		}
+
 		this.$['errorMessageContainer'].setShowing( false );
 
 		if( this.general === newGeneral && this.specific === newSpecific ) {
@@ -223,13 +225,13 @@ enyo.kind({
 
 		if( this.mode === "new" ) {
 
-			this.$['manager'].createCategory( newGeneral, newSpecific, { "onSuccess": enyo.bind( this, this.doChange, "new" ) } );
+			enyo.application.transactionCategoryManager.createCategory( newGeneral, newSpecific, { "onSuccess": enyo.bind( this, this.doChange, "new" ) } );
 		} else if( this.mode === "category" ) {
 
-			this.$['manager'].editCategory( this.id, newGeneral, newSpecific, this.general, this.specific, { "onSuccess": enyo.bind( this, this.doChange, "category" ) } );
+			enyo.application.transactionCategoryManager.editCategory( this.id, newGeneral, newSpecific, this.general, this.specific, { "onSuccess": enyo.bind( this, this.doChange, "category" ) } );
 		} else if( this.mode === "group" ) {
 
-			this.$['manager'].editGroup( newGeneral, this.general, { "onSuccess": enyo.bind( this, this.doChange, "group" ) } );
+			enyo.application.transactionCategoryManager.editGroup( newGeneral, this.general, { "onSuccess": enyo.bind( this, this.doChange, "group" ) } );
 		} else {
 
 			this.close();

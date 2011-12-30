@@ -11,6 +11,8 @@ enyo.kind({
 	name: "Checkbook.transactionCategory.manager",
 	kind: enyo.Component,
 
+	trsnCategories: null,
+
 	/** @private */
 	constructor: function() {
 
@@ -27,9 +29,11 @@ enyo.kind({
 	/**
 	 * Returns (via onSuccess callback) result object of transaction categories.
 	 *
-	 * @param	options (object)	key: value object of onSuccess callback and onError callback
-	 * @param	limit	limits the number of results
-	 * @param	offset	offset of result set to return
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 * @param	{int}	[limit]	limits the number of results
+	 * @param	{int}	[offset]	offset of result set to return
 	 *
 	 * @return	results	(array of objects) via onSuccess
 	 */
@@ -42,11 +46,89 @@ enyo.kind({
 	},
 
 	/**
+	 * Builds this.trsnCategories object
+	 *
+	 * @param	{string}	general	general category to fetch children
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 * @param	{int}	[limit]	limits the number of results
+	 * @param	{int}	[offset]	offset of result set to return
+	 */
+	load: function( currentCategory, options, limit, offset ) {
+
+		if( !offset || !limit || !currentCategory ) {
+			//Start fresh
+
+			if( this.trsnCategories ) {
+
+				this.log( "transaction categories already built" );
+
+				callbackFn();
+				return;
+			}
+
+			offset = 0;
+			limit = 100;
+			currentCategory = null;
+
+			this.trsnCategories = {
+					mainCats: [],
+					subCats: {}
+				};
+		}
+
+		this.fetchCategories(
+				{
+					"onSuccess": enyo.bind( this, this._loadHandler, currentCategory, options, limit, offset ),
+					"onError": options['onError']
+				},
+				limit,
+				offset
+			);
+	},
+
+	/** @private */
+	_loadHandler: function( currentCategory, options, limit, offset, results ) {
+
+		for( var i = 0; i < results.length; i++ ) {
+
+			var row = results[i];
+
+			if( !currentCategory || currentCategory !== row['genCat'] ) {
+
+				if( row['genCat'] !== "" ) {
+
+					this.trsnCategories['mainCats'].push( { "content": row['genCat'], "parent": "" } );
+				}
+
+				currentCategory = row['genCat'];
+				this.trsnCategories['subCats'][currentCategory] = [];
+			}
+
+			this.trsnCategories['subCats'][currentCategory].push( { "content": row['specCat'], "parent": currentCategory } );
+		}
+
+		if( results.length < limit ) {
+
+			if( enyo.isFunction( options['onSuccess'] ) ) {
+
+				options['onSuccess']();
+			}
+		} else {
+
+			this.load( currentCategory, options, ( offset + limit ), limit );
+		}
+	},
+
+	/**
 	 * Creates a new transaction category
 	 *
-	 * @param	general	new category group
-	 * @param	specific	new category item
-	 * @param	options (object)	key: value object of onSuccess callback and onError callback
+	 * @param	{string}	general	new category group
+	 * @param	{string}	specific	new category item
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
 	 */
 	createCategory: function( general, specific, options ) {
 
@@ -68,12 +150,14 @@ enyo.kind({
 	/**
 	 * Updates transaction category; changes a single item
 	 *
-	 * @param	id	id to update
-	 * @param	general	updated category group
-	 * @param	specific	updated category item
-	 * @param	oldGeneral	original category group
-	 * @param	oldSpecific	original category item
-	 * @param	options (object)	key: value object of onSuccess callback and onError callback
+	 * @param	{int}	id	id to update
+	 * @param	{string}	general	updated category group
+	 * @param	{string}	specific	updated category item
+	 * @param	{string}	oldGeneral	original category group
+	 * @param	{string}	oldSpecific	original category item
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
 	 *
 	 * @return	results	(array of objects) via onSuccess
 	 */
@@ -111,9 +195,11 @@ enyo.kind({
 	/**
 	 * Updates a transaction category group; changes many items
 	 *
-	 * @param	general	updated category group
-	 * @param	oldGeneral	original category group
-	 * @param	options (object)	key: value object of onSuccess callback and onError callback
+	 * @param	{string}	general	updated category group
+	 * @param	{string}	oldGeneral	original category group
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
 	 *
 	 * @return	results	(array of objects) via onSuccess
 	 */
@@ -151,8 +237,10 @@ enyo.kind({
 	/**
 	 * Deletes a single category
 	 *
-	 * @param	id	id to update
-	 * @param	options (object)	key: value object of onSuccess callback and onError callback
+	 * @param	{int}	id	id to update
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
 	 *
 	 * @return	results	(array of objects) via onSuccess
 	 */
@@ -175,10 +263,10 @@ enyo.kind({
 
 	categoriesChanged: function() {
 
-		if( trsnCategories ) {
+		if( this.trsnCategories ) {
 
 			this.log( "wiping transaction categories" );
-			trsnCategories = null;
+			this.trsnCategories = null;
 		}
 	}
 });

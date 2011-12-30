@@ -30,6 +30,11 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 			what's needed for this to happen, how does a service even work?
 	service will run in background of app and will need to notify app of changes
 
+Budget System
+=============
+* base on phone version
+* remove narrow column version?
+
 Misc
 ====
 * update autocomplete -- https://gist.github.com/1150840

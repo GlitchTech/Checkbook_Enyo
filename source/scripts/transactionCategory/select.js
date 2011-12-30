@@ -1,7 +1,5 @@
 /* Copyright 2011 and forward GlitchTech Science. All rights reserved. */
 
-var trsnCategories;
-
 /**
  * Checkbook.transactionCategory.select ( Popup )
  *
@@ -23,6 +21,10 @@ enyo.kind({
 	selected: {},
 
 	doCategorySelect: null,//Callback function; not an event, extra data may be attached
+
+	published: {
+		entireGeneral: false
+	},
 
 	components: [
 		{
@@ -100,81 +102,27 @@ enyo.kind({
 					]
 				}
 			]
-		},
-
-		{
-			name: "manager",
-			kind: "Checkbook.transactionCategory.manager"
 		}
 	],
 
-	loadCategories: function( callbackFn, currCat, offset, limit ) {
+	//Go directly to the source for general & specific categories to avoid callbacks
 
-		if( !offset || !limit || !currCat ) {
-			//Start fresh
+	loadCategories: function( callbackFn ) {
 
-			if( trsnCategories ) {
+		if( enyo.application.transactionCategoryManager.trsnCategories ) {
 
-				this.log( "transaction categories already built" );
+			this.log( "transaction categories already built" );
 
-				callbackFn();
-				return;
-			}
-
-			offset = 0;
-			limit = 100;
-			currCat = null;
-
-			trsnCategories = {
-					mainCats: [],
-					subCats: {}
-				};
-		}
-
-		this.$['manager'].fetchCategories(
-				{
-					"onSuccess": enyo.bind( this, this.loadCategoriesHandler, callbackFn, currCat, offset, limit )
-				},
-				limit,
-				offset
-			);
-	},
-
-	loadCategoriesHandler: function( callbackFn, currCat, offset, limit, results ) {
-
-		for( var i = 0; i < results.length; i++ ) {
-
-			var row = results[i];
-
-			if( !currCat || currCat !== row['genCat'] ) {
-
-				if( row['genCat'] !== "" ) {
-
-					trsnCategories['mainCats'].push( { "content": row['genCat'], "parent": "" } );
-				}
-
-				currCat = row['genCat'];
-				trsnCategories['subCats'][currCat] = [];
-			}
-
-			trsnCategories['subCats'][currCat].push( { "content": row['specCat'], "parent": currCat } );
-		}
-
-		if( results.length < limit ) {
-
-			if( enyo.isFunction( callbackFn ) ) {
-
-				callbackFn();
-			}
+			callbackFn();
 		} else {
 
-			this.loadCategories( callbackFn, currCat, ( offset + limit ), limit );
+			enyo.application.transactionCategoryManager.load( null, { "onSuccess": callbackFn }, null, null );
 		}
 	},
 
 	getCategoryChoice: function( callbackFn, subheader ) {
 
-		this.dispCategories = enyo.clone( trsnCategories['mainCats'] );
+		this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['mainCats'] );
 		//this.dispCategories.push( { "content": $L( "Add/Edit Categories" ), "parent": "|-add_edit-|" } );
 
 		this.openAtCenter();
@@ -229,7 +177,7 @@ enyo.kind({
 			} else if( row['parent'] === "|-go_back-|" ) {
 				//Parent <- Child
 
-				this.dispCategories = enyo.clone( trsnCategories['mainCats'] );
+				this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['mainCats'] );
 				//this.dispCategories.push( { "content": $L( "Add/Edit Categories" ), "parent": "|-add_edit-|" } );
 
 				this.$['categoryList'].punt();
@@ -238,14 +186,20 @@ enyo.kind({
 
 				if( enyo.isFunction( this.doCategorySelect ) ) {
 
-					this.doCategorySelect( { "category": row['parent'], "category2": row['content'] } );
+					this.doCategorySelect( { "category": row['parent'], "category2": ( row['content'] === $L( "All Sub Categories" ) ? "%" : row['content'] ) } );
 				}
 
 				this.close();
 			} else {
 				//Parent -> Child
 
-				this.dispCategories = enyo.clone( trsnCategories['subCats'][row['content']] );
+				this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['subCats'][row['content']] );
+
+				if( this.entireGeneral ) {
+
+					this.dispCategories.unshift( { "content": $L( "All Sub Categories" ), "parent": row['content'] } );
+				}
+
 				this.dispCategories.push( { "content": $L( "Back" ), "parent": "|-go_back-|" } );
 
 				this.$['categoryList'].punt();

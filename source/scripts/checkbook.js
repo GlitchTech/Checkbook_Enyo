@@ -193,6 +193,7 @@ enyo.kind({
 		enyo.application.criticalError = this.$['criticalError'];
 		enyo.application.accountManager = new Checkbook.accounts.manager();
 		enyo.application.transactionManager = new Checkbook.transactions.manager();
+		enyo.application.transactionCategoryManager = new Checkbook.transactionCategory.manager();
 
 		//Metrix Work
 		enyo.application.Metrix.postDeviceData();

@@ -78,7 +78,6 @@ enyo.kind({
 
 			reorderable: true,
 
-			onclick: "tapped",
 			onReorder: "reorder",
 			onSetupRow: "setupRow",
 			onAcquirePage: "acquirePage",
@@ -90,7 +89,8 @@ enyo.kind({
 					style: "padding-right: 7px;",
 
 					tapHighlight: true,
-					//onclick: "itemTapped",
+					onclick: "tapped",
+					onConfirm: "deleted",
 
 					components: [
 						{
@@ -221,6 +221,11 @@ enyo.kind({
 		{
 			name: "manager",
 			kind: "Checkbook.budget.manager"
+		},
+
+		{
+			name: "modify",
+			kind: "Checkbook.budget.modify"
 		}
 	],
 
@@ -271,7 +276,7 @@ enyo.kind({
 
 	buildHeader: function( result ) {
 
-//result['budgetCount']: 1
+		//result['budgetCount']
 
 		var progress = result['spent'] / result['spending_limit'] * 100;
 
@@ -318,6 +323,11 @@ enyo.kind({
 	dateChanged: function( inSender, date) {
 
 		this.log( date.toString() );
+
+		this.budgets = [];
+		this.$['entries'].punt();
+
+		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeader ) } );
 	},
 
 	toggleEdit: function() {
@@ -336,16 +346,29 @@ enyo.kind({
 	addBudget: function() {
 
 		this.log( "launch modify tool" );
+		this.$['modify'].openAtCenter();
 	},
 
 	/** List Control **/
 
-	tapped: function( inSender, inEvent ) {
+	reorder: function( inSender, newIndex, oldIndex ) {
 
 		console.log( arguments );
 	},
 
-	reorder: function( inSender, newIndex, oldIndex ) {
+	tapped: function( inSender, inEvent, rowIndex ) {
+
+		if( this.$['editModeToggle'].getDepressed() ) {
+
+			console.log( "edit row " + rowIndex );
+			this.$['modify'].openAtCenter();
+		} else {
+
+			console.log( "view row " + rowIndex );
+		}
+	},
+
+	deleted: function( inSender, rowIndex ) {
 
 		console.log( arguments );
 	},

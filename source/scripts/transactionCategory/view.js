@@ -109,11 +109,6 @@ enyo.kind({
 			kind: "Checkbook.transactionCategory.modify",
 
 			onChange: "modificationComplete",
-		},
-
-		{
-			name: "manager",
-			kind: "Checkbook.transactionCategory.manager"
 		}
 	],
 
@@ -163,7 +158,7 @@ enyo.kind({
 
 		if( !this.categories[index] ) {
 
-			this.$['manager'].fetchCategories(
+			enyo.application.transactionCategoryManager.fetchCategories(
 					{
 						"onSuccess": enyo.bind( this, this.dataResponse, index )
 					},
@@ -217,7 +212,7 @@ enyo.kind({
 
 		if( row ) {
 
-			this.$['manager'].deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, "delete" ) } );
+			enyo.application.transactionCategoryManager.deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, "delete" ) } );
 		}
 	},
 

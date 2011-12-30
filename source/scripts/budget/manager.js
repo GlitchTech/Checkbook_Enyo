@@ -148,7 +148,7 @@ enyo.kind({
 	 */
 	fetchBudget: function( budgetId, startTime, endTime, options ) {
 
-		return;
+		return "NYI";
 
 		var qryTransaction = new GTS.databaseQuery(
 				{

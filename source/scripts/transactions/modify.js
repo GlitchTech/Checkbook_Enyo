@@ -105,7 +105,7 @@ enyo.kind( {
 											flex: 1,
 											components: [
 												{
-													content: "Amount",
+													content: $L( "Amount" ),
 													className: "enyo-label"
 												}
 											]
@@ -205,7 +205,7 @@ enyo.kind( {
 											className: "enyo-text-ellipsis",
 											flex: 1
 										}, {
-											content: "Category",
+											content: $L( "Category" ),
 											className: "enyo-listselector-label enyo-label"
 										}, {
 											className: "enyo-listselector-arrow"
@@ -221,11 +221,11 @@ enyo.kind( {
 								{
 									name: "checkNum",
 									kind: enyo.Input,
-									hint: "# (optional)",
+									hint: $L( "# (optional)" ),
 									onfocus: "autofillCheckNo",
 									components: [
 										{
-											content: "Check Number",
+											content: $L( "Check Number" ),
 											className: "enyo-label"
 										}
 									]
