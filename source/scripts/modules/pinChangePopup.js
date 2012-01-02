@@ -51,7 +51,7 @@ enyo.kind({
 				}
 			]
 		}, {
-			content: $L( "Your pin may only ontain numeric characters. (0-9)" ),
+			content: $L( "Your pin may only contain numeric characters. (0-9)" ),
 			className: "smaller"
 		}, {
 			kind: enyo.RowGroup,

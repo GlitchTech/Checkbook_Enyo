@@ -126,6 +126,7 @@ enyo.kind( {
 								}, {
 									name: "accountDisplay",
 									kind: "GTS.ListSelectorBar",
+									localizeOptions: false,
 									labelText: "Display",
 									onChange: "accountDisplayUpdateLabel",
 									value: 0,
