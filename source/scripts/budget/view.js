@@ -225,9 +225,26 @@ enyo.kind({
 
 		{
 			name: "modify",
-			kind: "Checkbook.budget.modify"
+			kind: "Checkbook.budget.modify",
+			onFinish: "modifyComplete"
 		}
 	],
+
+	/**
+	 * @private
+	 * @constructs
+	 */
+	constructor: function() {
+
+		// Run our default construction
+		this.inherited( arguments );
+
+		// Setup listing of bound methods
+		// Cuts down on memory usage spikes, since bind() creates a new method every call, but causes more initial memory to be allocated
+		this.bound = {
+			modifyComplete: enyo.bind( this, this.modifyComplete )
+		};
+	},
 
 	rendered: function() {
 
@@ -235,7 +252,7 @@ enyo.kind({
 
 		this.budgets = [];
 
-		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeader ) } );
+		this.buildHeader();
 	},
 
 	colorize: function( inSender, progress ) {
@@ -274,7 +291,12 @@ enyo.kind({
 
 	/** Header Controls **/
 
-	buildHeader: function( result ) {
+	buildHeader: function() {
+
+		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
+	},
+
+	buildHeaderHandler: function( result ) {
 
 		//result['budgetCount']
 
@@ -345,7 +367,6 @@ enyo.kind({
 
 	addBudget: function() {
 
-		this.log( "launch modify tool" );
 		this.$['modify'].openAtCenter();
 	},
 
@@ -358,19 +379,36 @@ enyo.kind({
 
 	tapped: function( inSender, inEvent, rowIndex ) {
 
-		if( this.$['editModeToggle'].getDepressed() ) {
+		var row = this.budgets[rowIndex];
 
-			console.log( "edit row " + rowIndex );
-			this.$['modify'].openAtCenter();
-		} else {
+		if( row ) {
 
-			console.log( "view row " + rowIndex );
+			if( this.$['editModeToggle'].getDepressed() ) {
+
+				this.$['modify'].openAtCenter( row );
+			} else {
+
+				console.log( "view row " + rowIndex );
+			}
 		}
 	},
 
 	deleted: function( inSender, rowIndex ) {
 
-		console.log( arguments );
+		var row = this.budgets[rowIndex];
+
+		if( row ) {
+
+			this.$['manager'].deleteTransaction( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
+		}
+	},
+
+	modifyComplete: function() {
+
+		this.budgets = [];
+		this.$['entries'].punt();
+
+		this.buildHeader();
 	},
 
 	setupRow: function( inSender, inIndex ) {

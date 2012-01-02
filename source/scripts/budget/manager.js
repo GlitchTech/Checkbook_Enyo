@@ -34,8 +34,32 @@ enyo.kind({
 
 		enyo.application.gts_db.query(
 				enyo.application.gts_db.getInsert( "budgets", data ),
-				options
+				{
+					"onSuccess": enyo.bind( this, this.createBudgetFollower, options )
+				}
 			);
+	},
+
+	/** @private */
+	createBudgetFollower: function( options ) {
+
+		console.log( arguments );
+
+		var id = enyo.application.gts_db.lastInsertID();
+
+		if( id ) {
+
+			enyo.application.gts_db.query(
+					new GTS.databaseQuery( {
+							sql: "UPDATE budgets SET budgetOrder = ( SELECT IFNULL( MAX( budgetOrder ) + 1, 0 ) FROM budgets LIMIT 1 ) WHERE budgetId = ?;",
+							values: [ id ]
+						}),
+					options
+				);
+		} else if( enyo.isFunction( options['onSuccess'] ) ) {
+
+			options['onSuccess']();
+		}
 	},
 
 	/**
@@ -51,7 +75,7 @@ enyo.kind({
 	 *
 	 * @returns boolean	via onSuccess
 	 */
-	createBudget: function( data, options ) {
+	updateBudget: function( data, options ) {
 
 		enyo.application.gts_db.query(
 				enyo.application.gts_db.getUpdate( "budgets", data, { "budgetId": data['budgetId'] } ),
@@ -82,7 +106,7 @@ enyo.kind({
 			);
 	},
 
-	//reorder budget function
+	//reorder budget function NYI
 
 	/**
 	 * @public
@@ -217,8 +241,6 @@ enyo.kind({
 				options
 			);
 	}
-
-	//list function (with limit, offset)
 /*
 "table": "budgets",
 "columns": [

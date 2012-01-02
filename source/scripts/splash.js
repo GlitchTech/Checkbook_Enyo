@@ -139,7 +139,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 21;
+		this.versionCheck = 22;
 
 		if( currVersion === this.versionCheck ) {
 
@@ -731,6 +731,15 @@ enyo.kind({
 
 				this.versionCheck = 20;
 			case 20:
+				//Add secondary trans cat to budget system
+				querySet.push( "ALTER TABLE budgets ADD COLUMN category2 TEXT;" );
+
+				//Repeat System (ignore cleared, checknum)
+				querySet.push( "DROP TABLE IF EXISTS repeats;" );
+				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurance TEXT, last_sync TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER );" );
+
+				this.versionCheck = 21;
+			case 21:
 				querySet.push(
 						enyo.application.gts_db.getUpdate(
 								"acctTrsnSortOptn",
@@ -743,17 +752,11 @@ enyo.kind({
 							)
 					);
 
-				//Add secondary trans cat to budget system
-				querySet.push( "ALTER TABLE budgets ADD COLUMN category2 TEXT;" );
-
-				this.versionCheck = 21;
-			case 21:
+				this.versionCheck = 22;
+			case 22:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER );" );
-
-				//this.versionCheck = 22;
-			case 22:
 				//this.versionCheck = 23;
 		}
 

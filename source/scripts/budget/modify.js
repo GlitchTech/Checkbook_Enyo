@@ -59,7 +59,6 @@ enyo.kind({
 					components: [
 						{
 							name: "category",
-							json: "",
 
 							className: "enyo-text-ellipsis",
 							flex: 1
@@ -86,7 +85,7 @@ enyo.kind({
 							flex: 1,
 							components: [
 								{
-									content: $L( "Amount" ),
+									content: $L( "Spending Limit" ),
 									className: "enyo-label"
 								}
 							]
@@ -142,7 +141,7 @@ enyo.kind({
 					caption: $L( "Save" ),
 
 					flex: 3,
-					onclick: "",
+					onclick: "save",
 
 					className: "enyo-button-affirmative"
 				}, {
@@ -163,7 +162,7 @@ enyo.kind({
 			name: "errorMessage",
 			kind: "GTS.system_error",
 
-			errTitle: $L( "Export Error" ),
+			errTitle: $L( "Budget Error" ),
 			errMessage: "",
 			errMessage2: "" ,
 			onFinish: "closeErrorMessage"
@@ -173,6 +172,11 @@ enyo.kind({
 			name: "categorySystem",
 			kind: "Checkbook.transactionCategory.select",
 			entireGeneral: true
+		},
+
+		{
+			name: "manager",
+			kind: "Checkbook.budget.manager"
 		}
 	],
 
@@ -181,20 +185,98 @@ enyo.kind({
 		this.$['categorySystem'].loadCategories( enyo.bind( this, this.inherited, arguments ) );
 	},
 
-	openAtCenter: function() {
+	openAtCenter: function( inBudget ) {
 
 		this.inherited( arguments );
 
-		this.log( arguments );
+		this.budgetObj = enyo.mixin(
+				{
+					budgetId: null,
+					category: $L( "Uncategorized" ),
+					category2: "%",
+					spending_limit: "",
+					span: 1,
+					rollOver: 0
+				},
+				inBudget
+			);
+
+		this.renderCategory();
+		this.renderAmount();
 	},
+
+	/** Category Control **/
 
 	categoryTapped: function() {
 
 		this.$['categorySystem'].getCategoryChoice( enyo.bind( this, this.categorySelected ), null );
 	},
 
-	categorySelected: function() {
+	categorySelected: function( obj ) {
 
-		this.log( arguments );
+		enyo.mixin( this.budgetObj, obj );
+		this.renderCategory();
+	},
+
+	renderCategory: function() {
+
+		if( this.budgetObj['category2'] === "%" ) {
+
+			this.$['category'].setContent( this.budgetObj['category'] );
+		} else {
+
+			this.$['category'].setContent( this.budgetObj['category2'] );
+		}
+	},
+
+	/** Amount Control **/
+
+	amountKeyPress: function( inSender, inEvent ) {
+
+		if( !( inEvent.keyCode >= 48 && inEvent.keyCode <= 57 ) && inEvent.keyCode !== 46 ) {
+
+			inEvent.preventDefault();
+		}
+	},
+
+	renderAmount: function() {
+
+		this.$['amount'].setValue( this.budgetObj['spending_limit'] );
+	},
+
+	/** Save System **/
+
+	save: function() {
+
+		this.budgetObj['spending_limit'] = ( Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
+
+		if( this.budgetObj['spending_limit'] === 0 ) {
+
+			this.$['errorMessage'].load( null, "Spending limit must not be zero.", null, null );
+			return;
+		}
+
+		delete this.budgetObj['spent'];
+
+		if( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 ) {
+
+			this.$['manager'].updateBudget( this.budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
+		} else {
+
+			delete this.budgetObj['budgetId'];
+
+			this.$['manager'].createBudget( this.budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
+		}
+	},
+
+	saveComplete: function() {
+
+		this.close();
+		this.doFinish();
+	},
+
+	closeErrorMessage: function() {
+
+		this.$['errorMessage'].close();
 	}
 });
