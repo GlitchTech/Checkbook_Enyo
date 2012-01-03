@@ -106,8 +106,6 @@ enyo.kind({
 			);
 	},
 
-	//reorder budget function NYI
-
 	/**
 	 * @public
 	 *
@@ -172,15 +170,18 @@ enyo.kind({
 	 */
 	fetchBudget: function( budgetId, startTime, endTime, options ) {
 
-		return "NYI";
-
 		var qryTransaction = new GTS.databaseQuery(
 				{
-					"sql": "" +
-						" LIMIT 1;",
-					"values": [
-						budgetId
-					]
+						"sql": "SELECT *, IFNULL( ( SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( date AS INTEGER ) >= ? AND CAST( date AS INTEGER ) <= ? ), 0 ) AS spent" +
+							" FROM budgets" +
+							" WHERE budgetId = ?" +
+							" ORDER BY " + budgetSortOptions[sort]['query'] +
+							" LIMIT 1;",
+						"values": [
+							startTime,
+							endTime,
+							budgetId
+						]
 				}
 			);
 

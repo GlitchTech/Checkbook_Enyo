@@ -2,7 +2,6 @@
 
 enyo.kind({
 
-	//Use % as category2 for all category items, matches everything!
 	name: "Checkbook.budget.modify",
 	kind: enyo.ModalDialog,
 
@@ -126,7 +125,6 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					name: "",
 					kind: enyo.Button,
 					caption: $L( "Cancel" ),
 
@@ -136,7 +134,18 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					name: "",
+					name: "delete",
+					kind: enyo.Button,
+					caption: $L( "Delete" ),
+
+					flex: 3,
+					onclick: "delete",
+
+					className: "enyo-button-negative"
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
 					kind: enyo.Button,
 					caption: $L( "Save" ),
 
@@ -183,6 +192,8 @@ enyo.kind({
 	rendered: function() {
 
 		this.$['categorySystem'].loadCategories( enyo.bind( this, this.inherited, arguments ) );
+
+		this.saveComplete = enyo.bind( this, this.saveComplete );
 	},
 
 	openAtCenter: function( inBudget ) {
@@ -200,6 +211,8 @@ enyo.kind({
 				},
 				inBudget
 			);
+
+		this.$['delete'].setShowing( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 );
 
 		this.renderCategory();
 		this.renderAmount();
@@ -260,12 +273,23 @@ enyo.kind({
 
 		if( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 ) {
 
-			this.$['manager'].updateBudget( this.budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
+			this.$['manager'].updateBudget( this.budgetObj, { "onSuccess": this.saveComplete } );
 		} else {
 
 			delete this.budgetObj['budgetId'];
 
-			this.$['manager'].createBudget( this.budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
+			this.$['manager'].createBudget( this.budgetObj, { "onSuccess": this.saveComplete } );
+		}
+	},
+
+	delete: function() {
+
+		if( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 ) {
+
+			this.$['manager'].deleteTransaction( this.budgetObj['budgetId'], { "onSuccess": this.saveComplete } );
+		} else {
+
+			this.saveComplete();
 		}
 	},
 

@@ -253,8 +253,6 @@ enyo.kind({
 					"source/images/warning-icon.png"
 				);
 		}
-
-		this.openBudget();//TEMP - REMOVE
 	},
 
 	/** PopUp Controls **/

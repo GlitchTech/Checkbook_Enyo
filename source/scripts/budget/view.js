@@ -372,9 +372,36 @@ enyo.kind({
 
 	/** List Control **/
 
-	reorder: function( inSender, newIndex, oldIndex ) {
+	reorder: function( inSender, toIndex, fromIndex ) {
 
-		console.log( arguments );
+		if( toIndex != fromIndex && toIndex > -1 && toIndex < this.budgets.length ) {
+
+			var temp = this.budgets.splice( fromIndex, 1 );
+			var bottom = this.budgets.slice( toIndex );
+
+			this.budgets.length = toIndex;
+			this.budgets.push.apply( this.budgets, temp );
+			this.budgets.push.apply( this.budgets, bottom );
+
+			var qryOrder = [];
+
+			for( var i = 0; i < this.budgets.length; i++ ) {
+
+				qryOrder.push(
+						enyo.application.gts_db.getUpdate(
+								"budgets",
+								{ "budgetOrder": i },
+								{ "budgetId": this.budgets[i]['budgetId'] }
+							)
+					);
+			}
+
+			enyo.application.gts_db.queries( qryOrder );
+
+			this.sort = 0;
+
+			this.$['entries'].refresh();
+		}
 	},
 
 	tapped: function( inSender, inEvent, rowIndex ) {
