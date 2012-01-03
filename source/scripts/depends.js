@@ -18,5 +18,6 @@ enyo.depends(
 	"accountCategory/",
 	"transactions/",
 	"transactionCategory/",
-	"budget/"
+	"budget/",
+	"search/"
 );

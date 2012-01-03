@@ -16,10 +16,7 @@ enyo.kind({
 	},
 
 	events: {
-		onFinish: "",
-		onModify: "",
-		onChanged: "",
-		onDelete: ""
+		onSearchView: ""
 	},
 
 	components: [
@@ -415,7 +412,17 @@ enyo.kind({
 				this.$['modify'].openAtCenter( row );
 			} else {
 
-				console.log( "view row " + rowIndex );
+				enyo.nextTick(
+						this,
+						this.doSearchView,
+						null,
+						{
+							category: row['category'],
+							category2: row['category2'],
+							dateStart: this.$['date'].getValue().setStartOfMonth(),
+							dateEnd: this.$['date'].getValue().setEndOfMonth()
+						}
+					);
 			}
 		}
 	},

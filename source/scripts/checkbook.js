@@ -37,7 +37,8 @@ enyo.kind({
 							onChanged: "accountBalanceChanged",
 							onBalanceViewChanged: "tranasactionBalanceViewChanged",
 
-							onBudgetView: "openBudget"
+							onBudgetView: "openBudget",
+							onSearchView: "openSearch"
 						}
 					]
 				}
@@ -68,7 +69,6 @@ enyo.kind({
 					caption: $L( "Finance Information" ),
 					components: [
 						{
-							showing: false,
 							caption: $L( "Search" ),
 							onclick: "openSearch"
 						}, {
@@ -361,7 +361,8 @@ enyo.kind({
 		var budgetArgs = enyo.mixin(
 				{
 					name: "budget",
-					kind: "Checkbook.budget.view"
+					kind: "Checkbook.budget.view",
+					onSearchView: "openSearch"
 				},
 				args
 			);
@@ -369,6 +370,26 @@ enyo.kind({
 		this.showPanePopup(
 				null,
 				budgetArgs
+			);
+	},
+
+	/** Checkbook.search.* **/
+
+	openSearch: function( inSender, inEvent, args ) {
+
+		console.log( arguments );
+
+		var searchArgs = enyo.mixin(
+				{
+					name: "search",
+					kind: "Checkbook.search.view"
+				},
+				args
+			);
+
+		this.showPanePopup(
+				null,
+				searchArgs
 			);
 	},
 

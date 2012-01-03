@@ -14,6 +14,7 @@ enyo.kind( {
 		onBalanceViewChanged: "",//Balance mode changed
 
 		onBudgetView: "",//Show Budget Pane
+		onSearchView: "",//Show Search Pane
 	},
 
 	components: [
@@ -251,8 +252,6 @@ enyo.kind( {
 					caption: "Budget",
 					menuParent: "searchMenu"
 				}, {
-					showing: false,
-
 					caption: "Search",
 					menuParent: "searchMenu"
 				}
@@ -527,7 +526,14 @@ enyo.kind( {
 				this.log( "Report system go" );
 			} else if( inSender.value.toLowerCase() === "search" ) {
 
-				this.log( "Search system go" );
+				enyo.nextTick(
+						this,
+						this.doSearchView,
+						null,
+						{
+							acctId: this.account['acctId']
+						}
+					);
 			}
 		} else if( inSender.menuParent.toLowerCase() === "transactonmenu" ) {
 			//Transction Menu
