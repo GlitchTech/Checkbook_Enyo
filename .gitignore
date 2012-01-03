@@ -1,2 +1,11 @@
 #ignore thumbs.db
 */thumbs.db
+
+#ignore Metrix
+source/libraries/Metrix/*
+
+#ignore PrototypeJS
+source/libraries/prototype.js
+
+#ignore others
+source/libraries/ReorderableVirtualList.js

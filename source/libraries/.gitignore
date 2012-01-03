@@ -1,8 +1,0 @@
-#ignore Metrix
-Metrix/*
-
-#ignore PrototypeJS
-prototype.js
-
-#ignore others
-ReorderableVirtualList.js
