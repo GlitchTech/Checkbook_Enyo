@@ -379,12 +379,10 @@ enyo.kind({
 
 	openSearch: function( inSender, inEvent, args ) {
 
-		console.log( arguments );
-
 		var searchArgs = enyo.mixin(
 				{
 					name: "search",
-					kind: "Checkbook.transactions.search"
+					kind: "Checkbook.search.pane"
 				},
 				args
 			);

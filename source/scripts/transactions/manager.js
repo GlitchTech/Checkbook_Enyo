@@ -705,6 +705,65 @@ enyo.kind({
 	/**
 	 * @public
 	 *
+	 * Returns (via onSuccess callback) result object of transactions.
+	 *
+	 * @param {string}	whereStrings	string of where queries
+	 * @param {string[]}	whereArgs	argument array for whereStrings
+	 * @param {string}	sortQry	How to sort results
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 * @param {int}	[limit]	limits the number of transactions
+	 * @param {int}	[offset]	offset of result set to return
+	 *
+	 * @returns {object[]}
+	 */
+	searchTransactions: function( whereStrings, whereArgs, sortQry, options, limit, offset ) {
+
+		var qryTransactions = new GTS.databaseQuery(
+				{
+					"sql": "SELECT" +
+						//Expense table data
+						" DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account," +
+						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum," +
+
+						//Category information (JSON if split)
+						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
+							" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
+						" ELSE main.category END ) AS category," +
+						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
+							" 'PARSE_CATEGORY'" +
+						" ELSE main.category2 END ) AS category2" +
+
+						" FROM transactions main" +
+						" WHERE " + whereStrings +
+						" ORDER BY " + sortQry
+					,
+					"values": enyo.clone( whereArgs )
+				}
+			);
+
+		if( limit ) {
+
+			qryTransactions['sql'] += " LIMIT ?"
+			qryTransactions['values'].push( limit );
+		}
+
+		if( offset ) {
+
+			qryTransactions['sql'] += " OFFSET ?"
+			qryTransactions['values'].push( offset );
+		}
+
+		enyo.application.gts_db.query(
+				qryTransactions,
+				options
+			);
+	},
+
+	/**
+	 * @public
+	 *
 	 * Builds transactionSortOptions
 	 *
 	 * @param {object}	[options]	Callback functions
