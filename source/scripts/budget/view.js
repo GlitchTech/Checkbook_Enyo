@@ -16,6 +16,7 @@ enyo.kind({
 	},
 
 	events: {
+		onFinish: "",
 		onSearchView: ""
 	},
 

@@ -66,6 +66,7 @@ enyo.kind( {
 								{
 									name: "freezeAccount",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Freeze Internal Transactions",
 									subText: "Prevent any changes from being made only in this account.",
 									onText: "Yes",
@@ -73,6 +74,7 @@ enyo.kind( {
 								}, {
 									name: "pinLock",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "PIN Lock",
 									onText: "Yes",
 									offText: "No",
@@ -166,6 +168,7 @@ enyo.kind( {
 								}, {
 									name: "defaultAccount",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Default Account",
 									subText: "This account is launched automatically on start.",
 									onText: "Yes",
@@ -173,6 +176,7 @@ enyo.kind( {
 								}, {
 									name: "showTransTime",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Show Transaction Time",
 									subText: "Displays the transaction time in addition to the date.",
 									onText: "Yes",
@@ -181,6 +185,7 @@ enyo.kind( {
 								}, {
 									name: "showRunningBal",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Show Running Balance",
 									subText: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
 									onText: "Yes",
@@ -188,6 +193,7 @@ enyo.kind( {
 								}, {
 									name: "hideTransNotes",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Hide Transaction Notes",
 									subText: "Transaction notes will be hidden.",
 									onText: "Yes",
@@ -204,6 +210,7 @@ enyo.kind( {
 								{
 									name: "descriptionMultilineMode",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Description Multiline Mode",
 									subText: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
 									onText: "Yes",
@@ -211,6 +218,7 @@ enyo.kind( {
 								}, {
 									name: "autoComplete",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Use Auto-Complete",
 									subText: "Displays suggestions for transaction descriptions based on your history.",
 									onText: "Yes",
@@ -219,6 +227,7 @@ enyo.kind( {
 								}, {
 									name: "atmMode",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Use ATM Mode",
 									subText: "Amount field will be automatically formatted as you type.",
 									onText: "Yes",
@@ -256,6 +265,7 @@ enyo.kind( {
 								}, {
 									name: "checkNumber",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Add Check Number Field",
 									subText: "Add a field to record the check number in the add/edit transaction screen.",
 									onText: "Yes",
@@ -263,6 +273,7 @@ enyo.kind( {
 								}, {
 									name: "expenseCategories",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Add Expense Categories",
 									subText: "Add a field to record the expense category in the add/edit transaction screen.",
 									onText: "Yes",
@@ -273,6 +284,7 @@ enyo.kind( {
 
 									name: "hideCleared",
 									kind: "GTS.ToggleBar",
+									style: "padding-left: 0;",
 									mainText: "Hide cleared transactions",
 									subText: "",
 									onText: "Yes",

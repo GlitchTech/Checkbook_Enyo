@@ -57,7 +57,6 @@ enyo.kind({
 								{
 									name: "pinLock",
 									kind: "GTS.ToggleBar",
-									className: "force-left-padding",
 
 									mainText: "PIN Lock",
 
@@ -108,7 +107,6 @@ enyo.kind({
 								{
 									name: "transPreview",
 									kind: "GTS.ToggleBar",
-									className: "force-left-padding",
 
 									mainText: "Transaction Preview",
 									subText: "Show preview of a tapped transaction.",
@@ -120,7 +118,6 @@ enyo.kind({
 								}, {
 									name: "updateNotice",
 									kind: "GTS.ToggleBar",
-									className: "force-left-padding",
 
 									mainText: "System Notifications",
 									subText: "Recieve in-app notices of updates and other important news.",
@@ -132,7 +129,6 @@ enyo.kind({
 								}, {
 									name: "errorReporting",
 									kind: "GTS.ToggleBar",
-									className: "force-left-padding",
 
 									mainText: "Error Reporting",
 									subText: "Report errors to GlitchTech Science",
@@ -144,7 +140,6 @@ enyo.kind({
 								}, {
 									name: "dispColor",
 									kind: "GTS.ToggleBar",
-									className: "force-left-padding",
 
 									mainText: "Account Colors",
 									subText: "Add color in some areas based on account categories.",

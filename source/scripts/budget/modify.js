@@ -107,6 +107,7 @@ enyo.kind({
 
 					name: "rollover",
 					kind: "GTS.ToggleBar",
+					style: "padding-left: 0;",
 					mainText: "Rollover",
 					subText: "",
 

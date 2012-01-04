@@ -259,8 +259,11 @@ enyo.kind({
 
 		var queries = [
 				enyo.application.gts_db.getDelete( "transactions", { "account": acctId } ),
+				enyo.application.gts_db.getDelete( "repeats", { "rep_acctId": acctId } ),
+
 				enyo.application.gts_db.getUpdate( "transactions", { "linkedAccount": "", "linkedRecord": "" }, { "linkedAccount": acctId } ),
-				enyo.application.gts_db.getDelete( "repeats", { "acctId": acctId, "linkedAcctId": acctId } ),
+				enyo.application.gts_db.getUpdate( "repeats", { "rep_linkedAcctId": "" }, { "rep_linkedAcctId": acctId } ),
+
 				enyo.application.gts_db.getDelete( "accounts", { "acctId": acctId } )
 			];
 
@@ -856,7 +859,7 @@ enyo.kind({
 			opts['onError'] = userOpts['onError'];
 		} else {
 
-			opts['onError'] = null;
+			delete opts['onError'];
 		}
 
 		return opts;

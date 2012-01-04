@@ -253,6 +253,8 @@ enyo.kind({
 					"source/images/warning-icon.png"
 				);
 		}
+
+		this.openSearch();//TEMP REMOVE LATER
 	},
 
 	/** PopUp Controls **/
@@ -373,7 +375,7 @@ enyo.kind({
 			);
 	},
 
-	/** Checkbook.search.* **/
+	/** Checkbook.search **/
 
 	openSearch: function( inSender, inEvent, args ) {
 
@@ -382,7 +384,7 @@ enyo.kind({
 		var searchArgs = enyo.mixin(
 				{
 					name: "search",
-					kind: "Checkbook.search.view"
+					kind: "Checkbook.transactions.search"
 				},
 				args
 			);
