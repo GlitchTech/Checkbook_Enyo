@@ -135,7 +135,7 @@ enyo.kind({
 					value: 2,
 					choices: [
 						{
-							caption: "Pending and Cleared",
+							caption: "All",
 							value: 2
 						}, {
 							caption: "Cleared Only",
@@ -225,34 +225,32 @@ enyo.kind({
 		//Start Date
 		if( dateStart ) {
 
-			dateStart = new Date( dateStart );
+			var startValue = new Date( dateStart );
 
-			if( Date.validDate( dateStart ) ) {
+			if( Date.validDate( startValue ) ) {
 
-				dateStart.setHours( 0, 0, 0, 0 );//Start of day
-				this.$['fromDate'].setValue( dateStart );
+				startValue.setHours( 0, 0, 0, 0 );//Start of day
+				this.$['fromDate'].setValue( startValue );
 				this.$['fromToggle'].setValue( true );
 			} else {
 
 				this.$['fromToggle'].setValue( false );
-				dateStart = null;
 			}
 		}
 
 		//End Date
 		if( dateEnd ) {
 
-			dateEnd = new Date( dateEnd );
+			var endValue = new Date( dateEnd );
 
-			if( Date.validDate( dateEnd ) ) {
+			if( Date.validDate( endValue ) ) {
 
-				dateEnd.setHours( 23, 59, 59, 999 );//End of day
-				this.$['toDate'].setValue( dateEnd );
+				endValue.setHours( 23, 59, 59, 999 );//End of day
+				this.$['toDate'].setValue( endValue );
 				this.$['toToggle'].setValue( true );
 			} else {
 
 				this.$['toToggle'].setValue( false );
-				dateEnd = null;
 			}
 		}
 
@@ -426,18 +424,24 @@ enyo.kind({
 
 		//Acount Filters
 		var acctS = [];
+		var acctA = [];
 
 		for( var i = 0; i < this.acctList['items'].length; i++ ) {
 
 			if( this.acctList['items'][i]['selectStatus'] ) {
 
 				acctS.push( "account = ?" );
-				whereArgs.push( this.acctList['items'][i]['acctId'] );
+				acctA.push( this.acctList['items'][i]['acctId'] );
 			}
 		}
 
-		whereStrs += " AND ( " + acctS.join( " OR " ) + " )";
-		//whereArgs.push( accts.length > 0 ? accts.join( ", " ) : "-1" );
+		this.log( acctS.length, acctA.length );
+
+		if( acctS.length > 0 && acctA.length > 0 ) {
+
+			whereStrs += " AND ( " + acctS.join( " OR " ) + " )";
+			whereArgs = whereArgs.concat( acctA );
+		}
 
 		//Date Filters
 		if( this.$['fromToggle'].getValue() ) {
@@ -496,12 +500,9 @@ enyo.kind({
 			}
 		}
 
-		if( whereStrs.length > 0 ) {
+		//remove first AND/OR
+		whereStrs = whereStrs.replace( /^ (or|and) (.*)/i, "$2" );
 
-			//remove first AND/OR
-			whereStrs = whereStrs.replace( /^ (or|and) (.*)/i, "$2" );
-
-			this.doSearch( whereStrs, whereArgs );
-		}
+		this.doSearch( whereStrs, whereArgs );
 	}
 });

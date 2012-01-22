@@ -385,7 +385,9 @@ enyo.kind( {
 
 		this.transactions = [];
 		this.$['entries'].punt();
+
 		this.initialScroll();
+		this.balanceChangedHandler();
 	},
 
 	initialScroll: function() {
@@ -1156,19 +1158,19 @@ enyo.kind( {
 		for( var i = 0; i < results.length; i++ ) {
 /*
 results = {
-	account: 8
-	amount: -6.38
-	category: ""
-	category2: ""
-	checkNum: ""
-	cleared: 1
-	date: "1229314560000.0"
-	desc: "Gas"
-	itemId: 2552
-	linkedAccount: null
-	linkedRecord: null
-	note: ""
-	repeatId: null
+	account
+	amount
+	category
+	category2
+	checkNum
+	cleared
+	date
+	desc
+	itemId
+	linkedAccount
+	linkedRecord
+	note
+	repeatId
 }
 */
 			if( this.account['sort'] === 0 || this.account['sort'] === 6 || this.account['sort'] === 8 ) {

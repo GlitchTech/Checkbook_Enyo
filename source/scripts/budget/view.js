@@ -340,9 +340,7 @@ enyo.kind({
 		this.dateChanged( null, date );
 	},
 
-	dateChanged: function( inSender, date) {
-
-		this.log( date.toString() );
+	dateChanged: function( inSender, date ) {
 
 		this.budgets = [];
 		this.$['entries'].punt();
@@ -421,7 +419,8 @@ enyo.kind({
 							category: row['category'],
 							category2: row['category2'],
 							dateStart: this.$['date'].getValue().setStartOfMonth(),
-							dateEnd: this.$['date'].getValue().setEndOfMonth()
+							dateEnd: this.$['date'].getValue().setEndOfMonth(),
+							onFinish: enyo.bind( this, this.dateChanged, null, this.$['date'].getValue() )
 						}
 					);
 			}

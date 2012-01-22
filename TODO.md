@@ -30,20 +30,19 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 			- what's needed for this to happen, how does a service even work?
 	- service will run in background of app and will need to notify app of changes
 
-Budget System
-=============
-* test on device, adjust style as needed
-
 Search System
 =============
-* Refine
+* Total count - style more like email count
+* Odd error when opened; looks to be caused by enyo.BasicScroller in serach\results.js
 
 Misc
 ====
 * update autocomplete -- https://gist.github.com/1150840
 * trsn cat edit (from in modify transaction) error, line 202 area (edit line removed for now)
 * adapt for phones - https://developer.palm.com/distribution/viewtopic.php?f=109&t=18757&hilit=enyo+pre
-* GTS/DateTimePicker.js - odd functionality with more than one
+* App Menu
+	- Bug Report form (google forms & {kind: "IFrame", url: "www.example.com"}?)
+	- Leave a Review
 
 =========
 Completed
@@ -52,3 +51,4 @@ Completed
 * Import date format issue fix
 * Budget system added
 * Globalization
+* Bug with custom date time picker

@@ -84,6 +84,10 @@ enyo.kind({
 					caption: $L( "Show Notices" ),
 					onclick: "forceShowMetrix"
 				}, {
+					showing: false,
+					caption: $L( "Report Bug" ),
+					onclick: "errorReport"
+				}, {
 					caption: $L( "About" ),
 					onclick: "showPopup",
 					popup: "about"
@@ -253,8 +257,6 @@ enyo.kind({
 					"source/images/warning-icon.png"
 				);
 		}
-
-		this.openSearch();//TEMP REMOVE LATER
 	},
 
 	/** PopUp Controls **/
@@ -300,6 +302,11 @@ enyo.kind({
 	forceShowMetrix: function() {
 
 		enyo.application.Metrix.checkBulletinBoard( 1, true );
+	},
+
+	errorReport: function() {
+
+		console.log( "ERROR REPORT SYSTEM GO" );
 	},
 
 	/** PopUp Pane Controls **/
@@ -380,17 +387,40 @@ enyo.kind({
 	openSearch: function( inSender, inEvent, args ) {
 
 		var searchArgs = enyo.mixin(
+				args,
 				{
 					name: "search",
-					kind: "Checkbook.search.pane"
-				},
-				args
+					kind: "Checkbook.search.pane",
+					onModify: "showPanePopup",
+					onFinish: enyo.bind(
+							this,
+							this.closeSearch
+						),
+					doNext: ( args && enyo.isFunction( args['onFinish'] ) ? args['onFinish'] : null )
+				}
 			);
 
 		this.showPanePopup(
 				null,
 				searchArgs
 			);
+	},
+
+	closeSearch: function( inSender, changesMade ) {
+
+		if( changesMade === true ) {
+			//Update account and transaction information
+
+			enyo.application.accountManager.updateAccountModTime();
+			this.$['accounts'].renderAccountList();
+			this.$['transactions'].reloadSystem();
+		}
+
+		//If a prevous callback existed, call it with any arguments applied
+		if( enyo.isFunction( inSender.doNext ) ) {
+
+			inSender.doNext( changesMade );
+		}
 	},
 
 	/** Checkbook.preferences && ( Checkbook.preferences --> Checkbook.accounts.view ) Communication Channels **/

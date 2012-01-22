@@ -9,16 +9,23 @@ enyo.kind({
 	flex: 1,
 
 	where: {
-		strings: null,
-		arguments: null
+		strings: "",
+		arguments: []
 	},
 
+	resultCount: 0,
 	transactions: [],
 	sort: null,
 	sortQry: null,
 
+	published: {
+		changesMade: false
+	},
+
 	events: {
-		onLoading: ""
+		onModify: "",//Add/Edit Transaction
+		onResultsFound: "",//Update header with result count
+		onLoading: ""//Loading icon
 	},
 
 	components: [
@@ -38,9 +45,8 @@ enyo.kind({
 					kind: enyo.SwipeableItem,
 
 					tapHighlight: true,
-					onclick: "",
-					onmousehold: "",
-					onConfirm: "",
+					onclick: "transactionTapped",
+					onConfirm: "transactionDeleted",
 
 					style: "padding-right: 20px; padding-left: 30px;",
 
@@ -62,6 +68,22 @@ enyo.kind({
 										}, {
 											name: "time",
 											className: "date smaller"
+										}, {
+											layoutKind: enyo.HFlexLayout,
+											align: "center",
+											pack: "start",
+											components: [
+												{
+													name: "accountIcon",
+													kind: enyo.Image,
+													src: "",
+													style: "height: 16px; width: 16px; margin: 0 5px 0 0;"
+												}, {
+													name: "account",
+													className: "small",
+													content: "Account Name"
+												}
+											]
 										}
 									]
 								}, {
@@ -69,8 +91,8 @@ enyo.kind({
 									style: "text-align: right;"
 								}, {
 									name: "cleared",
-									onclick: "transactionCleared",
 									kind: enyo.CheckBox,
+									onclick: "transactionCleared",
 
 									style: "margin-left: 15px;"
 								}
@@ -113,6 +135,14 @@ enyo.kind({
 		{
 			name: "sortMenu",
 			kind: "Checkbook.selectedMenu"
+		},
+
+		{
+			name: "viewSingle",
+			kind: "Checkbook.transactions.viewSingle",
+			onClear: "vsCleared",
+			onEdit: "vsEdit",
+			onDelete: "transactionDeleted"
 		}
 	],
 
@@ -136,10 +166,32 @@ enyo.kind({
 				arguments: qryArgs
 			};
 
+		this.doLoading( true );
+
+		if( this.where['strings'].length <= 0 ) {
+
+			this.fetchSearchCountHandler();
+		} else {
+
+			enyo.application.transactionManager.searchTransactionsCount(
+					this.where['strings'],
+					this.where['arguments'],
+					this.sortQry,
+					{
+						"onSuccess": enyo.bind( this, this.fetchSearchCountHandler )
+					}
+				);
+		}
+	},
+
+	fetchSearchCountHandler: function( result ) {
+
+		this.resultCount = ( ( result && result['searchCount'] ) ? result['searchCount'] : 0 );
+
+		this.doResultsFound( this.resultCount );
+
 		this.transactions = [];
 		this.$['entries'].punt();
-
-		this.doLoading( true );
 	},
 
 	/** Footer Control **/
@@ -178,6 +230,163 @@ enyo.kind({
 		}
 	},
 
+	/** List Item Control **/
+
+	transactionTapped: function( inSender, inEvent, rowIndex ) {
+
+		this.log();
+
+		if( enyo.application.checkbookPrefs['transPreview'] === 1 ) {
+			//preview mode
+
+			this.$['viewSingle'].setIndex( rowIndex );
+			this.$['viewSingle'].setTransaction( this.transactions[rowIndex] );
+			this.$['viewSingle'].setAccount( { acctId: this.transactions[rowIndex]['account'] } );
+			this.$['viewSingle'].openAtCenter();
+		} else {
+
+			this.vsEdit( null, rowIndex );
+		}
+	},
+
+	transactionCleared: function( inSender, inEvent ) {
+
+		this.vsCleared( null, inEvent.rowIndex );
+
+		//Don't tap the row
+		inEvent.stopPropagation();
+	},
+
+	vsCleared: function( inSender, rowIndex ) {
+
+		if( this.transactions[rowIndex]['frozen'] === 1 ) {
+
+			this.$['entries'].refresh();
+			return;
+		}
+
+		this.changesMade = true;
+		this.doLoading( true );
+
+		this.transactions[rowIndex]['cleared'] = this.transactions[rowIndex]['cleared'] === 1 ? 0 : 1;
+
+		enyo.application.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], ( this.transactions[rowIndex]['cleared'] === 1 ) );
+
+		this.$['entries'].refresh();
+
+		return this.transactions[rowIndex]['cleared'];
+	},
+
+	vsEdit: function( inSender, rowIndex ) {
+
+		var row = this.transactions[rowIndex];
+
+		if( row && row['frozen'] !== 1 ) {
+			//account not frozen
+
+			var acctObj = {
+					acctId: row['account']
+				};
+
+			var trsnObj = {
+					account: row['account'],
+					amount: row['amount'],
+					category: row['category'],
+					category2: row['category2'],
+					checkNum: row['checkNum'],
+					cleared: row['cleared'],
+					date: row['date'],
+					desc: row['desc'],
+					itemId: row['itemId'],
+					linkedAccount: row['linkedAccount'],
+					linkedRecord: row['linkedRecord'],
+					note: row['note'],
+					repeatId: row['repeatId']
+				};
+
+			enyo.nextTick(
+					this,
+					this.doModify,
+					{
+						name: "editTransaction",
+						kind: "Checkbook.transactions.modify",
+						accountObj: acctObj,
+						trsnObj: trsnObj,
+						transactionType: "",
+						onFinish: enyo.bind( this, this.modifyTransactionComplete, rowIndex )
+					}
+				);
+		}
+	},
+
+	modifyTransactionComplete: function( rowIndex, inSender, action, accounts, actionStatus ) {
+
+		if( action === 1 && actionStatus === true ) {
+			//edited
+
+			this.changesMade = true;
+
+			this.transactions = [];
+			this.$['entries'].punt();
+/*
+			enyo.nextTick(
+					this,
+					this.scrollTo,
+					rowIndex
+				);*/
+		} else if( action === 2 ) {
+			//deleted
+
+			this.changesMade = true;
+
+			this.transactions = [];
+			this.$['entries'].punt();
+
+			this.resultCount--;
+			this.doResultsFound( this.resultCount );
+/*
+			enyo.nextTick(
+					this,
+					this.scrollTo,
+					( rowIndex - 1 )
+				);*/
+		}
+	},
+
+	transactionDeleted: function( inSender, rowIndex ) {
+
+		if( this.transactions[rowIndex]['frozen'] === 1 ) {
+
+			this.$['entries'].refresh();
+			return;
+		}
+
+		this.changesMade = true;
+		this.doLoading( true );
+
+		//update database;
+		enyo.application.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+
+		//update list
+		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
+		this.$['entries'].refresh();
+
+		this.resultCount--;
+		this.doResultsFound( this.resultCount );
+
+		//Fetch row to fix dynamic fetch
+		enyo.application.transactionManager.searchTransactions(
+				this.where['strings'],
+				this.where['arguments'],
+				this.sortQry,
+				{
+					"onSuccess": enyo.bind( this, this.acquirePageHandler, this.transactions.length )
+				},
+				1,//Limit
+				this.transactions.length//Offset
+			);
+	},
+
 	/** List Control **/
 
 	setupRow: function( inSender, inIndex ) {
@@ -194,9 +403,15 @@ enyo.kind({
 
 			//Date
 			var dateObj = new Date( parseInt( row['date'] ) );
-			this.$['time'].setContent( dateObj.format( { date: 'long', time: 'short' } ) );
+			this.$['time'].setContent( dateObj.format( { date: 'long', time: ( row['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
-			this.$.swipeableItem.addRemoveClass( "futureTransaction", ( row['date'] > Date.parse( new Date() ) ) );
+			var today = new Date();
+			if( row['showTransTime'] !== 1 ) {
+
+				today.setHours( 23, 59, 59, 999 );
+			}
+
+			this.$.swipeableItem.addRemoveClass( "futureTransaction", ( row['date'] > Date.parse( today ) ) );
 
 			//Balance Display
 			this.$['amount'].setContent( formatAmount( row['amount'] ) );
@@ -208,15 +423,26 @@ enyo.kind({
 			//Cleared
 			this.$['cleared'].setChecked( row['cleared'] === 1 );
 
+			//Account
+			this.$['accountIcon'].setSrc( "source/images/" + row['acctCategoryIcon'] );
+			this.$['account'].setContent( row['acctName'] );
+
 			//Categories
 			//Handle split transactions
-			this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( row['category'], row['category2'] ) );
+			if( row['enableCategories'] === 1 ) {
+
+				this.$['category'].setShowing( true );
+				this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( row['category'], row['category2'] ) );
+			} else {
+
+				this.$['category'].setShowing( false );
+			}
 
 			//Check Number
-			this.$['checkNum'].setContent( ( row['checkNum'] && row['checkNum'] !== "" ) ? ( "Check #" + row['checkNum'] ) : "" );
+			this.$['checkNum'].setContent( ( row['checkField'] === 1 && row['checkNum'] && row['checkNum'] !== "" ) ? ( "Check #" + row['checkNum'] ) : "" );
 
 			//Notes
-			this.$['note'].setContent( row['note'] );
+			this.$['note'].setContent( ( row['hideNotes'] === 1 ? "" : row['note'] ) );
 
 			//Row Icons
 			var transferCheck = ( row['linkedRecord'] && !isNaN( row['linkedRecord'] ) && row['linkedRecord'] != "" );
@@ -231,6 +457,13 @@ enyo.kind({
 	},
 
 	acquirePage: function( inSender, inPage ) {
+
+		if( this.where['strings'].length <= 0 ) {
+
+			this.transactions = [];
+			this.doLoading( false );
+			return;
+		}
 
 		var index = inPage * inSender.getPageSize();
 
@@ -255,23 +488,6 @@ enyo.kind({
 	acquirePageHandler: function( offset, results ) {
 
 		for( var i = 0; i < results.length; i++ ) {
-/*
-results = {
-	account: 8
-	amount: -6.38
-	category: ""
-	category2: ""
-	checkNum: ""
-	cleared: 1
-	date: "1229314560000.0"
-	desc: "Gas"
-	itemId: 2552
-	linkedAccount: null
-	linkedRecord: null
-	note: ""
-	repeatId: null
-}
-*/
 
 			this.transactions[offset + i] = enyo.mixin(
 					{
@@ -286,7 +502,10 @@ results = {
 			this.transactions[offset + i]['note'] = this.transactions[offset + i]['note'].dirtyString();
 		}
 
-		this.$['entries'].refresh();
+		if( this.$['entries'] ) {
+
+			this.$['entries'].refresh();
+		}
 
 		this.doLoading( false );
 	},

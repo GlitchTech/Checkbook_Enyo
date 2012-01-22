@@ -135,6 +135,7 @@ enyo.kind( {
 											kind: enyo.RowItem,
 											content: "Repeat"
 										}, {
+											name: "categoryHolder",
 											kind: enyo.RowItem,
 											layoutKind: enyo.HFlexLayout,
 											align: "center",
@@ -255,6 +256,42 @@ enyo.kind( {
 
 	openAtCenter: function() {
 
+		if( !this.account['acctId'] ) {
+
+			this.inherited( arguments );
+			this.close();
+			return;
+		}
+
+		//Check this.account properties
+		var count = 0;
+		for( var k in this.account ) {
+
+			if( this.account.hasOwnProperty( k ) ) {
+
+				count++;
+			}
+		}
+
+		var finishRender = enyo.bind( this, this.inherited, arguments );
+
+		if( count <= 5 ) {
+
+			enyo.application.accountManager.fetchAccount( this.account['acctId'], { "onSuccess": enyo.bind( this, this.loadAccount, finishRender ) } );
+		} else {
+
+			this.renderDisplay( finishRender );
+		}
+	},
+
+	loadAccount: function( finishRender, result ) {
+
+		this.account = result;
+		this.renderDisplay( finishRender );
+	},
+
+	renderDisplay: function( finishRender ) {
+
 		if( this.account['frozen'] === 1 ) {
 
 			this.$['btnEdit'].setShowing( false );
@@ -310,14 +347,16 @@ enyo.kind( {
 		var dateObj = new Date( parseInt( this.transaction['date'] ) );
 		this.$['time'].setContent( dateObj.format( { date: 'long', time: ( this.account['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
+		this.log( this.account['enableCategories'] );
+
 		//Categories
 		if( this.account['enableCategories'] === 1 ) {
 
-			this.$['category'].setShowing( true );
+			this.$['categoryHolder'].setShowing( true );
 			this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( this.transaction['category'], this.transaction['category2'] ) );
 		} else {
 
-			this.$['category'].setShowing( false );
+			this.$['categoryHolder'].setShowing( false );
 		}
 
 		//Check Number
@@ -345,7 +384,7 @@ enyo.kind( {
 		}
 
 		//Show once content is updated
-		this.inherited( arguments );
+		finishRender();
 	},
 
 	renderFromAccount: function( acct ) {

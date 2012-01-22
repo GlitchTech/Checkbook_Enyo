@@ -705,7 +705,7 @@ enyo.kind({
 	/**
 	 * @public
 	 *
-	 * Returns (via onSuccess callback) result object of transactions.
+	 * Returns (via onSuccess callback) result object of found transactions.
 	 *
 	 * @param {string}	whereStrings	string of where queries
 	 * @param {string[]}	whereArgs	argument array for whereStrings
@@ -727,6 +727,16 @@ enyo.kind({
 						" DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account," +
 						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum," +
 
+						//Account information
+						" ( SELECT accts.acctName FROM accounts accts WHERE accts.acctId = main.account ) AS acctName," +
+						" ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) AS acctCategory," +
+						"IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) ), 'icon_2.png' ) AS acctCategoryIcon, " +
+						" ( SELECT accts.showTransTime FROM accounts accts WHERE accts.acctId = main.account ) AS showTransTime," +
+						" ( SELECT accts.enableCategories FROM accounts accts WHERE accts.acctId = main.account ) AS enableCategories," +
+						" ( SELECT accts.checkField FROM accounts accts WHERE accts.acctId = main.account ) AS checkField," +
+						" ( SELECT accts.hideNotes FROM accounts accts WHERE accts.acctId = main.account ) AS hideNotes," +
+						" ( SELECT accts.frozen FROM accounts accts WHERE accts.acctId = main.account ) AS frozen," +
+
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
 							" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
@@ -736,6 +746,7 @@ enyo.kind({
 						" ELSE main.category2 END ) AS category2" +
 
 						" FROM transactions main" +
+
 						" WHERE " + whereStrings +
 						" ORDER BY " + sortQry
 					,
@@ -758,6 +769,48 @@ enyo.kind({
 		enyo.application.gts_db.query(
 				qryTransactions,
 				options
+			);
+	},
+
+	/**
+	 * @public
+	 *
+	 * Returns (via onSuccess callback) result object of count of found transactions.
+	 *
+	 * @param {string}	whereStrings	string of where queries
+	 * @param {string[]}	whereArgs	argument array for whereStrings
+	 * @param {string}	sortQry	How to sort results
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 *
+	 * @returns {object[]}
+	 */
+	searchTransactionsCount: function( whereStrings, whereArgs, sortQry, options ) {
+
+		var qryTransactions = new GTS.databaseQuery(
+				{
+					"sql": "SELECT COUNT( DISTINCT main.itemId ) AS searchCount" +
+						" FROM transactions main" +
+						" WHERE " + whereStrings
+					,
+					"values": enyo.clone( whereArgs )
+				}
+			);
+
+		enyo.application.gts_db.query(
+				qryTransactions,
+				{
+					"onSuccess": function( results ) {
+
+						// Call the onSuccess with result
+						if( enyo.isFunction( options['onSuccess'] ) ) {
+
+							options['onSuccess']( results[0] );
+						}
+					},
+					"onError": options['onError']
+				}
 			);
 	},
 

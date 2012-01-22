@@ -3,13 +3,13 @@ Checkbook HD
 
 Customer Support
 ----------------
-Email Address: glitchtechscience@gmail.com
 Website: http://forums.webosnation.com/glitchtech-science/
+Email: glitchtechscience@gmail.com
 
 Company Info
 ------------
 Website: http://glitchtechscience.com/
-Marketing Email: glitchtechscience@gmail.com
+Email: glitchtechscience@gmail.com
 
 Description
 -----------

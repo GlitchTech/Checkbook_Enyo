@@ -427,6 +427,31 @@ enyo.kind( {
 			this.$['linkedAccount'].$['listName'].setDisabled( true );
 		}
 
+		//Check this.accountObj properties
+		var count = 0;
+		for( var k in this.accountObj ) {
+
+			if( this.accountObj.hasOwnProperty( k ) ) {
+
+				count++;
+			}
+		}
+
+		if( count <= 5 ) {
+
+			enyo.application.accountManager.fetchAccount( this.accountObj['acctId'], { "onSuccess": enyo.bind( this, this.initialAccountLoadHandler ) } );
+		} else {
+
+			this.$['categorySystem'].loadCategories( enyo.bind( this, this.loadTransactionData ) );
+		}
+	},
+
+	initialAccountLoadHandler: function( result ) {
+
+		this.$['account'].removeClass( this.accountObj['acctCategoryColor'] );
+
+		this.accountObj = result;
+
 		this.$['categorySystem'].loadCategories( enyo.bind( this, this.loadTransactionData ) );
 	},
 

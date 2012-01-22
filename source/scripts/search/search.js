@@ -16,6 +16,7 @@ enyo.kind({
 	},
 
 	events: {
+		onModify: "",
 		onFinish: ""
 	},
 
@@ -42,7 +43,12 @@ enyo.kind({
 				}, {
 					content: $L( "Search System" ),
 					className: "bigger",
+					flex: 1,
 					style: "margin-top: -6px;"
+				}, {
+					name: "resultCount",
+					className: "enyo-button enyo-button-dark",
+					showing: false
 				}
 			]
 		}, {
@@ -55,12 +61,14 @@ enyo.kind({
 					flex: 1,
 
 					onSearch: "searchTransactions",
-					onFinish: "doFinish"
+					onFinish: "closeSearch"
 				}, {
 					name: "results",
 					kind: "Checkbook.search.results",
-					flex: 3,
+					flex: 2,
 
+					onModify: "modifyTransaction",
+					onResultsFound: "resultCount",
 					onLoading: "loadingDisplay"
 				}
 			]
@@ -79,9 +87,25 @@ enyo.kind({
 		this.$['results'].search( qryStrs, qryArgs );
 	},
 
+	resultCount: function( inSender, count ) {
+
+		this.$['resultCount'].setShowing( true );
+		this.$['resultCount'].setContent( count );
+	},
+
 	loadingDisplay: function( inSender, status ) {
 
 		this.$['loadingSpinner'].setShowing( status );
 		this.$['systemIcon'].setShowing( !status );
+	},
+
+	modifyTransaction: function( inSender, args ) {
+
+		this.doModify( args );
+	},
+
+	closeSearch: function() {
+
+		this.doFinish( this.$['results'].getChangesMade() );
 	}
 });
