@@ -1,6 +1,8 @@
 Checkbook HD
 ============
 
+https://bitbucket.org/GlitchTechScience/checkbook_enyo/
+
 Customer Support
 ----------------
 Website: http://forums.webosnation.com/glitchtech-science/
