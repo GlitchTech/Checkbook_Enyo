@@ -24,9 +24,11 @@ enyo.kind({
 							name: "accounts",
 							kind: "Checkbook.accounts.view",
 							flex: 1,
+
 							onModify: "showPanePopup",
 							onChanged: "accoutChanged",
 							onDelete: "accoutDeleted",
+
 							onView: "updateTransactionsView"
 						}, {
 							name: "transactions",
@@ -109,14 +111,6 @@ enyo.kind({
 			name: "splash",
 			kind: "Checkbook.splash",
 			onFinish: "splashFinisher"
-/*		},
-
-		{
-			kind: enyo.ApplicationEvents,
-			onApplicationRelaunch: "appRelaunched",
-			onWindowActivated: "windowActivated",
-			onWindowDeactivated: "windowDeactivated",
-			onUnload: "unloaded"*/
 		},
 
 		{
@@ -132,10 +126,25 @@ enyo.kind({
 		{
 			name: "security",
 			kind: "Checkbook.login"
+		},
+
+		{
+			kind: enyo.ApplicationEvents,
+			onBack: "goBack"
 		}
 	],
 
 	paneStack: [],
+
+	/** Application Events **/
+
+	backHandler: function( inSender, inEvent ) {
+
+		//this.$.slidingPane.back( inEvent );
+		//
+		inEvent.stopPropagation();
+		return -1;
+	},
 
 	/** Splash Controls **/
 
@@ -194,6 +203,8 @@ enyo.kind({
 		this.$['mainPane'].setShowing( true );
 		this.$['appMenu'].setAutomatic( true );
 
+		enyo.application.tabletMode = ( window.screen.availWidth > 480 );
+
 		enyo.application.criticalError = this.$['criticalError'];
 		enyo.application.accountManager = new Checkbook.accounts.manager();
 		enyo.application.transactionManager = new Checkbook.transactions.manager();
@@ -216,9 +227,9 @@ enyo.kind({
 	loadCheckbookStage3: function( result ) {
 
 		if( result ) {
-			//System security
 
 			if( result['acctLocked'] === 1 ) {
+				//System security
 
 				enyo.application.security.authUser(
 						result['acctName'] + " " + $L( "PIN Code" ),
@@ -231,6 +242,10 @@ enyo.kind({
 
 				this.updateTransactionsView( null, result );
 			}
+		} else if( !enyo.application.tabletMode ) {
+			//show only account window
+
+			this.$['mainPane'].selectViewByName( "accounts" );
 		}
 
 		this.$['accounts'].renderAccountList();
@@ -466,6 +481,11 @@ enyo.kind({
 	updateTransactionsView: function( inSender, account ) {
 
 		this.$['transactions'].changeAccount( account );
+
+		if( !enyo.application.tabletMode ) {
+
+			this.$['mainPane'].selectViewByName( "transactions" );
+		}
 	},
 
 	accoutChanged: function( inSender, result ) {

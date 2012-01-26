@@ -14,8 +14,11 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 	- page to collect all requests
 	- follow logic of database.js to parse through data
 	- modify all data objects to include userid token
+	- Eventual addition of using web portal
+		- Require already active account
 
 # Device Side:
+	- System for registring & logging in; update prefs table to add system
 	- Sync queue table (splash.js 733)
 	- First in. First out.
 	- Action: add, edit, del
@@ -29,6 +32,11 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 		- should service run when Checkbook is closed?
 			- what's needed for this to happen, how does a service even work?
 	- service will run in background of app and will need to notify app of changes
+
+Phone Mode
+==========
+
+Needs to be tested on an actual device to see behaviour. Work on optimizing list loading (ie only when in view).
 
 =========
 Completed

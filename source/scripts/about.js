@@ -41,10 +41,22 @@ enyo.kind({
 		},
 
 		{
-			kind: enyo.HtmlContent,
-			className: "small",
+			kind: enyo.HFlexBox,
+
+			align: "center",
+			pack: "left",
 			style: "margin-bottom: 10px;",
-			content: "<p>Thanks for using Checkbook on your webOS device.</p>"
+
+			components: [
+				{
+					className: "small",
+					content: "Thank you for using Checkbook powered by"
+				}, {
+					kind: enyo.Image,
+					src: "source/images/enyo-logo.png",
+					style: "background-color: black; border-radius: 5px; margin: 5px 0px 0px 5px; padding: 1px;"
+				}
+			]
 		},
 
 		{
