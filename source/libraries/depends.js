@@ -7,5 +7,5 @@ enyo.depends(
 
 	"ReorderableVirtualList.js",
 
-	"GTS/"
+	"gts/"
 );
