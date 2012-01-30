@@ -1,4 +1,4 @@
-/* Copyright 2011 and forward GlitchTech Science. All rights reserved. */
+/* Copyright © 2011, GlitchTech Science */
 
 //Convert to popup
 	//See how email does it & retains connection to main app

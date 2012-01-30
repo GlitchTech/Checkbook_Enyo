@@ -1,4 +1,4 @@
-/* Copyright 2011 and forward GlitchTech Science. All rights reserved. */
+/* Copyright © 2011, GlitchTech Science */
 
 /**
  * Checkbook.transactionCategory.autocomplete ( Popup )

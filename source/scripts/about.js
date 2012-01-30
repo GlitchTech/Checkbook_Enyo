@@ -1,4 +1,4 @@
-/* Copyright 2011 and forward GlitchTech Science. All rights reserved. */
+/* Copyright © 2011, GlitchTech Science */
 
 enyo.kind({
 
@@ -50,7 +50,7 @@ enyo.kind({
 			components: [
 				{
 					className: "small",
-					content: "Thank you for using Checkbook powered by"
+					content: "Thank you for using " + enyo.fetchAppInfo()['title'] + " powered by"
 				}, {
 					kind: enyo.Image,
 					src: "source/images/enyo-logo.png",
