@@ -3,6 +3,8 @@ Checkbook HD
 
 https://bitbucket.org/GlitchTechScience/checkbook_enyo/
 
+Project uses Metrix, PrototypeJS, and ReorderableVirtualList.js. These files belong to thier owners and not to GlitchTechScience.
+
 Customer Support
 ----------------
 Website: http://forums.webosnation.com/glitchtech-science/
