@@ -1,0 +1,3 @@
+[submodule "source/libraries/gts"]
+	path = source/libraries/gts
+	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts.git

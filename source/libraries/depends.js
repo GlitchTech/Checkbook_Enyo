@@ -1,4 +1,4 @@
-/* Copyright 2009 and forward GlitchTech Science.  All rights reserved. */
+/* Copyright © 2011, GlitchTech Science */
 
 enyo.depends(
 	"Metrix/metrix.js",
@@ -10,5 +10,5 @@ enyo.depends(
 	"spinner.js",
 	"spinnerLarge.js",
 
-	"GTS/"
+	"gts/"
 );
