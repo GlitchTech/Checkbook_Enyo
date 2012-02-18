@@ -102,7 +102,7 @@ enyo.kind({
 			showing: true,
 			components: [
 				{
-					kind: enyo.SpinnerLarge,
+					kind: "xSpinnerLarge",
 					showing: true
 				}
 			]
