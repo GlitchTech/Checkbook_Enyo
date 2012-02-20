@@ -325,7 +325,7 @@ enyo.kind( {
 			showing: true,
 			components: [
 				{
-					kind: "xSpinnerLarge",
+					kind: "GTS.SpinnerLarge",
 					showing: true
 				}
 			]

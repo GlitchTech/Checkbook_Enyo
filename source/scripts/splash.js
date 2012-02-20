@@ -27,7 +27,7 @@ enyo.kind({
 					pack: "start",
 					components: [
 						{
-							kind: "xSpinner",
+							kind: "GTS.Spinner",
 							style: "margin-right: 5px;",
 							showing: true
 						}, {

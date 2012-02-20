@@ -7,8 +7,5 @@ enyo.depends(
 
 	"ReorderableVirtualList.js",
 
-	"spinner.js",
-	"spinnerLarge.js",
-
 	"gts/"
 );

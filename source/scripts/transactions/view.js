@@ -33,7 +33,7 @@ enyo.kind( {
 					showing: false,
 
 					name: "loadingSpinner",
-					kind: "xSpinner",
+					kind: "GTS.Spinner",
 					className: "img-icon",
 					style: "margin: 0px 15px 5px 0;"
 				}, {
@@ -1204,8 +1204,6 @@ results = {
 	},
 
 	loadingDisplay: function( status ) {
-
-		return;
 
 		this.$['loadingSpinner'].setShowing( status );
 		this.$['acctTypeIcon'].setShowing( !status );
