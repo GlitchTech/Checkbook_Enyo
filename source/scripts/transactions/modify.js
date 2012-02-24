@@ -9,6 +9,7 @@ enyo.kind( {
 	style: "height: 100%;",
 
 	accountList: [],
+	renderCategories: false,
 
 	published: {
 		accountObj: {},
@@ -127,6 +128,7 @@ enyo.kind( {
 							]
 						}, {
 							kind: enyo.Group,
+							caption: $L( "Date" ),
 							tapHightlight: false,
 
 							className: "dividerDrawerBlack",
@@ -184,31 +186,64 @@ enyo.kind( {
 						}, {
 							name: "categoryHolder",
 							kind: enyo.Group,
-							tapHightlight: false,
+							caption: $L( "Category" ),
 
 							style: "padding:2px;",
 
 							components: [
 								{
-									kind: enyo.Item,
-									layoutKind: enyo.HFlexLayout,
+									name: "categoryList",
+									kind: enyo.VirtualRepeater,
+									onSetupRow: "getCategoryItem",
 
-									className: "enyo-single",
-									tapHightlight: false,
-
-									onclick: "categoryTapped",
 									components: [
 										{
-											name: "category",
-											json: "",
+											kind: enyo.SwipeableItem,
+											layoutKind: enyo.HFlexLayout,
 
-											className: "enyo-text-ellipsis",
+											style: "padding-top: 10px; padding-bottom: 10px;",
+
+											onclick: "categoryTapped",//Change category
+											onConfirm: "",//Delete category item
+
+											components: [
+												{
+													name: "categoryText",
+													className: "enyo-text-ellipsis",
+
+													flex: 3
+												}, {
+													name: "categoryAmount",
+													kind: enyo.Input,
+
+													flex: 1,
+
+													hint: "0.00",
+													oldValue: "",
+
+													onclick: "categoryAmountTapped",
+													oninput: "categoryAmountContentChanged",//ATM Function
+													onkeypress: "amountKeyPress",//Key possibility filter
+												}
+											]
+										}
+									]
+								}, {
+									kind: enyo.HFlexBox,
+									components: [
+										{
+											kind: enyo.Button,
+											caption: $L( "Add Category" ),
+											className: "enyo-button-dark",
+											onclick: "categoryAddNew",
+											flex: 3
+										}, {
+											name: "fillValueButton",
+											kind: enyo.Button,
+											caption: $L( "Fill Values" ),
+											className: "enyo-button-light",
+											onclick: "categoriesFillValues",
 											flex: 1
-										}, {
-											content: $L( "Category" ),
-											className: "enyo-listselector-label enyo-label"
-										}, {
-											className: "enyo-listselector-arrow"
 										}
 									]
 								}
@@ -379,8 +414,8 @@ enyo.kind( {
 					"cleared": 0,
 					"repeatId": -1,
 					"checkNum": "",
-					"category": "Uncategorized",
-					"category2": "Other"
+					"category": $L( "Uncategorized" ),
+					"category2": $L( "Other" )
 				},
 				this.trsnObj
 			);
@@ -502,7 +537,7 @@ enyo.kind( {
 			this.trsnObj['category'] = enyo.json.parse( this.trsnObj['category'] );
 		} else {
 
-			//Old Format Category
+			//Old Format Category; retain for backwards compatibility
 			if( this.trsnObj['category2'] === '' ) {
 
 				this.trsnObj['category2'] = this.trsnObj['category'].split( "|", 2 )[1];
@@ -518,6 +553,8 @@ enyo.kind( {
 					];
 		}
 
+		this.renderCategories = true;
+
 		//Run the formatters
 		this.$['transTypeIcon'].setIcon( "source/images/menu_icons/" + this.transactionType + ".png" );
 
@@ -529,112 +566,6 @@ enyo.kind( {
 				this.$['loadingScrim'].setShowing,
 				false
 			);
-	},
-
-	/** Data Change Handlers **/
-	descKeyPress: function( inSender, inEvent ) {
-		//Prevent return when not multiLine
-
-		if( this.accountObj['transDescMultiLine'] !== 1 && inEvent.keyCode === 13 ) {
-
-			inEvent.preventDefault();
-		}
-	},
-
-	descContentChanged: function() {
-		//Autocomplete
-
-		if( this.accountObj['useAutoComplete'] === 1 ) {
-
-			this.$['autocomplete'].setSearchValue( this.$['desc'].getValue() );
-		}
-	},
-
-	descAutoSuggestMade: function( inSender, suggestTrsnObj ) {
-
-		this.trsnObj['desc'] = suggestTrsnObj['desc'];
-		this.$['desc'].setValue( this.trsnObj['desc'] );
-
-		this.trsnObj['linkedAccount'] = ( this.transactionType === "transfer" ? suggestTrsnObj['linkedAccount'] : -1 );
-		this.$['linkedAccount'].setValue( this.trsnObj['linkedAccount'] );
-
-		this.trsnObj['category'] = suggestTrsnObj['category'];
-		this.trsnObj['category2'] = suggestTrsnObj['category2'];
-		this.categoryChanged();
-
-		this.$['amount'].forceFocus();
-	},
-
-	amountTypeChanged: function( inSender, inEvent ) {
-
-		switch( this.transactionType ) {
-			case 'expense':
-				this.transactionType = 'income';
-				break;
-			case 'transfer':
-				break;
-			case 'income':
-				this.transactionType = 'expense';
-				break;
-		}
-
-		this.$['transTypeIcon'].setIcon( "source/images/menu_icons/" + this.transactionType + ".png" );
-	},
-
-	amountContentChanged: function( inSender, inEvent ) {
-		//ATM Mode
-
-		var amountStr = inSender.getValue()
-
-		if( this.accountObj['atmEntry'] === 1 ) {
-
-			amountStr = amountStr.trim();
-			var oldAmountStr = inSender.oldValue.trim();
-
-			//Save cursor position
-			var curPos = this.$['amount'].getSelection();
-
-			if( !amountStr || amountStr.length <= 0 ) {
-
-				curPos['start'] = 4;
-				curPos['end'] = 4;
-			} else if( ( oldAmountStr.length - 1 ) === amountStr.length ) {
-				//Char deleted
-
-				curPos['start']++;
-				curPos['end']++;
-			}
-
-			//Format number
-			if( amountStr == "" || amountStr == 0 ) {
-
-				amountStr = "0.00";
-			} else {
-
-				amountStr = amountStr.replace( /[^0-9]/g, "" );
-				amountStr = amountStr.replace( /^0*/, "" );
-
-				amountStr = ( parseInt( amountStr ) / 100 ).toFixed( 2 );
-			}
-
-			//Update values
-			inSender.oldValue = amountStr;
-			inSender.setValue( amountStr );
-
-			//Restore cursor position
-			inSender.setSelection( curPos );//Ignoring command when string length < 4
-		} else {
-
-			inSender.setValue( amountStr.trim().replace( /[^0-9\.]/g, "" ) );
-		}
-	},
-
-	amountKeyPress: function( inSender, inEvent ) {
-
-		if( !( inEvent.keyCode >= 48 && inEvent.keyCode <= 57 ) && inEvent.keyCode !== 46 ) {
-
-			inEvent.preventDefault();
-		}
 	},
 
 	adjustSystemViews: function() {
@@ -704,6 +635,121 @@ enyo.kind( {
 		this.$['desc'].forceFocus();
 	},
 
+	/** Data Change Handlers **/
+
+	descKeyPress: function( inSender, inEvent ) {
+		//Prevent return when not multiLine
+
+		if( this.accountObj['transDescMultiLine'] !== 1 && inEvent.keyCode === 13 ) {
+
+			inEvent.preventDefault();
+		}
+	},
+
+	/** Autocomplete Controls **/
+
+	descContentChanged: function() {
+		//Autocomplete
+
+		if( this.accountObj['useAutoComplete'] === 1 ) {
+
+			this.$['autocomplete'].setSearchValue( this.$['desc'].getValue() );
+		}
+	},
+
+	descAutoSuggestMade: function( inSender, suggestTrsnObj ) {
+
+		this.trsnObj['desc'] = suggestTrsnObj['desc'];
+		this.$['desc'].setValue( this.trsnObj['desc'] );
+
+		this.trsnObj['linkedAccount'] = ( this.transactionType === "transfer" ? suggestTrsnObj['linkedAccount'] : -1 );
+		this.$['linkedAccount'].setValue( this.trsnObj['linkedAccount'] );
+
+		this.trsnObj['category'] = suggestTrsnObj['category'];
+		this.trsnObj['category2'] = suggestTrsnObj['category2'];
+		this.categoryChanged();
+
+		this.$['amount'].forceFocus();
+	},
+
+	/** Total Amount Controls **/
+
+	amountTypeChanged: function( inSender, inEvent ) {
+
+		switch( this.transactionType ) {
+			case 'expense':
+				this.transactionType = 'income';
+				break;
+			case 'transfer':
+				break;
+			case 'income':
+				this.transactionType = 'expense';
+				break;
+		}
+
+		this.$['transTypeIcon'].setIcon( "source/images/menu_icons/" + this.transactionType + ".png" );
+	},
+
+	/** All Amount Field Controls **/
+
+	amountContentChanged: function( inSender, inEvent ) {
+		//ATM Mode
+
+		var amountStr = inSender.getValue()
+
+		if( this.accountObj['atmEntry'] === 1 ) {
+
+			amountStr = amountStr.trim();
+			var oldAmountStr = inSender.oldValue.trim();
+
+			//Save cursor position
+			var curPos = this.$['amount'].getSelection();
+
+			if( !amountStr || amountStr.length <= 0 ) {
+
+				curPos['start'] = 4;
+				curPos['end'] = 4;
+			} else if( ( oldAmountStr.length - 1 ) === amountStr.length ) {
+				//Char deleted
+
+				curPos['start']++;
+				curPos['end']++;
+			}
+
+			//Format number
+			if( amountStr == "" || amountStr == 0 ) {
+
+				amountStr = "0.00";
+			} else {
+
+				amountStr = amountStr.replace( /[^0-9]/g, "" );
+				amountStr = amountStr.replace( /^0*/, "" );
+
+				amountStr = ( parseInt( amountStr ) / 100 ).toFixed( 2 );
+			}
+
+			//Update values
+			inSender.oldValue = amountStr;
+			inSender.setValue( amountStr );
+
+			//Restore cursor position
+			inSender.setSelection( curPos );//Ignoring command when string length < 4
+		} else {
+
+			inSender.setValue( amountStr.trim().replace( /[^0-9\.]/g, "" ) );
+		}
+	},
+
+	amountKeyPress: function( inSender, inEvent ) {
+
+		if( !( inEvent.keyCode >= 48 && inEvent.keyCode <= 57 ) && inEvent.keyCode !== 46 ) {
+
+			inEvent.preventDefault();
+		}
+	},
+
+	/** Account Controls **/
+
 	accountChanged: function( inSender, newIndex, oldIndex ) {
 
 		enyo.application.accountManager.fetchAccount( this.$['account'].getValue(), { "onSuccess": enyo.bind( this, this.accountChangedFollower ) } );
@@ -719,6 +765,8 @@ enyo.kind( {
 		this.adjustSystemViews();
 		this.dateChanged();
 	},
+
+	/** Linked Account Controls **/
 
 	linkedAccountChanged: function( inSender, newAcctId, oldAcctId ) {
 
@@ -737,6 +785,8 @@ enyo.kind( {
 		}
 	},
 
+	/** Date Controls **/
+
 	toggleDateDrawer: function() {
 
 		this.$['dateArrow'].addRemoveClass( "invert", !this.$['dateDrawer'].getOpen() );
@@ -749,28 +799,104 @@ enyo.kind( {
 		this.$['dateDisplay'].setContent( this.$['date'].getValue().format( { date: 'long', time: ( this.accountObj['showTransTime'] === 1 ? 'short' : '' ) } ) );
 	},
 
-	categoryTapped: function() {
+	/** Category Controls **/
 
-		//change this to dynamic
-		var index = 0;
+	getCategoryItem: function( inSender, inIndex ) {
 
-		this.$['categorySystem'].getCategoryChoice( enyo.bind( this, this.categorySelected, index ), this.trsnObj['category'][index] );
+		if( !this.renderCategories ) {
+			//Don't build before data is ready
+
+			return;
+		}
+
+		var row = this.trsnObj['category'][inIndex];
+
+		if( row ) {
+
+			this.$['categoryText'].setContent( ( row['category'] + " >> " + row['category2'] ).dirtyString() );
+
+			if( this.trsnObj['category'].length > 1 ) {
+				//If only one category, takes up full amount
+
+				row['amount'] = Math.abs( row['amount'] ).toFixed( 2 );
+
+				if( this.accountObj['atmEntry'] == 1 ) {
+
+					this.$['categoryAmount'].setValue( deformatAmount( row['amount'] ).toFixed( 2 ) );
+					this.$['categoryAmount'].setSelectAllOnFocus( false );
+				} else {
+
+					this.$['categoryAmount'].setValue( row['amount'] );
+					this.$['categoryAmount'].setSelectAllOnFocus( true );
+				}
+
+				this.$['categoryAmount'].setShowing( true );
+				this.amountContentChanged( this.$['categoryAmount'], null );
+			} else {
+
+				this.$['categoryAmount'].setShowing( false );
+			}
+
+			return true;
+		}
+	},
+
+	categoryTapped: function( inSender, inEvent, inIndex ) {
+		//Show category selector based on current row
+
+		this.$['categorySystem'].getCategoryChoice( enyo.bind( this, this.categorySelected, inIndex ), this.trsnObj['category'][inIndex] );
+	},
+
+	categoryAmountTapped: function( inSender, inEvent ) {
+		//Don't show category selector; only focus on amount field
+
+		inEvent.stopPropagation();
+	},
+
+	categoryAmountContentChanged: function( inSender, inEvent, inValue ) {
+
+		this.amountContentChanged( inSender, inEvent, inValue );
+
+		this.trsnObj['category'][inEvent.rowIndex]['amount'] = inSender.getValue();
+	},
+
+	categoriesFillValues: function( inSender, inEvent ) {
+
+		this.log( arguments );
+
+		//Loop through all objects, and get the total
+		//If total is less than full amount
+			//divide by empty amounts and fill in
+
+		//save changes
 	},
 
 	categorySelected: function( index, catObj ) {
 
-		this.trsnObj['category'][index] = catObj;
+		enyo.mixin( this.trsnObj['category'][index], catObj );
+
+		this.categoryChanged();
+	},
+
+	categoryAddNew: function() {
+
+		this.trsnObj['category'].push( {
+				"category": $L( "Uncategorized" ),
+				"category2": $L( "Other" ),
+				"amount": ""
+			});
 
 		this.categoryChanged();
 	},
 
 	categoryChanged: function() {
 
-		//JSON formatted string [{ category, category2, amount }]
-			//Need to change this to a repeater(?)
+		this.$['fillValueButton'].setShowing( this.trsnObj['category'].length > 1 );
 
-		this.$['category'].setContent( ( this.trsnObj['category'][0]['category'] + " >> " + this.trsnObj['category'][0]['category2'] ).dirtyString() );
+		this.$['categoryList'].render();
 	},
+
+	/** Check Number Controls **/
 
 	adjustMaxCheckNumber: function( checkNum ) {
 

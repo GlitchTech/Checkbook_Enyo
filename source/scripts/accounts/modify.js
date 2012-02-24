@@ -280,7 +280,7 @@ enyo.kind( {
 									offText: "No",
 									value: true
 								}, {
-									style: "display: none;",
+									showing: false,
 
 									name: "hideCleared",
 									kind: "GTS.ToggleBar",
