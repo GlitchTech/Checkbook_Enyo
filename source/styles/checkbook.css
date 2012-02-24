@@ -87,6 +87,25 @@
 	color: #0000cc;
 }
 
+.splitCatContainer .categoryGroup {
+	margin-left: -10px;
+}
+
+.splitCatContainer  .categoryGroup div {
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border-left: 1px solid rgba( 0, 0, 0, 0.2 );
+}
+
+.splitCatContainer .categoryAmount {
+}
+
+.splitCatContainer  .categoryAmount div {
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-right: 1px solid rgba( 0, 0, 0, 0.2 );
+}
+
 /*****************/
 
 .enyo-item.selected,

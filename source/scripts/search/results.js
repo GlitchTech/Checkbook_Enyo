@@ -99,7 +99,7 @@ enyo.kind({
 							]
 						}, {
 							name: "category",
-							className: "small"
+							allowHtml: true
 						}, {
 							name: "checkNum",
 							className: "small"

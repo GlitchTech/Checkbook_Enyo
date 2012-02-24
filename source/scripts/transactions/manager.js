@@ -547,7 +547,8 @@ enyo.kind({
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
-							" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
+							//" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
+							" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
 						" ELSE main.category END ) AS category," +
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
 							" 'PARSE_CATEGORY'" +
@@ -603,7 +604,8 @@ enyo.kind({
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
-							" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
+							//" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
+							" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
 						" ELSE main.category END ) AS category," +
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
 							" 'PARSE_CATEGORY'" +
@@ -739,7 +741,8 @@ enyo.kind({
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
-							" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
+							//" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
+							" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
 						" ELSE main.category END ) AS category," +
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
 							" 'PARSE_CATEGORY'" +
@@ -922,10 +925,15 @@ enyo.kind({
 	 *
 	 * @param {string}	category	main category string (from database)
 	 * @param {string}	category2	secondary category string (from database)
+	 * @param {boolean}	[truncate=true]	shorten number of categories displayed
+	 * @param {string}	[additionalClasses='small']	shorten number of categories displayed
 	 *
 	 * @return {string}
 	 */
-	formatCategoryDisplay: function( category, category2 ) {
+	formatCategoryDisplay: function( category, category2, truncate, additionalClasses ) {
+
+		truncate = ( ( typeof truncate !== 'undefined' ) ? truncate : true );
+		additionalClasses = ( ( typeof additionalClasses !== 'undefined' ) ? additionalClasses : 'small' );
 
 		var catDisplayItem;
 
@@ -934,21 +942,23 @@ enyo.kind({
 
 			//JSON formatted string [{ category, category2, amount }]
 			var catObj = category.evalJSON();
+			var leftCol = "";
+			var rightCol = "";
 
-			catDisplayItem = "<div class='splitCatContainer'>";
+			for( var i = 0; i < ( ( catObj.length > 3 && truncate ) ? 2 : catObj.length ); i++ ) {
 
-			for( var i = 0; i < ( catObj.length > 3 ? 2 : catObj.length ); i++ ) {
+				leftCol += "<div class='enyo-item " + additionalClasses + "'>" + catObj[i]['category'] + " &raquo; " + catObj[i]['category2'] + "</div>";
 
-				catDisplayItem += "<div class='categoryGroup'>" + catObj[i]['category'] + " &raquo; " + catObj[i]['category2'] + "</div>" +
-									"<div class='categoryAmount'>" + catObj[i]['amount'] + "</div>";
+				rightCol += "<div class='enyo-item " + additionalClasses + "'>" + formatAmount( catObj[i]['amount'] ) + "</div>";
 			}
 
-			if( catObj.length > 3 ) {
-
-				catDisplayItem += "+ " + ( catObj.length - 2 ) + " more";
-			}
-
-			catDisplayItem += "</div>";
+			catDisplayItem = "<div style='margin-bottom: 0.5em;'>" +
+						"<div class='splitCatContainer enyo-hflexbox'>" +
+							"<div class='categoryGroup'>" + leftCol + "</div>" +
+							"<div class='categoryAmount'>" + rightCol + "</div>" +
+						"</div>" +
+						( ( catObj.length > 3 && truncate ) ? "<div class='" + additionalClasses + "'>+" + ( catObj.length - 2 ) + " more</div>" : "" ) +
+					"</div>";
 		} else {
 
 			//Old Format Category
@@ -958,7 +968,7 @@ enyo.kind({
 				category = category.split( "|", 2 )[0];
 			}
 
-			catDisplayItem = category + " >> " + category2;
+			catDisplayItem = "<span class='" + additionalClasses + "'>" + category + " >> " + category2 + "</span>";
 		}
 
 		return( category !== "" ? catDisplayItem : "" );

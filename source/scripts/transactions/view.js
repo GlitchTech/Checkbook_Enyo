@@ -113,7 +113,7 @@ enyo.kind( {
 							]
 						}, {
 							name: "category",
-							className: "small"
+							allowHtml: true
 						}, {
 							name: "checkNum",
 							className: "small"
@@ -1076,7 +1076,7 @@ enyo.kind( {
 			if( this.account['enableCategories'] === 1 ) {
 
 				this.$['category'].setShowing( true );
-				this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( row['category'], row['category2'] ) );
+				this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( row['category'], row['category2'], true, "small" ) );
 			} else {
 
 				this.$['category'].setShowing( false );

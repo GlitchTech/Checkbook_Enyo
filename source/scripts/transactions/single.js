@@ -143,7 +143,7 @@ enyo.kind( {
 											components: [
 												{
 													name: "category",
-													className: "enyo-text-ellipsis",
+													allowHtml: true,
 													flex: 1
 												}, {
 													content: $L( "category" ),
@@ -347,13 +347,11 @@ enyo.kind( {
 		var dateObj = new Date( parseInt( this.transaction['date'] ) );
 		this.$['time'].setContent( dateObj.format( { date: 'long', time: ( this.account['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
-		this.log( this.account['enableCategories'] );
-
 		//Categories
 		if( this.account['enableCategories'] === 1 ) {
 
 			this.$['categoryHolder'].setShowing( true );
-			this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( this.transaction['category'], this.transaction['category2'] ) );
+			this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( this.transaction['category'], this.transaction['category2'], false, "" ) );
 		} else {
 
 			this.$['categoryHolder'].setShowing( false );

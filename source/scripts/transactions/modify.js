@@ -204,7 +204,7 @@ enyo.kind( {
 											style: "padding-top: 10px; padding-bottom: 10px;",
 
 											onclick: "categoryTapped",//Change category
-											onConfirm: "",//Delete category item
+											onConfirm: "categoryDelete",//Delete category item
 
 											components: [
 												{
@@ -847,6 +847,13 @@ enyo.kind( {
 		this.$['categorySystem'].getCategoryChoice( enyo.bind( this, this.categorySelected, inIndex ), this.trsnObj['category'][inIndex] );
 	},
 
+	categorySelected: function( index, catObj ) {
+
+		enyo.mixin( this.trsnObj['category'][index], catObj );
+
+		this.categoryChanged();
+	},
+
 	categoryAmountTapped: function( inSender, inEvent ) {
 		//Don't show category selector; only focus on amount field
 
@@ -862,18 +869,37 @@ enyo.kind( {
 
 	categoriesFillValues: function( inSender, inEvent ) {
 
-		this.log( arguments );
+		var amount;
 
-		//Loop through all objects, and get the total
-		//If total is less than full amount
-			//divide by empty amounts and fill in
+		var remainder = 0;
 
-		//save changes
-	},
+		var emptyItems = [];
+		var eiLen = 0;
 
-	categorySelected: function( index, catObj ) {
+		for( var i = 0; i < this.trsnObj['category'].length; i++ ) {
+			//Get total amount in categories; Get 0val categories
 
-		enyo.mixin( this.trsnObj['category'][index], catObj );
+			amount = deformatAmount( this.trsnObj['category'][i]['amount'] );
+			remainder += amount;
+
+			if( amount == 0 ) {
+
+				emptyItems.push( i );
+			}
+		}
+
+		remainder = deformatAmount( this.$['amount'].getValue() ) - remainder;
+
+		eiLen = emptyItems.length;
+
+		if( remainder > 0 && eiLen > 0 ) {
+
+			for( var i = 0; i < eiLen; i++ ) {
+				//Divide up remaining amount into 0val categories
+
+				this.trsnObj['category'][emptyItems[i]]['amount'] = remainder / eiLen;
+			}
+		}
 
 		this.categoryChanged();
 	},
@@ -885,6 +911,13 @@ enyo.kind( {
 				"category2": $L( "Other" ),
 				"amount": ""
 			});
+
+		this.categoryChanged();
+	},
+
+	categoryDelete: function( inSender, inIndex ) {
+
+		this.trsnObj['category'].splice( inIndex, 1 );
 
 		this.categoryChanged();
 	},

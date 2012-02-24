@@ -347,7 +347,6 @@ enyo.kind({
 		var searchStr = this.$['searchString'].getValue().dirtyString().trim();
 		searchStr = searchStr.split( " " );
 
-		//Do these need to be wrapped in %str%
 		//Add amount searching?
 		for( var i = 0; i < searchStr.length; i++ ) {
 
@@ -360,10 +359,8 @@ enyo.kind({
 					whereStrs += " AND desc LIKE ?";
 					whereArgs.push( searchStr[i] );
 
-					whereStrs += " AND category LIKE ?";
+					whereStrs += " AND ( category LIKE ? OR category2 LIKE ? )";
 					whereArgs.push( searchStr[i] );
-
-					whereStrs += " AND category2 LIKE ?";
 					whereArgs.push( searchStr[i] );
 
 					whereStrs += " AND checkNum LIKE ?";
@@ -381,10 +378,8 @@ enyo.kind({
 					whereStrs += " AND desc NOT LIKE ?";
 					whereArgs.push( searchStr[i] );
 
-					whereStrs += " AND category NOT LIKE ?";
+					whereStrs += " AND ( category NOT LIKE ? OR category2 NOT LIKE ? )";
 					whereArgs.push( searchStr[i] );
-
-					whereStrs += " AND category2 NOT LIKE ?";
 					whereArgs.push( searchStr[i] );
 
 					whereStrs += " AND checkNum NOT LIKE ?";

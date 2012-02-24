@@ -260,9 +260,9 @@ enyo.kind({
 		//green from 25% to 74.99%
 		inSender.addRemoveClass( "green", ( progress >= 25 && progress < 75 ) );
 		//yellow from 75% to 99.99%
-		inSender.addRemoveClass( "yellow", ( progress >= 75 && progress < 100 ) );
+		inSender.addRemoveClass( "yellow", ( progress >= 75 && progress <= 100 ) );
 		//red over 100%
-		inSender.addRemoveClass( "red", ( progress >= 100 ) );
+		inSender.addRemoveClass( "red", ( progress > 100 ) );
 	},
 
 	menuItemClick: function() {
