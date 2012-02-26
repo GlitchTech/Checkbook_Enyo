@@ -137,17 +137,16 @@ enyo.kind( {
 										}, {
 											name: "categoryHolder",
 											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-											align: "center",
 
 											components: [
 												{
+													content: $L( "category" ),
+													className: "enyo-label",
+													style: "text-align: right;"
+												}, {
 													name: "category",
 													allowHtml: true,
 													flex: 1
-												}, {
-													content: $L( "category" ),
-													className: "enyo-label"
 												}
 											]
 										}, {

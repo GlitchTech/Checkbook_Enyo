@@ -93,7 +93,7 @@ enyo.kind({
 	 * @param {function}	[options.onSuccess]
 	 * @param {function}	[options.onError]
 	 */
-	deleteTransaction: function( budgetId, options ) {
+	deleteBudget: function( budgetId, options ) {
 
 		enyo.application.gts_db.query(
 				enyo.application.gts_db.getDelete(
@@ -128,13 +128,17 @@ enyo.kind({
 						" IFNULL(" +
 								" SUM( spending_limit ), 0" +
 							" ) AS spending_limit," +
-						" IFNULL(" +
-								" SUM( ( SELECT ABS( SUM( ex.amount ) )" +
-								" FROM transactions ex" +
-								" WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( date AS INTEGER ) >= ? AND CAST( date AS INTEGER ) <= ? ) ), 0" +
-							" ) AS spent" +
+
+						" IFNULL( SUM( " +
+							" IFNULL( ( " +
+									"SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? " +
+								"), 0 ) + ( IFNULL( ( " +
+									"SELECT ABS( SUM( ts.amount ) ) FROM transactions ex LEFT JOIN transactionSplit ts ON ts.transId = ex.itemId WHERE ts.genCat LIKE budgets.category AND ts.specCat LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? " +
+								"), 0 ) ) " +
+							"), 0 ) AS spent" +
+
 						" FROM budgets;",
-					"values": [ startTime, endTime ]
+					"values": [ startTime, endTime, startTime, endTime ]
 				}
 			);
 
@@ -172,12 +176,19 @@ enyo.kind({
 
 		var qryTransaction = new GTS.databaseQuery(
 				{
-						"sql": "SELECT *, IFNULL( ( SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( date AS INTEGER ) >= ? AND CAST( date AS INTEGER ) <= ? ), 0 ) AS spent" +
+						"sql": "SELECT *, " +
+								"( IFNULL( ( " +
+										"SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? " +
+									"), 0 ) + ( IFNULL( ( " +
+										"SELECT ABS( SUM( ts.amount ) ) FROM transactions ex LEFT JOIN transactionSplit ts ON ts.transId = ex.itemId WHERE ts.genCat LIKE budgets.category AND ts.specCat LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? " +
+									"), 0 ) ) ) AS spent" +
 							" FROM budgets" +
 							" WHERE budgetId = ?" +
 							" ORDER BY " + budgetSortOptions[sort]['query'] +
 							" LIMIT 1;",
 						"values": [
+							startTime,
+							endTime,
 							startTime,
 							endTime,
 							budgetId
@@ -226,12 +237,19 @@ enyo.kind({
 		enyo.application.gts_db.query(
 				new GTS.databaseQuery(
 					{
-						"sql": "SELECT *, IFNULL( ( SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( date AS INTEGER ) >= ? AND CAST( date AS INTEGER ) <= ? ), 0 ) AS spent" +
+						"sql": "SELECT *, " +
+								"( IFNULL( ( " +
+										"SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? " +
+									"), 0 ) + ( IFNULL( ( " +
+										"SELECT ABS( SUM( ts.amount ) ) FROM transactions ex LEFT JOIN transactionSplit ts ON ts.transId = ex.itemId WHERE ts.genCat LIKE budgets.category AND ts.specCat LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? " +
+									"), 0 ) ) ) AS spent" +
 							" FROM budgets" +
 							" ORDER BY " + budgetSortOptions[sort]['query'] +
 							" LIMIT ?" +
 							" OFFSET ?;",
 						"values": [
+							startTime,
+							endTime,
 							startTime,
 							endTime,
 							limit,

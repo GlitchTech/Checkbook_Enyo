@@ -287,7 +287,7 @@ enyo.kind({
 
 		if( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 ) {
 
-			this.$['manager'].deleteTransaction( this.budgetObj['budgetId'], { "onSuccess": this.saveComplete } );
+			this.$['manager'].deleteBudget( this.budgetObj['budgetId'], { "onSuccess": this.saveComplete } );
 		} else {
 
 			this.saveComplete();

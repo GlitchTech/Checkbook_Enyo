@@ -261,12 +261,7 @@ enyo.kind({
 
 		if( category ) {
 
-			searchStr += " " + category;
-		}
-
-		if( category2 && category2 !== "%" ) {
-
-			searchStr += " " + category2;
+			searchStr += '"' + category + '"' + ( ( category2 && category2 !== "%" ) ? ' "' + category2 + '"' : "" );
 		}
 
 		this.$['searchString'].setValue( searchStr.trim() );
@@ -345,31 +340,24 @@ enyo.kind({
 		var whereArgs = [];
 
 		var searchStr = this.$['searchString'].getValue().dirtyString().trim();
-		searchStr = searchStr.split( " " );
 
-		//Add amount searching?
+		//Extract quote items
+		var phrases = searchStr.match( /"([^"]*)"/gi );
+
+		for( var i = 0; i < phrases.length; i++ ) {
+
+				phrases[i] = phrases[i].replace( /"/g, "" );
+		}
+
+		searchStr = searchStr.replace( /"[^"]*"/gi, "" ).trim();
+
+		searchStr = searchStr.split( " " ).concat( phrases );
+
+		this.log( searchStr );
+
 		for( var i = 0; i < searchStr.length; i++ ) {
 
-			if( searchStr[i][0] === "+" ) {
-
-				searchStr[i] = "%" + searchStr[i].slice( 1 ) + "%";
-
-				if( searchStr[i] !== "" ) {
-
-					whereStrs += " AND desc LIKE ?";
-					whereArgs.push( searchStr[i] );
-
-					whereStrs += " AND ( category LIKE ? OR category2 LIKE ? )";
-					whereArgs.push( searchStr[i] );
-					whereArgs.push( searchStr[i] );
-
-					whereStrs += " AND checkNum LIKE ?";
-					whereArgs.push( searchStr[i] );
-
-					whereStrs += " AND note LIKE ?";
-					whereArgs.push( searchStr[i] );
-				}
-			} else if( searchStr[i][0] === "-" ) {
+			if( searchStr[i][0] === "-" ) {
 
 				searchStr[i] = "%" + searchStr[i].slice( 1 ) + "%";
 
@@ -379,6 +367,10 @@ enyo.kind({
 					whereArgs.push( searchStr[i] );
 
 					whereStrs += " AND ( category NOT LIKE ? OR category2 NOT LIKE ? )";
+					whereArgs.push( searchStr[i] );
+					whereArgs.push( searchStr[i] );
+
+					whereStrs += " AND itemId NOT IN ( SELECT ts.transId FROM transactionSplit ts WHERE ts.genCat LIKE ? OR ts.specCat LIKE ? )";
 					whereArgs.push( searchStr[i] );
 					whereArgs.push( searchStr[i] );
 
@@ -399,6 +391,10 @@ enyo.kind({
 				whereArgs.push( searchStr[i] );
 
 				whereStrs += " OR category2 LIKE ?";
+				whereArgs.push( searchStr[i] );
+
+				whereStrs += " OR itemId IN ( SELECT ts.transId FROM transactionSplit ts WHERE ts.genCat LIKE ? OR ts.specCat LIKE ? )";
+				whereArgs.push( searchStr[i] );
 				whereArgs.push( searchStr[i] );
 
 				whereStrs += " OR checkNum LIKE ?";
@@ -429,8 +425,6 @@ enyo.kind({
 				acctA.push( this.acctList['items'][i]['acctId'] );
 			}
 		}
-
-		this.log( acctS.length, acctA.length );
 
 		if( acctS.length > 0 && acctA.length > 0 ) {
 

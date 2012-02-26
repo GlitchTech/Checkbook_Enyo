@@ -433,7 +433,7 @@ enyo.kind({
 
 		if( row ) {
 
-			this.$['manager'].deleteTransaction( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
+			this.$['manager'].deleteBudget( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
 		}
 	},
 
