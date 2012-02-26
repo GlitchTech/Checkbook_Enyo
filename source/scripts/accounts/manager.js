@@ -180,7 +180,7 @@ enyo.kind({
 		if( data['defaultAccount'] === 1 ) {
 			//Set all other accounts as non-defaults. Use unshift to call before update.
 
-			queries.unshift( enyo.application.gts_db.getUpdate( "accounts", { "defaultAccount": 0 }, { "0": "0" } ) );
+			queries.unshift( enyo.application.gts_db.getUpdate( "accounts", { "defaultAccount": 0 } ) );
 		}
 
 		enyo.application.gts_db.queries(
