@@ -128,7 +128,18 @@ enyo.kind( {
 
 	dataHandler: function( desc, result ) {
 
-		this.doSelect( { "desc": desc, "linkedAccount": result[0]['linkedAccount'], "category": [ { "category": result[0]['category'].dirtyString(), "category2": result[0]['category2'].dirtyString(), "amount": "" } ] } );
+		this.doSelect( {
+				"desc": desc,
+				"linkedAccount": result[0]['linkedAccount'],
+				"category": [
+					{
+						"category": result[0]['category'].dirtyString(),
+						"category2": result[0]['category2'].dirtyString(),
+						"amount": ""
+					}
+				]
+			});
+
 		this.searchValue = "";
 		this.close();
 	}

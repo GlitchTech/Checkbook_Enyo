@@ -383,6 +383,13 @@ enyo.kind( {
 
 	reloadSystem: function() {
 
+		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
+
+			this.log( "System not ready yet" );
+
+			return false;
+		}
+
 		this.transactions = [];
 		this.$['entries'].punt();
 
@@ -1107,7 +1114,7 @@ enyo.kind( {
 
 			this.log( "System not ready yet" );
 
-			return;
+			return false;
 		}
 
 		if( index < 0 ) {

@@ -203,8 +203,6 @@ enyo.kind({
 		this.$['mainPane'].setShowing( true );
 		this.$['appMenu'].setAutomatic( true );
 
-		enyo.application.tabletMode = ( window.screen.availWidth > 480 );
-
 		enyo.application.criticalError = this.$['criticalError'];
 		enyo.application.accountManager = new Checkbook.accounts.manager();
 		enyo.application.transactionManager = new Checkbook.transactions.manager();
@@ -242,10 +240,6 @@ enyo.kind({
 
 				this.updateTransactionsView( null, result );
 			}
-		} else if( !enyo.application.tabletMode ) {
-			//show only account window
-
-			this.$['mainPane'].selectViewByName( "accounts" );
 		}
 
 		this.$['accounts'].renderAccountList();
@@ -481,11 +475,6 @@ enyo.kind({
 	updateTransactionsView: function( inSender, account ) {
 
 		this.$['transactions'].changeAccount( account );
-
-		if( !enyo.application.tabletMode ) {
-
-			this.$['mainPane'].selectViewByName( "transactions" );
-		}
 	},
 
 	accoutChanged: function( inSender, result ) {

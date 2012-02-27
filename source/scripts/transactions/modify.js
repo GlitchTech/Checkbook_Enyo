@@ -530,7 +530,6 @@ enyo.kind( {
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
-		//Split category (HANDLE SPLIT CATEGORY - incomplete)
 		if( this.trsnObj['category2'] === 'PARSE_CATEGORY' ) {
 
 			//JSON formatted string [{ category, category2, amount }]
@@ -666,7 +665,6 @@ enyo.kind( {
 		this.$['linkedAccount'].setValue( this.trsnObj['linkedAccount'] );
 
 		this.trsnObj['category'] = suggestTrsnObj['category'];
-		this.trsnObj['category2'] = suggestTrsnObj['category2'];
 		this.categoryChanged();
 
 		this.$['amount'].forceFocus();
