@@ -317,8 +317,8 @@ enyo.kind({
 		this.$['progress'].load( "Authenticating", "Trying to authenticate credentials", 25 );
 
 		this.$['gDataControls'].gdata_authenticate(
-				"matthew.schott@gmail.com",//this.$['gUser'].getValue(),
-				"GL!tch3dh3r0",//this.$['gPass'].getValue(),
+				this.$['gUser'].getValue(),
+				this.$['gPass'].getValue(),
 				"wise",
 				{
 					'onSuccess': enyo.bind( this, this.fetchSpreadsheetList ),

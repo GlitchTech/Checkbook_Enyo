@@ -343,15 +343,19 @@ enyo.kind({
 
 		//Extract quote items
 		var phrases = searchStr.match( /"([^"]*)"/gi );
+		searchStr = searchStr.split( " " );
 
-		for( var i = 0; i < phrases.length; i++ ) {
+		if( phrases ) {
 
-				phrases[i] = phrases[i].replace( /"/g, "" );
+			for( var i = 0; i < phrases.length; i++ ) {
+
+					phrases[i] = phrases[i].replace( /"/g, "" );
+			}
+
+			searchStr = searchStr.replace( /"[^"]*"/gi, "" ).trim();
+
+			searchStr = searchStr.concat( phrases );
 		}
-
-		searchStr = searchStr.replace( /"[^"]*"/gi, "" ).trim();
-
-		searchStr = searchStr.split( " " ).concat( phrases );
 
 		this.log( searchStr );
 
