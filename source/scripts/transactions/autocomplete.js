@@ -111,12 +111,24 @@ enyo.kind( {
 
 	rowClicked: function( inSender, inEvent, rowIndex ) {
 
-		//UPDATE FOR SPLIT TRANSACTIONS
-
 		enyo.application.gts_db.query(
 				new GTS.databaseQuery(
 						{
-							"sql": "SELECT ( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct, category, category2, COUNT( desc ) AS count FROM transactions a WHERE desc = ? AND category != '' GROUP BY category ORDER BY count DESC LIMIT 1;",
+							"sql": "SELECT " +
+									"( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct, " +
+									" ( CASE WHEN a.category = '||~SPLIT~||' THEN" +
+										" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = a.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
+									" ELSE a.category END ) AS category," +
+									" ( CASE WHEN a.category = '||~SPLIT~||' THEN" +
+										" 'PARSE_CATEGORY'" +
+									" ELSE a.category2 END ) AS category2, " +
+									"COUNT( desc ) AS count " +
+								"FROM transactions a " +
+								"WHERE desc = ? " +
+									"AND category != '' " +
+									"GROUP BY category " +
+								"ORDER BY count DESC " +
+								"LIMIT 1;",
 							"values": [ this.getOwner().$['account'].getValue(), this.suggestResults[rowIndex]['desc'] ]
 						}
 					),
@@ -126,19 +138,15 @@ enyo.kind( {
 			);
 	},
 
-	dataHandler: function( desc, result ) {
+	dataHandler: function( desc, results ) {
 
-		this.doSelect( {
+		var data = {
 				"desc": desc,
-				"linkedAccount": result[0]['linkedAccount'],
-				"category": [
-					{
-						"category": result[0]['category'].dirtyString(),
-						"category2": result[0]['category2'].dirtyString(),
-						"amount": ""
-					}
-				]
-			});
+				"linkedAccount": results[0]['linkedAccount'],
+				"category": enyo.application.transactionManager.parseCategoryDB( results[0]['category'].dirtyString(), results[0]['category2'].dirtyString() )
+			};
+
+		this.doSelect( data );
 
 		this.searchValue = "";
 		this.close();

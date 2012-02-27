@@ -921,6 +921,50 @@ enyo.kind({
 	/**
 	 * @public
 	 *
+	 * Returns JSON object with category & category 2 data from standard Checkbook DB formatted data
+	 *
+	 * @param {string}	category	main category string (from database)
+	 * @param {string}	category2	secondary category string (from database)
+	 *
+	 * @return {object}
+	 */
+	parseCategoryDB: function( category, category2 ) {
+
+		var data;
+
+		if( category2 === 'PARSE_CATEGORY' ) {
+			//JSON formatted string [{ category, category2, amount }]
+
+			data = enyo.json.parse( category );
+		} else {
+
+			if( category === '' && category2 === '' ) {
+				//None set; use default
+
+				category = $L( "Uncategorized" );
+				category2 = $L( "Other" );
+			} else if( category2 === '' ) {
+				//Old Format Category; retain for backwards compatibility
+
+				category2 = category.split( "|", 2 )[1];
+				category = category.split( "|", 2 )[0];
+			}
+
+			data = [
+						{
+							"category": category,
+							"category2": category2,
+							"amount": ""
+						}
+					];
+		}
+
+		return data;
+	},
+
+	/**
+	 * @public
+	 *
 	 * Creates a display string from category database items
 	 *
 	 * @param {string}	category	main category string (from database)

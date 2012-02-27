@@ -1059,7 +1059,7 @@ enyo.kind({
 					);
 			}
 
-			var catObj = this.importItems[this.documentIndex]['transactions'][i]['category'] = this.importItems[this.documentIndex]['transactions'][i]['category'];
+			var catObj = this.importItems[this.documentIndex]['transactions'][i]['category'];
 			var catQuery = [];
 
 			if( catObj.length > 1 && this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) {

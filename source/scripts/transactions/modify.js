@@ -530,27 +530,7 @@ enyo.kind( {
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
-		if( this.trsnObj['category2'] === 'PARSE_CATEGORY' ) {
-
-			//JSON formatted string [{ category, category2, amount }]
-			this.trsnObj['category'] = enyo.json.parse( this.trsnObj['category'] );
-		} else {
-
-			//Old Format Category; retain for backwards compatibility
-			if( this.trsnObj['category2'] === '' ) {
-
-				this.trsnObj['category2'] = this.trsnObj['category'].split( "|", 2 )[1];
-				this.trsnObj['category'] = this.trsnObj['category'].split( "|", 2 )[0];
-			}
-
-			this.trsnObj['category'] = [
-						{
-							"category": this.trsnObj['category'],
-							"category2": this.trsnObj['category2'],
-							"amount": ""
-						}
-					];
-		}
+		this.trsnObj['category'] = enyo.application.transactionManager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
 
 		this.renderCategories = true;
 
