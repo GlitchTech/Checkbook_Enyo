@@ -345,7 +345,7 @@ enyo.kind({
 		var phrases = searchStr.match( /"([^"]*)"/gi );
 		searchStr = searchStr.split( " " );
 
-		if( phrases ) {
+		if( phrases && phrases.length > 0 ) {
 
 			for( var i = 0; i < phrases.length; i++ ) {
 
