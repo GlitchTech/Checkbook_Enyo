@@ -151,4 +151,4 @@ enyo.kind( {
 		this.searchValue = "";
 		this.close();
 	}
-} );
+});

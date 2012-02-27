@@ -278,4 +278,4 @@ enyo.kind( {
 			this.options.onFailure();
 		}
 	}
-} );
+});

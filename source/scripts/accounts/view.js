@@ -357,4 +357,4 @@ enyo.kind( {
 
 		this.$['searchMenu'].openAtControl( inSender );
 	}
-} );
+});

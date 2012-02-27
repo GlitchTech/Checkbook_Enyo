@@ -7,5 +7,7 @@ enyo.depends(
 	"single.js",
 
 	"modify.js",
-	"autocomplete.js"
+	"autocomplete.js",
+
+	"repeat.js"
 );

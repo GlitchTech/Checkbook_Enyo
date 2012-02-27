@@ -102,4 +102,4 @@ enyo.kind( {
 			callbackFn( "" );
 		}
 	}
-} );
+});

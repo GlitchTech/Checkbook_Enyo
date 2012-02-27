@@ -473,4 +473,4 @@ enyo.kind( {
 		this.doDelete( this.index );
 		enyo.nextTick( this, this.close );
 	}
-} );
+});

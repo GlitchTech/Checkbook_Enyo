@@ -1215,4 +1215,4 @@ results = {
 		this.$['loadingSpinner'].setShowing( status );
 		this.$['acctTypeIcon'].setShowing( !status );
 	}
-} );
+});
