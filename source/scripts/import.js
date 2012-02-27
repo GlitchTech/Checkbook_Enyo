@@ -317,8 +317,8 @@ enyo.kind({
 		this.$['progress'].load( "Authenticating", "Trying to authenticate credentials", 25 );
 
 		this.$['gDataControls'].gdata_authenticate(
-				this.$['gUser'].getValue(),
-				this.$['gPass'].getValue(),
+				"matthew.schott@gmail.com",//this.$['gUser'].getValue(),
+				"GL!tch3dh3r0",//this.$['gPass'].getValue(),
 				"wise",
 				{
 					'onSuccess': enyo.bind( this, this.fetchSpreadsheetList ),
@@ -1043,21 +1043,25 @@ enyo.kind({
 				delete this.importItems[this.documentIndex]['transactions'][i]['itemId'];
 			}
 
+			/*
 			//Restore category listing
 			for( var j = 0; j < this.importItems[this.documentIndex]['transactions'][i]['category'][j]; j++ ) {
 
-				GTS.databaseQuery(
-						{
-							"sql": "INSERT INTO transactionCategories( genCat, specCat ) SELECT ?, ? WHERE NOT EXISTS( SELECT 1 FROM transactionCategories WHERE genCat = ? AND specCat = ? );",
-							"values": [
-									this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category'],
-									this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category2'],
-									this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category'],
-									this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category2']
-								]
-						}
+				queries.push(
+						new GTS.databaseQuery(
+							{
+								"sql": "INSERT INTO transactionCategories( genCat, specCat ) SELECT ?, ? WHERE NOT EXISTS( SELECT 1 FROM transactionCategories WHERE genCat = ? AND specCat = ? );",
+								"values": [
+										this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category'],
+										this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category2'],
+										this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category'],
+										this.importItems[this.documentIndex]['transactions'][i]['category'][j]['category2']
+									]
+							}
+						)
 					);
 			}
+			*/
 
 			var catObj = this.importItems[this.documentIndex]['transactions'][i]['category'];
 			var catQuery = [];
@@ -1065,22 +1069,7 @@ enyo.kind({
 			if( catObj.length > 1 && this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) {
 				//Split Category && item not new
 
-				this.importItems[this.documentIndex]['transactions'][i]['category'] = "||~SPLIT~||";
-				this.importItems[this.documentIndex]['transactions'][i]['category2'] = "";
-
-				//TODO handle split transactions; unable to proceed until after export system is built to handle split transactions (not set on enyo or mojo)
-				//deformatAmount
-				/*
-					"transactionSplit",
-					"columns": [
-						"tsId",
-						"transId",
-						"genCat",
-						"specCat",
-						"amount",
-						"last_sync"
-					]
-				*/
+				catQuery = enyo.application.transactionManager.handleCategoryData( this.importItems[this.documentIndex]['transactions'][i] );
 			} else {
 				//Single Category
 
@@ -1095,7 +1084,7 @@ enyo.kind({
 						)
 				);
 
-			queries.concat( catQuery );
+			queries = queries.concat( catQuery );
 		}
 
 		var options = {

@@ -577,7 +577,23 @@ enyo.kind({
 				enyo.application.gts_db.getSelect(
 						"transactions",
 						[
-							"*",
+							"itemId",
+							"linkedRecord",
+
+							"amount",
+							"checkNum",
+							"cleared",
+							"date",
+							"desc",
+							"note",
+
+							" ( CASE WHEN category = '||~SPLIT~||' THEN" +
+									" ( '[' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = itemId ORDER BY ts.amount DESC ) ), '{ \"category\": \"?\", \"category2\" : \"?\", \"amount\": \"0\" }' ) || ']' )" +
+								" ELSE category END ) AS category",
+							" ( CASE WHEN category = '||~SPLIT~||' THEN" +
+									" 'PARSE_CATEGORY'" +
+								" ELSE category2 END ) AS category2",
+
 							"IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountName",
 							"IFNULL( ( SELECT accounts.acctCategory FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountCat",
 							"IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.linkedAccount ), '' ) AS linkedAccountName",
@@ -643,7 +659,7 @@ enyo.kind({
 										'"' + row['checkNum'].cleanString() + '",' +
 										'"' + row['note'].cleanString() + '",' +
 										'"' + row['itemId'] + '",' +
-										'"' + ( row['category'] + ( row['category2'] === null ? "" : "|" + row['category2'] ) ) + '",' +
+										'"' + enyo.json.stringify( enyo.application.transactionManager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
 										'"' + row['linkedRecord'] + '",' +
 										'"' + row['linkedAccountName'].cleanString() + '",' +
 										'"' + row['linkedAccountCat'].cleanString() + '"\n';

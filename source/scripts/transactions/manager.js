@@ -26,7 +26,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Creates a new transaction from the passed in parameters. Does basic checking on parameters. Returns boolean for success.
 	 *
 	 * @param {object}	data key: value object of new transaction parameters. Unset parameters will become system defaults
@@ -68,7 +67,7 @@ enyo.kind({
 		var sql = this._prepareData( data, type );
 
 		//Handle split transactions
-		sql = sql.concat( this._handleCategoryData( data ) );
+		sql = sql.concat( this.handleCategoryData( data ) );
 
 		//Handle repeating system (maybe?)
 		sql = sql.concat( this._handleRepeatSystem( data ) );
@@ -192,7 +191,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Updates transaction from the passed in parameters. Does basic checking on parameters. Returns boolean for success
 	 *
 	 * @param {object}	data	key: value object of new transaction parameters. Unset parameters will become system defaults
@@ -245,7 +243,7 @@ enyo.kind({
 		var sql = this._prepareData( data, type );
 
 		//Handle split transactions
-		sql = sql.concat( this._handleCategoryData( data ) );
+		sql = sql.concat( this.handleCategoryData( data ) );
 
 		//Handle repeating system (maybe?)
 		sql = sql.concat( this._handleRepeatSystem( data ) );
@@ -342,14 +340,14 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @public
 	 * Category handler system
 	 *
 	 * @param {object}	data	Object to be readied; Since object, pass by reference situation;
 	 *
 	 * @returns {object[]}	SQL functions to be run. Returns empty array if category is not split
 	 */
-	_handleCategoryData: function( data ) {
+	handleCategoryData: function( data ) {
 
 		var sqlArray = [];
 
@@ -468,7 +466,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Clears a single transaction. Does not changed (if exists) linked transaction's status.
 	 *
 	 * @param {int}	trsnId	id of transaction to clear
@@ -495,7 +492,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Deletes a transaction & (if exists) its linked transaction
 	 *
 	 * @param {int}	trsnId	id of transaction to deleted
@@ -507,16 +503,25 @@ enyo.kind({
 
 		enyo.application.gts_db.queries(
 				[
+					//Main Transaction
 					enyo.application.gts_db.getDelete(
 							"transactions",
 							{
 								"itemId": trsnId
 							}
 						),
+					//Linked Transaction
 					enyo.application.gts_db.getDelete(
 							"transactions",
 							{
 								"linkedRecord": trsnId
+							}
+						),
+					//Split Transactions
+					new GTS.databaseQuery(
+							{
+								'sql': "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )" ,
+								'values': [ trsnId, trsnId ]
 							}
 						)
 				],
@@ -526,7 +531,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Returns (via onSuccess callback) result object with single transaction.
 	 *
 	 * @param {int}	transId	id of transaction to retrieve
@@ -547,8 +551,7 @@ enyo.kind({
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
-							//" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
-							" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
+							" ( '[' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), '{ \"category\": \"?\", \"category2\" : \"?\", \"amount\": \"0\" }' ) || ']' )" +
 						" ELSE main.category END ) AS category," +
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
 							" 'PARSE_CATEGORY'" +
@@ -581,7 +584,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Returns (via onSuccess callback) result object of transactions.
 	 *
 	 * @param {object}	accountObj standard account object to retrieve key parameters from
@@ -604,8 +606,7 @@ enyo.kind({
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
-							//" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
-							" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
+							" ( '[' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), '{ \"category\": \"?\", \"category2\" : \"?\", \"amount\": \"0\" }' ) || ']' )" +
 						" ELSE main.category END ) AS category," +
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
 							" 'PARSE_CATEGORY'" +
@@ -706,7 +707,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Returns (via onSuccess callback) result object of found transactions.
 	 *
 	 * @param {string}	whereStrings	string of where queries
@@ -741,8 +741,7 @@ enyo.kind({
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
-							//" ( '[' || ( SELECT GROUP_CONCAT( ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ), ',' ) FROM transactionSplit ts WHERE ts.transId = main.itemId ) || ']' )" +
-							" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
+							" ( '[' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), '{ \"category\": \"?\", \"category2\" : \"?\", \"amount\": \"0\" }' ) || ']' )" +
 						" ELSE main.category END ) AS category," +
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
 							" 'PARSE_CATEGORY'" +
@@ -777,7 +776,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Returns (via onSuccess callback) result object of count of found transactions.
 	 *
 	 * @param {string}	whereStrings	string of where queries
@@ -819,7 +817,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Builds transactionSortOptions
 	 *
 	 * @param {object}	[options]	Callback functions
@@ -870,7 +867,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Gets max check number
 	 *
 	 * @param {int}	account id	Account to get the max check number from
@@ -920,7 +916,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Returns JSON object with category & category 2 data from standard Checkbook DB formatted data
 	 *
 	 * @param {string}	category	main category string (from database)
@@ -964,7 +959,6 @@ enyo.kind({
 
 	/**
 	 * @public
-	 *
 	 * Creates a display string from category database items
 	 *
 	 * @param {string}	category	main category string (from database)
