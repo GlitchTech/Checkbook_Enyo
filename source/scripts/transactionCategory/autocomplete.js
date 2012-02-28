@@ -4,7 +4,6 @@
  * Checkbook.transactionCategory.autocomplete ( Popup )
  */
 enyo.kind( {
-
 	name: "Checkbook.transactionCategory.autocomplete",
 	kind: enyo.Popup,
 	layoutKind: enyo.VFlexLayout,

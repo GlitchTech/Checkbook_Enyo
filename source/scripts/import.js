@@ -1,19 +1,11 @@
 /* Copyright © 2011, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.import",
-	kind: enyo.ModalDialog,
+	kind: enyo.VFlexBox,
 
-	layoutKind: enyo.VFlexLayout,
-
-	modal: true,
-	scrim: true,
-
-	dismissWithClick: false,
-	dismissWithEscape: false,
-
-	style: "width: 400px;",
+	className: "light",
+	style: "height: 100%;",
 
 	allSheetsList: [],
 	importItems: [],
@@ -26,131 +18,141 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Header,
+			kind: enyo.PageHeader,
 			layoutKind: enyo.HFlexLayout,
-			align: "center",
+			pack: "center",
 
-			className: "enyo-header-dark popup-header",
-			style: "border-radius: 10px; margin-bottom: 10px;",
+			className: "enyo-header-dark",
 
 			components: [
 				{
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
 					content: $L( "Import System" ),
 					className: "bigger",
-					style: "text-align: center; margin-right: -32px;",
+					style: "margin-right: -32px;"
+				}, {
+					kind: enyo.Spacer,
 					flex: 1
 				}, {
 					kind: enyo.ToolButton,
+
 					icon: "source/images/menu_icons/close.png",
 					className: "img-icon",
-					style: "text-align: center;",
+
 					onclick: "closeImport"
 				}
 			]
-		}, {
-			name: "instructions",
-			components: [
-				{
-					kind: enyo.HtmlContent,
-					className: "group smaller",
-					style: "padding: 0 0.5em 0 0.5em;",
-					content: "<p>" +
-							$L( "To import your finances into this program you must have a Google Documents account. " ) + "<br />" +
-							"<a href='http://docs.google.com/'>" + $L( "Sign up here" ) + "</a>" +
-						"</p><p>" +
-							$L( "Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten." ) + " <span style='color:#cc0000;'>" + $L( "The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note." ) + "</span>" +
-						"</p>"
-				}, {
-					name: "instructionsButton",
-					kind: enyo.Button,
-					caption: $L( "Continue" ),
-					onclick: "prepareCredentials"
-				}
-			]
-		}, {
-			showing: false,
+		},
 
-			name: "credentials",
-			layoutKind: enyo.VFlexLayout,
+		{
+			kind: enyo.Scroller,
+			flex: 1,
+
 			components: [
 				{
-					kind: enyo.RowGroup,
-					caption: $L( "Google Credentials" ),
+					name: "instructions",
+					className: "light narrow-column",
+					flex: 1,
 					components: [
 						{
-							name: "gUser",
-							kind: enyo.Input,
-							hint: $L( "Google Username" ),
+							kind: enyo.HtmlContent,
+							className: "group smaller",
+							style: "padding: 0 0.5em 0 0.5em;",
+							content: "<p>" +
+									$L( "To import your finances into this program you must have a Google Documents account. " ) + "<br />" +
+									"<a href='http://docs.google.com/'>" + $L( "Sign up here" ) + "</a>" +
+								"</p><p>" +
+									$L( "Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten." ) + " <span style='color:#cc0000;'>" + $L( "The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note." ) + "</span>" +
+								"</p>"
+						}
+					]
+				},
 
-							inputType: "email",
+				{
+					showing: false,
 
+					name: "credentials",
+					layoutKind: enyo.VFlexLayout,
+
+					className: "light narrow-column",
+					flex: 1,
+
+					components: [
+						{
+							kind: enyo.RowGroup,
+							caption: $L( "Google Credentials" ),
 							components: [
 								{
-									content: $L( "Username" ),
-									className: "small",
-									style: "color: rgb( 32, 117, 191 );"
+									name: "gUser",
+									kind: enyo.Input,
+									hint: $L( "Google Username" ),
+
+									inputType: "email",
+
+									components: [
+										{
+											content: $L( "Username" ),
+											className: "small",
+											style: "color: rgb( 32, 117, 191 );"
+										}
+									]
+								}, {
+									name: "gPass",
+									kind: enyo.PasswordInput,
+									hint: $L( "Account Password" ),
+
+									components: [
+										{
+											content: $L( "Password" ),
+											className: "small",
+											style: "color: rgb( 32, 117, 191 );"
+										}
+									]
 								}
 							]
 						}, {
-							name: "gPass",
-							kind: enyo.PasswordInput,
-							hint: $L( "Account Password" ),
+							content: "Enter your Google Spreadsheets credentials to import your financial data from <a href='http://docs.google.com/'>Google Documents</a> to your device.",
+							allowHtml: true,
+							className: "smallest",
+							style: "padding: 0.5em 0.5em 0 0.5em;"
+						}, {
+							layoutKind: enyo.HFlexLayout,
+							style: "padding: 0.5em 0.5em 0.5em 0.5em;",
 
 							components: [
 								{
-									content: $L( "Password" ),
-									className: "small",
-									style: "color: rgb( 32, 117, 191 );"
+									name: "saveCredentials",
+									kind: enyo.CheckBox,
+									checked: true,
+
+									style: "margin-right: 10px;"
+								}, {
+									content: $L( "Save credentials" ),
+									flex: 1
 								}
 							]
 						}
 					]
-				}, {
-					content: "Enter your Google Spreadsheets credentials to import your financial data from <a href='http://docs.google.com/'>Google Documents</a> to your device.",
-					allowHtml: true,
-					className: "smallest",
-					style: "padding: 0.5em 0.5em 0 0.5em;"
-				}, {
-					layoutKind: enyo.HFlexLayout,
-					style: "padding: 0.5em 0.5em 0.5em 0.5em;",
+				},
 
-					components: [
-						{
-							name: "saveCredentials",
-							kind: enyo.CheckBox,
-							checked: true,
-
-							style: "margin-right: 10px;"
-						}, {
-							content: $L( "Save credentials" ),
-							flex: 1
-						}
-					]
-				}, {
-					name: "credentialsButton",
-					kind: enyo.Button,
-					caption: $L( "Sign In" ),
-					onclick: "autenticateWithGoogle",
-					className: "enyo-button-affirmative"
-				}
-			]
-		}, {
-			showing: false,
-
-			name: "sheetList",
-			layoutKind: enyo.VFlexLayout,
-			components: [
 				{
-					kind: enyo.Group,
-					caption: $L( "Visible Spreadsheets" ),
+					showing: false,
+
+					name: "sheetList",
+					layoutKind: enyo.VFlexLayout,
+
+					className: "light narrow-column",
+					flex: 1,
 
 					components: [
 						{
-							name: 'spreadsheetList',
-							kind: enyo.VirtualList,
+							name: "spreadsheetList",
+							kind: enyo.VirtualRepeater,
 
-							style: "height: 325px;",
-							onSetupRow: 'setupRow',
+							flex: 1,
+							onSetupRow: "setupRow",
 
 							components: [
 								{
@@ -175,28 +177,89 @@ enyo.kind({
 							]
 						}
 					]
+				}
+			]
+		},
+
+		{
+			name: "instructionsBar",
+			kind: enyo.Toolbar,
+			components: [
+				{
+					kind: enyo.Spacer,
+					flex: 1
 				}, {
-					layoutKind: enyo.HFlexLayout,
-					components: [
-						{
-							name: "sheetListButton",
-							kind: enyo.Button,
-							caption: $L( "Import Accounts" ),
+					name: "instructionsButton",
+					kind: enyo.Button,
+					content: $L( "Continue" ),
 
-							onclick: "beginImportProcess",
+					onclick: "prepareCredentials",
 
-							flex: 4,
-							className: "enyo-button-affirmative"
-						}, {
-							name: "sheetListSelectButton",
-							kind: enyo.Button,
-							caption: $L( "Select" ) + "...",
+					style: "min-width: 150px;"
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}
+			]
+		},
 
-							onclick: "sheetListSelectOptions",
+		{
+			showing: false,
 
-							flex: 1
-						}
-					]
+			name: "credentialsBar",
+			kind: enyo.Toolbar,
+			components: [
+				{
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
+					name: "credentialsButton",
+					kind: enyo.Button,
+					content: $L( "Sign In" ),
+
+					onclick: "authenticateWithGoogle",
+
+					className: "enyo-button-affirmative deep-green",
+					style: "min-width: 150px;"
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}
+			]
+		},
+
+		{
+			showing: false,
+
+			name: "sheetListBar",
+			kind: enyo.Toolbar,
+			components: [
+				{
+					kind: enyo.Spacer,
+					flex: 8
+				}, {
+					name: "sheetListButton",
+					kind: enyo.Button,
+					content: $L( "Import Accounts" ),
+
+					onclick: "beginImportProcess",
+
+					className: "enyo-button-affirmative deep-green",
+					style: "min-width: 150px;"
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
+					name: "sheetListSelectButton",
+					kind: enyo.Button,
+					caption: $L( "Select" ) + "...",
+
+					onclick: "sheetListSelectOptions",
+
+					flex: 1
+				}, {
+					kind: enyo.Spacer,
+					flex: 8
 				}
 			]
 		},
@@ -247,6 +310,9 @@ enyo.kind({
 		this.log();
 
 		this.$['instructionsButton'].setDisabled( false );
+		this.$['instructionsBar'].setShowing( true );
+		this.$['credentialsBar'].setShowing( false );
+		this.$['sheetListBar'].setShowing( false );
 
 		this.$['instructions'].show();
 		this.$['credentials'].hide();
@@ -297,6 +363,9 @@ enyo.kind({
 
 		this.$['instructionsButton'].setDisabled( true );
 		this.$['credentialsButton'].setDisabled( false );
+		this.$['instructionsBar'].setShowing( false );
+		this.$['credentialsBar'].setShowing( true );
+		this.$['sheetListBar'].setShowing( false );
 
 		this.$['instructions'].hide();
 		this.$['credentials'].show();
@@ -307,7 +376,7 @@ enyo.kind({
 		this.resized();
 	},
 
-	autenticateWithGoogle: function() {
+	authenticateWithGoogle: function() {
 
 		this.log();
 
@@ -410,9 +479,12 @@ enyo.kind({
 			this.$['progress'].setMessage( "Processing spreadsheets..." );
 			this.$['progress'].setProgress( 75 );
 
-			this.$['spreadsheetList'].punt();
+			this.$['spreadsheetList'].render();
 
 			this.$['sheetListButton'].setDisabled( false );
+			this.$['instructionsBar'].setShowing( false );
+			this.$['credentialsBar'].setShowing( false );
+			this.$['sheetListBar'].setShowing( true );
 
 			this.$['instructions'].hide();
 			this.$['credentials'].hide();
@@ -443,7 +515,7 @@ enyo.kind({
 
 		this.allSheetsList[inEvent.rowIndex]['selectStatus'] = !this.allSheetsList[inEvent.rowIndex]['selectStatus'];
 
-		this.$['spreadsheetList'].refresh();
+		this.$['spreadsheetList'].render();
 	},
 
 	sheetListSelectOptions: function( inSender ) {
@@ -476,7 +548,7 @@ enyo.kind({
 			}
 		}
 
-		this.$['spreadsheetList'].refresh();
+		this.$['spreadsheetList'].render();
 	},
 
 	beginImportProcess: function() {
@@ -1118,7 +1190,7 @@ enyo.kind({
 
 			this.allSheetsList[this.importItems[this.documentIndex]['sheetIndex']]['selectStatus'] = false;
 
-			this.$['spreadsheetList'].refresh();
+			this.$['spreadsheetList'].render();
 
 			this.documentIndex++;
 			this.pageIndex = 0;
@@ -1173,8 +1245,6 @@ enyo.kind({
 		this.$['sheetList'].hide();
 
 		//Close & continue
-		this.close();
-
 		this.doFinish( success );
 	}
 });

@@ -59,12 +59,10 @@ enyo.kind({
 							onclick: "openPreferences"
 						}, {
 							caption: $L( "Import Data" ),
-							onclick: "showPopup",
-							popup: "import"
+							onclick: "openImport"
 						}, {
 							caption: $L( "Export Data" ),
-							onclick: "showPopup",
-							popup: "export"
+							onclick: "openExport"
 						}
 					]
 				}, {
@@ -95,14 +93,6 @@ enyo.kind({
 					popup: "about"
 				}
 			]
-		}, {
-			name: "import",
-			kind: "Checkbook.import",
-			onFinish: "importComplete"
-		}, {
-			name: "export",
-			kind: "Checkbook.export",
-			onFinish: "closePopup"
 		}, {
 			name: "about",
 			kind: "Checkbook.about",
@@ -291,23 +281,6 @@ enyo.kind({
 		inSender.close();
 	},
 
-	importComplete: function( inSender, importStatus ) {
-
-		this.$['appMenu'].setAutomatic( true );
-
-		if( importStatus === true ) {
-
-			this.$['transactions'].reloadSystem();
-
-			this.notificationType = null;
-
-			enyo.nextTick(
-					this,
-					this.loadCheckbookStage2
-				);
-		}
-	},
-
 	forceShowMetrix: function() {
 
 		enyo.application.Metrix.checkBulletinBoard( 1, true );
@@ -369,6 +342,48 @@ enyo.kind({
 			//show base view
 			this.$['appMenu'].setAutomatic( true );
 			this.$['container'].selectView( this.$['mainPane'] );
+		}
+	},
+
+	/** Checkbook.Import && Checkbook.Export **/
+
+	openExport: function( inSender, inEvent ) {
+
+		this.showPanePopup(
+				null,
+				{
+					name: "export",
+					kind: "Checkbook.export"
+				}
+			);
+	},
+
+	openImport: function( inSender, inEvent ) {
+
+		this.showPanePopup(
+				null,
+				{
+					name: "import",
+					kind: "Checkbook.import",
+					onFinish: "importComplete"
+				}
+			);
+	},
+
+	importComplete: function( inSender, importStatus ) {
+
+		this.$['appMenu'].setAutomatic( true );
+
+		if( importStatus === true ) {
+
+			this.$['transactions'].reloadSystem();
+
+			this.notificationType = null;
+
+			enyo.nextTick(
+					this,
+					this.loadCheckbookStage2
+				);
 		}
 	},
 

@@ -7,7 +7,6 @@
  *	Requires GTS.database to exist in enyo.application.gts_db
  */
 enyo.kind( {
-
 	name: "Checkbook.encryption",
 	kind: enyo.Component,
 

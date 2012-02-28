@@ -1,19 +1,11 @@
 /* Copyright © 2011, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.export",
-	kind: enyo.ModalDialog,
+	kind: enyo.VFlexBox,
 
-	layoutKind: enyo.VFlexLayout,
-
-	modal: true,
-	scrim: true,
-
-	dismissWithClick: false,
-	dismissWithEscape: false,
-
-	style: "width: 400px;",
+	className: "light",
+	style: "height: 100%;",
 
 	acctList: [],
 
@@ -23,108 +15,119 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Header,
+			kind: enyo.PageHeader,
 			layoutKind: enyo.HFlexLayout,
-			align: "center",
+			pack: "center",
 
-			className: "enyo-header-dark popup-header",
-			style: "border-radius: 10px; margin-bottom: 10px;",
+			className: "enyo-header-dark",
 
 			components: [
 				{
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
 					content: $L( "Export System" ),
 					className: "bigger",
-					style: "text-align: center; margin-right: -32px;",
+					style: "margin-right: -32px;"
+				}, {
+					kind: enyo.Spacer,
 					flex: 1
 				}, {
 					kind: enyo.ToolButton,
+
 					icon: "source/images/menu_icons/close.png",
 					className: "img-icon",
-					style: "text-align: center;",
+
 					onclick: "closeExport"
 				}
 			]
-		}, {
-			name: "credentials",
-			layoutKind: enyo.VFlexLayout,
+		},
+
+		{
+			kind: enyo.Scroller,
+			flex: 1,
+
 			components: [
 				{
-					kind: enyo.RowGroup,
-					caption: $L( "Google Credentials" ),
+					name: "credentials",
+					layoutKind: enyo.VFlexLayout,
+
+					className: "light narrow-column",
+					flex: 1,
+
 					components: [
 						{
-							name: "gUser",
-							kind: enyo.Input,
-							hint: $L( "Google Username" ),
-
-							inputType: "email",
-
+							kind: enyo.RowGroup,
+							caption: $L( "Google Credentials" ),
 							components: [
 								{
-									content: $L( "Username" ),
-									className: "small",
-									style: "color: rgb( 32, 117, 191 );"
+									name: "gUser",
+									kind: enyo.Input,
+									hint: $L( "Google Username" ),
+
+									inputType: "email",
+
+									components: [
+										{
+											content: $L( "Username" ),
+											className: "small",
+											style: "color: rgb( 32, 117, 191 );"
+										}
+									]
+								}, {
+									name: "gPass",
+									kind: enyo.PasswordInput,
+									hint: $L( "Account Password" ),
+
+									components: [
+										{
+											content: $L( "Password" ),
+											className: "small",
+											style: "color: rgb( 32, 117, 191 );"
+										}
+									]
 								}
 							]
 						}, {
-							name: "gPass",
-							kind: enyo.PasswordInput,
-							hint: $L( "Account Password" ),
+							content: "Enter your Google Spreadsheets credentials to export your financial data to <a href='http://docs.google.com/'>Google Documents</a> from your device.",
+							allowHtml: true,
+							className: "smallest",
+							style: "padding: 0.5em 0.5em 0 0.5em;"
+						}, {
+							layoutKind: enyo.HFlexLayout,
+							style: "padding: 0.5em 0.5em 0.5em 0.5em;",
 
 							components: [
 								{
-									content: $L( "Password" ),
-									className: "small",
-									style: "color: rgb( 32, 117, 191 );"
+									name: "saveCredentials",
+									kind: enyo.CheckBox,
+									checked: true,
+
+									style: "margin-right: 10px;"
+								}, {
+									content: $L( "Save credentials" ),
+									flex: 1
 								}
 							]
 						}
 					]
-				}, {
-					content: "Enter your Google Spreadsheets credentials to export your financial data to <a href='http://docs.google.com/'>Google Documents</a> from your device.",
-					allowHtml: true,
-					className: "smallest",
-					style: "padding: 0.5em 0.5em 0 0.5em;"
-				}, {
-					layoutKind: enyo.HFlexLayout,
-					style: "padding: 0.5em 0.5em 0.5em 0.5em;",
+				},
 
-					components: [
-						{
-							name: "saveCredentials",
-							kind: enyo.CheckBox,
-							checked: true,
-
-							style: "margin-right: 10px;"
-						}, {
-							content: $L( "Save credentials" ),
-							flex: 1
-						}
-					]
-				}, {
-					name: "credentialsButton",
-					kind: enyo.Button,
-					caption: $L( "Sign In" ),
-					onclick: "authenticateWithGoogle",
-					className: "enyo-button-affirmative"
-				}
-			]
-		}, {
-			showing: false,
-
-			name: "accountList",
-			layoutKind: enyo.VFlexLayout,
-			components: [
 				{
-					kind: enyo.Group,
-					caption: $L( "Accounts" ),
+					showing: false,
+
+					name: "accountList",
+					layoutKind: enyo.VFlexLayout,
+
+					className: "light narrow-column",
+					flex: 1,
 
 					components: [
 						{
 							name: "accounts",
-							kind: enyo.VirtualList,
+							kind: enyo.VirtualRepeater,
 
-							style: "height: 325px;",
+							flex: 1,
 							onSetupRow: "setupRow",
 
 							components: [
@@ -166,28 +169,60 @@ enyo.kind({
 							]
 						}
 					]
+				}
+			]
+		},
+
+		{
+			name: "credentialsBar",
+			kind: enyo.Toolbar,
+			components: [
+				{
+					kind: enyo.Spacer,
+					flex: 1
 				}, {
-					layoutKind: enyo.HFlexLayout,
-					components: [
-						{
-							name: "accountListButton",
-							kind: enyo.Button,
-							caption: $L( "Export Accounts" ),
+					name: "credentialsButton",
+					kind: enyo.Button,
+					content: $L( "Sign In" ),
 
-							onclick: "beginExportProcess",
+					onclick: "authenticateWithGoogle",
 
-							flex: 4,
-							className: "enyo-button-affirmative"
-						}, {
-							name: "accountListSelectButton",
-							kind: enyo.Button,
-							caption: $L( "Select" ) + "...",
+					className: "enyo-button-affirmative deep-green",
+					style: "min-width: 150px;"
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}
+			]
+		}, {
+			name: "accountListBar",
+			showing: false,
+			kind: enyo.Toolbar,
+			components: [
+				{
+					kind: enyo.Spacer,
+					flex: 8
+				}, {
+					name: "accountListButton",
+					kind: enyo.Button,
+					caption: $L( "Export Accounts" ),
 
-							onclick: "accountListSelectOptions",
+					onclick: "beginExportProcess",
 
-							flex: 1
-						}
-					]
+					className: "enyo-button-affirmative deep-green",
+					style: "min-width: 150px;"
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
+					name: "accountListSelectButton",
+					kind: enyo.Button,
+					caption: $L( "Select" ) + "...",
+
+					onclick: "accountListSelectOptions"
+				}, {
+					kind: enyo.Spacer,
+					flex: 8
 				}
 			]
 		},
@@ -258,6 +293,8 @@ enyo.kind({
 		this.log();
 
 		this.$['credentialsButton'].setDisabled( false );
+		this.$['credentialsBar'].setShowing( true );
+		this.$['accountListBar'].setShowing( false );
 
 		this.$['credentials'].show();
 		this.$['accountList'].hide();
@@ -436,9 +473,11 @@ enyo.kind({
 		this.$['progress'].setMessage( "Processing accounts..." );
 		this.$['progress'].setProgress( 75 );
 
-		this.$['accounts'].punt();
+		this.$['accounts'].render();
 
 		this.$['accountListButton'].setDisabled( false );
+		this.$['credentialsBar'].setShowing( false );
+		this.$['accountListBar'].setShowing( true );
 
 		this.$['credentials'].hide();
 		this.$['accountList'].show();
@@ -484,7 +523,7 @@ enyo.kind({
 			this.acctList[inEvent.rowIndex]['selectStatus'] = !this.acctList[inEvent.rowIndex]['selectStatus'];
 		}
 
-		this.$['accounts'].refresh();
+		this.$['accounts'].render();
 	},
 
 	authSuccessful: function( index ) {
@@ -492,7 +531,7 @@ enyo.kind({
 		this.acctList[index]['bypass'] = true;
 		this.acctList[index]['selectStatus'] = true;
 
-		this.$['accounts'].refresh();
+		this.$['accounts'].render();
 	},
 
 	accountListSelectOptions: function( inSender ) {
@@ -525,7 +564,7 @@ enyo.kind({
 			}
 		}
 
-		this.$['accounts'].refresh();
+		this.$['accounts'].render();
 	},
 
 	/** Run export process **/
@@ -731,8 +770,6 @@ enyo.kind({
 		}
 
 		//Close & continue
-		this.close();
-
 		this.doFinish();
 	},
 

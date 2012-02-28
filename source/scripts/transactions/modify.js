@@ -24,18 +24,13 @@ enyo.kind( {
 	components: [
 		{
 			kind: enyo.PageHeader,
+			layoutKind: enyo.HFlexLayout,
+			pack: "center",
 			components: [
 				{
-					layoutKind: enyo.HFlexLayout,
-					pack: "center",
-					className: "narrow-column",
-					components: [
-						{
-							name: "transTypeText",
-							content: "Modify Transaction",
-							className: "bigger"
-						}
-					]
+					name: "transTypeText",
+					content: "Modify Transaction",
+					className: "bigger"
 				}
 			]
 		},

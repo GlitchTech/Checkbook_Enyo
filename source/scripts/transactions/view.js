@@ -1,7 +1,6 @@
 /* Copyright © 2011, GlitchTech Science */
 
 enyo.kind( {
-
 	name: "Checkbook.transactions.view",
 	kind: enyo.SlidingView,
 
