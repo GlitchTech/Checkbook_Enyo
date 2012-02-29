@@ -26,11 +26,11 @@ enyo.kind( {
 			};
 	},
 
-	/**
-	 * @private
-	 */
-	rendered: function() {
+	//create new
+	//edit
+	//delete
+	//get new events
 
-		this.inherited( arguments );
-	}
+	//build rrule
+	//parse rrule
 });
