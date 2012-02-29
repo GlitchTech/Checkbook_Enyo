@@ -867,11 +867,16 @@ enyo.kind( {
 
 		if( remainder > 0 && eiLen > 0 ) {
 
-			for( var i = 0; i < eiLen; i++ ) {
-				//Divide up remaining amount into 0val categories
+			//Divide up remaining amount into 0val categories && Limit to 2 decimal places
+			var divAmount = ( remainder / eiLen ).toFixed( 2 );
 
-				this.trsnObj['category'][emptyItems[i]]['amount'] = remainder / eiLen;
+			for( var i = 0; i < ( eiLen - 1 ); i++ ) {
+
+				this.trsnObj['category'][emptyItems[i]]['amount'] = divAmount;
 			}
+
+			//For uneven divisions
+			this.trsnObj['category'][emptyItems[eiLen - 1]]['amount'] = remainder - ( divAmount * ( eiLen - 1 ) );
 		}
 
 		this.categoryChanged();
