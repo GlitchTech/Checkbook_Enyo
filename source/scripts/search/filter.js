@@ -343,6 +343,8 @@ enyo.kind({
 
 		//Extract quote items
 		var phrases = searchStr.match( /"([^"]*)"/gi );
+
+		searchStr = searchStr.replace( /"[^"]*"/gi, "" ).trim();
 		searchStr = searchStr.split( " " );
 
 		if( phrases && phrases.length > 0 ) {
@@ -352,12 +354,8 @@ enyo.kind({
 					phrases[i] = phrases[i].replace( /"/g, "" );
 			}
 
-			searchStr = searchStr.replace( /"[^"]*"/gi, "" ).trim();
-
 			searchStr = searchStr.concat( phrases );
 		}
-
-		this.log( searchStr );
 
 		for( var i = 0; i < searchStr.length; i++ ) {
 

@@ -7,7 +7,8 @@ enyo.depends(
 	"single.js",
 
 	"modify.js",
-	"autocomplete.js",
 
-	"repeat.js"
+	"transactionCategory/",
+	"autocomplete/",
+	"recurrence/"
 );

@@ -14,9 +14,7 @@ enyo.depends(
 	"login.js",
 
 	"accounts/",
-	"accountCategory/",
 	"transactions/",
-	"transactionCategory/",
 	"search/",
 	"budget/"
 );

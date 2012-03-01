@@ -10,7 +10,7 @@ enyo.kind( {
 
 	lazy: false,
 
-	style: "width: 350px; height: 350px; border-width: 8px;",//Want this to be dynamic height!
+	style: "max-width: 350px; height: 350px; border-width: 8px;",//Want this to be dynamic height!
 
 	published: {
 		searchValue: "",
@@ -25,30 +25,30 @@ enyo.kind( {
 
 	components: [
 		{
-					name: "suggestionList",
-					kind: enyo.VirtualList,
-					flex: 1,
+			name: "suggestionList",
+			kind: enyo.VirtualList,
+			flex: 1,
 
-					onSetupRow: "setupRow",
+			onSetupRow: "setupRow",
+
+			components: [
+				{
+					kind: enyo.Item,
+					layoutKind: enyo.HFlexLayout,
+
+					tapHighlight: true,
+					onclick: "rowClicked",
 
 					components: [
 						{
-							kind: enyo.Item,
-							layoutKind: enyo.HFlexLayout,
-
-							tapHighlight: true,
-							onclick: "rowClicked",
-
-							components: [
-								{
-									name: "general",
-									allowHtml: true,
-									flex: 1
-								}
-							]
+							name: "general",
+							allowHtml: true,
+							flex: 1
 						}
 					]
 				}
+			]
+		}
 	],
 
 	searchValueChanged: function() {

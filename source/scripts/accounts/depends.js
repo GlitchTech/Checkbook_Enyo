@@ -2,7 +2,11 @@
 
 enyo.depends(
 	"manager.js",
+
 	"list.js",
 	"view.js",
-	"modify.js"
+
+	"modify.js",
+
+	"accountCategory/"
 );
