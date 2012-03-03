@@ -54,9 +54,11 @@ enyo.kind({
 					caption: $L( "Preferences & Data" ),
 					components: [
 						{
-							name: "prefsMenuItem",
 							caption: $L( "Preferences & Accounts" ),
 							onclick: "openPreferences"
+						}, {
+							caption: $L( "Auto-Complete Preferences" ),
+							onclick: "openACPrefs"
 						}, {
 							caption: $L( "Import Data" ),
 							onclick: "openImport"
@@ -385,6 +387,19 @@ enyo.kind({
 					this.loadCheckbookStage2
 				);
 		}
+	},
+
+	/** Checkbook.autocompleteprefs.* **/
+
+	openACPrefs: function( inSender, inEvent ) {
+
+		this.showPanePopup(
+				null,
+				{
+					name: "autocompleteprefs",
+					kind: "Checkbook.autocompleteprefs.view"
+				}
+			);
 	},
 
 	/** Checkbook.budget.* **/

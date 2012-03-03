@@ -1,5 +1,8 @@
 #ignore thumbs.db
+thumbs.db
 */thumbs.db
+*/*/thumbs.db
+*/*/*/thumbs.db
 
 #ignore Metrix
-source/libraries/Metrix/*
+lib/Metrix/*

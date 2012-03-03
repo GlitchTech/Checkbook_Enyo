@@ -64,7 +64,14 @@ enyo.kind( {
 		enyo.application.gts_db.query(
 				new GTS.databaseQuery(
 						{
-							"sql": "SELECT DISTINCT desc FROM transactions WHERE desc LIKE ? ORDER BY desc ASC LIMIT ?;",
+							"sql": "SELECT " +
+										"DISTINCT desc " +
+									"FROM transactions " +
+									"WHERE " +
+										"desc LIKE ? " +
+										//AND desc NOT IN ( SELECT desc FROM suggestions )//Needs union or something with suggetions table
+									"ORDER BY desc ASC " +
+									"LIMIT ?;",
 							"values": [ this.searchValue + "%", this.limit ]
 						}
 					),

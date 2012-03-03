@@ -58,7 +58,6 @@ enyo.kind( {
 
 			onSetupRow: "transactionBuildRow",
 			onAcquirePage: "transactionFetchGroup",
-			//pageSize: 15,
 
 			components: [
 				{
