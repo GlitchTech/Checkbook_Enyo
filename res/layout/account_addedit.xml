@@ -40,7 +40,7 @@
 				android:layout_height="1dip"
 				android:background="@drawable/div_grad"
 				android:layout_below="@id/category"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<TextView
 				android:id="@+id/secOptLabel"
 				android:layout_width="wrap_content"
@@ -50,13 +50,13 @@
 				android:text="Security Options"
 				android:layout_below="@id/category"
 				android:layout_marginTop="2dip"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<View
 				android:layout_width="fill_parent"
 				android:layout_height="1dip"
 				android:background="@drawable/div_grad"
 				android:layout_below="@id/secOptLabel"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<CheckBox
 				android:id="@+id/frozen"
 				android:text="Freeze Internal Transactions"
@@ -64,7 +64,7 @@
 				android:layout_height="wrap_content"
 				android:layout_below="@id/secOptLabel"
 				android:layout_marginTop="2dip"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<TextView
 				android:id="@+id/frozenLabel"
 				android:layout_width="fill_parent"
@@ -72,13 +72,13 @@
 				android:paddingLeft="10dip"
 				android:text="Prevent any changes from being made only in this account."
 				android:layout_below="@id/frozen"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<View
 				android:layout_width="fill_parent"
 				android:layout_height="1dip"
 				android:background="@drawable/div_grad"
 				android:layout_below="@id/frozenLabel"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<CheckBox
 				android:id="@+id/locked"
 				android:text="PIN Lock"
@@ -87,14 +87,14 @@
 				android:layout_below="@id/frozenLabel"
 				android:clickable="true"
 				android:layout_marginTop="2dip"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<TextView
 				android:id="@+id/lockedCode"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				style="@style/PinTap"
 				android:layout_below="@id/locked"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<View
 				android:layout_width="fill_parent"
 				android:layout_height="1dip"
@@ -177,16 +177,14 @@
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:layout_below="@id/balViewPreview"
-				android:layout_marginTop="2dip"
-				android:visibility="gone" /><!-- TODO -->
+				android:layout_marginTop="2dip" />
 			<TextView
 				android:id="@+id/defaultAccountLabel"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:paddingLeft="10dip"
 				android:text="This account is launched automatically on start."
-				android:layout_below="@id/defaultAccount"
-				android:visibility="gone" /><!-- TODO -->
+				android:layout_below="@id/defaultAccount" />
 			<View
 				android:layout_width="fill_parent"
 				android:layout_height="1dip"
@@ -218,7 +216,7 @@
 				android:layout_height="wrap_content"
 				android:layout_below="@id/showTransTimeLabel"
 				android:layout_marginTop="2dip"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<TextView
 				android:id="@+id/runningBalanceLabel"
 				android:layout_width="fill_parent"
@@ -226,7 +224,7 @@
 				android:paddingLeft="10dip"
 				android:text="Running balance will be shown beneath transaction amount. The transaction amount will be black and the balance will be colored."
 				android:layout_below="@id/runningBalance"
-				android:visibility="gone" /><!-- TODO -->
+				android:visibility="gone" />
 			<View
 				android:layout_width="fill_parent"
 				android:layout_height="1dip"

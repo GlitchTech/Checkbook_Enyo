@@ -375,7 +375,7 @@ public class checkbook extends Application {
 		}
 	}
 
-	public account_obj getDefaultAcc() {
+	public long getDefaultAccountId() {
 
 		String accountQry = "SELECT acctId FROM " + QRY_TABLE + " WHERE defaultAccount = 1 LIMIT 1";
 
@@ -394,6 +394,13 @@ public class checkbook extends Application {
 		}
 
 		results.close();
+		
+		return acctId;
+	}
+
+	public account_obj getDefaultAccountObj() {
+		
+		long acctId = this.getDefaultAccountId();
 
 		if( acctId < 0 ) {
 

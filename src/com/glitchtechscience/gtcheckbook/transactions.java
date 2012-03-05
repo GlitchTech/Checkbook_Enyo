@@ -87,7 +87,7 @@ public class transactions extends Activity {
 		setUpButtons();
 		setUpBalances();
 		setUpData();
-	}
+	} 
 
 	@Override
 	public void onResume() {

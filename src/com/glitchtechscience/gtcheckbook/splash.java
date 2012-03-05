@@ -141,8 +141,26 @@ public class splash extends Activity {
 	};
 
 	protected void loadAccts() {
+		
+		checkbook appState = ( ( checkbook )getApplicationContext() );
 
 		startActivity( new Intent( splash.this, accounts.class ) );
+		
+		long acctId = appState.getDefaultAccountId();
+		
+		if( acctId >= 0 ) {
+			
+			appState.trsnItemsChanged = true;
+	
+			Intent i = new Intent( splash.this, transactions.class );
+			Bundle b = new Bundle();
+	
+			b.putLong( "acctId", acctId );
+	
+			i.putExtras( b );
+			startActivity( i );
+		}
+		
 		this.finish();
 		dialog.dismiss();
 	}

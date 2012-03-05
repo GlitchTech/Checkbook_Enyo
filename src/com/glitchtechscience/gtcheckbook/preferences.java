@@ -166,7 +166,7 @@ public class preferences extends Activity {
 
 	private void updateDefaultAccount() {
 
-		account_obj defaultAcct = appState.getDefaultAcc();
+		account_obj defaultAcct = appState.getDefaultAccountObj();
 
 		Button defaultBttn = ( Button )findViewById( R.id.prefDefaultAcct );
 
