@@ -2,8 +2,8 @@
 <manifest
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.glitchtechscience.gtcheckbook"
-	android:versionName="0.6.58"
-	android:versionCode="18">
+	android:versionName="0.6.65"
+	android:versionCode="20">
 	<uses-sdk
 		android:minSdkVersion="7" />
 	<uses-permission

@@ -29,6 +29,9 @@ import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -512,7 +515,7 @@ public class importData extends Activity {
 			public void run() {
 
 				// finish sheet -> push to db -> start next sheet
-
+				
 				String[] docSheets = new String[ 0 ];
 				int[] rowCounts = new int[ 0 ];
 				boolean loopDoc = true;
@@ -678,6 +681,27 @@ public class importData extends Activity {
 										int linkedRecord = nodeToInt( itemNode, "gsx:gtlinkid" );
 										String linkedAccount = nodeToString( itemNode, "gsx:gtlinkedaccount" );
 										String linkedAccountCat = nodeToString( itemNode, "gsx:gtlinkedaccountcat" );
+										
+										//category handling
+
+										if( category.compareTo( "" ) == 0 || category.compareToIgnoreCase( "none" ) == 0 ) {
+											//No or bad category data
+
+											category = "";
+										} else {
+											
+											try {
+												//Attempt to parse JSON
+																			
+												JSONArray array = ( JSONArray )JSONValue.parse( category );
+												JSONObject cat = ( JSONObject )array.get( 0 );
+												
+												category = (String)cat.get( "category" ) + "|" + (String)cat.get( "category2" );
+											} catch( Exception e ) {
+												
+												e.printStackTrace();
+											}
+										}
 
 										String account = nodeToString( itemNode, "gsx:account" );
 										if( account.length() <= 0 ) {
