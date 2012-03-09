@@ -1,3 +1,19 @@
+/** Styles for adaptive screen size **/
+@viewport {
+  width: device-width;
+  height: device-height;
+}
+
+@media screen and (min-width: 400px) {
+  /** Tablet **/
+}
+
+@media screen and (max-width: 400px) {
+  /** Phone **/
+}
+
+/** Account List **/
+
 .hiddenAccount {
 	display: none;
 }
@@ -38,7 +54,7 @@
 	padding: 0px 14px 5px 14px;
 }
 
-/*****************/
+/** Transaction List **/
 
 .transactionItemTop {
 	margin-left: -25px;
@@ -106,7 +122,25 @@
 	border-right: 1px solid rgba( 0, 0, 0, 0.2 );
 }
 
-/*****************/
+/** Transaction Preview && Similar **/
+
+.modal-pane-view {
+	font-size: 18px;
+	height: 600px;
+}
+
+.modal-pane-view .group .enyo-scroller {
+	margin: -12px
+}
+
+.modal-pane-view .group .enyo-first {
+	border-top-left-radius: 8px 8px;
+	border-top-right-radius: 8px 8px;
+	height: 65px;
+	padding: 8px;
+}
+
+/** Menu Selection **/
 
 .enyo-item.selected,
 .enyo-popup-menu .selected .enyo-item {

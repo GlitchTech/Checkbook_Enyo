@@ -118,21 +118,3 @@
 	font-weight: normal;
 	color: #333333;
 }
-
-/* Transaction Preview */
-
-.modal-pane-view {
-	font-size: 18px;
-	height: 600px;
-}
-
-.modal-pane-view .group .enyo-scroller {
-	margin: -12px
-}
-
-.modal-pane-view .group .enyo-first {
-	border-top-left-radius: 8px 8px;
-	border-top-right-radius: 8px 8px;
-	height: 65px;
-	padding: 8px;
-}

@@ -90,27 +90,6 @@
 	background-position: center center;
 }
 
-/* Desktop Background CSS */
-.desktop-background {
-  min-height:740px;
-  background-position: center top;
-}
-
-.desktop-background-shade {
-  -webkit-transition: background-color 1s ease;
-}
-
-.desktop-background-gradient {
-  -webkit-border-image: url( '../images/compose-background-shadow.png' ) 0 128 stretch;
-  border-width: 0 128px;
-  margin: 0 -128px;
-}
-
-.desktop-background-center {
-  margin: 0 auto;
-  max-width: 768px;
-}
-
 /* Background Colors */
 
 .custom-background.black {

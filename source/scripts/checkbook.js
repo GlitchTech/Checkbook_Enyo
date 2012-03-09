@@ -57,6 +57,7 @@ enyo.kind({
 							caption: $L( "Preferences & Accounts" ),
 							onclick: "openPreferences"
 						}, {
+							showing: false,
 							caption: $L( "Auto-Complete Preferences" ),
 							onclick: "openACPrefs"
 						}, {
