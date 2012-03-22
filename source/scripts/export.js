@@ -75,15 +75,20 @@ enyo.kind({
 										}
 									]
 								}, {
-									name: "gPass",
-									kind: enyo.PasswordInput,
-									hint: $L( "Account Password" ),
-
+									name: "gPassWrapper",
 									components: [
 										{
-											content: $L( "Password" ),
-											className: "small",
-											style: "color: rgb( 32, 117, 191 );"
+											name: "gPass",
+											kind: enyo.PasswordInput,
+											hint: $L( "Account Password" ),
+
+											components: [
+												{
+													content: $L( "Password" ),
+													className: "small",
+													style: "color: rgb( 32, 117, 191 );"
+												}
+											]
 										}
 									]
 								}
@@ -107,6 +112,17 @@ enyo.kind({
 								}, {
 									content: $L( "Save credentials" ),
 									flex: 1
+								}, {
+									name: "showPass",
+									kind: enyo.ToggleButton,
+
+									state: false,
+									onLabel: $L( "Show password" ),
+									offLabel: $L( "Mask password" ),
+
+									onChange: 'togglePasswordVis',
+
+									style: "margin-left: 10px;"
 								}
 							]
 						}
@@ -325,7 +341,38 @@ enyo.kind({
 		this.$['gPass'].setValue( pass );
 		this.$['saveCredentials'].setChecked( save );
 
+		this.$['showPass'].setDisabled( save );//Disable show cred if loaded from DB
+
 		this.$['gUser'].forceFocus();
+	},
+
+	togglePasswordVis: function( inSender, state ) {
+
+		var pass = this.$['gPass'].getValue();
+
+		this.$['gPass'].destroy();
+
+		this.$['gPassWrapper'].createComponent(
+				{
+					name: "gPass",
+					kind: ( state ? enyo.Input : enyo.PasswordInput ),
+					hint: $L( "Account Password" ),
+
+					components: [
+						{
+							content: $L( "Password" ),
+							className: "small",
+							style: "color: rgb( 32, 117, 191 );"
+						}
+					]
+				}, {
+					owner: this
+				}
+			);
+
+		this.$['gPassWrapper'].render();
+
+		this.$['gPass'].setValue( pass );
 	},
 
 	/** Authenticate **/

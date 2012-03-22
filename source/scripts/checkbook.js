@@ -368,7 +368,7 @@ enyo.kind({
 				{
 					name: "import",
 					kind: "Checkbook.import",
-					onFinish: "importComplete"
+					onFinish: enyo.bind( this, this.importComplete )
 				}
 			);
 	},
