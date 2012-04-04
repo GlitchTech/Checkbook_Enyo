@@ -21,6 +21,28 @@ enyo.kind( {
 		onFinish: ""
 	},
 
+	recurranceOptions: [
+		{
+			caption: "No Repeat",
+			value: 0
+		}, {
+			caption: "Daily",
+			value: 1
+		}, {
+			caption: "Weekly",
+			value: 2
+		}, {
+			caption: "Monthly",
+			value: 3
+		}, {
+			caption: "Yearly",
+			value: 4
+		}, {
+			caption: "Custom",
+			value: 5
+		}
+	],
+
 	components: [
 		{
 			kind: enyo.PageHeader,
@@ -168,14 +190,48 @@ enyo.kind( {
 								}
 							]
 						}, {
-							showing: false,
-
 							kind: enyo.Group,
+							caption: $L( "Recurrance" ),
 							tapHightlight: false,
+
+							style: "padding: 2px;",
+
 							components: [
 								{
-									kind: enyo.Item,
-									content: "repeat row"
+									name: "recurranceNode",
+									kind: "GTS.ListSelectorBar",
+									labelText: "",
+
+									onChange: "recurranceNodeChanged",
+
+									className: "enyo-single",
+									style: "margin-left: 8px;"
+								}, {
+									//not inline, popup or pane?
+
+									name: "recurranceDrawer",
+									kind: enyo.Drawer,
+									open: false,
+
+									components: [
+										{
+											kind: enyo.Group,
+											caption: $L( "Choose Custom Repeat" ),
+											components: [
+												//Drop down
+													//Week day chooser
+												//Every X (time unit)(s)
+											]
+										}, {
+											kind: enyo.Group,
+											caption: $L( "Repeat Until" ),
+											components: [
+												//Forever, occurances, end date
+												//Date, number picker
+											]
+										}
+										//Summary on repeat length
+									]
 								}
 							]
 						}, {
@@ -433,6 +489,7 @@ enyo.kind( {
 
 		this.log();
 
+		//Setup main account
 		this.accountList = accounts;
 
 		this.$['account'].setChoices( this.accountList );
@@ -442,6 +499,7 @@ enyo.kind( {
 
 		this.$['account'].render();
 
+		//Setup linked account
 		if( this.accountList.length > 1 ) {
 
 			this.$['linkedAccount'].setChoices( this.accountList );
@@ -456,6 +514,10 @@ enyo.kind( {
 			this.$['linkedAccount'].setDisabled( true );
 			this.$['linkedAccount'].$['listName'].setDisabled( true );
 		}
+
+		//Setup recurrance
+		this.$['recurranceNode'].setChoices( this.recurranceOptions );
+		this.$['recurranceNode'].render();
 
 		//Check this.accountObj properties
 		var count = 0;
@@ -770,6 +832,16 @@ enyo.kind( {
 	dateChanged: function( inSender, inDate ) {
 
 		this.$['dateDisplay'].setContent( this.$['date'].getValue().format( { date: 'long', time: ( this.accountObj['showTransTime'] === 1 ? 'short' : '' ) } ) );
+	},
+
+	/** Recurrance Controls **/
+
+	recurranceNodeChanged: function( inSender, newIndex, oldIndex ) {
+
+		if( this.recurranceOptions[newIndex]['caption'] === "Custom" ) {
+
+			//Show popup
+		}
 	},
 
 	/** Category Controls **/
