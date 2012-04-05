@@ -53,7 +53,7 @@ public class accounts extends Activity {
 
 		super.onResume();
 
-		if( appState.acctItemsChanged ) {
+		if( appState.acctItemsChanged != true ) {
 
 			Log.d( "Note", "Accounts changed" );
 
@@ -69,6 +69,7 @@ public class accounts extends Activity {
 			dialog.hide();
 		} catch( Exception ex ) {
 
+			Log.e( "catched error", ex.toString() );
 		}
 	}
 
@@ -81,7 +82,7 @@ public class accounts extends Activity {
 	}
 
 	public void setUpListView() {
-
+		
 		ListView l1 = ( ListView )findViewById( android.R.id.list );
 
 		ColorDrawable divcolor = new ColorDrawable( Color.DKGRAY );
@@ -185,6 +186,8 @@ public class accounts extends Activity {
 			} catch( NumberFormatException ex ) {
 
 				balView = 0;
+
+				Log.e("catched error", ex.toString() );
 			}
 
 			Log.i( "Sys Balance Change", appState.formatAccountBalance( balView ) );

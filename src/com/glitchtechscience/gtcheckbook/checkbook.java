@@ -226,8 +226,15 @@ public class checkbook extends Application {
 
 			qryAccts += " ORDER BY acctName";
 		} else if( sort == 1 ) {
-
-			qryAccts += " ORDER BY " + this.accountSortOptions[currAcctSort].data;
+			
+			try {
+				
+				
+				qryAccts += " ORDER BY " + this.accountSortOptions[currAcctSort].data;
+			} catch( NullPointerException ex ) {
+				
+				Log.e( "Caught Error", ex.toString() );
+			}
 		}
 
 		Date date = new Date();

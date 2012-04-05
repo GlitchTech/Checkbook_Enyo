@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class transactions extends Activity {
-
+	
 	private checkbook appState;
 	private SQLiteDatabase db;
 	private account_obj acct;
@@ -130,24 +130,28 @@ public class transactions extends Activity {
 		return appState.applyMenuChoice( item, transactions.this ) || super.onOptionsItemSelected( item );
 	}
 
-	public void setUpData() {
+	public void setUpData() {		
 
-		// Set up trsnList query & system
-		String expenseQry = "SELECT " + QRY_SELECT + " FROM " + QRY_TABLE + " WHERE " + QRY_WHERE + " ORDER BY " + appState.getAcctTrsnSortsQryViaId( acct.sort );
+		if( this.trsnListCursor == null ) {
 
-		try {
+			// Set up trsnList query & system
+			String expenseQry = "SELECT " + QRY_SELECT + " FROM " + QRY_TABLE + " WHERE " + QRY_WHERE + " ORDER BY " + appState.getAcctTrsnSortsQryViaId( acct.sort );
 
-			trsnListCursor.close();
-		} catch( Exception ex ) {}
+			this.trsnListCursor = this.db.rawQuery( expenseQry, new String[] { acct.rowId + "" } );
 
-		trsnListCursor = this.db.rawQuery( expenseQry, new String[] { acct.rowId + "" } );
+			String[] dataCols = new String[] { "desc" };
+			int[] dispFields = new int[] { R.id.trsnName };
 
-		String[] dataCols = new String[] { "desc" };
-		int[] dispFields = new int[] { R.id.trsnName };
+			this.trsnList = ( ListView )findViewById( R.id.trsnList );
+			this.trsnListAdp = new trsnListAdapter( transactions.this, R.layout.trsn_item, this.trsnListCursor, dataCols, dispFields );
+			this.trsnList.setAdapter( this.trsnListAdp );
+			
+			this.startManagingCursor( this.trsnListCursor );
+		} else {
 
-		this.trsnList = ( ListView )findViewById( R.id.trsnList );
-		this.trsnListAdp = new trsnListAdapter( transactions.this, R.layout.trsn_item, trsnListCursor, dataCols, dispFields );
-		this.trsnList.setAdapter( this.trsnListAdp );
+			//Refreshes list with new data set
+			this.trsnListAdp.changeCursor( this.trsnListCursor );
+		}
 	}
 
 	private void setUpButtons() {
@@ -321,6 +325,7 @@ public class transactions extends Activity {
 		} catch( NullPointerException ex ) {
 
 			//TODO handle this
+			Log.e( "Caught Error", ex.toString() );
 		}
 
 		( ( TextView )findViewById( R.id.trsnAccountName ) ).setText( acct.name );
