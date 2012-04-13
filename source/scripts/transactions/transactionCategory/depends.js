@@ -3,6 +3,7 @@
 enyo.depends(
 	"manager.js",
 
+	"select.js",
 	"view.js",
 	"modify.js",
 
