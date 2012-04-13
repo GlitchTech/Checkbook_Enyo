@@ -1,7 +1,7 @@
 /* Copyright © 2011, GlitchTech Science */
 
 enyo.kind( {
-	name: "Checkbook.transactions.repeat",
+	name: "Checkbook.transactions.repeat.manager",
 	kind: enyo.Component,
 
 	published: {
@@ -29,6 +29,7 @@ enyo.kind( {
 	//create new
 	//edit
 	//delete
+
 	//get new events
 
 	//build rrule

@@ -56,6 +56,13 @@
 
 /*****************/
 
+.enyo-label-fullsize {
+	color: #1879cd;
+	text-transform: uppercase;
+}
+
+/*****************/
+
 .enyo-progress-bar.big {
 	height: 25px;
 	border-width: 0px 5px;
