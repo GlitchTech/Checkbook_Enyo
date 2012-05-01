@@ -233,8 +233,6 @@ enyo.kind( {
 								}
 							]
 						}, {
-							showing: false,
-
 							kind: enyo.Group,
 							caption: $L( "Recurrence" ),
 							tapHightlight: false,
@@ -959,9 +957,9 @@ enyo.kind( {
 		//Want to trigger popup if opening from no recurrence
 	},
 
-	recurrenceChanged: function( inSender, summary ) {
+	recurrenceChanged: function( inSender, rObj ) {
 
-		this.$['recurrenceDisplay'].setContent( summary );
+		this.$['recurrenceDisplay'].setContent( rObj['summary'] );
 	},
 
 	/** Check Number Controls **/

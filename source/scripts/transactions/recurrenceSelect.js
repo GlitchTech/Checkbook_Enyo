@@ -4,20 +4,20 @@ enyo.kind( {
 	name: "Checkbook.transactions.repeat.select",
 	kind: enyo.Control,
 
-	//Private variables
+	/** @private variables */
 	recurrenceOptions: [],
 
-	//Public variables
+	/** @public variables */
 	published: {
 		date: ""
 	},
 
-	//Public Events
+	/** @public events */
 	events: {
 		onChange: ""
 	},
 
-	//UI
+	/** UI */
 	components: [
 		{
 			name: "recurrenceNode",
@@ -151,14 +151,120 @@ enyo.kind( {
 	 */
 	getValue: function() {
 
-		return {};
+		var robj = {};
+
+		if( this.$['recurrenceNode'].getValue() == 0 ) {
+
+		} else {
+			//Recurrence
+
+			robj['startDate'] = this.date;
+			robj['frequency'] = this.$['frequency'].getValue();
+
+			switch( this.$['recurrenceNode'].getValue() ) {
+				case 1://Daily
+					robj['pattern'] = "daily";
+					break;
+				case 2://Weekly
+					robj['pattern'] = "weekly";
+
+					robj['dow'] = [];
+
+					for( i = 0; i < 7; i++ ) {
+
+						if( this.$['weekly' + i].getChecked() ) {
+
+							robj['dow'].push( i );
+						}
+					}
+					break;
+				case 3://Monthly
+					robj['pattern'] = "monthly";
+					break;
+				case 4://Yearly
+				default:
+					robj['pattern'] = "yearly";
+			}
+
+			//ending conditions
+			switch( this.$['endingCondition'].getValue() ) {
+				case 'd':
+					robj['endCondition'] = "date";
+					robj['endDate'] = this.$['endingDate'].getValue();
+					break;
+				case 'o':
+					robj['endCondition'] = "occurences";
+					robj['endCount'] = this.$['endingCount'].getValue();
+					break;
+				case 'f':
+				default:
+					robj['endCondition'] = "none";
+			}
+		}
+
+		return robj;
 	},
 
 	/**
 	 * @public
 	 * Sets recurrence OBJ
 	 */
-	setValue: function( rrobj ) {
+	setValue: function( robj ) {
+
+		if( robj == null || typeof( robj ) === "undefined" ) {
+
+			this.$['recurrenceNode'].setValue( 0 );
+		} else {
+			//Recurrence
+
+			this.date = robj['startDate'];
+			this.$['frequency'].setValue( robj['frequency'] );
+
+			for( i = 0; i < 7; i++ ) {
+
+				this.$['weekly' + i].setChecked( false );
+			}
+
+			switch( robj['pattern'] ) {
+				case "daily":
+					this.$['recurrenceNode'].setValue( 1 );
+					break;
+				case "weekly":
+					this.$['recurrenceNode'].setValue( 2 );
+
+					for( i = 0; i < robj['dow'].length; i++ ) {
+
+						this.$['weekly' + robj['dow'][i]].setChecked( true );
+					}
+					break;
+				case "monthly":
+					this.$['recurrenceNode'].setValue( 3 );
+					break;
+				case "yearly":
+					this.$['recurrenceNode'].setValue( 4 );
+					break;
+				default:
+					this.$['recurrenceNode'].setValue( 0 );
+			}
+
+			//ending conditions
+			switch( robj['endCondition'] ) {
+				case "date":
+					this.$['endingCondition'].setValue( 'd' );
+					this.$['endingDate'].setValue( robj['endDate'] );
+					break;
+				case "occurences":
+					this.$['endingCondition'].setValue( 'o' );
+					this.$['endingCount'].setValue( robj['endCount'] );
+					break;
+				case "none":
+				default:
+					this.$['endingCondition'].setValue( 'f' );
+			}
+		}
+
+		this.buildRecurrenceOptions();
+		this.recurrenceNodeChanged();
 	},
 
 	/**
@@ -192,7 +298,7 @@ enyo.kind( {
 							kind: enyo.CheckBox,
 							onChange: "sendSummary",
 							checked: ( this.date.getDay() == i ),
-							dayName: dowDate.format( { format: "EEE" } )
+							dayName: dowDate.format( { format: "EEEE" } )
 						}
 					]
 				});
@@ -207,6 +313,10 @@ enyo.kind( {
 		this.recurrenceNodeChanged();
 	},
 
+	/**
+	 * @protected
+	 * Date recurrence is based on changed, called by system
+	 */
 	dateChanged: function() {
 
 		this.buildRecurrenceOptions();
@@ -295,7 +405,7 @@ enyo.kind( {
 			}
 		}
 
-		this.doChange( summary );
+		this.doChange( { "summary": summary, "value": this.getValue() } );
 	},
 
 	/**
