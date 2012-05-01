@@ -84,9 +84,6 @@ enyo.kind({
 						}
 					]
 				}, {
-					caption: $L( "Show Notices" ),
-					onclick: "forceShowMetrix"
-				}, {
 					showing: false,
 					caption: $L( "Report Bug" ),
 					onclick: "errorReport"
@@ -201,9 +198,6 @@ enyo.kind({
 		enyo.application.transactionManager = new Checkbook.transactions.manager();
 		enyo.application.transactionCategoryManager = new Checkbook.transactionCategory.manager();
 
-		//Metrix Work
-		enyo.application.Metrix.postDeviceData();
-
 		enyo.nextTick(
 				this,
 				this.loadCheckbookStage2
@@ -239,7 +233,7 @@ enyo.kind({
 
 		if( this.notificationType === true && enyo.application.checkbookPrefs['updateCheckNotification'] == 1 ) {
 
-			enyo.application.Metrix.checkBulletinBoard( 1, false );//Min bulletin version (int), force review (boolean)
+			//Check for notifications
 		} else if( this.notificationType === false ) {
 			//First run notice
 
@@ -282,11 +276,6 @@ enyo.kind({
 
 		this.$['appMenu'].setAutomatic( true );
 		inSender.close();
-	},
-
-	forceShowMetrix: function() {
-
-		enyo.application.Metrix.checkBulletinBoard( 1, true );
 	},
 
 	errorReport: function() {

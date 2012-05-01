@@ -38,6 +38,21 @@ Phone Mode
 
 Needs to be tested on an actual device to see behaviour. Work on optimizing list loading (ie only when in view).
 
+Recurrance
+==========
+
+* UI is partially built
+* Backend does not exist yet
+
+Phone Mode
+==========
+
+Enyo Update
+===========
+
+* Update code to run on EnyoJS instead of Enyo 1.0
+* This update will have to wait for a later revision of Enyo, lists aren't up to it as of yet.
+
 =========
 Completed
 =========

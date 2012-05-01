@@ -103,13 +103,6 @@ enyo.kind({
 			enyo.application.checkbookPrefs = {};
 		}
 
-		if( !enyo.application.Metrix ) {
-
-			this.log( "setting up Metrix" );
-
-			enyo.application.Metrix = new Metrix();
-		}
-
 		this.checkDB();
 	},
 
