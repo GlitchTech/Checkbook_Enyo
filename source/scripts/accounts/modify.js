@@ -56,6 +56,14 @@ enyo.kind( {
 							labelText: "Account Category",
 							className: "iconListSelector custom-background",
 							onChange: "categoryChanged"
+						}, {
+							name: "defaultAccount",
+							kind: "GTS.ToggleBar",
+							style: "padding-left: 0;",
+							mainText: "Default Account",
+							subText: "This account is launched automatically on start.",
+							onText: "Yes",
+							offText: "No"
 						},
 
 						{
@@ -165,14 +173,6 @@ enyo.kind( {
 											value: 2
 										}
 									]
-								}, {
-									name: "defaultAccount",
-									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
-									mainText: "Default Account",
-									subText: "This account is launched automatically on start.",
-									onText: "Yes",
-									offText: "No"
 								}, {
 									name: "showTransTime",
 									kind: "GTS.ToggleBar",
