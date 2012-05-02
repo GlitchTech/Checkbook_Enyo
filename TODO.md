@@ -1,3 +1,6 @@
+Recurrance
+==========
+
 GTS Syncing
 ===========
 
@@ -38,12 +41,6 @@ Phone Mode
 
 Needs to be tested on an actual device to see behaviour. Work on optimizing list loading (ie only when in view).
 
-Recurrance
-==========
-
-* UI is partially built
-* Backend does not exist yet
-
 Phone Mode
 ==========
 
@@ -59,5 +56,5 @@ Completed
 * Style consistency fix
 * Import date format issue fix
 * Budget system added
-* Globalization
-* Bug with custom date time picker
+* Globalization updates
+* Bug fix for custom date time picker

@@ -3,3 +3,6 @@ thumbs.db
 */thumbs.db
 */*/thumbs.db
 */*/*/thumbs.db
+
+#ignore workspace
+*.sublime-workspace

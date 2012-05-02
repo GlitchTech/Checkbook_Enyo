@@ -714,10 +714,6 @@ enyo.kind({
 				//Add secondary trans cat to system
 				querySet.push( "ALTER TABLE transactions ADD COLUMN category2 TEXT;" );
 
-				//Repeat System (ignore cleared, checknum)
-				querySet.push( "DROP TABLE IF EXISTS repeats;" );
-				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurance TEXT, last_sync TEXT, desc TEXT, amount REAL, note TEXT, category TEXT, acctId INTEGER, linkedAcctId INTEGER, autoTrsnLink INTEGER );" );
-
 				this.versionCheck = 19;
 			case 19:
 				querySet.push( "ALTER TABLE prefs ADD COLUMN previewTransaction INTEGER NOT NULL DEFAULT 1;" );
@@ -726,10 +722,6 @@ enyo.kind({
 			case 20:
 				//Add secondary trans cat to budget system
 				querySet.push( "ALTER TABLE budgets ADD COLUMN category2 TEXT;" );
-
-				//Repeat System (ignore cleared, checknum)
-				querySet.push( "DROP TABLE IF EXISTS repeats;" );
-				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurance TEXT, last_sync TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER );" );
 
 				this.versionCheck = 21;
 			case 21:
@@ -747,10 +739,16 @@ enyo.kind({
 
 				this.versionCheck = 22;
 			case 22:
+				//Repeat System (ignore cleared, checknum)
+				querySet.push( "DROP TABLE IF EXISTS repeats;" );
+				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurrence TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER, lastUpdated TEXT, last_sync TEXT );" );
+
+				this.versionCheck = 23;
+			case 23:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
-				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER );" );
-				//this.versionCheck = 23;
+				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );
+				//this.versionCheck = 24;
 		}
 
 		querySet.push(

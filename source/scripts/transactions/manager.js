@@ -11,6 +11,12 @@ enyo.kind({
 	name: "Checkbook.transactions.manager",
 	kind: enyo.Component,
 
+	/**
+	 * @private recurrence variables
+	 */
+	seriesCountLimit: 3,
+	seriesDayLimit: 45,
+
 	/** @private */
 	constructor: function() {
 
@@ -61,16 +67,16 @@ enyo.kind({
 
 		//Set IDs
 		data['itemId'] = parseInt( results[0]['maxItemId'] ) + 1;
-		//data['repeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;//Unused at this time
+		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
 		//Prepare data
 		var sql = this._prepareData( data, type );
 
+		//Handle repeating system
+		sql = sql.concat( this._handleRepeatSystem( data, ( ( autoTransfer > 0 && autoTransferLink >= 0 ) ? autoTransferLink : -1 ) ) );
+
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );
-
-		//Handle repeating system (maybe?)
-		sql = sql.concat( this._handleRepeatSystem( data ) );
 
 		sql.push( enyo.application.gts_db.getInsert( "transactions", data ) );
 
@@ -202,11 +208,12 @@ enyo.kind({
 	 * @returns boolean	via onSuccess
 	 */
 	updateTransaction: function( data, type, options ) {
+		//TODO need a param after options for dealing with series transactions
 
 		enyo.application.gts_db.query(
 				new GTS.databaseQuery(
 						{
-							'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
+							'sql': "SELECT ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
 							'values': []
 						}
 					),
@@ -242,11 +249,11 @@ enyo.kind({
 		//Prepare data
 		var sql = this._prepareData( data, type );
 
+		//Handle repeating system
+		sql = sql.concat( this._handleRepeatSystem( data, -1 ) );
+
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );
-
-		//Handle repeating system (maybe?)
-		sql = sql.concat( this._handleRepeatSystem( data ) );
 
 		sql.push( enyo.application.gts_db.getUpdate( "transactions", data, { "itemId": data['itemId'] } ) );
 
@@ -284,6 +291,43 @@ enyo.kind({
 					}
 				}
 			);
+	},
+
+	/**
+	 * @public
+	 * Checks for repeating transactions
+	 *
+	 * @param int	[acctId]	specific account to update; if not set will update all accounts
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 */
+	updateSeriesTransactions: function( acctId, options ) {
+
+		//this.seriesDayLimit
+		//this.seriesCountLimit
+/*
+get all series WHERE
+	lastOccurrence < this.seriesDayLimit in the future AND
+	(
+		lastUpdated < current day at 00:00:00 OR
+		lastUpdate IS NULL OR
+		lastUpdate = ''
+	) AND (
+		(
+			endingCondition == 'date' AND
+			endDate < this.seriesDayLimit in the future
+		) OR (
+			endingCondition == 'occurences' AND
+			currCout < endCount
+		)
+	)
+
+///////
+Get max trsn id if results.length > 0
+///////
+loop through series data and create insert statements
+*/
 	},
 
 	/**
@@ -364,6 +408,7 @@ enyo.kind({
 			);
 
 		if( data['category'].length > 1 ) {
+
 			//Split category
 			for( var i = 0; i < data['category'].length; i++ ) {
 
@@ -435,30 +480,95 @@ enyo.kind({
 
 	/**
 	 * @private
-	 * Repeat handler system
+	 * Handle SQL for repeat events
 	 *
 	 * @param {object}	data	Object to be readied; Since object, pass by reference situation;
+	 * @param [int]	autoTransfer	account to auto transfer to (-1 means no transfer)
 	 *
 	 * @returns {object[]}	SQL functions to be run. Returns empty array if nothing to do.
 	 */
-	_handleRepeatSystem: function( data ) {
+	_handleRepeatSystem: function( data, autoTransfer ) {
 
 		var sqlArray = [];
 
-		/** Handle Repeat data **/
-		if( data['repeatId'] < 0 ) {
+		if( data['repeatUnlinked'] != 1 ) {
+			//If transaction is not 'unlinked' from repeating series (or not set yet)
 
-			//Check & handle new repeating transactions
-		} else {
+			if( !data['repeatId'] || data['repeatId'] < 0 ) {
+				//New repeating transactions (check/handle)
 
-			//Do existing repeating transactions
+				data['repeatId'] = data['maxRepeatId'];
+
+				var repeatInsert =  {
+						"repeatId": data['repeatId'],
+
+						//Repeat settings
+						"frequency": data['rObj']['pattern'],//Daily, Weekly, Monthly, Yearly
+						"itemSpan": data['rObj']['frequency'],//Time between events (every 2 months)
+						"daysOfWeek": ( ( data['rObj']['pattern'] == "weekly" ) ? enyo.json.stringify( data['rObj']['dow'] ) : "" ),//Array for day index else blank
+
+						"endingCondition": data['rObj']['endCondition'],
+						"endDate": ( ( data['rObj']['endCondition'] == "date" ) ? data['rObj']['endDate'] : "" ),
+						"endCount": ( ( data['rObj']['endCondition'] == "occurences" ) ? data['rObj']['endCount'] : "" ),
+
+						//Initial occurrence is latest and only
+						"lastOccurrence": data['date'],
+						"currCout": 1,
+
+						//Original data
+						"origDate": data['rObj']['startDate'],
+						"rep_desc": data['desc'],
+						"rep_amount": data['amount'],
+						"rep_note": data['note'],
+						"rep_category": enyo.json.stringify( data['category'] ),
+						"rep_acctId": data['account'],
+						"rep_linkedAcctId": data['linkedAccount'],
+						"rep_autoTrsnLink": autoTransfer,
+
+						//Sync system information
+						"last_sync": ""
+					};
+
+				//TODO calculate future repeats (to limit) && update repeatInsert object
+
+				sqlArray.push( enyo.application.gts_db.getInsert( "repeats", repeatInsert ) );
+			} else if( data['rObj']['pattern'] == "none" ) {
+				//Delete repeating entry
+
+				sqlArray.push( enyo.application.gts_db.getDelete( "repeats", { "repeatId": data['repeatId'] } ) );
+
+				//Delete future (after curr date) transactions with repeat id except for this one
+				var endOfDay = new Date();
+				endOfDay.setHours( 23, 59, 59, 999 );
+
+				sqlArray.push(
+						new GTS.databaseQuery(
+								{
+									'sql': "DELETE FROM transactions WHERE itemId != ? AND repeatId = ? AND date > ?" ,
+									'values': [ data['itemId'], data['repeatId'], endOfDay.getTime() ]
+								}
+							)
+					);
+
+				//Set repeatId to null
+				data['repeatId'] = null;
+			} else {
+				//Do existing repeating transactions
+
+				//TODO
+
+				//remember to set lastUpdated to null
+			}
 		}
 
+		delete data['rObj'];
 		delete data['maxRepeatId'];
 
 		/////////////////////////////////
-		//Temp while system doesn't exist
+		//Temp while system not completed
 		data['repeatId'] = null;
+		this.log( sqlArray );
+		return [];
 		/////////////////////////////////
 
 		return sqlArray;

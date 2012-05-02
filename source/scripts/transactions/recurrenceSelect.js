@@ -155,10 +155,11 @@ enyo.kind( {
 
 		if( this.$['recurrenceNode'].getValue() == 0 ) {
 
+			robj['pattern'] = "none";
 		} else {
 			//Recurrence
 
-			robj['startDate'] = this.date;
+			robj['startDate'] = this.date.getTime();
 			robj['frequency'] = this.$['frequency'].getValue();
 
 			switch( this.$['recurrenceNode'].getValue() ) {
@@ -190,7 +191,7 @@ enyo.kind( {
 			switch( this.$['endingCondition'].getValue() ) {
 				case 'd':
 					robj['endCondition'] = "date";
-					robj['endDate'] = this.$['endingDate'].getValue();
+					robj['endDate'] = this.$['endingDate'].getValue().getTime();
 					break;
 				case 'o':
 					robj['endCondition'] = "occurences";

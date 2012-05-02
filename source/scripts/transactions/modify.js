@@ -446,6 +446,7 @@ enyo.kind( {
 					"checkNum": "",
 					"category": $L( "Uncategorized" ),
 					"category2": $L( "Other" )
+					//TODO default repeat information
 				},
 				this.trsnObj
 			);
@@ -568,6 +569,8 @@ enyo.kind( {
 
 		//Run the formatters
 		this.$['transTypeIcon'].setIcon( "source/images/menu_icons/" + this.transactionType + ".png" );
+
+		//TODO set repeat values
 
 		this.adjustSystemViews();
 		this.dateChanged();
@@ -953,8 +956,6 @@ enyo.kind( {
 		this.$['recurrenceArrow'].addRemoveClass( "invert", !this.$['recurrenceDrawer'].getOpen() );
 
 		this.$['recurrenceDrawer'].toggleOpen();
-
-		//Want to trigger popup if opening from no recurrence
 	},
 
 	recurrenceChanged: function( inSender, rObj ) {
@@ -983,7 +984,7 @@ enyo.kind( {
 
 		//this.transactionType
 
-		this.trsnObj['itemId'] = this.trsnObj['itemId'];
+		//this.trsnObj['itemId']
 		this.trsnObj['desc'] = this.$['desc'].getValue();
 
 		this.trsnObj['amount'] = this.$['amount'].getValue();
@@ -1002,7 +1003,9 @@ enyo.kind( {
 		this.trsnObj['cleared'] = this.$['cleared'].getValue();
 		this.trsnObj['note'] = this.$['notes'].getValue();
 
+		this.trsnObj['rObj'] = this.$['recurrence'].getValue();
 		//this.trsnObj['repeatId']
+		//this.trsnObj['repeatUnlinked']
 
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );
 		this.trsnObj['autoTransferLink'] = this.accountObj['auto_savings_link'];
@@ -1022,9 +1025,31 @@ enyo.kind( {
 			};
 
 		if( this.trsnObj['itemId'] < 0 ) {
+			//New transaction
 
 			enyo.application.transactionManager.createTransaction( this.trsnObj, this.transactionType, options );
+		} else if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
+			//Modified repeating transaction
+
+//if this.trsnObj['rObj']['pattern'] == "none"
+	//confirm that this will end the series & remove transactions after today
+
+/*
+Would you like to delete only this transaction, all transactions in the series, or this and all future transactions in the series?
+---
+Only this instance
+All other transactions in the series will remain.
+//change repeatUnlinked to 1
+---
+All following
+This and all the following transactions will be deleted.
+---
+All transactions in the series
+All transactions in the series will be deleted.
+---
+*/
 		} else {
+			//Modified transaction
 
 			enyo.application.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
 		}
