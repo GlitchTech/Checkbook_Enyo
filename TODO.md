@@ -47,7 +47,7 @@ Phone Mode
 Enyo Update
 ===========
 
-* Update code to run on EnyoJS instead of Enyo 1.0
+* Update code to run on EnyoJS (2) instead of Enyo 1
 * This update will have to wait for a later revision of Enyo, lists aren't up to it as of yet.
 
 =========
