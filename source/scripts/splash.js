@@ -741,7 +741,7 @@ enyo.kind({
 			case 22:
 				//Repeat System (ignore cleared, checknum)
 				querySet.push( "DROP TABLE IF EXISTS repeats;" );
-				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurrence TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER, lastUpdated TEXT, last_sync TEXT );" );
+				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCount INTEGER, origDate TEXT, lastOccurrence TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER, lastUpdated TEXT, last_sync TEXT );" );
 
 				this.versionCheck = 23;
 			case 23:

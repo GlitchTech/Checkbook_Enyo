@@ -437,7 +437,7 @@ enyo.kind( {
 					"amount": "",
 					"amount_old": "NOT_A_VALUE",
 					"note": "",
-					"date": ( new Date() ).getTime(),
+					"date": Date.parse( new Date() ),
 					"account": this.accountObj['acctId'],
 					"linkedRecord": -1,
 					"linkedAccount": -1,

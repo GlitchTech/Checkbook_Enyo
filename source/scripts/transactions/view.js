@@ -137,6 +137,10 @@ enyo.kind( {
 							onclick: "sortButtonClicked",
 							icon: "source/images/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark"
+						}, {
+							onclick: "reloadSystem",
+							icon: "source/images/menu_icons/refresh.png",
+							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
 				}, {
