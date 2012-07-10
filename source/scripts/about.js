@@ -2,7 +2,7 @@
 
 
 /**
- * @private
+ * @protected
  * Dummy data since enyo.fetchAppInfo() doesn't exist in 2.0
  */
 var appInfo = {

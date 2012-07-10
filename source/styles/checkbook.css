@@ -1,17 +1,3 @@
-/** Styles for adaptive screen size **/
-@viewport {
-  width: device-width;
-  height: device-height;
-}
-
-@media screen and (min-width: 400px) {
-  /** Tablet **/
-}
-
-@media screen and (max-width: 400px) {
-  /** Phone **/
-}
-
 /** Account List **/
 
 .hiddenAccount {

@@ -23,7 +23,7 @@ enyo.kind({
 	],
 
 	/**
-	 * @private
+	 * @protected
 	 *
 	 * @type {int}	lastModified	unix timestamp
 	 * @type {int}	lastBuild	unix timestamp
@@ -46,7 +46,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 */
 	constructor: function() {
 
@@ -91,7 +91,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 */
 	_createAccountFollower: function( data, options, code ) {
 
@@ -152,7 +152,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 */
 	_updateAccountFollower: function( data, acctId, pinChanged, options, code ) {
 
@@ -609,7 +609,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 */
 	fetchOverallBalancesHandler: function( callbackFn, results ) {
 
@@ -633,7 +633,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 *
 	 * Builds accountObject
 	 * @see this#_buildAccountObjectsHandler
@@ -720,7 +720,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 *
 	 * Parses query data from _buildAccountObjects
 	 * @see this#_buildAccountObjects
@@ -782,7 +782,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 *
 	 * Sets booleans to integers & undefineds to empty
 	 *
@@ -803,7 +803,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 *
 	 * Merge user options into the standard set
 	 *
@@ -827,7 +827,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 *
 	 * Adjusts the options object passed in to update the account timestamp first then continue
 	 *
@@ -876,12 +876,12 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 */
 	_emptyFunction: function() {},
 
 	/**
-	 * @private
+	 * @protected
 	 * Used to report generic errors
 	 */
 	_errorHandler: function() {

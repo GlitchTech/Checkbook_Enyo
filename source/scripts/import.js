@@ -209,7 +209,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					name: "instructionsButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					content: "Continue",
 
 					onclick: "prepareCredentials",
@@ -233,7 +233,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					name: "credentialsButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					content: "Sign In",
 
 					onclick: "authenticateWithGoogle",
@@ -258,7 +258,7 @@ enyo.kind({
 					flex: 8
 				}, {
 					name: "sheetListButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					content: "Import Accounts",
 
 					onclick: "beginImportProcess",
@@ -270,7 +270,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					name: "sheetListSelectButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					caption: "Select" + "...",
 
 					onclick: "sheetListSelectOptions",

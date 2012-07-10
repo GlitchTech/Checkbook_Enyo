@@ -198,7 +198,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					name: "credentialsButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					content: "Sign In",
 
 					onclick: "authenticateWithGoogle",
@@ -220,7 +220,7 @@ enyo.kind({
 					flex: 8
 				}, {
 					name: "accountListButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					caption: "Export Accounts",
 
 					onclick: "beginExportProcess",
@@ -232,7 +232,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					name: "accountListSelectButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					caption: "Select" + "...",
 
 					onclick: "accountListSelectOptions"

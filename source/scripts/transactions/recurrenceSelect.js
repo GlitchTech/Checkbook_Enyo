@@ -4,7 +4,7 @@ enyo.kind( {
 	name: "Checkbook.transactions.repeat.select",
 	kind: enyo.Control,
 
-	/** @private variables */
+	/** @protected variables */
 	recurrenceOptions: [],
 
 	/** @public variables */
@@ -269,7 +269,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * called when UI is built
 	 */
 	rendered: function() {
@@ -332,7 +332,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Builds a text string based on values set and sends to value to the onChange function
 	 */
 	sendSummary: function() {
@@ -410,7 +410,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Builds recurrence option dropdown according to currently set date
 	 */
 	buildRecurrenceOptions: function() {
@@ -444,7 +444,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Shows/Hides settings for recurrence
 	 */
 	recurrenceNodeChanged: function() {
@@ -476,7 +476,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Shows/Hides settings for ending conditions
 	 */
 	endingConditionChanged: function() {
@@ -488,7 +488,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Returns 1st, 2nd, 3rd, etc based on input
 	 *
 	 * @param int

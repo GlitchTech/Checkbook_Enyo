@@ -201,21 +201,21 @@ enyo.kind( {
 							components:[
 								{
 									name: "btnEdit",
-									kind: enyo.Button,
+									kind: onyx.Button,
 									caption: "Edit",
 									onclick: "editClicked",
 									flex: 1,
 									className: "enyo-button-dark"
 								}, {
 									name: "btnDelete",
-									kind: enyo.Button,
+									kind: onyx.Button,
 									caption: "Delete",
 									onclick: "deleteClicked",
 									flex: 1,
 									className: "enyo-button-negative"
 								}, {
 									name: "btnCancel",
-									kind: enyo.Button,
+									kind: onyx.Button,
 									caption: "Close",
 									onclick: "close",
 									flex: 1,
@@ -230,7 +230,7 @@ enyo.kind( {
 	],
 
 	/**
-	 * @private
+	 * @protected
 	 * @constructs
 	 */
 	constructor: function() {
@@ -244,7 +244,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 */
 	rendered: function() {
 

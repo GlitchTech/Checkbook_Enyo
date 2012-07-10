@@ -13,7 +13,7 @@ enyo.kind({
 
 	trsnCategories: null,
 
-	/** @private */
+	/** @protected */
 	constructor: function() {
 
 		this.inherited( arguments );
@@ -88,7 +88,7 @@ enyo.kind({
 			);
 	},
 
-	/** @private */
+	/** @protected */
 	_loadHandler: function( currentCategory, options, limit, offset, results ) {
 
 		for( var i = 0; i < results.length; i++ ) {

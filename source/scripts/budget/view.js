@@ -229,7 +229,7 @@ enyo.kind({
 	],
 
 	/**
-	 * @private
+	 * @protected
 	 * @constructs
 	 */
 	constructor: function() {

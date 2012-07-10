@@ -31,7 +31,7 @@ enyo.kind( {
 			);
 	},
 
-	/** @private */
+	/** @protected */
 	encryptStringSuccess: function( string, callbackFn, results ) {
 
 		if( enyo.isFunction( callbackFn ) ) {
@@ -48,7 +48,7 @@ enyo.kind( {
 		}
 	},
 
-	/** @private */
+	/** @protected */
 	encryptStringFailure: function( string, callbackFn, results ) {
 
 		if( enyo.isFunction( callbackFn ) ) {
@@ -78,7 +78,7 @@ enyo.kind( {
 			);
 	},
 
-	/** @private */
+	/** @protected */
 	decryptStringSuccess: function( string, callbackFn, results ) {
 
 		if( enyo.isFunction( callbackFn ) ) {
@@ -93,7 +93,7 @@ enyo.kind( {
 		}
 	},
 
-	/** @private */
+	/** @protected */
 	decryptStringFailure: function( string, callbackFn, results ) {
 
 		if( enyo.isFunction( callbackFn ) ) {

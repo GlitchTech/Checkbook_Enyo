@@ -169,7 +169,7 @@ enyo.kind({
 				}
 			]
 		}, {
-			kind: enyo.Button,
+			kind: onyx.Button,
 			caption: "Search",
 			className: "enyo-button-dark",
 			onclick: "search"

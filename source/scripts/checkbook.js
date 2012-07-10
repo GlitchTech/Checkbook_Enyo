@@ -1,51 +1,45 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.app",
-	kind: enyo.VFlexBox,
+	kind: "enyo.Control",
+	fit: true,
 
 	components: [
 		{
 			name: "container",
-			kind: enyo.Pane,
-			transitionKind: "enyo.transitions.Fade",
-			flex: 1,
+			kind: "Panels",
+
+			fit: true,
+
+			classes: "app-panels enyo-fit",
+			arrangerKind: "CollapsingArranger",
+
 			components: [
 				{
-					name: "mainPane",
-					kind: enyo.SlidingPane,
+					name: "accounts",
+					kind: "Checkbook.accounts.view",
 
-					flex: 1,
-					showing: false,
+					onModify: "showPanePopup",
+					onChanged: "accoutChanged",
+					onDelete: "accoutDeleted",
 
-					components: [
-						{
-							name: "accounts",
-							kind: "Checkbook.accounts.view",
-							flex: 1,
+					onView: "updateTransactionsView"
+				}, {
+					name: "transactions",
+					//kind: "Checkbook.transactions.view",
 
-							onModify: "showPanePopup",
-							onChanged: "accoutChanged",
-							onDelete: "accoutDeleted",
+					content: "TEST TRANSACTIONS",
 
-							onView: "updateTransactionsView"
-						}, {
-							name: "transactions",
-							kind: "Checkbook.transactions.view",
-							flex: 2,
+					onModify: "showPanePopup",
+					onChanged: "accountBalanceChanged",
+					onBalanceViewChanged: "tranasactionBalanceViewChanged",
 
-							onModify: "showPanePopup",
-							onChanged: "accountBalanceChanged",
-							onBalanceViewChanged: "tranasactionBalanceViewChanged",
-
-							onBudgetView: "openBudget",
-							onSearchView: "openSearch"
-						}
-					]
+					onBudgetView: "openBudget",
+					onSearchView: "openSearch"
 				}
 			]
-		}, {
+		}, /*{
 			name: "appMenu",
 			kind: enyo.AppMenu,
 			scrim: true,
@@ -116,10 +110,10 @@ enyo.kind({
 		{
 			name: "security",
 			kind: "Checkbook.login"
-		},
+		}*/
 
 		{
-			kind: enyo.ApplicationEvents,
+			kind: "Signals",
 			onBack: "goBack"
 		}
 	],
@@ -145,8 +139,8 @@ enyo.kind({
 		this.log();
 
 		//Load splash popup. Verifies database.
-		this.$['splash'].openAtCenter();
-		this.$['appMenu'].setAutomatic( false );
+		//this.$['splash'].openAtCenter();
+		//this.$['appMenu'].setAutomatic( false );
 	},
 
 	splashFinisher: function() {

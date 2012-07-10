@@ -2,7 +2,7 @@
 
 enyo.kind( {
 	name: "Checkbook.accounts.view",
-	kind: enyo.SlidingView,
+	layoutKind: "FittableRowsLayout",
 
 	accounts: [],
 	totalBalance: [ 0, 0, 0, 0, 0 ],
@@ -17,21 +17,21 @@ enyo.kind( {
 
 	components: [
 		{
-			kind: enyo.PageHeader,
+			kind: "onyx.Toolbar",
+			layoutKind: "FittableColumnsLayout",
 			components: [
 				{
 					kind: enyo.Image,
 					src: "assets/dollar_sign_1.png",
-					className: "img-icon",
-					style: "margin-right: 0.25em;"
+					classes: "img-icon",
+					style: "margin-right: 0.25em; height: 32px;"
 				}, {
 					content: "Checkbook",
-					className: "big enyo-text-ellipsis",
-					style: "margin-top: -6px;",
-					flex: 1
+					classes: "big enyo-text-ellipsis",
+					fit: true
 				}, {
 					name: "overallBalance",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					content: "Balance",
 					style: "padding: 0 8px; margin: 0;",
 					onclick: "balanceButtonClicked"
@@ -40,7 +40,8 @@ enyo.kind( {
 		}, {
 			name: "entries",
 			kind: "Checkbook.accounts.list",
-			flex: 1,
+			fit: true,
+
 			balanceView: 4,
 
 			editMode: false,
@@ -50,8 +51,8 @@ enyo.kind( {
 			onChanged: "accountChanged",
 			onDelete: "accountDeleted"
 		}, {
-			kind: enyo.Toolbar,
-			className: "rich-brown",
+			kind: "onyx.Toolbar",
+			classes: "rich-brown",
 			components: [
 				{
 					kind: enyo.ToolButtonGroup,
@@ -59,7 +60,7 @@ enyo.kind( {
 						{
 							onclick: "showSort",
 							icon: "assets/menu_icons/sort.png",
-							className: "enyo-grouped-toolbutton-dark"
+							classes: "enyo-grouped-toolbutton-dark"
 						}
 					]
 				}, {
@@ -72,13 +73,13 @@ enyo.kind( {
 							onclick: "addAccount",
 							toggling: true,
 							icon: "assets/menu_icons/new.png",
-							className: "enyo-grouped-toolbutton-dark"
+							classes: "enyo-grouped-toolbutton-dark"
 						}, {
 							name: "editModeToggle",
 							toggling: true,
 							onclick: "toggleLock",
 							icon: "assets/menu_icons/lock.png",
-							className: "enyo-grouped-toolbutton-dark"
+							classes: "enyo-grouped-toolbutton-dark"
 						}
 					]
 				}, {
@@ -91,7 +92,7 @@ enyo.kind( {
 
 							onclick: "showSearch",
 							icon: "assets/menu_icons/search.png",
-							className: "enyo-grouped-toolbutton-dark"
+							classes: "enyo-grouped-toolbutton-dark"
 						}
 					]
 				}
@@ -100,15 +101,15 @@ enyo.kind( {
 
 		{
 			name: "balanceMenu",
-			kind: "Checkbook.balanceMenu",
+			//kind: "Checkbook.balanceMenu",
 			onMenuItemClick: "menuItemClick"
 		}, {
 			name: "sortMenu",
-			kind: "Checkbook.selectedMenu",
+			//kind: "Checkbook.selectedMenu",
 			components: accountSortOptions
 		}, {
 			name: "searchMenu",
-			kind: "GTS.menu",
+			//kind: "GTS.menu",
 			components: [
 				{
 					caption: "Reports",
@@ -260,7 +261,7 @@ enyo.kind( {
 		}
 
 		this.$['overallBalance'].setCaption( formatAmount( this.totalBalance[this.balanceView] ) );
-		this.$['overallBalance'].setClassName( "enyo-button " + balanceColor );
+		this.$['overallBalance'].setclasses( "enyo-button " + balanceColor );
 	},
 
 	balanceButtonClicked: function( inSender ) {

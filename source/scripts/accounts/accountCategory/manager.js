@@ -11,7 +11,7 @@ enyo.kind({
 	name: "Checkbook.accountCategory.manager",
 	kind: enyo.Component,
 
-	/** @private */
+	/** @protected */
 	constructor: function() {
 
 		this.inherited( arguments );
@@ -105,7 +105,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Handles positioning the new category at the end of the list
 	 */
 	createCategoryFollower: function( options ) {

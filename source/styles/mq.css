@@ -1,0 +1,19 @@
+/** Styles for adaptive screen size **/
+@viewport {
+	width: device-width;
+	height: device-height;
+}
+
+/* set the width and some basic styling for each panel */
+.app-panels > * {
+	width: 400px;
+	background-color: #EAEAEA;
+	box-shadow: -4px -4px 4px rgba(0,0,0,0.3);
+}
+
+/* on small devices, make each panel fit to the app width */
+@media all and (max-width: 800px) {
+	.app-panels > * {
+		min-width: 100%;
+	}
+}

@@ -10,7 +10,7 @@
 
 enyo.kind({
 	name: "Checkbook.accounts.list",
-	kind: enyo.VFlexBox,
+	fit: true,
 
 	accounts: [],
 

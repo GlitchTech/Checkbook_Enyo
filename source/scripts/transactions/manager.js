@@ -12,12 +12,12 @@ enyo.kind({
 	kind: enyo.Component,
 
 	/**
-	 * @private recurrence variables
+	 * @protected recurrence variables
 	 */
 	seriesCountLimit: 3,
 	seriesDayLimit: 45,
 
-	/** @private */
+	/** @protected */
 	constructor: function() {
 
 		this.inherited( arguments );
@@ -57,7 +57,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Handles result processing of max ids; Handles running of main query;
 	 */
 	createTransactionFollower: function( data, type, options, results ) {
@@ -88,7 +88,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Creates SQL for inserting a new transaction (or set depending on type)
 	 *
 	 * @param {object}	dataIn	Object to be readied; Source object is not modified by function
@@ -135,7 +135,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Handles creating auto transfer transaction items; only run from createTransactionFollower
 	 */
 	createAutoTransfer: function( data, autoTransfer, autoTransferLink ) {
@@ -240,7 +240,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Handles result processing of max ids; Handles running of main query;
 	 */
 	updateTransactionFollower: function( data, type, options, results ) {
@@ -310,7 +310,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Modifies the data object to be ready for database insertion. Calls split transaction handler if needed.
 	 *
 	 * @param {object}	data	Object to be readied; Since object, pass by reference situation;
@@ -458,7 +458,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Handle SQL for repeat events
 	 *
 	 * @param {object}	data	Object to be readied; Since object, pass by reference situation;
@@ -651,7 +651,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Generates SQL for saving series events
 	 *
 	 * @param {object}[]	repeatArray	Array of objects with series transaction information
@@ -1008,7 +1008,7 @@ enyo.kind({
 			);
 	},
 
-	/** @private fetchTransactionsFollower: handles running balance **/
+	/** @protected fetchTransactionsFollower: handles running balance **/
 	fetchTransactionsFollower: function( accountObj, options, limit, offset, resultSet ) {
 
 		if( accountObj['runningBalance'] === 1 ) {

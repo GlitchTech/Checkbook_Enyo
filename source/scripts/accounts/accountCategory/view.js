@@ -96,7 +96,7 @@ enyo.kind({
 			kind: enyo.Toolbar,
 			components: [
 				{
-					kind: enyo.Button,
+					kind: onyx.Button,
 
 					flex: 2,
 					className: "enyo-button-primary",

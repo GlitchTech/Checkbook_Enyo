@@ -10,7 +10,7 @@ enyo.kind( {
 	name: "Checkbook.autocompleteprefs.manager",
 	kind: enyo.Component,
 
-	/** @private */
+	/** @protected */
 	constructor: function() {
 
 		this.inherited( arguments );

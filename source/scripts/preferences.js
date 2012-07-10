@@ -187,7 +187,7 @@ enyo.kind({
 									choices: []
 								}, {
 									name: "addAccountButton",
-									kind: enyo.Button,
+									kind: onyx.Button,
 									toggling: true,
 
 									content: "Add Account",
@@ -200,14 +200,14 @@ enyo.kind({
 							components: [
 								{
 									name: "editAccountCategories",
-									kind: enyo.Button,
+									kind: onyx.Button,
 									toggling: true,
 
 									content: "Edit Account Categories",
 									onclick: "modifyAccountCategories"
 								}, {
 									name: "editTransactionCategories",
-									kind: enyo.Button,
+									kind: onyx.Button,
 									toggling: true,
 
 									content: "Edit Transaction Categories",
@@ -215,7 +215,7 @@ enyo.kind({
 								}
 							]
 						}, {
-							kind: enyo.Button,
+							kind: onyx.Button,
 							content: "Full Wipe",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
@@ -234,7 +234,7 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 4
 				}, {
-					kind: enyo.Button,
+					kind: onyx.Button,
 
 					flex: 2,
 					className: "enyo-button-affirmative deep-green",

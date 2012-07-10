@@ -317,7 +317,7 @@ enyo.kind( {
 
 						{
 							name: "accountDeleteButton",
-							kind: enyo.Button,
+							kind: onyx.Button,
 							content: "Delete Account",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
@@ -338,7 +338,7 @@ enyo.kind( {
 					kind: enyo.Spacer,
 					flex: 4
 				}, {
-					kind: enyo.Button,
+					kind: onyx.Button,
 					flex: 2,
 					content: "Cancel",
 					style: "width: 150px",
@@ -347,7 +347,7 @@ enyo.kind( {
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					kind: enyo.Button,
+					kind: onyx.Button,
 					flex: 2,
 					content: "Save",
 					className: "enyo-button-affirmative deep-green",

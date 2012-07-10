@@ -43,7 +43,7 @@ enyo.kind( {
 					flex: 1
 				}, {
 					name: "balanceButton",
-					kind: enyo.Button,
+					kind: onyx.Button,
 					style: "padding: 0 8px; margin: 0;",
 					caption: "Balance",
 					onclick: "balanceButtonClicked"

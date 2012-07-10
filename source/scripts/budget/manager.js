@@ -5,7 +5,7 @@ enyo.kind({
 	name: "Checkbook.budget.manager",
 	kind: enyo.Component,
 
-	/** @private */
+	/** @protected */
 	constructor: function() {
 
 		this.inherited( arguments );
@@ -40,7 +40,7 @@ enyo.kind({
 			);
 	},
 
-	/** @private */
+	/** @protected */
 	createBudgetFollower: function( options ) {
 
 		console.log( arguments );

@@ -216,14 +216,14 @@ enyo.kind( {
 									kind: enyo.HFlexBox,
 									components: [
 										{
-											kind: enyo.Button,
+											kind: onyx.Button,
 											caption: "Add Category",
 											className: "enyo-button-dark",
 											onclick: "categoryAddNew",
 											flex: 3
 										}, {
 											name: "fillValueButton",
-											kind: enyo.Button,
+											kind: onyx.Button,
 											caption: "Fill Values",
 											className: "enyo-button-light",
 											onclick: "categoriesFillValues",
@@ -338,7 +338,7 @@ enyo.kind( {
 
 						{
 							name: "transactionDeleteButton",
-							kind: enyo.Button,
+							kind: onyx.Button,
 							content: "Delete Transaction",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
@@ -359,7 +359,7 @@ enyo.kind( {
 					kind: enyo.Spacer,
 					flex: 4
 				}, {
-					kind: enyo.Button,
+					kind: onyx.Button,
 					flex: 2,
 					content: "Cancel",
 					style: "width: 150px",
@@ -368,7 +368,7 @@ enyo.kind( {
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					kind: enyo.Button,
+					kind: onyx.Button,
 					flex: 2,
 					content: "Save",
 					className: "enyo-button-affirmative deep-green",
