@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 //Convert to popup
 	//See how email does it & retains connection to main app
@@ -58,7 +58,7 @@ enyo.kind( {
 										{
 											name: "desc",
 											kind: enyo.RichText,
-											hint: $L( "Enter Description" ),
+											hint: "Enter Description",
 
 											onkeypress: "descKeyPress",
 											oninput: "descContentChanged",
@@ -101,7 +101,7 @@ enyo.kind( {
 											flex: 1,
 											components: [
 												{
-													content: $L( "Amount" ),
+													content: "Amount",
 													className: "enyo-label"
 												}
 											]
@@ -123,7 +123,7 @@ enyo.kind( {
 							]
 						}, {
 							kind: enyo.Group,
-							caption: $L( "Date" ),
+							caption: "Date",
 							tapHightlight: false,
 
 							className: "dividerDrawerBlack",
@@ -170,7 +170,7 @@ enyo.kind( {
 						}, {
 							name: "categoryHolder",
 							kind: enyo.Group,
-							caption: $L( "Category" ),
+							caption: "Category",
 
 							style: "padding:2px;",
 
@@ -217,14 +217,14 @@ enyo.kind( {
 									components: [
 										{
 											kind: enyo.Button,
-											caption: $L( "Add Category" ),
+											caption: "Add Category",
 											className: "enyo-button-dark",
 											onclick: "categoryAddNew",
 											flex: 3
 										}, {
 											name: "fillValueButton",
 											kind: enyo.Button,
-											caption: $L( "Fill Values" ),
+											caption: "Fill Values",
 											className: "enyo-button-light",
 											onclick: "categoriesFillValues",
 											flex: 1
@@ -234,7 +234,7 @@ enyo.kind( {
 							]
 						}, {
 							kind: enyo.Group,
-							caption: $L( "Recurrence" ),
+							caption: "Recurrence",
 							tapHightlight: false,
 
 							className: "dividerDrawerBlack",
@@ -286,11 +286,11 @@ enyo.kind( {
 								{
 									name: "checkNum",
 									kind: enyo.Input,
-									hint: $L( "# (optional)" ),
+									hint: "# (optional)",
 									onfocus: "autofillCheckNo",
 									components: [
 										{
-											content: $L( "Check Number" ),
+											content: "Check Number",
 											className: "enyo-label"
 										}
 									]
@@ -361,7 +361,7 @@ enyo.kind( {
 				}, {
 					kind: enyo.Button,
 					flex: 2,
-					content: $L( "Cancel" ),
+					content: "Cancel",
 					style: "width: 150px",
 					onclick: "doFinish"
 				}, {
@@ -370,7 +370,7 @@ enyo.kind( {
 				}, {
 					kind: enyo.Button,
 					flex: 2,
-					content: $L( "Save" ),
+					content: "Save",
 					className: "enyo-button-affirmative deep-green",
 					style: "width: 150px;",
 					onclick: "saveTransaction"
@@ -444,8 +444,8 @@ enyo.kind( {
 					"cleared": 0,
 					"repeatId": -1,
 					"checkNum": "",
-					"category": $L( "Uncategorized" ),
-					"category2": $L( "Other" )
+					"category": "Uncategorized",
+					"category2": "Other"
 					//TODO default repeat information
 				},
 				this.trsnObj
@@ -927,8 +927,8 @@ enyo.kind( {
 	categoryAddNew: function() {
 
 		this.trsnObj['category'].push( {
-				"category": $L( "Uncategorized" ),
-				"category2": $L( "Other" ),
+				"category": "Uncategorized",
+				"category2": "Other",
 				"amount": ""
 			});
 

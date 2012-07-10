@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -75,7 +75,7 @@ enyo.kind({
 
 		this.log();
 
-		this.$['title'].setContent( $L( "Loading Checkbook" ) );
+		this.$['title'].setContent( "Loading Checkbook" );
 
 		this.firstRun = false;
 
@@ -86,7 +86,7 @@ enyo.kind({
 
 		this.log();
 
-		this.$['message'].setContent( $L( "Preparing application." ) );
+		this.$['message'].setContent( "Preparing application." );
 		this.$['splashProgress'].setPosition( 5 );
 
 		if( !enyo.application.gts_db ) {
@@ -94,6 +94,8 @@ enyo.kind({
 			this.log( "creating database object" );
 
 			var db = new GTS.database( dbArgs );
+
+			this.log( "enyo.application.gts_db v" + db.getVersion() + " created." );
 		}
 
 		if( !enyo.application.checkbookPrefs ) {
@@ -110,7 +112,7 @@ enyo.kind({
 
 		this.log();
 
-		this.$['message'].setContent( $L( "Checking database version..." ) );
+		this.$['message'].setContent( "Checking database version..." );
 		this.$['splashProgress'].setPosition( 10 );
 
 		enyo.application.gts_db.query(
@@ -132,7 +134,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 22;
+		this.versionCheck = 23;
 
 		if( currVersion === this.versionCheck ) {
 
@@ -165,7 +167,7 @@ enyo.kind({
 			}
 
 			//Check for recurring updates using the repeating system
-			this.$['message'].setContent( $L( "Updating transaction data..." ) );
+			this.$['message'].setContent( "Updating transaction data..." );
 			this.$['splashProgress'].setPosition( 85 );
 			//this.repeat_updateAll( enyo.bind( this, this.splashFinished ) );
 
@@ -202,7 +204,7 @@ enyo.kind({
 
 		this.firstRun = true;
 
-		this.$['message'].setContent( $L( "Creating application database..." ) );
+		this.$['message'].setContent( "Creating application database..." );
 		this.$['splashProgress'].setPosition( 50 );
 
 		var chars = ( "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz" + ( new Date() ).getTime() ).split( "" );
@@ -679,7 +681,7 @@ enyo.kind({
 
 		this.log();
 
-		this.$['message'].setContent( $L( "Updating database..." ) );
+		this.$['message'].setContent( "Updating database..." );
 		this.$['splashProgress'].setPosition( 50 );
 
 		var querySet = [];
@@ -745,10 +747,34 @@ enyo.kind({
 
 				this.versionCheck = 23;
 			case 23:
+				//Remove set passwords (encryption system changed)
+				querySet.push(
+						enyo.application.gts_db.getUpdate(
+								"prefs",
+								{
+									"useCode": 0,
+									"code": ""
+								},
+								{}
+							)
+					);
+				querySet.push(
+						enyo.application.gts_db.getUpdate(
+								"accounts",
+								{
+									"acctLocked": 0,
+									"lockedCode": ""
+								},
+								{}
+							)
+					);
+
+				this.versionCheck = 24;
+			case 24:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );
-				//this.versionCheck = 24;
+				//this.versionCheck = 25;
 		}
 
 		querySet.push(
@@ -775,10 +801,10 @@ enyo.kind({
 		this.$.spinner.setShowing( false );
 		this.$['icon'].setShowing( true );
 
-		this.$['title'].setContent( $L( "Checkbook Load Error" ) );
+		this.$['title'].setContent( "Checkbook Load Error" );
 		this.$['message'].setContent(
-				$L( "Checkbook has failed to load." ) + "<br />" +
-				$L( "Please contact <a href='mailto:glitchtechscience@gmail.com'>GlitchTech Science</a> for assistant with the following error:" ) + "<br />" + "<br />" +
+				"Checkbook has failed to load." + "<br />" +
+				"Please contact <a href='mailto:glitchtechscience@gmail.com'>GlitchTech Science</a> for assistant with the following error:" + "<br />" + "<br />" +
 				"Code: " + errorObj['code'] + "<br />" +
 				"Message: " + errorObj['message']
 			);

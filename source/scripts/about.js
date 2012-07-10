@@ -1,4 +1,33 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
+
+
+/**
+ * @private
+ * Dummy data since enyo.fetchAppInfo() doesn't exist in 2.0
+ */
+var appInfo = {
+	"title": "Checkbook HD Beta",
+	"id": "com.glitchtechscience.enyo.checkbookbeta",
+	"version": "1.1.0",
+
+	"vendor": "GlitchTech Science",
+	"vendorurl": "http://www.glitchtechscience.com",
+	"vendoremail": "GlitchTechScience@gmail.com",
+
+	"copyright": "&copy; Copyright 2011 and forward GlitchTech Science. All rights reserved.",
+
+	"keywords": [
+		"Checkbook",
+		"Checkbook HD",
+		"finance",
+		"budget",
+		"money",
+		"cash"
+	],
+
+	"icon": "assets/icon_1.png",
+	"miniicon": "assets/icon_1_32x32.png"
+};
 
 enyo.kind({
 
@@ -25,10 +54,10 @@ enyo.kind({
 			components: [
 				{
 					kind: enyo.Image,
-					src: enyo.fetchAppInfo()['icon'],
+					src: appInfo['icon']
 				}, {
 					kind: enyo.HtmlContent,
-					content: enyo.fetchAppInfo()['title'] + " v" + enyo.fetchAppInfo()['version'],
+					content: appInfo['title'] + " v" + appInfo['version'],
 					style: "padding-left: 10px",
 					flex: 1
 				}, {
@@ -50,7 +79,7 @@ enyo.kind({
 			components: [
 				{
 					className: "small",
-					content: "Thank you for using " + enyo.fetchAppInfo()['title'] + " powered by"
+					content: "Thank you for using " + appInfo['title'] + " powered by"
 				}, {
 					kind: enyo.Image,
 					src: "assets/enyo-logo.png",
@@ -95,7 +124,7 @@ enyo.kind({
 					kind: enyo.HtmlContent,
 					onLinkClick: "linkClicked",
 
-					content: "<a href='" + enyo.fetchAppInfo()['vendorurl'] + "'>" + enyo.fetchAppInfo()['vendor'] + " Website</a>",
+					content: "<a href='" + appInfo['vendorurl'] + "'>" + appInfo['vendor'] + " Website</a>",
 
 					style: "padding-left: 10px",
 					flex: 1
@@ -116,7 +145,7 @@ enyo.kind({
 					kind: enyo.HtmlContent,
 					onLinkClick: "linkClicked",
 
-					content: "<a href='http://twitter.com/#!/glitchtech'>" + enyo.fetchAppInfo()['vendor'] + " Twitter</a>",
+					content: "<a href='http://twitter.com/#!/glitchtech'>" + appInfo['vendor'] + " Twitter</a>",
 
 					style: "padding-left: 10px",
 					flex: 1
@@ -137,7 +166,7 @@ enyo.kind({
 					kind: enyo.HtmlContent,
 					onLinkClick: "linkClicked",
 
-					content: "<a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>Send Email</a>",
+					content: "<a href='mailto:" + appInfo['vendoremail'] + "?subject=" + appInfo['title'] + " Support'>Send Email</a>",
 
 					style: "padding-left: 10px",
 					flex: 1
@@ -146,7 +175,7 @@ enyo.kind({
 		},
 
 		{
-			content: enyo.fetchAppInfo()['copyright'],
+			content: appInfo['copyright'],
 			className: "smaller",
 			style: "margin-top: 10px;"
 		},

@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
 	name: "Checkbook.accounts.modify",
@@ -41,10 +41,10 @@ enyo.kind( {
 									name: "accountName",
 									kind: enyo.Input,
 									flex: 1,
-									hint: $L( "Enter Account Name..." ),
+									hint: "Enter Account Name...",
 									components: [
 										{
-											content: $L( "Account Name" ),
+											content: "Account Name",
 											className: "enyo-label"
 										}
 									]
@@ -68,7 +68,7 @@ enyo.kind( {
 
 						{
 							kind: enyo.DividerDrawer,
-							caption: $L( "Security Options" ),
+							caption: "Security Options",
 							open: true,
 							components: [
 								{
@@ -108,10 +108,10 @@ enyo.kind( {
 													onmousedown: "changePinCode",
 													onmouseup: "changePinCode",
 
-													hint: $L( "Tap to set..." ),
+													hint: "Tap to set...",
 													components: [
 														{
-															content: $L( "Code" ),
+															content: "Code",
 															className: "enyo-label"
 														}
 													]
@@ -125,7 +125,7 @@ enyo.kind( {
 
 						{
 							kind: enyo.DividerDrawer,
-							caption: $L( "Display Options" ),
+							caption: "Display Options",
 							open: true,
 							components: [
 								{
@@ -204,7 +204,7 @@ enyo.kind( {
 
 						{
 							kind: enyo.DividerDrawer,
-							caption: $L( "Transaction Options" ),
+							caption: "Transaction Options",
 							open: true,
 							components: [
 								{
@@ -258,7 +258,7 @@ enyo.kind( {
 										{
 											name: "autoTransferLink",
 											kind: "GTS.ListSelectorBar",
-											labelText: $L( "Transfer to..." ),
+											labelText: "Transfer to...",
 											className: "iconListSelector"
 										}
 									]
@@ -302,12 +302,12 @@ enyo.kind( {
 								{
 									name: "accountNotes",
 									kind: enyo.RichText,
-									hint: $L( "Account specific notes" ),
+									hint: "Account specific notes",
 									style: "min-height: 150px;",
 									flex: 1,
 									components: [
 										{
-											content: $L( "Notes" ),
+											content: "Notes",
 											className: "enyo-label"
 										}
 									]
@@ -318,7 +318,7 @@ enyo.kind( {
 						{
 							name: "accountDeleteButton",
 							kind: enyo.Button,
-							content: $L( "Delete Account" ),
+							content: "Delete Account",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
 							onclick: "deleteAccount"
@@ -340,7 +340,7 @@ enyo.kind( {
 				}, {
 					kind: enyo.Button,
 					flex: 2,
-					content: $L( "Cancel" ),
+					content: "Cancel",
 					style: "width: 150px",
 					onclick: "doFinish"
 				}, {
@@ -349,7 +349,7 @@ enyo.kind( {
 				}, {
 					kind: enyo.Button,
 					flex: 2,
-					content: $L( "Save" ),
+					content: "Save",
 					className: "enyo-button-affirmative deep-green",
 					style: "width: 150px;",
 					onclick: "saveAccount"

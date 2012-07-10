@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 /**
  * Checkbook.autocompleteprefs.view ( VFlexBox )
@@ -22,7 +22,7 @@ enyo.kind( {
 				{
 					kind: enyo.Spacer
 				}, {
-					content: $L( "Auto-Complete Preferences" ),
+					content: "Auto-Complete Preferences",
 					className: "bigger"
 				}, {
 					kind: enyo.Spacer
@@ -73,7 +73,7 @@ enyo.kind( {
 					kind: enyo.ToolButtonGroup,
 					components: [
 						{
-							caption: $L( "Close" ),
+							caption: "Close",
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: "doFinish"
 						}, {

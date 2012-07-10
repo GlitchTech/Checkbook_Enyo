@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 	name: "Checkbook.import",
@@ -29,7 +29,7 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					content: $L( "Import System" ),
+					content: "Import System",
 					className: "bigger",
 					style: "margin-right: -32px;"
 				}, {
@@ -61,10 +61,10 @@ enyo.kind({
 							className: "group smaller",
 							style: "padding: 0 0.5em 0 0.5em;",
 							content: "<p>" +
-									$L( "To import your finances into this program you must have a Google Documents account. " ) + "<br />" +
-									"<a href='http://docs.google.com/'>" + $L( "Sign up here" ) + "</a>" +
+									"To import your finances into this program you must have a Google Documents account. " + "<br />" +
+									"<a href='http://docs.google.com/'>" + "Sign up here" + "</a>" +
 								"</p><p>" +
-									$L( "Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten." ) + " <span style='color:#cc0000;'>" + $L( "The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note." ) + "</span>" +
+									"Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten. <span style='color:#cc0000;'>The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note.</span>" +
 								"</p>"
 						}
 					]
@@ -82,18 +82,18 @@ enyo.kind({
 					components: [
 						{
 							kind: enyo.RowGroup,
-							caption: $L( "Google Credentials" ),
+							caption: "Google Credentials",
 							components: [
 								{
 									name: "gUser",
 									kind: enyo.Input,
-									hint: $L( "Google Username" ),
+									hint: "Google Username",
 
 									inputType: "email",
 
 									components: [
 										{
-											content: $L( "Username" ),
+											content: "Username",
 											className: "small",
 											style: "color: rgb( 32, 117, 191 );"
 										}
@@ -104,11 +104,11 @@ enyo.kind({
 										{
 											name: "gPass",
 											kind: enyo.PasswordInput,
-											hint: $L( "Account Password" ),
+											hint: "Account Password",
 
 											components: [
 												{
-													content: $L( "Password" ),
+													content: "Password",
 													className: "small",
 													style: "color: rgb( 32, 117, 191 );"
 												}
@@ -137,15 +137,15 @@ enyo.kind({
 
 									style: "margin-right: 10px;"
 								}, {
-									content: $L( "Save credentials" ),
+									content: "Save credentials",
 									flex: 1
 								}, {
 									name: "showPass",
 									kind: enyo.ToggleButton,
 
 									state: false,
-									onLabel: $L( "Show password" ),
-									offLabel: $L( "Mask password" ),
+									onLabel: "Show password",
+									offLabel: "Mask password",
 
 									onChange: 'togglePasswordVis',
 
@@ -210,7 +210,7 @@ enyo.kind({
 				}, {
 					name: "instructionsButton",
 					kind: enyo.Button,
-					content: $L( "Continue" ),
+					content: "Continue",
 
 					onclick: "prepareCredentials",
 
@@ -234,7 +234,7 @@ enyo.kind({
 				}, {
 					name: "credentialsButton",
 					kind: enyo.Button,
-					content: $L( "Sign In" ),
+					content: "Sign In",
 
 					onclick: "authenticateWithGoogle",
 
@@ -259,7 +259,7 @@ enyo.kind({
 				}, {
 					name: "sheetListButton",
 					kind: enyo.Button,
-					content: $L( "Import Accounts" ),
+					content: "Import Accounts",
 
 					onclick: "beginImportProcess",
 
@@ -271,7 +271,7 @@ enyo.kind({
 				}, {
 					name: "sheetListSelectButton",
 					kind: enyo.Button,
-					caption: $L( "Select" ) + "...",
+					caption: "Select" + "...",
 
 					onclick: "sheetListSelectOptions",
 
@@ -288,13 +288,13 @@ enyo.kind({
 			kind: enyo.Menu,
 			components: [
 				{
-					caption: $L( "All" ),
+					caption: "All",
 					value: 1
 				}, {
-					caption: $L( "None" ),
+					caption: "None",
 					value: 2
 				}, {
-					caption: $L( "Invert" ),
+					caption: "Invert",
 					value: 3
 				}
 			]
@@ -307,7 +307,7 @@ enyo.kind({
 			name: "errorMessage",
 			kind: "GTS.system_error",
 
-			errTitle: $L( "Import Error" ),
+			errTitle: "Import Error",
 			errMessage: "",
 			errMessage2: "" ,
 			onFinish: "closeErrorMessage"
@@ -407,11 +407,11 @@ enyo.kind({
 				{
 					name: "gPass",
 					kind: ( state ? enyo.Input : enyo.PasswordInput ),
-					hint: $L( "Account Password" ),
+					hint: "Account Password",
 
 					components: [
 						{
-							content: $L( "Password" ),
+							content: "Password",
 							className: "small",
 							style: "color: rgb( 32, 117, 191 );"
 						}
@@ -932,7 +932,7 @@ enyo.kind({
 
 				if( trsn['accountCat'] === "" ) {
 
-					trsn['accountCat'] = $L( "Imported Account" );
+					trsn['accountCat'] = "Imported Account";
 				}
 
 				if( typeof( this.accountList[trsn['accountCat']] ) === "undefined" || typeof( this.accountList[trsn['accountCat']][trsn['accountName']] ) === "undefined" ) {
@@ -960,7 +960,7 @@ enyo.kind({
 
 					if( trsn['linkedAccountCat'] === "" ) {
 
-						trsn['linkedAccountCat'] = $L( "Imported Account" );
+						trsn['linkedAccountCat'] = "Imported Account";
 					}
 
 					if( typeof( this.accountList[trsn['linkedAccountCat']] ) === "undefined" || typeof( this.accountList[trsn['linkedAccountCat']][trsn['linkedAccountName']] ) === "undefined" ) {

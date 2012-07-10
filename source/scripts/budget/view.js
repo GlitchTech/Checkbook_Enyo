@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -40,7 +40,7 @@ enyo.kind({
 					className: "img-icon",
 					style: "margin: 0px 15px 5px 0;"
 				}, {
-					content: $L( "Budget System" ),
+					content: "Budget System",
 					className: "bigger",
 					style: "margin-top: -6px;"
 				}, {
@@ -103,7 +103,7 @@ enyo.kind({
 								}, {
 									name: "current"
 								}, {
-									content: $L( "of" ),
+									content: "of",
 									style: "padding-left: 5px; padding-right: 5px;"
 								}, {
 									name: "total"
@@ -149,7 +149,7 @@ enyo.kind({
 					kind: enyo.ToolButtonGroup,
 					components: [
 						{
-							caption: $L( "Back" ),
+							caption: "Back",
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: "doFinish"
 						}, {

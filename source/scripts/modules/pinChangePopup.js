@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 /**
  * Checkbook.pinChangePopup ( Popup )
@@ -45,13 +45,13 @@ enyo.kind({
 			components: [
 				{
 					name: "title",
-					content: $L( "Change PIN Code" ),
+					content: "Change PIN Code",
 
 					className: "bigger"
 				}
 			]
 		}, {
-			content: $L( "Your pin may only contain numeric characters. (0-9)" ),
+			content: "Your pin may only contain numeric characters. (0-9)",
 			className: "smaller"
 		}, {
 			kind: enyo.RowGroup,
@@ -60,7 +60,7 @@ enyo.kind({
 					name: "pin1",
 					kind: enyo.PasswordInput,
 
-					hint: $L( "10 characters max" ),
+					hint: "10 characters max",
 
 					autoKeyModifier: "num-lock",
 					selectAllOnFocus: true,
@@ -72,7 +72,7 @@ enyo.kind({
 
 					components: [
 						{
-							content: $L( "pin code" ),
+							content: "pin code",
 							className: "small",
 							style: "text-transform: uppercase; color: rgb( 32, 117, 191 );"
 						}
@@ -89,10 +89,10 @@ enyo.kind({
 
 					oninput: "checkPin",
 
-					hint: $L( "10 characters max" ),
+					hint: "10 characters max",
 					components: [
 						{
-							content: $L( "confirm" ),
+							content: "confirm",
 							className: "small",
 							style: "text-transform: uppercase; color: rgb( 32, 117, 191 );"
 						}
@@ -112,7 +112,7 @@ enyo.kind({
 				}, {
 					name: "errorMessage",
 					style: "color: #d70000;",
-					content: $L( "The code entered is invalid." )
+					content: "The code entered is invalid."
 				}
 			]
 		}, {
@@ -124,7 +124,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-primary",
 
-					caption: $L( "Cancel" ),
+					caption: "Cancel",
 					onclick: "doFinish"
 				}, {
 					kind: enyo.Spacer,
@@ -135,7 +135,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-affirmative",
 
-					caption: $L( "Change" ),
+					caption: "Change",
 					onclick: "updatePin"
 				}
 			]
@@ -158,7 +158,7 @@ enyo.kind({
 
 		if( this.$['pin1'].getValue() === "" || this.$['pin2'].getValue() === "" ) {
 
-			this.$['errorMessage'].setContent( $L( "The code entered is invalid." ) );
+			this.$['errorMessage'].setContent( "The code entered is invalid." );
 			this.$['errorMessageContainer'].show();
 
 			return;
@@ -166,7 +166,7 @@ enyo.kind({
 
 		if( this.$['pin1'].getValue() !== this.$['pin2'].getValue() ) {
 
-			this.$['errorMessage'].setContent( $L( "The codes entered do not match." ) );
+			this.$['errorMessage'].setContent( "The codes entered do not match." );
 			this.$['errorMessageContainer'].show();
 
 			return;

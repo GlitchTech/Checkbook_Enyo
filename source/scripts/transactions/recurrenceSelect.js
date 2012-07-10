@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
 	name: "Checkbook.transactions.repeat.select",
@@ -64,7 +64,7 @@ enyo.kind( {
 						}, {
 							name: "frequencyUnits"
 						}, {
-							content: $L( "Frequency" ),
+							content: "Frequency",
 
 							flex: 1,
 
@@ -132,7 +132,7 @@ enyo.kind( {
 
 							onChange: "sendSummary"
 						}, {
-							content: $L( "Occurrences" ),
+							content: "Occurrences",
 
 							flex: 1,
 
@@ -457,19 +457,19 @@ enyo.kind( {
 
 		switch( this.$['recurrenceNode'].getValue() ) {
 			case 1:
-				this.$['frequencyUnits'].setContent( $L( "day(s)" ) );
+				this.$['frequencyUnits'].setContent( "day(s)" );
 				break;
 			case 2:
-				this.$['frequencyUnits'].setContent( $L( "week(s)" ) );
+				this.$['frequencyUnits'].setContent( "week(s)" );
 				break;
 			case 3:
-				this.$['frequencyUnits'].setContent( $L( "month(s)" ) );
+				this.$['frequencyUnits'].setContent( "month(s)" );
 				break;
 			case 4:
-				this.$['frequencyUnits'].setContent( $L( "year(s)" ) );
+				this.$['frequencyUnits'].setContent( "year(s)" );
 				break;
 			default:
-				this.$['frequencyUnits'].setContent( $L( "span(s)" ) );
+				this.$['frequencyUnits'].setContent( "span(s)" );
 		}
 
 		this.sendSummary();

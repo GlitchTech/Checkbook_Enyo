@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -41,7 +41,7 @@ enyo.kind({
 					className: "img-icon",
 					style: "margin: 0px 15px 5px 0;"
 				}, {
-					content: $L( "Search System" ),
+					content: "Search System",
 					className: "bigger",
 					flex: 1,
 					style: "margin-top: -6px;"
@@ -90,7 +90,7 @@ enyo.kind({
 	resultCount: function( inSender, count ) {
 
 		this.$['resultCount'].setShowing( true );
-		this.$['resultCount'].setContent( count + $L( " transactions" ) );
+		this.$['resultCount'].setContent( count + " transactions" );
 	},
 
 	loadingDisplay: function( inSender, status ) {

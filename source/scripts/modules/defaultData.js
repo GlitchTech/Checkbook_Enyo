@@ -2,28 +2,28 @@ var dbArgs = {
 		name: "db",
 		database: "ext:checkbook-database",
 		version: "1",
-		debug: ( enyo.fetchAppInfo()['id'].indexOf( "beta" ) > 0 )//Only debug when in Beta versions
+		debug: true//Only debug when in Beta versions
 	};
 
 /** Default Data **/
 var defaultAccountCategories = [
 		{
-			"name": $L( "Checking" ),
+			"name": "Checking",
 			"catOrder": 1,
 			"icon": "checkbook_1.png",
 			"color": "green"
 		}, {
-			"name": $L( "Savings" ),
+			"name": "Savings",
 			"catOrder": 2,
 			"icon": "safe_1.png",
 			"color": "yellow"
 		}, {
-			"name": $L( "Credit Card" ),
+			"name": "Credit Card",
 			"catOrder": 3,
 			"icon": "credit_card_3.png",
 			"color": "red"
 		}, {
-			"name": $L( "Other" ),
+			"name": "Other",
 			"catOrder": 4,
 			"icon": "coins_3.png",
 			"color": "black"
@@ -172,268 +172,268 @@ var appColors = [
 
 var defaultExpenseCategories = [
 		{
-			"genCat": $L( "Auto & Transport" ),
-			"specCat": $L( "Auto Insurance" )
+			"genCat": "Auto & Transport",
+			"specCat": "Auto Insurance"
 		}, {
-			"genCat": $L( "Auto & Transport" ),
-			"specCat": $L( "Auto Payment" )
+			"genCat": "Auto & Transport",
+			"specCat": "Auto Payment"
 		}, {
-			"genCat": $L( "Auto & Transport" ),
-			"specCat": $L( "Gas & Fuel" )
+			"genCat": "Auto & Transport",
+			"specCat": "Gas & Fuel"
 		}, {
-			"genCat": $L( "Auto & Transport" ),
-			"specCat": $L( "Parking" )
+			"genCat": "Auto & Transport",
+			"specCat": "Parking"
 		}, {
-			"genCat": $L( "Auto & Transport" ),
-			"specCat": $L( "Public Transportation" )
+			"genCat": "Auto & Transport",
+			"specCat": "Public Transportation"
 		}, {
-			"genCat": $L( "Auto & Transport" ),
-			"specCat": $L( "Service & Parts" )
+			"genCat": "Auto & Transport",
+			"specCat": "Service & Parts"
 		}, {
-			"genCat": $L( "Auto & Transport" ),
-			"specCat": $L( "Car Wash" )
+			"genCat": "Auto & Transport",
+			"specCat": "Car Wash"
 		}, {
-			"genCat": $L( "Bills & Utilities" ),
-			"specCat": $L( "Home Phone" )
+			"genCat": "Bills & Utilities",
+			"specCat": "Home Phone"
 		}, {
-			"genCat": $L( "Bills & Utilities" ),
-			"specCat": $L( "Internet" )
+			"genCat": "Bills & Utilities",
+			"specCat": "Internet"
 		}, {
-			"genCat": $L( "Bills & Utilities" ),
-			"specCat": $L( "Mobile Phone" )
+			"genCat": "Bills & Utilities",
+			"specCat": "Mobile Phone"
 		}, {
-			"genCat": $L( "Bills & Utilities" ),
-			"specCat": $L( "Television" )
+			"genCat": "Bills & Utilities",
+			"specCat": "Television"
 		}, {
-			"genCat": $L( "Bills & Utilities" ),
-			"specCat": $L( "Utilities" )
+			"genCat": "Bills & Utilities",
+			"specCat": "Utilities"
 		}, {
-			"genCat": $L( "Business Services" ),
-			"specCat": $L( "Advertising" )
+			"genCat": "Business Services",
+			"specCat": "Advertising"
 		}, {
-			"genCat": $L( "Business Services" ),
-			"specCat": $L( "Legal" )
+			"genCat": "Business Services",
+			"specCat": "Legal"
 		}, {
-			"genCat": $L( "Business Services" ),
-			"specCat": $L( "Office Supplies" )
+			"genCat": "Business Services",
+			"specCat": "Office Supplies"
 		}, {
-			"genCat": $L( "Business Services" ),
-			"specCat": $L( "Printing" )
+			"genCat": "Business Services",
+			"specCat": "Printing"
 		}, {
-			"genCat": $L( "Business Services" ),
-			"specCat": $L( "Shipping" )
+			"genCat": "Business Services",
+			"specCat": "Shipping"
 		}, {
-			"genCat": $L( "Education" ),
-			"specCat": $L( "Books & Supplies" )
+			"genCat": "Education",
+			"specCat": "Books & Supplies"
 		}, {
-			"genCat": $L( "Education" ),
-			"specCat": $L( "Student Loan" )
+			"genCat": "Education",
+			"specCat": "Student Loan"
 		}, {
-			"genCat": $L( "Education" ),
-			"specCat": $L( "Tuition" )
+			"genCat": "Education",
+			"specCat": "Tuition"
 		}, {
-			"genCat": $L( "Entertainment" ),
-			"specCat": $L( "Amusement" )
+			"genCat": "Entertainment",
+			"specCat": "Amusement"
 		}, {
-			"genCat": $L( "Entertainment" ),
-			"specCat": $L( "Arts" )
+			"genCat": "Entertainment",
+			"specCat": "Arts"
 		}, {
-			"genCat": $L( "Entertainment" ),
-			"specCat": $L( "Movies & DVDs" )
+			"genCat": "Entertainment",
+			"specCat": "Movies & DVDs"
 		}, {
-			"genCat": $L( "Entertainment" ),
-			"specCat": $L( "Music" )
+			"genCat": "Entertainment",
+			"specCat": "Music"
 		}, {
-			"genCat": $L( "Entertainment" ),
-			"specCat": $L( "Newspapers & Magazines" )
+			"genCat": "Entertainment",
+			"specCat": "Newspapers & Magazines"
 		}, {
-			"genCat": $L( "Fees & Charges" ),
-			"specCat": $L( "ATM Fee" )
+			"genCat": "Fees & Charges",
+			"specCat": "ATM Fee"
 		}, {
-			"genCat": $L( "Fees & Charges" ),
-			"specCat": $L( "Bank Fee" )
+			"genCat": "Fees & Charges",
+			"specCat": "Bank Fee"
 		}, {
-			"genCat": $L( "Fees & Charges" ),
-			"specCat": $L( "Finance Charge" )
+			"genCat": "Fees & Charges",
+			"specCat": "Finance Charge"
 		}, {
-			"genCat": $L( "Fees & Charges" ),
-			"specCat": $L( "Late Fee" )
+			"genCat": "Fees & Charges",
+			"specCat": "Late Fee"
 		}, {
-			"genCat": $L( "Fees & Charges" ),
-			"specCat": $L( "Service Fee" )
+			"genCat": "Fees & Charges",
+			"specCat": "Service Fee"
 		}, {
-			"genCat": $L( "Financial" ),
-			"specCat": $L( "Financial Advisor" )
+			"genCat": "Financial",
+			"specCat": "Financial Advisor"
 		}, {
-			"genCat": $L( "Financial" ),
-			"specCat": $L( "Life Insurance" )
+			"genCat": "Financial",
+			"specCat": "Life Insurance"
 		}, {
-			"genCat": $L( "Food & Dining" ),
-			"specCat": $L( "Alcohol & Bars" )
+			"genCat": "Food & Dining",
+			"specCat": "Alcohol & Bars"
 		}, {
-			"genCat": $L( "Food & Dining" ),
-			"specCat": $L( "Coffee Shops" )
+			"genCat": "Food & Dining",
+			"specCat": "Coffee Shops"
 		}, {
-			"genCat": $L( "Food & Dining" ),
-			"specCat": $L( "Fast Food" )
+			"genCat": "Food & Dining",
+			"specCat": "Fast Food"
 		}, {
-			"genCat": $L( "Food & Dining" ),
-			"specCat": $L( "Groceries" )
+			"genCat": "Food & Dining",
+			"specCat": "Groceries"
 		}, {
-			"genCat": $L( "Food & Dining" ),
-			"specCat": $L( "Restaurants" )
+			"genCat": "Food & Dining",
+			"specCat": "Restaurants"
 		}, {
-			"genCat": $L( "Gifts & Donations" ),
-			"specCat": $L( "Charity" )
+			"genCat": "Gifts & Donations",
+			"specCat": "Charity"
 		}, {
-			"genCat": $L( "Gifts & Donations" ),
-			"specCat": $L( "Gift" )
+			"genCat": "Gifts & Donations",
+			"specCat": "Gift"
 		}, {
-			"genCat": $L( "Health & Fitness" ),
-			"specCat": $L( "Dentist" )
+			"genCat": "Health & Fitness",
+			"specCat": "Dentist"
 		}, {
-			"genCat": $L( "Health & Fitness" ),
-			"specCat": $L( "Doctor" )
+			"genCat": "Health & Fitness",
+			"specCat": "Doctor"
 		}, {
-			"genCat": $L( "Health & Fitness" ),
-			"specCat": $L( "Eyecare" )
+			"genCat": "Health & Fitness",
+			"specCat": "Eyecare"
 		}, {
-			"genCat": $L( "Health & Fitness" ),
-			"specCat": $L( "Gym" )
+			"genCat": "Health & Fitness",
+			"specCat": "Gym"
 		}, {
-			"genCat": $L( "Health & Fitness" ),
-			"specCat": $L( "Health Insurance" )
+			"genCat": "Health & Fitness",
+			"specCat": "Health Insurance"
 		}, {
-			"genCat": $L( "Health & Fitness" ),
-			"specCat": $L( "Pharmacy" )
+			"genCat": "Health & Fitness",
+			"specCat": "Pharmacy"
 		}, {
-			"genCat": $L( "Health & Fitness" ),
-			"specCat": $L( "Sports" )
+			"genCat": "Health & Fitness",
+			"specCat": "Sports"
 		}, {
-			"genCat": $L( "Home" ),
-			"specCat": $L( "Furnishings" )
+			"genCat": "Home",
+			"specCat": "Furnishings"
 		}, {
-			"genCat": $L( "Home" ),
-			"specCat": $L( "Home Improvement" )
+			"genCat": "Home",
+			"specCat": "Home Improvement"
 		}, {
-			"genCat": $L( "Home" ),
-			"specCat": $L( "Home Insurance" )
+			"genCat": "Home",
+			"specCat": "Home Insurance"
 		}, {
-			"genCat": $L( "Home" ),
-			"specCat": $L( "Home Services" )
+			"genCat": "Home",
+			"specCat": "Home Services"
 		}, {
-			"genCat": $L( "Home" ),
-			"specCat": $L( "Home Supplies" )
+			"genCat": "Home",
+			"specCat": "Home Supplies"
 		}, {
-			"genCat": $L( "Home" ),
-			"specCat": $L( "Lawn & Garden" )
+			"genCat": "Home",
+			"specCat": "Lawn & Garden"
 		}, {
-			"genCat": $L( "Home" ),
-			"specCat": $L( "Mortgage & Rent" )
+			"genCat": "Home",
+			"specCat": "Mortgage & Rent"
 		}, {
-			"genCat": $L( "Income" ),
-			"specCat": $L( "Bonus" )
+			"genCat": "Income",
+			"specCat": "Bonus"
 		}, {
-			"genCat": $L( "Income" ),
-			"specCat": $L( "Paycheck" )
+			"genCat": "Income",
+			"specCat": "Paycheck"
 		}, {
-			"genCat": $L( "Income" ),
-			"specCat": $L( "Reimbursement" )
+			"genCat": "Income",
+			"specCat": "Reimbursement"
 		}, {
-			"genCat": $L( "Income" ),
-			"specCat": $L( "Rental Income" )
+			"genCat": "Income",
+			"specCat": "Rental Income"
 		}, {
-			"genCat": $L( "Income" ),
-			"specCat": $L( "Returned Purchase" )
+			"genCat": "Income",
+			"specCat": "Returned Purchase"
 		}, {
-			"genCat": $L( "Kids" ),
-			"specCat": $L( "Allowance" )
+			"genCat": "Kids",
+			"specCat": "Allowance"
 		}, {
-			"genCat": $L( "Kids" ),
-			"specCat": $L( "Baby Supplies" )
+			"genCat": "Kids",
+			"specCat": "Baby Supplies"
 		}, {
-			"genCat": $L( "Kids" ),
-			"specCat": $L( "Babysitter & Daycare" )
+			"genCat": "Kids",
+			"specCat": "Babysitter & Daycare"
 		}, {
-			"genCat": $L( "Kids" ),
-			"specCat": $L( "Child Support" )
+			"genCat": "Kids",
+			"specCat": "Child Support"
 		}, {
-			"genCat": $L( "Kids" ),
-			"specCat": $L( "Kids Activities" )
+			"genCat": "Kids",
+			"specCat": "Kids Activities"
 		}, {
-			"genCat": $L( "Kids" ),
-			"specCat": $L( "Toys" )
+			"genCat": "Kids",
+			"specCat": "Toys"
 		}, {
-			"genCat": $L( "Personal Care" ),
-			"specCat": $L( "Hair" )
+			"genCat": "Personal Care",
+			"specCat": "Hair"
 		}, {
-			"genCat": $L( "Personal Care" ),
-			"specCat": $L( "Laundry" )
+			"genCat": "Personal Care",
+			"specCat": "Laundry"
 		}, {
-			"genCat": $L( "Personal Care" ),
-			"specCat": $L( "Spa & Massage" )
+			"genCat": "Personal Care",
+			"specCat": "Spa & Massage"
 		}, {
-			"genCat": $L( "Pets" ),
-			"specCat": $L( "Pet Food & Supplies" )
+			"genCat": "Pets",
+			"specCat": "Pet Food & Supplies"
 		}, {
-			"genCat": $L( "Pets" ),
-			"specCat": $L( "Pet Grooming" )
+			"genCat": "Pets",
+			"specCat": "Pet Grooming"
 		}, {
-			"genCat": $L( "Pets" ),
-			"specCat": $L( "Veterinary" )
+			"genCat": "Pets",
+			"specCat": "Veterinary"
 		}, {
-			"genCat": $L( "Shopping" ),
-			"specCat": $L( "Books" )
+			"genCat": "Shopping",
+			"specCat": "Books"
 		}, {
-			"genCat": $L( "Shopping" ),
-			"specCat": $L( "Clothing" )
+			"genCat": "Shopping",
+			"specCat": "Clothing"
 		}, {
-			"genCat": $L( "Shopping" ),
-			"specCat": $L( "Electronics & Software" )
+			"genCat": "Shopping",
+			"specCat": "Electronics & Software"
 		}, {
-			"genCat": $L( "Shopping" ),
-			"specCat": $L( "Hobbies" )
+			"genCat": "Shopping",
+			"specCat": "Hobbies"
 		}, {
-			"genCat": $L( "Shopping" ),
-			"specCat": $L( "Sporting Goods" )
+			"genCat": "Shopping",
+			"specCat": "Sporting Goods"
 		}, {
-			"genCat": $L( "Taxes" ),
-			"specCat": $L( "Federal Tax" )
+			"genCat": "Taxes",
+			"specCat": "Federal Tax"
 		}, {
-			"genCat": $L( "Taxes" ),
-			"specCat": $L( "Local Tax" )
+			"genCat": "Taxes",
+			"specCat": "Local Tax"
 		}, {
-			"genCat": $L( "Taxes" ),
-			"specCat": $L( "Property Tax" )
+			"genCat": "Taxes",
+			"specCat": "Property Tax"
 		}, {
-			"genCat": $L( "Taxes" ),
-			"specCat": $L( "Sales Tax" )
+			"genCat": "Taxes",
+			"specCat": "Sales Tax"
 		}, {
-			"genCat": $L( "Taxes" ),
-			"specCat": $L( "State Tax" )
+			"genCat": "Taxes",
+			"specCat": "State Tax"
 		}, {
-			"genCat": $L( "Transfer" ),
-			"specCat": $L( "Credit Card Payment" )
+			"genCat": "Transfer",
+			"specCat": "Credit Card Payment"
 		}, {
-			"genCat": $L( "Travel" ),
-			"specCat": $L( "Air Travel" )
+			"genCat": "Travel",
+			"specCat": "Air Travel"
 		}, {
-			"genCat": $L( "Travel" ),
-			"specCat": $L( "Hotel" )
+			"genCat": "Travel",
+			"specCat": "Hotel"
 		}, {
-			"genCat": $L( "Travel" ),
-			"specCat": $L( "Rental Car & Taxi" )
+			"genCat": "Travel",
+			"specCat": "Rental Car & Taxi"
 		}, {
-			"genCat": $L( "Travel" ),
-			"specCat": $L( "Vacation" )
+			"genCat": "Travel",
+			"specCat": "Vacation"
 		}, {
-			"genCat": $L( "Uncategorized" ),
-			"specCat": $L( "Cash & ATM" )
+			"genCat": "Uncategorized",
+			"specCat": "Cash & ATM"
 		}, {
-			"genCat": $L( "Uncategorized" ),
-			"specCat": $L( "Check" )
+			"genCat": "Uncategorized",
+			"specCat": "Check"
 		}, {
-			"genCat": $L( "Uncategorized" ),
-			"specCat": $L( "Other" )
+			"genCat": "Uncategorized",
+			"specCat": "Other"
 		}
 	];

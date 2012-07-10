@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 /**
  * Checkbook.transactionCategory.select ( Popup )
@@ -48,7 +48,7 @@ enyo.kind({
 									flex: 1,
 									components: [
 										{
-											content: $L( "Select a Category" ),
+											content: "Select a Category",
 											className: "bigger"
 										}, {
 											name: "subheader",
@@ -123,7 +123,7 @@ enyo.kind({
 	getCategoryChoice: function( callbackFn, subheader ) {
 
 		this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['mainCats'] );
-		//this.dispCategories.push( { "content": $L( "Add/Edit Categories" ), "parent": "|-add_edit-|" } );
+		//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
 		this.openAtCenter();
 		//Popup loaded, now can do UI changes
@@ -178,7 +178,7 @@ enyo.kind({
 				//Parent <- Child
 
 				this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['mainCats'] );
-				//this.dispCategories.push( { "content": $L( "Add/Edit Categories" ), "parent": "|-add_edit-|" } );
+				//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
 				this.$['categoryList'].punt();
 			} else if( row['parent'] !== "" ) {
@@ -186,7 +186,7 @@ enyo.kind({
 
 				if( enyo.isFunction( this.doCategorySelect ) ) {
 
-					this.doCategorySelect( { "category": row['parent'], "category2": ( row['content'] === $L( "All Sub Categories" ) ? "%" : row['content'] ) } );
+					this.doCategorySelect( { "category": row['parent'], "category2": ( row['content'] === "All Sub Categories" ? "%" : row['content'] ) } );
 				}
 
 				this.close();
@@ -197,10 +197,10 @@ enyo.kind({
 
 				if( this.entireGeneral ) {
 
-					this.dispCategories.unshift( { "content": $L( "All Sub Categories" ), "parent": row['content'] } );
+					this.dispCategories.unshift( { "content": "All Sub Categories", "parent": row['content'] } );
 				}
 
-				this.dispCategories.push( { "content": $L( "Back" ), "parent": "|-go_back-|" } );
+				this.dispCategories.push( { "content": "Back", "parent": "|-go_back-|" } );
 
 				this.$['categoryList'].punt();
 			}

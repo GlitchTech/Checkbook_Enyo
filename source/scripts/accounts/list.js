@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 /**
  * Checkbook.accounts.list ( Component )
@@ -209,7 +209,7 @@ enyo.kind({
 			if( row['acctLocked'] == 1 ) {
 
 				enyo.application.security.authUser(
-						row['acctName'] + " " + $L( "PIN Code" ),
+						row['acctName'] + " " + "PIN Code",
 						row['lockedCode'],
 						{
 							"onSuccess": nextAction

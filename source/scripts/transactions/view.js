@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
 	name: "Checkbook.transactions.view",
@@ -218,19 +218,19 @@ enyo.kind( {
 			components: [
 				{
 					name: "tmClear",
-					caption: $L( "Clear Transaction" ),
+					caption: "Clear Transaction",
 					value: "clear",
 					menuParent: "transactonMenu"
 				}, {
-					caption: $L( "Edit Transaction" ),
+					caption: "Edit Transaction",
 					value: "edit",
 					menuParent: "transactonMenu"
 				}, {
-					caption: $L( "Duplicate Transaction" ),
+					caption: "Duplicate Transaction",
 					value: "duplicate",
 					menuParent: "transactonMenu"
 				}, {
-					caption: $L( "Delete Transaction" ),
+					caption: "Delete Transaction",
 					value: "delete",
 					menuParent: "transactonMenu"
 				}
@@ -903,10 +903,10 @@ enyo.kind( {
 
 		if( this.transactions[inEvent.rowIndex]['cleared'] === 1 ) {
 
-			this.$['tmClear'].setCaption( $L( "Unclear Transaction" ) );
+			this.$['tmClear'].setCaption( "Unclear Transaction" );
 		} else {
 
-			this.$['tmClear'].setCaption( $L( "Clear Transaction" ) );
+			this.$['tmClear'].setCaption( "Clear Transaction" );
 		}
 
 		this.$['transactonMenu'].rowIndex = inEvent.rowIndex;

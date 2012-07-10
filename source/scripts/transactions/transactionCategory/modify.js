@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -62,7 +62,7 @@ enyo.kind({
 
 					components: [
 						{
-							content: $L( "Group" ),
+							content: "Group",
 							className: "enyo-label"
 						}
 					]
@@ -75,7 +75,7 @@ enyo.kind({
 
 					components: [
 						{
-							content: $L( "Category" ),
+							content: "Category",
 							className: "enyo-label"
 						}
 					]
@@ -94,7 +94,7 @@ enyo.kind({
 				}, {
 					name: "errorMessage",
 					style: "color: #d70000;",
-					content: $L( "Categories may not be blank." )
+					content: "Categories may not be blank."
 				}
 			]
 		}, {
@@ -106,7 +106,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-primary",
 
-					caption: $L( "Cancel" ),
+					caption: "Cancel",
 					onclick: "close"
 				}, {
 					kind: enyo.Spacer,
@@ -117,7 +117,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-affirmative",
 
-					caption: $L( "Save" ),
+					caption: "Save",
 					onclick: "save"
 				}
 			]
@@ -142,7 +142,7 @@ enyo.kind({
 
 		if( inId < 0 && !enyo.isString( inGeneral ) ) {
 
-			this.$['title'].setContent( $L( "Create a Category" ) );
+			this.$['title'].setContent( "Create a Category" );
 			this.$['specific'].setShowing( true );
 			this.mode = "new";
 			this.id = -1;
@@ -151,7 +151,7 @@ enyo.kind({
 			this.specific = "";
 		} else if( inId < 0 && enyo.isString( inGeneral ) ) {
 
-			this.$['title'].setContent( $L( "Edit Group Name" ) );
+			this.$['title'].setContent( "Edit Group Name" );
 			this.$['specific'].setShowing( false );
 			this.mode = "group";
 			this.id = -1;
@@ -160,7 +160,7 @@ enyo.kind({
 			this.specific = "";
 		} else if( inId > 0 && enyo.isString( inGeneral ) && enyo.isString( inSpecific ) ) {
 
-			this.$['title'].setContent( $L( "Edit Category" ) );
+			this.$['title'].setContent( "Edit Category" );
 			this.$['specific'].setShowing( true );
 			this.mode = "category";
 			this.id = inId;
@@ -203,14 +203,14 @@ enyo.kind({
 
 		if( newGeneral.length <= 0 || ( this.mode !== "group" && newSpecific.length <= 0 ) ) {
 
-			this.$['errorMessage'].setContent( $L( "Category fields may not be blank." ) );
+			this.$['errorMessage'].setContent( "Category fields may not be blank." );
 			this.$['errorMessageContainer'].setShowing( true );
 			return;
 		}
 
-		if( newSpecific === $L( "All Sub Categories" ) ) {
+		if( newSpecific === "All Sub Categories" ) {
 
-			this.$['errorMessage'].setContent( $L( "Invalid category." ) );
+			this.$['errorMessage'].setContent( "Invalid category." );
 			this.$['errorMessageContainer'].setShowing( true );
 			return;
 		}

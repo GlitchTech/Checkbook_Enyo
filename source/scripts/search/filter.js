@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -30,7 +30,7 @@ enyo.kind({
 						{
 							name: "searchString",
 							kind: enyo.RichText,
-							hint: $L( "Search" ),
+							hint: "Search",
 
 							oninput: "searchChanged",
 							autoKeyModifier: "shift-single",
@@ -41,7 +41,7 @@ enyo.kind({
 				}, {
 					name: "accountDrawer",
 					kind: enyo.DividerDrawer,
-					caption: $L( "Accounts" ),
+					caption: "Accounts",
 					components: [
 						{
 							name: "accounts",
@@ -170,7 +170,7 @@ enyo.kind({
 			]
 		}, {
 			kind: enyo.Button,
-			caption: $L( "Search" ),
+			caption: "Search",
 			className: "enyo-button-dark",
 			onclick: "search"
 		}, {
@@ -282,7 +282,7 @@ enyo.kind({
 
 	renderDrawerCaption: function() {
 
-		this.$['accountDrawer'].setCaption( $L( "Accounts" ) + " (" + this.acctList['count'] + $L( " of " ) + this.acctList['items'].length + ")" );
+		this.$['accountDrawer'].setCaption( "Accounts" ) + " (" + this.acctList['count'] + $L( " of " ) + this.acctList['items'].length + ")";
 	},
 
 	setupRow: function( inSender, inIndex ) {
@@ -309,7 +309,7 @@ enyo.kind({
 		if( this.acctList['items'][rowIndex]['acctLocked'] && !this.acctList['items'][rowIndex]['bypass'] ) {
 
 				enyo.application.security.authUser(
-						this.acctList['items'][rowIndex]['name'] + " " + $L( "PIN Code" ),
+						this.acctList['items'][rowIndex]['name'] + " " + "PIN Code",
 						this.acctList['items'][rowIndex]['lockedCode'],
 						{
 							"onSuccess": enyo.bind( this, this.authSuccessful, inEvent )

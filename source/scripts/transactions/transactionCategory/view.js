@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -32,7 +32,7 @@ enyo.kind({
 					flex: 1,
 					components: [
 						{
-							content: $L( "Transaction Categories" ),
+							content: "Transaction Categories",
 							className: "bigger"
 						}, {
 							name: "subheader",
@@ -98,7 +98,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-primary",
 
-					caption: $L( "Create New" ),
+					caption: "Create New",
 					onclick: "createNew"
 				}
 			]

@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 	name: "Checkbook.export",
@@ -26,7 +26,7 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					content: $L( "Export System" ),
+					content: "Export System",
 					className: "bigger",
 					style: "margin-right: -32px;"
 				}, {
@@ -58,18 +58,18 @@ enyo.kind({
 					components: [
 						{
 							kind: enyo.RowGroup,
-							caption: $L( "Google Credentials" ),
+							caption: "Google Credentials",
 							components: [
 								{
 									name: "gUser",
 									kind: enyo.Input,
-									hint: $L( "Google Username" ),
+									hint: "Google Username",
 
 									inputType: "email",
 
 									components: [
 										{
-											content: $L( "Username" ),
+											content: "Username",
 											className: "small",
 											style: "color: rgb( 32, 117, 191 );"
 										}
@@ -80,11 +80,11 @@ enyo.kind({
 										{
 											name: "gPass",
 											kind: enyo.PasswordInput,
-											hint: $L( "Account Password" ),
+											hint: "Account Password",
 
 											components: [
 												{
-													content: $L( "Password" ),
+													content: "Password",
 													className: "small",
 													style: "color: rgb( 32, 117, 191 );"
 												}
@@ -110,15 +110,15 @@ enyo.kind({
 
 									style: "margin-right: 10px;"
 								}, {
-									content: $L( "Save credentials" ),
+									content: "Save credentials",
 									flex: 1
 								}, {
 									name: "showPass",
 									kind: enyo.ToggleButton,
 
 									state: false,
-									onLabel: $L( "Show password" ),
-									offLabel: $L( "Mask password" ),
+									onLabel: "Show password",
+									offLabel: "Mask password",
 
 									onChange: 'togglePasswordVis',
 
@@ -199,7 +199,7 @@ enyo.kind({
 				}, {
 					name: "credentialsButton",
 					kind: enyo.Button,
-					content: $L( "Sign In" ),
+					content: "Sign In",
 
 					onclick: "authenticateWithGoogle",
 
@@ -221,7 +221,7 @@ enyo.kind({
 				}, {
 					name: "accountListButton",
 					kind: enyo.Button,
-					caption: $L( "Export Accounts" ),
+					caption: "Export Accounts",
 
 					onclick: "beginExportProcess",
 
@@ -233,7 +233,7 @@ enyo.kind({
 				}, {
 					name: "accountListSelectButton",
 					kind: enyo.Button,
-					caption: $L( "Select" ) + "...",
+					caption: "Select" + "...",
 
 					onclick: "accountListSelectOptions"
 				}, {
@@ -248,13 +248,13 @@ enyo.kind({
 			kind: enyo.Menu,
 			components: [
 				{
-					caption: $L( "All" ),
+					caption: "All",
 					value: 1
 				}, {
-					caption: $L( "None" ),
+					caption: "None",
 					value: 2
 				}, {
-					caption: $L( "Invert" ),
+					caption: "Invert",
 					value: 3
 				}
 			]
@@ -271,7 +271,7 @@ enyo.kind({
 			name: "errorMessage",
 			kind: "GTS.system_error",
 
-			errTitle: $L( "Export Error" ),
+			errTitle: "Export Error",
 			errMessage: "",
 			errMessage2: "" ,
 			onFinish: "closeErrorMessage"
@@ -356,11 +356,11 @@ enyo.kind({
 				{
 					name: "gPass",
 					kind: ( state ? enyo.Input : enyo.PasswordInput ),
-					hint: $L( "Account Password" ),
+					hint: "Account Password",
 
 					components: [
 						{
-							content: $L( "Password" ),
+							content: "Password",
 							className: "small",
 							style: "color: rgb( 32, 117, 191 );"
 						}
@@ -542,7 +542,7 @@ enyo.kind({
 		if( row ) {
 
 			this.$['accountName'].setContent( row['name'] );
-			this.$['accountNote'].setContent( row['itemCount'] + " " + $L( "Transaction" + ( row['itemCount'] > 1 ? "s" : "" ) ) );
+			this.$['accountNote'].setContent( row['itemCount'] + " " + "Transaction" + ( row['itemCount'] > 1 ? "s" : "" ) );
 
 			this.$['icon'].setSrc( "assets/" + row['icon'] );
 			this.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 || row['bypass'] ) );
@@ -559,7 +559,7 @@ enyo.kind({
 		if( this.acctList[inEvent.rowIndex]['acctLocked'] && !this.acctList[inEvent.rowIndex]['bypass'] ) {
 
 				enyo.application.security.authUser(
-						this.acctList[inEvent.rowIndex]['name'] + " " + $L( "PIN Code" ),
+						this.acctList[inEvent.rowIndex]['name'] + " " + "PIN Code",
 						this.acctList[inEvent.rowIndex]['lockedCode'],
 						{
 							"onSuccess": enyo.bind( this, this.authSuccessful, inEvent.rowIndex )
@@ -654,8 +654,8 @@ enyo.kind({
 
 	startNewSheet: function( accountsToExport, index ) {
 
-		this.$['progress'].setTitle( $L( "Exporting" ) + " " + accountsToExport[index]['name'] );
-		this.$['progress'].setMessage( ( index + 1 ) + " of " + accountsToExport.length + "<br />" + $L( "Retrieving transactions" ) );
+		this.$['progress'].setTitle( "Exporting" + " " + accountsToExport[index]['name'] );
+		this.$['progress'].setMessage( ( index + 1 ) + " of " + accountsToExport.length + "<br />" + "Retrieving transactions" );
 		this.$['progress'].setProgress( ( ( ( index + 1 ) * 1 / 4 ) / accountsToExport.length ) * 100 );
 
 		//fetch account finance data, use SQL to make each line a CSV
@@ -729,7 +729,7 @@ enyo.kind({
 			endIndex = results.length;
 		}
 
-		this.$['progress'].setMessage( ( index + 1 ) + " of " + accountsToExport.length + "<br />" + $L( "Processing account" ) );
+		this.$['progress'].setMessage( ( index + 1 ) + " of " + accountsToExport.length + "<br />" + "Processing account" );
 		this.$['progress'].setProgress( ( ( ( index + 1 ) * ( 2 + endIndex / results.length ) / 4 ) / accountsToExport.length ) * 100 );
 
 		for( var i = offset; i < endIndex; i++ ) {
@@ -763,10 +763,10 @@ enyo.kind({
 
 	uploadSheet: function( accountsToExport, index, uploadData ) {
 
-		this.$['progress'].setMessage( ( index + 1 ) + " of " + accountsToExport.length + "<br />" + $L( "Uploading data" ) );
+		this.$['progress'].setMessage( ( index + 1 ) + " of " + accountsToExport.length + "<br />" + "Uploading data" );
 		this.$['progress'].setProgress( ( ( ( index + 1 ) * 3 / 4 ) / accountsToExport.length ) * 100 );
 
-		var docTitle = "[" + $L( "Checkbook HD" ) + "] " + uploadData['accountName'] + " [" + uploadData['accountCategory'] + "] [" + Date.format( { date: "short", time: "" } ) + "]";
+		var docTitle = "[" + "Checkbook HD" + "] " + uploadData['accountName'] + " [" + uploadData['accountCategory'] + "] [" + Date.format( { date: "short", time: "" } ) + "]";
 
 		this.$['gDataControls'].gdata_upload_file(
 				docTitle,
@@ -795,7 +795,7 @@ enyo.kind({
 			this.$['progress'].close();
 
 			this.$['errorMessage'].setErrTitle( "Export Complete" );
-			this.showErrorMessage( enyo.bind( this, this.closeExport ), accountsToExport.length + $L( " account"  + ( accountsToExport.length > 1 ? "s" : "" ) + " exported." ) );
+			this.showErrorMessage( enyo.bind( this, this.closeExport ), accountsToExport.length + " account"  + ( accountsToExport.length > 1 ? "s" : "" ) + " exported." );
 		}
 	},
 

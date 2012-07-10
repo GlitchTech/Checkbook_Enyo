@@ -7,7 +7,7 @@
 	"vendorurl": "http://www.glitchtechscience.com",
 	"vendoremail": "GlitchTechScience@gmail.com",
 
-	"copyright": "&copy; Copyright 2009 and forward GlitchTech Science. All rights reserved.",
+	"copyright": "&copy; Copyright 2011 and forward GlitchTech Science. All rights reserved.",
 
 	"keywords": [
 		"Checkbook",
@@ -22,8 +22,8 @@
 	"uiRevision": 2,
 
 	"main": "index.html",
-	"icon": "source/images/icon_1.png",
-	"miniicon": "source/images/icon_1_32x32.png",
+	"icon": "assets/icon_1.png",
+	"miniicon": "assets/icon_1_32x32.png",
 
 	"noDeprecatedStyles": true
 }

@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 /**
  * Checkbook.transactions.manager ( Component )
@@ -190,10 +190,10 @@ enyo.kind({
 		atData['linkedRecord'] = atData['itemId'] + 1;
 
 		atData['note'] = atData['desc'];
-		atData['desc'] = $L( "Auto Transfer" )
+		atData['desc'] = "Auto Transfer"
 
-		atData['category'] = $L( "Transfer" );
-		atData['category2'] = $L( "Auto Transfer" );
+		atData['category'] = "Transfer";
+		atData['category2'] = "Auto Transfer";
 
 		delete atData['checkNum'];
 
@@ -320,7 +320,7 @@ enyo.kind({
 	 */
 	_prepareData: function( data, type ) {
 
-		data['desc'] = ( ( data['desc'] === "" || data['desc'] === null ) ? $L( "Description" ) : data['desc'] );
+		data['desc'] = ( ( data['desc'] === "" || data['desc'] === null ) ? "Description" : data['desc'] );
 		data['cleared'] = ( data['cleared'] ? 1 : 0 );
 
 		data['amount'] = ( Object.isNumber( data['amount'] ) ? 0 : Number( data['amount'] ).toFixed( 2 ).valueOf() );
@@ -450,8 +450,8 @@ enyo.kind({
 		} else {
 			//Unset data
 
-			data['category'] = $L( "Uncategorized" );
-			data['category2'] = $L( "Other" );
+			data['category'] = "Uncategorized";
+			data['category2'] = "Other";
 		}
 
 		return sqlArray;
@@ -1296,8 +1296,8 @@ enyo.kind({
 			if( category === '' && category2 === '' ) {
 				//None set; use default
 
-				category = $L( "Uncategorized" );
-				category2 = $L( "Other" );
+				category = "Uncategorized";
+				category2 = "Other";
 			} else if( category2 === '' ) {
 				//Old Format Category; retain for backwards compatibility
 

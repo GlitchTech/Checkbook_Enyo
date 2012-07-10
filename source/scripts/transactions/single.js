@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
 	name: "Checkbook.transactions.viewSingle",
@@ -12,7 +12,7 @@ enyo.kind( {
 	style: "width: 500px;",
 
 	published: {
-		caption: $L( "Transaction Details" ),
+		caption: "Transaction Details",
 
 		index: -1,
 		account: null,
@@ -69,7 +69,7 @@ enyo.kind( {
 													className: "big",
 													flex: 1
 												}, {
-													content: $L( "amount" ),
+													content: "amount",
 													className: "enyo-label"
 												}
 											]
@@ -90,7 +90,7 @@ enyo.kind( {
 													name: "fromAccount",
 													flex: 1
 												}, {
-													content: $L( "from" ),
+													content: "from",
 													className: "enyo-label"
 												}
 											]
@@ -111,7 +111,7 @@ enyo.kind( {
 													name: "toAccount",
 													flex: 1
 												}, {
-													content: $L( "to" ),
+													content: "to",
 													className: "enyo-label"
 												}
 											]
@@ -140,7 +140,7 @@ enyo.kind( {
 
 											components: [
 												{
-													content: $L( "category" ),
+													content: "category",
 													className: "enyo-label",
 													style: "text-align: right;"
 												}, {
@@ -159,7 +159,7 @@ enyo.kind( {
 													name: "checkNum",
 													flex: 1
 												}, {
-													content: $L( "check number" ),
+													content: "check number",
 													className: "enyo-label"
 												}
 											]
@@ -188,7 +188,7 @@ enyo.kind( {
 													allowHtml: true,
 													flex: 1
 												}, {
-													content: $L( "note" ),
+													content: "note",
 													className: "enyo-label"
 												}
 											]
@@ -202,21 +202,21 @@ enyo.kind( {
 								{
 									name: "btnEdit",
 									kind: enyo.Button,
-									caption: $L("Edit"),
+									caption: "Edit",
 									onclick: "editClicked",
 									flex: 1,
 									className: "enyo-button-dark"
 								}, {
 									name: "btnDelete",
 									kind: enyo.Button,
-									caption: $L("Delete"),
+									caption: "Delete",
 									onclick: "deleteClicked",
 									flex: 1,
 									className: "enyo-button-negative"
 								}, {
 									name: "btnCancel",
 									kind: enyo.Button,
-									caption: $L("Close"),
+									caption: "Close",
 									onclick: "close",
 									flex: 1,
 									className: "enyo-button-light"

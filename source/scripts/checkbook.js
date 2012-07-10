@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -51,44 +51,44 @@ enyo.kind({
 			scrim: true,
 			components: [
 				{
-					caption: $L( "Preferences & Data" ),
+					caption: "Preferences & Data",
 					components: [
 						{
-							caption: $L( "Preferences & Accounts" ),
+							caption: "Preferences & Accounts",
 							onclick: "openPreferences"
 						}, {
 							showing: false,
-							caption: $L( "Auto-Complete Preferences" ),
+							caption: "Auto-Complete Preferences",
 							onclick: "openACPrefs"
 						}, {
-							caption: $L( "Import Data" ),
+							caption: "Import Data",
 							onclick: "openImport"
 						}, {
-							caption: $L( "Export Data" ),
+							caption: "Export Data",
 							onclick: "openExport"
 						}
 					]
 				}, {
-					caption: $L( "Finance Information" ),
+					caption: "Finance Information",
 					components: [
 						{
-							caption: $L( "Search" ),
+							caption: "Search",
 							onclick: "openSearch"
 						}, {
-							caption: $L( "Budget" ),
+							caption: "Budget",
 							onclick: "openBudget"
 						}, {
 							showing: false,
-							caption: $L( "Reports" ),
+							caption: "Reports",
 							onclick: "openReports"
 						}
 					]
 				}, {
 					showing: false,
-					caption: $L( "Report Bug" ),
+					caption: "Report Bug",
 					onclick: "errorReport"
 				}, {
-					caption: $L( "About" ),
+					caption: "About",
 					onclick: "showPopup",
 					popup: "about"
 				}
@@ -165,7 +165,7 @@ enyo.kind({
 			//App Locked
 
 			enyo.application.security.authUser(
-					$L( "Main Program PIN Code" ),
+					"Main Program PIN Code",
 					enyo.application.checkbookPrefs['code'],
 					{
 						"onSuccess": enyo.bind( this, this.loadCheckbook ),
@@ -217,7 +217,7 @@ enyo.kind({
 				//System security
 
 				enyo.application.security.authUser(
-						result['acctName'] + " " + $L( "PIN Code" ),
+						result['acctName'] + " " + "PIN Code",
 						result['lockedCode'],
 						{
 							"onSuccess": enyo.bind( this, this.updateTransactionsView, null, result )

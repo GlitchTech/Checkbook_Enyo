@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -33,7 +33,7 @@ enyo.kind({
 			components: [
 				{
 					name: "title",
-					content: $L( "Modify Budget" ),
+					content: "Modify Budget",
 					className: "bigger",
 					style: "text-align: center; margin-right: -32px;",
 					flex: 1
@@ -62,7 +62,7 @@ enyo.kind({
 							className: "enyo-text-ellipsis",
 							flex: 1
 						}, {
-							content: $L( "Category" ),
+							content: "Category",
 							className: "enyo-listselector-label enyo-label"
 						}, {
 							className: "enyo-listselector-arrow"
@@ -84,7 +84,7 @@ enyo.kind({
 							flex: 1,
 							components: [
 								{
-									content: $L( "Spending Limit" ),
+									content: "Spending Limit",
 									className: "enyo-label"
 								}
 							]
@@ -127,7 +127,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					kind: enyo.Button,
-					caption: $L( "Cancel" ),
+					caption: "Cancel",
 
 					flex: 3,
 					onclick: "close"
@@ -137,7 +137,7 @@ enyo.kind({
 				}, {
 					name: "delete",
 					kind: enyo.Button,
-					caption: $L( "Delete" ),
+					caption: "Delete",
 
 					flex: 3,
 					onclick: "delete",
@@ -148,7 +148,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					kind: enyo.Button,
-					caption: $L( "Save" ),
+					caption: "Save",
 
 					flex: 3,
 					onclick: "save",
@@ -172,7 +172,7 @@ enyo.kind({
 			name: "errorMessage",
 			kind: "GTS.system_error",
 
-			errTitle: $L( "Budget Error" ),
+			errTitle: "Budget Error",
 			errMessage: "",
 			errMessage2: "" ,
 			onFinish: "closeErrorMessage"
@@ -204,7 +204,7 @@ enyo.kind({
 		this.budgetObj = enyo.mixin(
 				{
 					budgetId: null,
-					category: $L( "Uncategorized" ),
+					category: "Uncategorized",
 					category2: "%",
 					spending_limit: "",
 					span: 1,

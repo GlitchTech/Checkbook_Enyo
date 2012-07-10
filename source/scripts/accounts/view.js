@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
 	name: "Checkbook.accounts.view",
@@ -25,7 +25,7 @@ enyo.kind( {
 					className: "img-icon",
 					style: "margin-right: 0.25em;"
 				}, {
-					content: $L( "Checkbook" ),
+					content: "Checkbook",
 					className: "big enyo-text-ellipsis",
 					style: "margin-top: -6px;",
 					flex: 1

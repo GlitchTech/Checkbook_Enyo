@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
 	name: "Checkbook.login",
@@ -52,7 +52,7 @@ enyo.kind( {
 							name: "pin",
 							kind: enyo.PasswordInput,
 
-							hint: $L( "Enter PIN using key pad." ),
+							hint: "Enter PIN using key pad.",
 
 							autoKeyModifier: "num-lock",
 							spellcheck: false,
@@ -63,7 +63,7 @@ enyo.kind( {
 
 							components: [
 								{
-									content: $L( "pin code" ),
+									content: "pin code",
 									className: "small",
 									style: "text-transform: uppercase; color: rgb( 32, 117, 191 );"
 								}
@@ -182,7 +182,7 @@ enyo.kind( {
 							flex: 2,
 							className: "enyo-button-primary",
 
-							caption: $L( "Cancel" ),
+							caption: "Cancel",
 							onclick: "badPin"
 						}, {
 							kind: enyo.Spacer,
@@ -193,7 +193,7 @@ enyo.kind( {
 							flex: 2,
 							className: "enyo-button-affirmative",
 
-							caption: $L( "Confirm" ),
+							caption: "Confirm",
 							onclick: "checkPin"
 						}
 					]
@@ -250,7 +250,7 @@ enyo.kind( {
 			this.errorCount++;
 
 			this.$['errorMessageContainer'].setShowing( true );
-			this.$['errorMessage'].setContent( $L( "Invalid PIN." ) + "<br />" + this.errorCount + $L( " out of 5 attempts used." ) );
+			this.$['errorMessage'].setContent( "Invalid PIN." ) + "<br />" + this.errorCount + $L( " out of 5 attempts used." );
 			this.$['pin'].setValue( "" )
 
 			if( this.errorCount >= 5 ) {

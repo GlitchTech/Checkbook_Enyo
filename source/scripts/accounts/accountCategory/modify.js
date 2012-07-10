@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 
@@ -59,7 +59,7 @@ enyo.kind({
 
 					components: [
 						{
-							content: $L( "name" ),
+							content: "name",
 							className: "enyo-label"
 						}
 					]
@@ -84,7 +84,7 @@ enyo.kind({
 							className: "enyo-text-ellipsis",
 							flex: 1
 						}, {
-							content: $L( "Color" ),
+							content: "Color",
 							className: "enyo-listselector-label enyo-label"
 						}, {
 							className: "enyo-listselector-arrow"
@@ -117,7 +117,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-primary",
 
-					caption: $L( "Cancel" ),
+					caption: "Cancel",
 					onclick: "close"
 				}, {
 					kind: enyo.Spacer,
@@ -128,7 +128,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-affirmative",
 
-					caption: $L( "Save" ),
+					caption: "Save",
 					onclick: "save"
 				}
 			]
@@ -159,7 +159,7 @@ enyo.kind({
 
 		if( inRowid < 0 ) {
 
-			this.$['title'].setContent( $L( "Create a Category" ) );
+			this.$['title'].setContent( "Create a Category" );
 
 			this.rowid = -1;
 			this.name = "";
@@ -167,7 +167,7 @@ enyo.kind({
 			this.color = "";
 		} else if( inRowid > 0 ) {
 
-			this.$['title'].setContent( $L( "Edit Category" ) );
+			this.$['title'].setContent( "Edit Category" );
 
 			this.rowid = inRowid;
 			this.name = inName;
@@ -220,7 +220,7 @@ enyo.kind({
 
 		if( newName.length <= 0 ) {
 
-			this.$['errorMessage'].setContent( $L( "Category name may not be blank." ) );
+			this.$['errorMessage'].setContent( "Category name may not be blank." );
 			this.$['errorMessageContainer'].setShowing( true );
 			return;
 		}
@@ -232,7 +232,7 @@ enyo.kind({
 
 		if( count > 0 ) {
 
-			this.$['errorMessage'].setContent( $L( "Category names must be unique." ) );
+			this.$['errorMessage'].setContent( "Category names must be unique." );
 			this.$['errorMessageContainer'].setShowing( true );
 			return;
 		}

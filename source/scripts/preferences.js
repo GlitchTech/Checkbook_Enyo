@@ -1,4 +1,4 @@
-/* Copyright © 2011, GlitchTech Science */
+/* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
 	name: "Checkbook.preferences",
@@ -26,7 +26,7 @@ enyo.kind({
 					className: "img-icon",
 					style: "margin-right: 0.25em;"
 				}, {
-					content: $L( "Preferences & Accounts" ),
+					content: "Preferences & Accounts",
 					className: "bigger",
 					style: "margin-top: -6px;"
 				}, {
@@ -52,7 +52,7 @@ enyo.kind({
 					components: [
 						{
 							kind: enyo.Group,
-							caption: $L( "Program Security" ),
+							caption: "Program Security",
 							components: [
 								{
 									name: "pinLock",
@@ -83,14 +83,14 @@ enyo.kind({
 
 													flex: 1,
 
-													hint: $L( "Tap to set..." ),
+													hint: "Tap to set...",
 
 													onmousedown: "changeAppPin",
 													onmouseup: "changeAppPin",
 
 													components: [
 														{
-															content: $L( "Code" ),
+															content: "Code",
 															className: "enyo-label"
 														}
 													]
@@ -102,7 +102,7 @@ enyo.kind({
 							]
 						}, {
 							kind: enyo.RowGroup,
-							caption: $L( "General Options" ),
+							caption: "General Options",
 							components: [
 								{
 									name: "transPreview",
@@ -155,7 +155,7 @@ enyo.kind({
 							]
 						}, {
 							kind: enyo.RowGroup,
-							caption: $L( "Accounts" ),
+							caption: "Accounts",
 							components: [
 								{
 									name: "entries",
@@ -190,33 +190,33 @@ enyo.kind({
 									kind: enyo.Button,
 									toggling: true,
 
-									content: $L( "Add Account" ),
+									content: "Add Account",
 									onclick: "addAccount"
 								}
 							]
 						}, {
 							kind: enyo.RowGroup,
-							caption: $L( "Add/Edit Categories" ),
+							caption: "Add/Edit Categories",
 							components: [
 								{
 									name: "editAccountCategories",
 									kind: enyo.Button,
 									toggling: true,
 
-									content: $L( "Edit Account Categories" ),
+									content: "Edit Account Categories",
 									onclick: "modifyAccountCategories"
 								}, {
 									name: "editTransactionCategories",
 									kind: enyo.Button,
 									toggling: true,
 
-									content: $L( "Edit Transaction Categories" ),
+									content: "Edit Transaction Categories",
 									onclick: "modifyTransactionCategories"
 								}
 							]
 						}, {
 							kind: enyo.Button,
-							content: $L( "Full Wipe" ),
+							content: "Full Wipe",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
 							onclick: "fullwipe"
@@ -239,7 +239,7 @@ enyo.kind({
 					flex: 2,
 					className: "enyo-button-affirmative deep-green",
 
-					caption: $L( "Done" ),
+					caption: "Done",
 					onclick: "doFinish"
 				}, {
 					kind: enyo.Spacer,
@@ -386,7 +386,7 @@ enyo.kind({
 	buildDefaultAccountList: function( accounts ) {
 
 		accounts.unshift( {
-				caption: $L( "No Default Account" ),
+				caption: "No Default Account",
 				color: null,
 				icon: null,
 				value: -1
