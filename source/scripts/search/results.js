@@ -124,7 +124,7 @@ enyo.kind({
 					components: [
 						{
 							onclick: "sortClicked",
-							icon: "source/images/menu_icons/sort.png",
+							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
@@ -424,7 +424,7 @@ enyo.kind({
 			this.$['cleared'].setChecked( row['cleared'] === 1 );
 
 			//Account
-			this.$['accountIcon'].setSrc( "source/images/" + row['acctCategoryIcon'] );
+			this.$['accountIcon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 			this.$['account'].setContent( row['acctName'] );
 
 			//Categories

@@ -22,7 +22,7 @@ enyo.kind({
 					kind: enyo.Spacer
 				}, {
 					kind: enyo.Image,
-					src: "source/images/dollar_sign_1.png",
+					src: "assets/dollar_sign_1.png",
 					className: "img-icon",
 					style: "margin-right: 0.25em;"
 				}, {
@@ -369,10 +369,10 @@ enyo.kind({
 
 			if( row['hidden'] === 2 ) {
 
-				inControl.$['icon'].setSrc( imgToGrey( "source/images/" + row['acctCategoryIcon'] ) );
+				inControl.$['icon'].setSrc( imgToGrey( "assets/" + row['acctCategoryIcon'] ) );
 			} else {
 
-				inControl.$['icon'].setSrc( "source/images/" + row['acctCategoryIcon'] );
+				inControl.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 			}
 
 			inControl.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );

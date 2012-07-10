@@ -73,7 +73,7 @@ enyo.kind({
 								}, {
 									name: "iconLock",
 									kind: enyo.Image,
-									src: "source/images/padlock_1.png",
+									src: "assets/padlock_1.png",
 									className: "accountLockIcon unlocked"
 								}, {
 									name: "name",
@@ -318,7 +318,7 @@ enyo.kind({
 			this.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
 			this.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
 
-			this.$['icon'].setSrc( "source/images/" + row['acctCategoryIcon'] );
+			this.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 			this.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
 
 			this.$['name'].setContent( row['acctName'] );

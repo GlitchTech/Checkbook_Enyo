@@ -41,7 +41,7 @@ enyo.kind({
 					]
 				}, {
 					kind: enyo.ToolButton,
-					icon: "source/images/menu_icons/close.png",
+					icon: "assets/menu_icons/close.png",
 					className: "img-icon",
 					style: "text-align: center;",
 					onclick: "close"
@@ -135,7 +135,7 @@ enyo.kind({
 
 		if( row ) {
 
-			this.$['icon'].setSrc( "source/images/" + row['icon'] );
+			this.$['icon'].setSrc( "assets/" + row['icon'] );
 			this.$['name'].setContent( row['name'] );
 
 			this.$['item'].setClassName( "enyo-item enyo-swipeableitem custom-background legend " + row['color'] + " enyo-vflexbox" );

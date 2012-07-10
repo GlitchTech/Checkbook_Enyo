@@ -33,7 +33,7 @@ enyo.kind({
 						}, {
 							name: "icon",
 							kind: "Image",
-							src: "source/images/warning-icon.png",
+							src: "assets/warning-icon.png",
 							style: "margin-right: 5px;",
 							showing: false
 						}, {

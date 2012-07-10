@@ -77,7 +77,7 @@ enyo.kind( {
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: "doFinish"
 						}, {
-							icon: "source/images/menu_icons/sort.png",
+							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: ""
 						}
@@ -89,7 +89,7 @@ enyo.kind( {
 					kind: enyo.ToolButtonGroup,
 					components: [
 						{
-							icon: "source/images/menu_icons/new.png",
+							icon: "assets/menu_icons/new.png",
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: ""
 						}
@@ -116,7 +116,7 @@ enyo.kind( {
 		if( inIndex >= 0 && inIndex < 100 ) {
 
 			this.$['desc'].setContent( "description name: " + inIndex );
-			this.$['icon'].setSrc( "source/images/" + ( ( inIndex % 2 ) == 0 ? "green-plus.png" : "red-cross.png" ) );
+			this.$['icon'].setSrc( "assets/" + ( ( inIndex % 2 ) == 0 ? "green-plus.png" : "red-cross.png" ) );
 
 			return true;
 		}

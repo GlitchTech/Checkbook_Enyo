@@ -39,7 +39,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					kind: enyo.ToolButton,
-					icon: "source/images/menu_icons/close.png",
+					icon: "assets/menu_icons/close.png",
 					className: "img-icon",
 					style: "text-align: center;",
 					onclick: "close"

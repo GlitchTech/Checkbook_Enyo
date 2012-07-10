@@ -25,7 +25,7 @@ enyo.kind( {
 
 					name: "acctTypeIcon",
 					kind: enyo.Image,
-					src: "source/images/dollar_sign_1.png",
+					src: "assets/dollar_sign_1.png",
 					className: "img-icon",
 					style: "margin: 0 15px 0 0;"
 				}, {
@@ -135,11 +135,11 @@ enyo.kind( {
 					components: [
 						{
 							onclick: "sortButtonClicked",
-							icon: "source/images/menu_icons/sort.png",
+							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}, {
 							onclick: "reloadSystem",
-							icon: "source/images/menu_icons/refresh.png",
+							icon: "assets/menu_icons/refresh.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
@@ -152,19 +152,19 @@ enyo.kind( {
 							name: "addIncomeButton",
 							onclick: "addIncome",
 							toggling: true,
-							icon: "source/images/menu_icons/income.png",
+							icon: "assets/menu_icons/income.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}, {
 							name: "addTransferButton",
 							onclick: "addTransfer",
 							toggling: true,
-							icon: "source/images/menu_icons/transfer.png",
+							icon: "assets/menu_icons/transfer.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}, {
 							name: "addExpenseButton",
 							onclick: "addExpense",
 							toggling: true,
-							icon: "source/images/menu_icons/expense.png",
+							icon: "assets/menu_icons/expense.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
@@ -177,11 +177,11 @@ enyo.kind( {
 							showing: false,
 
 							onclick: "functionButtonClicked",
-							icon: "source/images/menu_icons/config.png",
+							icon: "assets/menu_icons/config.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}, {
 							onclick: "searchButtonClicked",
-							icon: "source/images/menu_icons/search.png",
+							icon: "assets/menu_icons/search.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
@@ -308,7 +308,7 @@ enyo.kind( {
 			this.account = enyo.clone( accountObj );
 
 			this.$['acctName'].setContent( this.account['acctName'] );
-			this.$['acctTypeIcon'].setSrc( "source/images/" + this.account['acctCategoryIcon'] );
+			this.$['acctTypeIcon'].setSrc( "assets/" + this.account['acctCategoryIcon'] );
 
 			this.renderBalanceButton();
 			this.renderSortButton();

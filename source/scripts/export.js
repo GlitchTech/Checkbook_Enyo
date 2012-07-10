@@ -35,7 +35,7 @@ enyo.kind({
 				}, {
 					kind: enyo.ToolButton,
 
-					icon: "source/images/menu_icons/close.png",
+					icon: "assets/menu_icons/close.png",
 					className: "img-icon",
 
 					onclick: "closeExport"
@@ -162,7 +162,7 @@ enyo.kind({
 										}, {
 											name: "iconLock",
 											kind: enyo.Image,
-											src: "source/images/padlock_1.png",
+											src: "assets/padlock_1.png",
 											className: "accountLockIcon unlocked"
 										}, {
 											flex: 1,
@@ -544,7 +544,7 @@ enyo.kind({
 			this.$['accountName'].setContent( row['name'] );
 			this.$['accountNote'].setContent( row['itemCount'] + " " + $L( "Transaction" + ( row['itemCount'] > 1 ? "s" : "" ) ) );
 
-			this.$['icon'].setSrc( "source/images/" + row['icon'] );
+			this.$['icon'].setSrc( "assets/" + row['icon'] );
 			this.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 || row['bypass'] ) );
 
 			this.$['accountSelected'].setChecked( row['selectStatus'] );

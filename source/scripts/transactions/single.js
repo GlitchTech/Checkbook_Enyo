@@ -123,7 +123,7 @@ enyo.kind( {
 											components: [
 												{
 													kind: enyo.Image,
-													src: "source/images/calendar.png",
+													src: "assets/calendar.png",
 													className: "img-icon",
 													style: "margin-right: 1em;"
 												}, {
@@ -317,7 +317,7 @@ enyo.kind( {
 			this.transactionType = "income";
 		}
 
-		this.$['transTypeIcon'].setSrc( "source/images/menu_icons/" + this.transactionType + ".png" );
+		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
 		this.$['amount'].setContent( formatAmount( Math.abs( this.transaction['amount'] ) ) );
 
 		if( this.transactionType === "transfer" ) {
@@ -386,7 +386,7 @@ enyo.kind( {
 
 	renderFromAccount: function( acct ) {
 
-		this.$['fromAccountImg'].setSrc( "source/images/" + acct['acctCategoryIcon'] );
+		this.$['fromAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['fromAccount'].setContent( acct['acctName'] );
 
 		if( enyo.application.checkbookPrefs['dispColor'] === 1 ) {
@@ -400,7 +400,7 @@ enyo.kind( {
 
 	renderToAccount: function( acct ) {
 
-		this.$['toAccountImg'].setSrc( "source/images/" + acct['acctCategoryIcon'] );
+		this.$['toAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['toAccount'].setContent( acct['acctName'] );
 
 		if( enyo.application.checkbookPrefs['dispColor'] === 1 ) {

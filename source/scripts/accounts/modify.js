@@ -428,14 +428,14 @@ enyo.kind( {
 			if( row ) {
 
 				this.categories['assoc'][row['name']] = {
-							icon: "source/images/" + row['icon'],
+							icon: "assets/" + row['icon'],
 							color: row['color']
 						};
 
 				this.categories['choices'].push(
 						{
 							caption: row['name'],
-							icon: "source/images/" + row['icon'],
+							icon: "assets/" + row['icon'],
 							color: row['color'],
 							value: row['name']
 						}

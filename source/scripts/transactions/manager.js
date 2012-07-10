@@ -750,29 +750,41 @@ enyo.kind({
 					}
 
 					trsnData = {
-						"itemId": maxItemId,
+						"itemId": maxItemId,
+
 						"account": repeatArray[i]['rep_acctId'],
 						"repeatId": repeatArray[i]['repeatId'],
 
-						"desc": repeatArray[i]['rep_desc'],
+						"desc": repeatArray[i]['rep_desc'],
+
 						"note": repeatArray[i]['rep_note'],
 						"date": Date.parse( serDate ),
 
-						"amount": repeatArray[i]['rep_amount'],
-						"amount_old": "NOT_A_VALUE",
+						"amount": repeatArray[i]['rep_amount'],
 
-						"linkedRecord": -1,//set elsewhere
-						"linkedAccount": repeatArray[i]['rep_linkedAcctId'],
+						"amount_old": "NOT_A_VALUE",
 
-						"cleared": false,
-						"checkNum": "",
 
-						"category": repeatArray[i]['rep_category'],
-						"category2": "",
+						"linkedRecord": -1,
+//set elsewhere
+						"linkedAccount": repeatArray[i]['rep_linkedAcctId'],
 
-						"rObj": false,//do not calculate repeats for this event
 
-						"autoTransfer": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransfer'] : 0 ),
+						"cleared": false,
+
+						"checkNum": "",
+
+
+						"category": repeatArray[i]['rep_category'],
+
+						"category2": "",
+
+
+						"rObj": false,
+//do not calculate repeats for this event
+
+						"autoTransfer": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransfer'] : 0 ),
+
 						"autoTransferLink": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransferLink'] : -1 )
 					};
 
@@ -1196,7 +1208,7 @@ enyo.kind({
 
 				transactionSortOptions.push(
 							{
-								icon: "source/images/sort_icons/" + row['sortGroup'].toLowerCase().replace( " ", "" ) + ".png",
+								icon: "assets/sort_icons/" + row['sortGroup'].toLowerCase().replace( " ", "" ) + ".png",
 								caption: row['label'],
 								value: row['sortId'],
 								qry: row['qry'],

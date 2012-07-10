@@ -37,7 +37,7 @@ enyo.kind( {
 							flex: 1
 						}, {
 							kind: enyo.ToolButton,
-							icon: "source/images/menu_icons/close.png",
+							icon: "assets/menu_icons/close.png",
 
 							className: "img-icon",
 							style: "text-align: center;",
@@ -78,7 +78,7 @@ enyo.kind( {
 					components: [
 						{
 							kind: "Image",
-							src: "source/images/warning-icon.png",
+							src: "assets/warning-icon.png",
 							style: "margin-right: 5px;"
 						}, {
 							name: "errorMessage",

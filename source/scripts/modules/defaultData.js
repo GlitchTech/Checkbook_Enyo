@@ -33,127 +33,127 @@ var defaultAccountCategories = [
 //Remove and use file picker in modify account categories?
 var appIcons = [
 		/*{//Reserved for recurring events
-			"icon": "source/images/calendar.png",
+			"icon": "assets/calendar.png",
 			"value": "calendar.png"
 		},*/
 		{
-			"icon": "source/images/cash_1.png",
+			"icon": "assets/cash_1.png",
 			"value": "cash_1.png"
 		}, {
-			"icon": "source/images/cash_2.png",
+			"icon": "assets/cash_2.png",
 			"value": "cash_2.png"
 		}, {
-			"icon": "source/images/cash_3.png",
+			"icon": "assets/cash_3.png",
 			"value": "cash_3.png"
 		}, {
-			"icon": "source/images/cash_4.png",
+			"icon": "assets/cash_4.png",
 			"value": "cash_4.png"
 		}, {
-			"icon": "source/images/cash_5.png",
+			"icon": "assets/cash_5.png",
 			"value": "cash_5.png"
 		}, {
-			"icon": "source/images/checkbook_1.png",
+			"icon": "assets/checkbook_1.png",
 			"value": "checkbook_1.png"
 		}, {
-			"icon": "source/images/checkbook_2.png",
+			"icon": "assets/checkbook_2.png",
 			"value": "checkbook_2.png"
 		}, {
-			"icon": "source/images/coins_1.png",
+			"icon": "assets/coins_1.png",
 			"value": "coins_1.png"
 		}, {
-			"icon": "source/images/coins_2.png",
+			"icon": "assets/coins_2.png",
 			"value": "coins_2.png"
 		}, {
-			"icon": "source/images/coins_3.png",
+			"icon": "assets/coins_3.png",
 			"value": "coins_3.png"
 		}, {
-			"icon": "source/images/coins_4.png",
+			"icon": "assets/coins_4.png",
 			"value": "coins_4.png"
 		}, {
-			"icon": "source/images/credit_card_1.png",
+			"icon": "assets/credit_card_1.png",
 			"value": "credit_card_1.png"
 		}, {
-			"icon": "source/images/credit_card_2.png",
+			"icon": "assets/credit_card_2.png",
 			"value": "credit_card_2.png"
 		}, {
-			"icon": "source/images/credit_card_3.png",
+			"icon": "assets/credit_card_3.png",
 			"value": "credit_card_3.png"
 		}, {
-			"icon": "source/images/dollar_sign_1.png",
+			"icon": "assets/dollar_sign_1.png",
 			"value": "dollar_sign_1.png"
 		}, {
-			"icon": "source/images/dollar_sign_2.png",
+			"icon": "assets/dollar_sign_2.png",
 			"value": "dollar_sign_2.png"
 		}, {
-			"icon": "source/images/dollar_sign_3.png",
+			"icon": "assets/dollar_sign_3.png",
 			"value": "dollar_sign_3.png"
 		}, {
-			"icon": "source/images/echeck.png",
+			"icon": "assets/echeck.png",
 			"value": "echeck.png"
 		}, {
 			/*
 			//Reserved for recurring transfers
-			"icon": "source/images/future_transfer_1.png",
+			"icon": "assets/future_transfer_1.png",
 			"value": "future_transfer_1.png"
 		}, {
 			*/
-			"icon": "source/images/icon_1.png",
+			"icon": "assets/icon_1.png",
 			"value": "icon_1.png"
 		}, {
-			"icon": "source/images/icon_2.png",
+			"icon": "assets/icon_2.png",
 			"value": "icon_2.png"
 		}, {
-			"icon": "source/images/icon_3.png",
+			"icon": "assets/icon_3.png",
 			"value": "icon_3.png"
 		}, {
-			"icon": "source/images/icon_4.png",
+			"icon": "assets/icon_4.png",
 			"value": "icon_4.png"
 		}, {
-			"icon": "source/images/jewel_1.png",
+			"icon": "assets/jewel_1.png",
 			"value": "jewel_1.png"
 		}, {
-			"icon": "source/images/jewel_2.png",
+			"icon": "assets/jewel_2.png",
 			"value": "jewel_2.png"
 		}, {
-			"icon": "source/images/money_bag_1.png",
+			"icon": "assets/money_bag_1.png",
 			"value": "money_bag_1.png"
 		}, {
-			"icon": "source/images/money_bag_2.png",
+			"icon": "assets/money_bag_2.png",
 			"value": "money_bag_2.png"
 		}, {
-			"icon": "source/images/money_bag_3.png",
+			"icon": "assets/money_bag_3.png",
 			"value": "money_bag_3.png"
 		}, {
-			"icon": "source/images/money_bag_4.png",
+			"icon": "assets/money_bag_4.png",
 			"value": "money_bag_4.png"
 		}, {
 			/*
 			//Reserved for locked accounts
-			"icon": "source/images/padlock_1.png",
+			"icon": "assets/padlock_1.png",
 			"value": "padlock_1.png"
 		}, {
 			*/
-			"icon": "source/images/padlock_2.png",
+			"icon": "assets/padlock_2.png",
 			"value": "padlock_2.png"
 		}, {
-			"icon": "source/images/safe_1.png",
+			"icon": "assets/safe_1.png",
 			"value": "safe_1.png"
 		}, {
-			"icon": "source/images/safe_2.png",
+			"icon": "assets/safe_2.png",
 			"value": "safe_2.png"
 		}, {
-			"icon": "source/images/transfer_1.png",
+			"icon": "assets/transfer_1.png",
 			"value": "transfer_1.png"
 		}, {
-			"icon": "source/images/transfer_2.png",
+			"icon": "assets/transfer_2.png",
 			"value": "transfer_2.png"
 		}, {
 			/*//Reserved for transfers
-			"icon": "source/images/transfer_3.png",
+			"icon": "assets/transfer_3.png",
 			"value": "transfer_3.png"
 		}, {
 			*/
-			"icon": "source/images/transfer_4.png",
+			"icon": "assets/transfer_4.png",
 			"value": "transfer_4.png"
 		}
 	];

@@ -21,7 +21,7 @@ enyo.kind( {
 			components: [
 				{
 					kind: enyo.Image,
-					src: "source/images/dollar_sign_1.png",
+					src: "assets/dollar_sign_1.png",
 					className: "img-icon",
 					style: "margin-right: 0.25em;"
 				}, {
@@ -58,7 +58,7 @@ enyo.kind( {
 					components: [
 						{
 							onclick: "showSort",
-							icon: "source/images/menu_icons/sort.png",
+							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
@@ -71,13 +71,13 @@ enyo.kind( {
 							name: "addAccountButton",
 							onclick: "addAccount",
 							toggling: true,
-							icon: "source/images/menu_icons/new.png",
+							icon: "assets/menu_icons/new.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}, {
 							name: "editModeToggle",
 							toggling: true,
 							onclick: "toggleLock",
-							icon: "source/images/menu_icons/lock.png",
+							icon: "assets/menu_icons/lock.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
@@ -90,7 +90,7 @@ enyo.kind( {
 							showing: false,
 
 							onclick: "showSearch",
-							icon: "source/images/menu_icons/search.png",
+							icon: "assets/menu_icons/search.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
 					]
@@ -343,11 +343,11 @@ enyo.kind( {
 
 		if( this.$['editModeToggle'].getDepressed() ) {
 
-			this.$['editModeToggle'].setIcon( "source/images/menu_icons/unlock.png" );
+			this.$['editModeToggle'].setIcon( "assets/menu_icons/unlock.png" );
 			this.$['entries'].setEditMode( true );
 		} else {
 
-			this.$['editModeToggle'].setIcon( "source/images/menu_icons/lock.png" );
+			this.$['editModeToggle'].setIcon( "assets/menu_icons/lock.png" );
 			this.$['entries'].setEditMode( false );
 		}
 	},

@@ -38,7 +38,7 @@ enyo.kind({
 				}, {
 					kind: enyo.ToolButton,
 
-					icon: "source/images/menu_icons/close.png",
+					icon: "assets/menu_icons/close.png",
 					className: "img-icon",
 
 					onclick: "closeImport"

@@ -33,7 +33,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					kind: enyo.ToolButton,
-					icon: "source/images/menu_icons/close.png",
+					icon: "assets/menu_icons/close.png",
 					style: "top: -25px; right: -10px; position: relative;",
 					onclick: "doClose"
 				}
@@ -53,7 +53,7 @@ enyo.kind({
 					content: "Thank you for using " + enyo.fetchAppInfo()['title'] + " powered by"
 				}, {
 					kind: enyo.Image,
-					src: "source/images/enyo-logo.png",
+					src: "assets/enyo-logo.png",
 					style: "background-color: black; border-radius: 5px; margin: 5px 0px 0px 5px; padding: 1px;"
 				}
 			]
@@ -69,7 +69,7 @@ enyo.kind({
 			components: [
 				{
 					kind: enyo.Image,
-					src: "source/images/application-web.png",
+					src: "assets/application-web.png",
 				}, {
 					kind: enyo.HtmlContent,
 					onLinkClick: "linkClicked",
@@ -90,7 +90,7 @@ enyo.kind({
 			components: [
 				{
 					kind: enyo.Image,
-					src: "source/images/application-web.png",
+					src: "assets/application-web.png",
 				}, {
 					kind: enyo.HtmlContent,
 					onLinkClick: "linkClicked",
@@ -111,7 +111,7 @@ enyo.kind({
 			components: [
 				{
 					kind: enyo.Image,
-					src: "source/images/twitter-icon.png",
+					src: "assets/twitter-icon.png",
 				}, {
 					kind: enyo.HtmlContent,
 					onLinkClick: "linkClicked",
@@ -132,7 +132,7 @@ enyo.kind({
 			components: [
 				{
 					kind: enyo.Image,
-					src: "source/images/application-email.png",
+					src: "assets/application-email.png",
 				}, {
 					kind: enyo.HtmlContent,
 					onLinkClick: "linkClicked",

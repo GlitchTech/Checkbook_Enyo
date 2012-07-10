@@ -65,7 +65,7 @@ enyo.kind({
 										}, {
 											name: "iconLock",
 											kind: enyo.Image,
-											src: "source/images/padlock_1.png",
+											src: "assets/padlock_1.png",
 											className: "accountLockIcon unlocked"
 										}, {
 											flex: 1,
@@ -293,7 +293,7 @@ enyo.kind({
 
 			this.$['accountName'].setContent( row['acctName'] );
 
-			this.$['icon'].setSrc( "source/images/" + row['acctCategoryIcon'] );
+			this.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 			this.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 || row['bypass'] ) );
 
 			this.$['accountSelected'].setChecked( row['selectStatus'] );

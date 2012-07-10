@@ -29,7 +29,7 @@ enyo.kind({
 
 					name: "systemIcon",
 					kind: enyo.Image,
-					src: "source/images/icon_4.png",
+					src: "assets/icon_4.png",
 					className: "img-icon",
 					style: "margin: 0 15px 0 0;"
 				}, {
@@ -128,11 +128,11 @@ enyo.kind({
 								}, {
 									name: "config",
 									kind: enyo.Image,
-									src: "source/images/config.png"
+									src: "assets/config.png"
 								}, {
 									name: "search",
 									kind: enyo.Image,
-									src: "source/images/search.png"
+									src: "assets/search.png"
 								}
 							]
 						}
@@ -153,7 +153,7 @@ enyo.kind({
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: "doFinish"
 						}, {
-							icon: "source/images/menu_icons/sort.png",
+							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: "sortButtonClicked"
 						}
@@ -167,7 +167,7 @@ enyo.kind({
 						{
 							onclick: "dateBack",
 							className: "enyo-grouped-toolbutton-dark",
-							icon: "source/images/menu_icons/back.png"
+							icon: "assets/menu_icons/back.png"
 						}
 					]
 				}, {
@@ -185,7 +185,7 @@ enyo.kind({
 						{
 							onclick: "dateForward",
 							className: "enyo-grouped-toolbutton-dark",
-							icon: "source/images/menu_icons/forward.png"
+							icon: "assets/menu_icons/forward.png"
 						}
 					]
 				}, {
@@ -198,10 +198,10 @@ enyo.kind({
 							name: "editModeToggle",
 							toggling: true,
 							className: "enyo-grouped-toolbutton-dark",
-							icon: "source/images/menu_icons/lock.png",
+							icon: "assets/menu_icons/lock.png",
 							onclick: "toggleEdit"
 						}, {
-							icon: "source/images/menu_icons/new.png",
+							icon: "assets/menu_icons/new.png",
 							className: "enyo-grouped-toolbutton-dark",
 							onclick: "addBudget"
 						}
@@ -352,10 +352,10 @@ enyo.kind({
 
 		if( this.$['editModeToggle'].getDepressed() ) {
 
-			this.$['editModeToggle'].setIcon( "source/images/menu_icons/unlock.png" );
+			this.$['editModeToggle'].setIcon( "assets/menu_icons/unlock.png" );
 		} else {
 
-			this.$['editModeToggle'].setIcon( "source/images/menu_icons/lock.png" );
+			this.$['editModeToggle'].setIcon( "assets/menu_icons/lock.png" );
 		}
 
 		this.$['entries'].refresh();

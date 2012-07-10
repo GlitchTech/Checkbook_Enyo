@@ -79,9 +79,9 @@ enyo.kind( {
 												{
 													name: "transTypeIcon",
 													className: "enyo-radiobutton-dark",
-													//icon: "source/images/menu_icons/income.png",
-													//icon: "source/images/menu_icons/transfer.png",
-													//icon: "source/images/menu_icons/expense.png",
+													//icon: "assets/menu_icons/income.png",
+													//icon: "assets/menu_icons/transfer.png",
+													//icon: "assets/menu_icons/expense.png",
 
 													onclick: "amountTypeChanged"
 												}
@@ -141,7 +141,7 @@ enyo.kind( {
 									components: [
 										{
 											kind: enyo.Image,
-											src: "source/images/calendar.png",
+											src: "assets/calendar.png",
 											className: "img-icon",
 											style: "margin-right: 1em;"
 										}, {
@@ -252,7 +252,7 @@ enyo.kind( {
 									components: [
 										{
 											kind: enyo.Image,
-											src: "source/images/repeat.png",
+											src: "assets/repeat.png",
 											className: "img-icon",
 											style: "margin-right: 1em;"
 										}, {
@@ -568,7 +568,7 @@ enyo.kind( {
 		this.renderCategories = true;
 
 		//Run the formatters
-		this.$['transTypeIcon'].setIcon( "source/images/menu_icons/" + this.transactionType + ".png" );
+		this.$['transTypeIcon'].setIcon( "assets/menu_icons/" + this.transactionType + ".png" );
 
 		//TODO set repeat values
 
@@ -700,7 +700,7 @@ enyo.kind( {
 				break;
 		}
 
-		this.$['transTypeIcon'].setIcon( "source/images/menu_icons/" + this.transactionType + ".png" );
+		this.$['transTypeIcon'].setIcon( "assets/menu_icons/" + this.transactionType + ".png" );
 	},
 
 	/** All Amount Field Controls **/

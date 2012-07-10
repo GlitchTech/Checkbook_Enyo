@@ -241,7 +241,7 @@ enyo.kind({
 					"Welcome to " + enyo.fetchAppInfo()['title'],
 					"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
 					"",
-					"source/images/icon_1_32x32.png"
+					"assets/icon_1_32x32.png"
 				);
 
 			enyo.asyncMethod(
@@ -250,7 +250,7 @@ enyo.kind({
 					"~|p2t|~",
 					"",
 					"~|mt|~",
-					"source/images/warning-icon.png"
+					"assets/warning-icon.png"
 				);
 		}
 	},
