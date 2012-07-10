@@ -94,17 +94,17 @@ enyo.kind( {
 							layoutKind: enyo.HFlexLayout,
 							components: [
 								{
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "1",
 									flex: 1,
 									onclick: "padPressed"
 								}, {
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "2",
 									flex: 1,
 									onclick: "padPressed"
 								}, {
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "3",
 									flex: 1,
 									onclick: "padPressed"
@@ -114,17 +114,17 @@ enyo.kind( {
 							layoutKind: enyo.HFlexLayout,
 							components: [
 								{
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "4",
 									flex: 1,
 									onclick: "padPressed"
 								}, {
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "5",
 									flex: 1,
 									onclick: "padPressed"
 								}, {
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "6",
 									flex: 1,
 									onclick: "padPressed"
@@ -134,17 +134,17 @@ enyo.kind( {
 							layoutKind: enyo.HFlexLayout,
 							components: [
 								{
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "7",
 									flex: 1,
 									onclick: "padPressed"
 								}, {
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "8",
 									flex: 1,
 									onclick: "padPressed"
 								}, {
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "9",
 									flex: 1,
 									onclick: "padPressed"
@@ -155,17 +155,17 @@ enyo.kind( {
 							components: [
 								{
 									//Spacer; 2 to 1 ratio doesn't look right
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									style: "visibility: hidden;",
 									flex: 1
 								}, {
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "0",
 									flex: 1,
 									onclick: "padPressed"
 								}, {
 									name: "clear",
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "Clear",
 									flex: 1,
 									onclick: "padPressed"
@@ -177,7 +177,7 @@ enyo.kind( {
 					kind: enyo.Toolbar,
 					components: [
 						{
-							kind: onyx.Button,
+							kind: "onyx.Button",
 
 							flex: 2,
 							className: "enyo-button-primary",
@@ -188,7 +188,7 @@ enyo.kind( {
 							kind: enyo.Spacer,
 							flex: 1
 						}, {
-							kind: onyx.Button,
+							kind: "onyx.Button",
 
 							flex: 2,
 							className: "enyo-button-affirmative",

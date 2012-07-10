@@ -54,6 +54,14 @@
 	padding-left: 10px !important;
 }
 
+.onyx-popup .light {
+
+	background-color: #eeeeee;
+	color: #333333;
+
+	border-radius: 5px;
+}
+
 /*****************/
 
 .enyo-label-fullsize {

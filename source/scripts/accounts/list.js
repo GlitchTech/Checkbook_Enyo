@@ -12,9 +12,9 @@ enyo.kind({
 	name: "Checkbook.accounts.list",
 	fit: true,
 
-	accounts: [],
+	style: "position: relative;",
 
-	flex: 1,
+	accounts: [],
 
 	events: {
 		onSetupRow: "",
@@ -36,12 +36,10 @@ enyo.kind({
 	components: [
 		{
 			name: "entries",
-			kind: "ReorderableVirtualList",
-
-			flex: 1,
+			kind: "List",
 
 			onReorder: "reorder",
-			onSetupRow: "handleSetupRow",
+			onSetupItem: "handleSetupRow",
 
 			components: [
 				{
@@ -95,17 +93,17 @@ enyo.kind({
 
 		{
 			name: "loadingScrim",
-			kind: enyo.Scrim,
-			layoutKind: enyo.VFlexLayout,
-			align: "center",
-			pack: "center",
-			showing: true,
-			components: [
-				{
-					kind: "GTS.SpinnerLarge",
-					showing: true
-				}
-			]
+			kind: onyx.Scrim,
+			classes: "onyx-scrim-translucent",
+			showing: true
+		}, {
+			name: "loadingSpinner",
+			kind: "jmtk.Spinner",
+			color: "#284907",
+			diameter: "90",
+			shape: "spiral",
+
+			style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 		}
 	],
 
@@ -113,7 +111,7 @@ enyo.kind({
 
 		this.log();
 
-		this.$['entries'].setReorderable( this.reorderable );
+		//this.$['entries'].setReorderable( this.reorderable );
 
 		this.inherited( arguments );
 	},
@@ -147,14 +145,19 @@ enyo.kind({
 	dataResponse: function( results ) {
 
 		this.accounts = enyo.clone( results );
+		this.$['entries'].setCount( this.accounts.length );
 
 		//Reload list
 		this.punt();
 
-		//Hide loading scrim; heartbeat delay
-		enyo.nextTick(
+		//Hide loading items; heartbeat delay
+		enyo.asyncMethod(
 				this.$['loadingScrim'],
 				this.$['loadingScrim'].hide
+			);
+		enyo.asyncMethod(
+				this.$['loadingSpinner'],
+				this.$['loadingSpinner'].hide
 			);
 	},
 

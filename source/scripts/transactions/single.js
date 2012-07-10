@@ -201,21 +201,21 @@ enyo.kind( {
 							components:[
 								{
 									name: "btnEdit",
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "Edit",
 									onclick: "editClicked",
 									flex: 1,
 									className: "enyo-button-dark"
 								}, {
 									name: "btnDelete",
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "Delete",
 									onclick: "deleteClicked",
 									flex: 1,
 									className: "enyo-button-negative"
 								}, {
 									name: "btnCancel",
-									kind: onyx.Button,
+									kind: "onyx.Button",
 									caption: "Close",
 									onclick: "close",
 									flex: 1,

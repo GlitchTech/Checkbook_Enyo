@@ -119,7 +119,7 @@ enyo.kind({
 			kind: enyo.Toolbar,
 			components: [
 				{
-					kind: onyx.Button,
+					kind: "onyx.Button",
 
 					flex: 2,
 					className: "enyo-button-primary",
@@ -130,7 +130,7 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					kind: onyx.Button,
+					kind: "onyx.Button",
 
 					flex: 2,
 					className: "enyo-button-affirmative",

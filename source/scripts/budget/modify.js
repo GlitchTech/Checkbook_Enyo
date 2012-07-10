@@ -126,7 +126,7 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					kind: onyx.Button,
+					kind: "onyx.Button",
 					caption: "Cancel",
 
 					flex: 3,
@@ -136,7 +136,7 @@ enyo.kind({
 					flex: 1
 				}, {
 					name: "delete",
-					kind: onyx.Button,
+					kind: "onyx.Button",
 					caption: "Delete",
 
 					flex: 3,
@@ -147,7 +147,7 @@ enyo.kind({
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					kind: onyx.Button,
+					kind: "onyx.Button",
 					caption: "Save",
 
 					flex: 3,

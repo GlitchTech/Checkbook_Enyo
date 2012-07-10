@@ -10,3 +10,6 @@
 [submodule "lib/gts-plugins"]
 	path = lib/gts-plugins
 	url = https://bitbucket.org/GlitchTechScience/gts-plugins.git
+[submodule "lib/canvas-spinner"]
+	path = lib/canvas-spinner
+	url = https://github.com/JMTK/canvas-spinner.git

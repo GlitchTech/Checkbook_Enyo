@@ -39,7 +39,20 @@ enyo.kind({
 					onSearchView: "openSearch"
 				}
 			]
-		}, /*{
+		},
+
+		{
+			name: "splash",
+			kind: "Checkbook.splash",
+			onFinish: "splashFinisher"
+		},
+
+		{
+			kind: "Signals",
+			onBack: "goBack"
+		}
+
+		/*{
 			name: "appMenu",
 			kind: enyo.AppMenu,
 			scrim: true,
@@ -91,10 +104,6 @@ enyo.kind({
 			name: "about",
 			kind: "Checkbook.about",
 			onClose: "closePopup"
-		}, {
-			name: "splash",
-			kind: "Checkbook.splash",
-			onFinish: "splashFinisher"
 		},
 
 		{
@@ -111,11 +120,6 @@ enyo.kind({
 			name: "security",
 			kind: "Checkbook.login"
 		}*/
-
-		{
-			kind: "Signals",
-			onBack: "goBack"
-		}
 	],
 
 	paneStack: [],
@@ -139,7 +143,7 @@ enyo.kind({
 		this.log();
 
 		//Load splash popup. Verifies database.
-		//this.$['splash'].openAtCenter();
+		this.$['splash'].show();
 		//this.$['appMenu'].setAutomatic( false );
 	},
 

@@ -1,13 +1,12 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.splash",
-	kind: enyo.ModalDialog,
+	kind: "onyx.Popup",
 
-	scrim: true,
+	centered: true,
 	modal: true,
-	dismissWithClick: false,
+	floating: true,
 
 	published: {
 		firstRun: false
@@ -27,8 +26,13 @@ enyo.kind({
 					pack: "start",
 					components: [
 						{
-							kind: "GTS.Spinner",
+							kind: "jmtk.Spinner",
+							color: "#284907",
+							diameter: "90",
+							shape: "spiral",
+
 							style: "margin-right: 5px;",
+
 							showing: true
 						}, {
 							name: "icon",
@@ -79,7 +83,7 @@ enyo.kind({
 
 		this.firstRun = false;
 
-		this.checkSystem();
+		//this.checkSystem();
 	},
 
 	checkSystem: function() {

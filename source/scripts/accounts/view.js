@@ -31,7 +31,7 @@ enyo.kind( {
 					fit: true
 				}, {
 					name: "overallBalance",
-					kind: onyx.Button,
+					kind: "onyx.Button",
 					content: "Balance",
 					style: "padding: 0 8px; margin: 0;",
 					onclick: "balanceButtonClicked"
