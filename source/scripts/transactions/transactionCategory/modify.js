@@ -46,7 +46,7 @@ enyo.kind({
 					className: "img-icon",
 					style: "text-align: center;",
 
-					onclick: "close"
+					ontap: "close"
 				}
 			]
 		}, {
@@ -107,7 +107,7 @@ enyo.kind({
 					className: "enyo-button-primary",
 
 					caption: "Cancel",
-					onclick: "close"
+					ontap: "close"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
@@ -118,7 +118,7 @@ enyo.kind({
 					className: "enyo-button-affirmative",
 
 					caption: "Save",
-					onclick: "save"
+					ontap: "save"
 				}
 			]
 		},

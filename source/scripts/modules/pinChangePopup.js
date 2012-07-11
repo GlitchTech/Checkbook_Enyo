@@ -125,7 +125,7 @@ enyo.kind({
 					className: "enyo-button-primary",
 
 					caption: "Cancel",
-					onclick: "doFinish"
+					ontap: "doFinish"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
@@ -136,7 +136,7 @@ enyo.kind({
 					className: "enyo-button-affirmative",
 
 					caption: "Change",
-					onclick: "updatePin"
+					ontap: "updatePin"
 				}
 			]
 		}

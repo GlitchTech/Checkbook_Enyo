@@ -55,7 +55,7 @@ enyo.kind({
 									layoutKind: enyo.HFlexLayout,
 
 									tapHighlight: true,
-									onclick: "accountSelectedChanged",
+									ontap: "accountSelectedChanged",
 
 									components: [
 										{
@@ -172,7 +172,7 @@ enyo.kind({
 			kind: "onyx.Button",
 			caption: "Search",
 			className: "enyo-button-dark",
-			onclick: "search"
+			ontap: "search"
 		}, {
 			kind: enyo.Toolbar,
 			className: "tardis-blue",
@@ -180,7 +180,7 @@ enyo.kind({
 			components: [
 				{
 					content: "Back",
-					onclick: "doFinish"
+					ontap: "doFinish"
 				}
 			]
 		}

@@ -2,7 +2,7 @@
 
 enyo.kind( {
 	name: "Checkbook.transactions.view",
-	kind: enyo.SlidingView,
+	layoutKind: "FittableRowsLayout",
 
 	transactions: [],
 	account: {},
@@ -18,43 +18,43 @@ enyo.kind( {
 
 	components: [
 		{
-			kind: enyo.PageHeader,
+			name: "header",
+			kind: "onyx.Toolbar",
+			layoutKind: "FittableColumnsLayout",
 			components: [
 				{//Swap between icon for account & spinner when loading data in the background.
-					showing: true,
-
 					name: "acctTypeIcon",
 					kind: enyo.Image,
 					src: "assets/dollar_sign_1.png",
-					className: "img-icon",
-					style: "margin: 0 15px 0 0;"
+					classes: "img-icon",
+					style: "margin: 0 15px 0 0; height: 32px;"
 				}, {
-					showing: false,
-
 					name: "loadingSpinner",
-					kind: "GTS.Spinner",
-					className: "img-icon",
-					style: "margin: 0px 15px 5px 0;"
+					kind: "jmtk.Spinner",
+					color: "#284907",
+					diameter: "32",
+					shape: "spiral",
+					style: "margin: 0 15px 0 0;"
 				}, {
 					name: "acctName",
 					content: "Checkbook",
-					className: "bigger enyo-text-ellipsis",
+					classes: "enyo-text-ellipsis",
 					style: "margin-top: -6px;",
-					flex: 1
+					fit: true
 				}, {
 					name: "balanceButton",
 					kind: "onyx.Button",
 					style: "padding: 0 8px; margin: 0;",
 					caption: "Balance",
-					onclick: "balanceButtonClicked"
+					ontap: "balanceButtontaped"
 				}
 			]
 		}, {
 			name: "entries",
-			kind: enyo.VirtualList,//GTS.LazyList
+			kind: "GTS.LazyList",
 
-			flex: 1,
-			className: "checkbook-stamp",
+			fit: true,
+			classes: "checkbook-stamp",
 
 			onSetupRow: "transactionBuildRow",
 			onAcquirePage: "transactionFetchGroup",
@@ -64,7 +64,7 @@ enyo.kind( {
 					kind: enyo.SwipeableItem,
 
 					tapHighlight: true,
-					onclick: "transactionTapped",
+					ontap: "transactiontapped",
 					onmousehold: "transactionHeld",
 					onConfirm: "transactionDeleted",
 
@@ -75,7 +75,7 @@ enyo.kind( {
 						{
 							name: "mainBody",
 							layoutKind: enyo.HFlexLayout,
-							className: "transactionItemTop",
+							classes: "transactionItemTop",
 
 							components: [
 								{
@@ -84,10 +84,10 @@ enyo.kind( {
 									components: [
 										{
 											name: "desc",
-											className: "description enyo-text-ellipsis bold"
+											classes: "description enyo-text-ellipsis bold"
 										}, {
 											name: "time",
-											className: "date smaller"
+											classes: "date smaller"
 										}
 									]
 								}, {
@@ -103,7 +103,7 @@ enyo.kind( {
 									]
 								}, {
 									name: "cleared",
-									onclick: "transactionCleared",
+									ontap: "transactionCleared",
 									kind: enyo.CheckBox,
 
 									style: "margin-left: 15px;"
@@ -114,75 +114,71 @@ enyo.kind( {
 							allowHtml: true
 						}, {
 							name: "checkNum",
-							className: "small"
+							classes: "small"
 						}, {
 							name: "note",
-							className: "small",
+							classes: "small",
 							allowHtml: true
 						}
 					]
 				}
 			]
 		}, {
-			kind: enyo.Toolbar,
-			className: "deep-green",
+			name: "footer",
+			kind: "onyx.Toolbar",
+			classes: "deep-green text-center",
 			components: [
 				{
-					kind: enyo.GrabButton
-				}, {
-					kind: enyo.ToolButtonGroup,
-					style: "margin-left: 50px;",
+					classes: "left",
 					components: [
 						{
-							onclick: "sortButtonClicked",
-							icon: "assets/menu_icons/sort.png",
-							className: "enyo-grouped-toolbutton-dark"
+							//Doesn't display properly
+							showing: false,
+							kind: "onyx.Grabber",
+							style: "margin-right: 50px;"
 						}, {
-							onclick: "reloadSystem",
-							icon: "assets/menu_icons/refresh.png",
-							className: "enyo-grouped-toolbutton-dark"
+							kind: "onyx.IconButton",
+							ontap: "sortButtontaped",
+							src: "assets/menu_icons/sort.png"
+						}, {
+							kind: "onyx.IconButton",
+							ontap: "reloadSystem",
+							src: "assets/menu_icons/refresh.png"
 						}
 					]
 				}, {
-					kind: enyo.Spacer
-				}, {
-					kind: enyo.ToolButtonGroup,
 					components: [
 						{
 							name: "addIncomeButton",
-							onclick: "addIncome",
-							toggling: true,
-							icon: "assets/menu_icons/income.png",
-							className: "enyo-grouped-toolbutton-dark"
+							kind: "onyx.Checkbox",
+
+							onchange: "addIncome",
+							classes: "income"
 						}, {
 							name: "addTransferButton",
-							onclick: "addTransfer",
-							toggling: true,
-							icon: "assets/menu_icons/transfer.png",
-							className: "enyo-grouped-toolbutton-dark"
+							kind: "onyx.Checkbox",
+
+							onchange: "addTransfer",
+							classes: "transfer"
 						}, {
 							name: "addExpenseButton",
-							onclick: "addExpense",
-							toggling: true,
-							icon: "assets/menu_icons/expense.png",
-							className: "enyo-grouped-toolbutton-dark"
+							kind: "onyx.Checkbox",
+
+							onchange: "addExpense",
+							classes: "expense"
 						}
 					]
 				}, {
-					kind: enyo.Spacer
-				}, {
-					kind: enyo.ToolButtonGroup,
+					classes: "right",
 					components: [
 						{
-							showing: false,
-
-							onclick: "functionButtonClicked",
-							icon: "assets/menu_icons/config.png",
-							className: "enyo-grouped-toolbutton-dark"
+							kind: "onyx.IconButton",
+							ontap: "searchButtontaped",
+							src: "assets/menu_icons/search.png"
 						}, {
-							onclick: "searchButtonClicked",
-							icon: "assets/menu_icons/search.png",
-							className: "enyo-grouped-toolbutton-dark"
+							kind: "onyx.IconButton",
+							//ontap: "functionButtontaped",
+							//src: "assets/menu_icons/config.png"
 						}
 					]
 				}
@@ -191,7 +187,7 @@ enyo.kind( {
 
 		{
 			name: "viewSingle",
-			kind: "Checkbook.transactions.viewSingle",
+			//kind: "Checkbook.transactions.viewSingle",
 			onClear: "vsCleared",
 			onEdit: "vsEdit",
 			onDelete: "transactionDeleted"
@@ -199,7 +195,7 @@ enyo.kind( {
 
 		{
 			name: "deleteTransactionConfirm",
-			kind: "GTS.deleteConfirm",
+			//kind: "GTS.deleteConfirm",
 
 			confirmTitle: "Delete Transaction",
 			confirmMessage: "Are you sure you want to delete this transaction?",
@@ -213,7 +209,7 @@ enyo.kind( {
 		//All menu item actions call 'menuItemClick'
 		{
 			name: "transactonMenu",
-			kind: "GTS.menu",
+			//kind: "GTS.menu",
 			lazy: false,
 			components: [
 				{
@@ -237,13 +233,13 @@ enyo.kind( {
 			]
 		}, {
 			name: "balanceMenu",
-			kind: "Checkbook.balanceMenu"
+			//kind: "Checkbook.balanceMenu"
 		}, {
 			name: "sortMenu",
-			kind: "Checkbook.selectedMenu"
+			//kind: "Checkbook.selectedMenu"
 		}, {
 			name: "searchMenu",
-			kind: "GTS.menu",
+			//kind: "GTS.menu",
 			components: [
 				{
 					showing: false,
@@ -260,7 +256,7 @@ enyo.kind( {
 			]
 		}, {
 			name: "functionMenu",
-			kind: "GTS.menu",
+			//kind: "GTS.menu",
 			components: [
 				{
 					caption: "Purge Transactions",
@@ -276,21 +272,23 @@ enyo.kind( {
 		}
 	],
 
-	create: function() {
+	rendered: function() {
 
 		this.inherited( arguments );
 
 		this.log();
 
-		this.$.pageHeader.hide();
-		this.$.toolbar.hide();
+		this.$['header'].hide();
+		this.$['footer'].hide();
+
+		this.loadingDisplay( false );
 	},
 
 	changeAccount: function( accountObj, force ) {
 
 		force = typeof( force ) !== 'undefined' ? force : false;
 
-		if( !accountObj ) {
+		if( !accountObj || !accountObj['acctId'] ) {
 
 			this.unloadSystem();
 			return;
@@ -298,8 +296,10 @@ enyo.kind( {
 
 		if( !this.account['acctId'] ) {
 
-			this.$.pageHeader.show();
-			this.$.toolbar.show();
+			this.$['header'].show();
+			this.$['footer'].show();
+
+			this.reflow();
 		}
 
 		if( force || !this.account['acctId'] || this.account['acctId'] !== accountObj['acctId'] ) {
@@ -346,8 +346,10 @@ enyo.kind( {
 				sortQry
 */
 			this.transactions = [];
-			this.$['entries'].punt();
+			this.$['entries'].setCount( this.transactions.length );
 			this.initialScroll();
+
+			return;//TEMP
 
 			if( this.account['frozen'] === 1 ) {
 
@@ -377,10 +379,10 @@ enyo.kind( {
 
 		this.account = {};
 		this.transactions = [];
-		this.$['entries'].punt();
+		this.$['entries'].setCount( this.transactions.length );
 
-		this.$.pageHeader.hide();
-		this.$.toolbar.hide();
+		this.$['header'].hide();
+		this.$['footer'].hide();
 	},
 
 	reloadSystem: function() {
@@ -393,7 +395,7 @@ enyo.kind( {
 		}
 
 		this.transactions = [];
-		this.$['entries'].punt();
+		this.$['entries'].setCount( this.transactions.length );
 
 		this.initialScroll();
 		this.balanceChangedHandler();
@@ -514,7 +516,7 @@ enyo.kind( {
 				);
 
 			this.transactions = [];
-			this.$['entries'].punt();
+			this.$['entries'].setCount( this.transactions.length );
 			this.initialScroll();
 		} else if( inSender.menuParent.toLowerCase() === "functionmenu" ) {
 
@@ -631,11 +633,13 @@ enyo.kind( {
 			balanceColor = "negativeBalance";
 		}
 
-		this.$['balanceButton'].setCaption( formatAmount( balance ) );
-		this.$['balanceButton'].setClassName( "enyo-button " + balanceColor );
+		this.$['balanceButton'].setContent( formatAmount( balance ) );
+		//this.$['balanceButton'].setclasses( "enyo-button " + balanceColor );
 	},
 
-	balanceButtonClicked: function( inSender ) {
+	balanceButtontaped: function( inSender ) {
+
+		return;//TEMP
 
 		this.$['balanceMenu'].setItems(
 				[
@@ -681,20 +685,22 @@ enyo.kind( {
 
 	buildTransactionSorting: function() {
 
+		return;//TEMP
+
 		this.$['sortMenu'].setItems( transactionSortOptions );
 	},
 
-	sortButtonClicked: function( inSender, inEvent ) {
+	sortButtontaped: function( inSender, inEvent ) {
 
 		this.$['sortMenu'].openAtControl( inSender, this.account['sort'] );
 	},
 
-	searchButtonClicked: function( inSender, inEvent ) {
+	searchButtontaped: function( inSender, inEvent ) {
 
 		this.$['searchMenu'].openAtControl( inSender );
 	},
 
-	functionButtonClicked: function( inSender, inEvent ) {
+	functionButtontaped: function( inSender, inEvent ) {
 
 		this.$['functionMenu'].openAtControl( inSender );
 	},
@@ -717,7 +723,7 @@ enyo.kind( {
 	newTransaction: function( type ) {
 
 		//Prevent user from launching multiple New Transaction windows
-		if( this.$['add' + type + 'Button'].getDepressed() &&
+		if( this.$['add' + type + 'Button'].getChecked() &&
 			!( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
 
 			this.toggleCreateButtons();
@@ -748,12 +754,15 @@ enyo.kind( {
 			//Reload full list
 			this.account['itemCount']++;
 			this.transactions = [];
-			this.$['entries'].punt();
+
+			this.$['entries'].setCount( this.transactions.length );
 			this.initialScroll();
 		}
 	},
 
 	toggleCreateButtons: function() {
+
+		return;//TEMP
 
 		if( this.$['addIncomeButton'].getDisabled() ) {
 
@@ -774,6 +783,8 @@ enyo.kind( {
 
 	/* List Control */
 	scrollTo: function( topIndex ) {
+
+		return;//TEMP
 
 		if( topIndex < 0 ) {
 
@@ -825,7 +836,7 @@ enyo.kind( {
 			);
 	},
 
-	transactionTapped: function( inSender, inEvent, rowIndex ) {
+	transactiontapped: function( inSender, inEvent, rowIndex ) {
 
 		this.log();
 
@@ -870,7 +881,7 @@ enyo.kind( {
 			this.balanceChangedHandler( accounts );
 
 			this.transactions = [];
-			this.$['entries'].punt();
+			this.$['entries'].setCount( this.transactions.length );
 
 			enyo.asyncMethod(
 					this,
@@ -885,7 +896,7 @@ enyo.kind( {
 			this.account['itemCount']--;
 
 			this.transactions = [];
-			this.$['entries'].punt();
+			this.$['entries'].setCount( this.transactions.length );
 
 			enyo.asyncMethod(
 					this,
@@ -903,10 +914,10 @@ enyo.kind( {
 
 		if( this.transactions[inEvent.rowIndex]['cleared'] === 1 ) {
 
-			this.$['tmClear'].setCaption( "Unclear Transaction" );
+			this.$['tmClear'].setContent( "Unclear Transaction" );
 		} else {
 
-			this.$['tmClear'].setCaption( "Clear Transaction" );
+			this.$['tmClear'].setContent( "Clear Transaction" );
 		}
 
 		this.$['transactonMenu'].rowIndex = inEvent.rowIndex;
@@ -988,7 +999,7 @@ enyo.kind( {
 			if( rowIndex === 0 ) {
 
 				this.transactions = [];
-				this.$['entries'].punt();
+				this.$['entries'].setCount( this.transactions.length );
 				return;
 			}
 
@@ -1214,7 +1225,14 @@ results = {
 
 	loadingDisplay: function( status ) {
 
-		this.$['loadingSpinner'].setShowing( status );
-		this.$['acctTypeIcon'].setShowing( !status );
+		if( status ) {
+
+			this.$['loadingSpinner'].show();
+			this.$['acctTypeIcon'].hide();
+		} else {
+
+			this.$['loadingSpinner'].hide();
+			this.$['acctTypeIcon'].show();
+		}
 	}
 });

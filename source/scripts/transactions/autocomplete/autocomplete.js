@@ -37,7 +37,7 @@ enyo.kind( {
 					layoutKind: enyo.HFlexLayout,
 
 					tapHighlight: true,
-					onclick: "rowClicked",
+					ontap: "rowClicked",
 
 					components: [
 						{

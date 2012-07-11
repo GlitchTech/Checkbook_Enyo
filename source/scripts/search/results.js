@@ -45,7 +45,7 @@ enyo.kind({
 					kind: enyo.SwipeableItem,
 
 					tapHighlight: true,
-					onclick: "transactionTapped",
+					ontap: "transactiontapped",
 					onConfirm: "transactionDeleted",
 
 					style: "padding-right: 20px; padding-left: 30px;",
@@ -92,7 +92,7 @@ enyo.kind({
 								}, {
 									name: "cleared",
 									kind: enyo.CheckBox,
-									onclick: "transactionCleared",
+									ontap: "transactionCleared",
 
 									style: "margin-left: 15px;"
 								}
@@ -123,7 +123,7 @@ enyo.kind({
 					style: "margin-left: 50px;",
 					components: [
 						{
-							onclick: "sortClicked",
+							ontap: "sortClicked",
 							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark"
 						}
@@ -232,7 +232,7 @@ enyo.kind({
 
 	/** List Item Control **/
 
-	transactionTapped: function( inSender, inEvent, rowIndex ) {
+	transactiontapped: function( inSender, inEvent, rowIndex ) {
 
 		this.log();
 

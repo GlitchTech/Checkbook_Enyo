@@ -1,39 +1,48 @@
 /** Account List **/
 
-.hiddenAccount {
+.account-item {
+	padding: 0px;
+}
+
+.account-item .hiddenAccount {
 	display: none;
 }
 
-.maskedAccount .accountName {
+.account-item .maskedAccount .accountName {
 	color: #0000cc;
 }
 
-.accountLockIcon,
-.accountIcon {
-	height: 32px;
-	width: 32px;
-}
-
-.accountIcon {
-	margin-right: 10px;
-}
-
-.accountLockIcon {
-	margin-left: -42px;
-}
-
-.accountLockIcon.unlocked {
-	display: none;
-}
-
-.account-item {
-	padding: 0px;
+.account-item .onyx-swipeable-item-content {
+	padding: 9px 3px;
 }
 
 .account-item .account {
 	border-top: 1px solid rgba(255, 255, 255, 0.5);
 
 	padding: 8px 14px;
+}
+
+.account-item .account > * {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.account-item .account .accountLockIcon,
+.account-item .account .accountIcon {
+	height: 32px !important;
+	width: 32px !important;
+}
+
+.account-item .account .accountIcon {
+	margin-right: 10px;
+}
+
+.account-item .account .accountLockIcon {
+	margin-left: -42px;
+}
+
+.account-item .account .accountLockIcon.unlocked {
+	display: none;
 }
 
 .account-item .note {
@@ -51,31 +60,31 @@
 }
 
 .repeatIcon {
-	background-image: url('../images/calendar.png');
+	background-image: url( "../images/calendar.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .repeatTransferIcon {
-	background-image: url('../images/future_transfer_1.png');
+	background-image: url( "../images/future_transfer_1.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .transferIcon {
-	background-image: url('../images/transfer_3.png');
+	background-image: url( "../images/transfer_3.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .expenseIcon {
-	background-image: url('../images/icon-expense.png');
+	background-image: url( "../images/icon-expense.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .incomeIcon {
-	background-image: url('../images/icon-income.png');
+	background-image: url( "../images/icon-income.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
@@ -132,7 +141,7 @@
 .enyo-popup-menu .selected .enyo-item {
 	padding-right: 40px;
 
-	background-image: url( '../images/sort_icons/status.png' );
+	background-image: url( "../images/sort_icons/status.png" );
 	background-repeat: no-repeat;
 	background-position: right center;
 }
@@ -141,7 +150,7 @@
 .enyo-popup-menu .normal .enyo-item {
 	padding-right: 40px;
 
-	background-image: url( '../images/sort_icons/empty.png' );
+	background-image: url( "../images/sort_icons/empty.png" );
 	background-repeat: no-repeat;
 	background-position: right center;
 }

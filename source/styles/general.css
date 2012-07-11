@@ -1,4 +1,5 @@
 /* Text Size */
+
 .big {
 	font-size: 110%;
 }
@@ -89,14 +90,26 @@
 	margin-right: 0.5em;
 }
 
+/* Float Alignment */
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
 /*****************/
 
 .bold {
 	font-weight: bold;
 }
 
-.half-margin-bottom {
-	margin-bottom: 0.5em;
+.text-ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .small-row-padding {
@@ -133,7 +146,7 @@
 
 /*****************/
 
-.onyx-toolbar.simple {
+.onyx-toolbar.transparent {
 	background: transparent;
 	border-width: 0;
 }
@@ -147,11 +160,43 @@
 
 /*****************/
 
+.onyx-button.transparent {
+	background-color: transparent;
+}
+
+/* Custom Checkbox States */
+
+.onyx-checkbox.add {
+	background: url( "../../assets/menu_icons/new.png" ) no-repeat;
+}
+
+.onyx-checkbox.lock {
+	background: url( "../../assets/menu_icons/lock.png" ) no-repeat;
+}
+
+.onyx-checkbox.lock[checked] {
+	background: url( "../../assets/menu_icons/unlock.png" ) no-repeat;
+}
+
+.onyx-checkbox.income {
+	background: url( "../../assets/menu_icons/income.png" ) no-repeat;
+}
+
+.onyx-checkbox.transfer {
+	background: url( "../../assets/menu_icons/transfer.png" ) no-repeat;
+}
+
+.onyx-checkbox.expense {
+	background: url( "../../assets/menu_icons/expense.png" ) no-repeat;
+}
+
+/*****************/
+
 .enyo-progress-bar.big {
 	height: 25px;
 	border-width: 0px 5px;
 
-	-webkit-border-image: url( '../images/progress_bar/progress-bar-big.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/progress-bar-big.png" ) 0 5 0 5 repeat repeat;
 }
 
 .enyo-progress-bar.big .enyo-progress-bar-inner {
@@ -159,28 +204,28 @@
 	height: 25px;
 	border-width: 0 5px;
 
-	-webkit-border-image: url( '../images/progress_bar/blue-big.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/blue-big.png" ) 0 5 0 5 repeat repeat;
 }
 
 .enyo-progress-bar.green .enyo-progress-bar-inner {
-	-webkit-border-image: url( '../images/progress_bar/green.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/green.png" ) 0 5 0 5 repeat repeat;
 }
 .enyo-progress-bar.big.green .enyo-progress-bar-inner {
-	-webkit-border-image: url( '../images/progress_bar/green-big.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/green-big.png" ) 0 5 0 5 repeat repeat;
 }
 
 .enyo-progress-bar.yellow .enyo-progress-bar-inner {
-	-webkit-border-image: url( '../images/progress_bar/yellow.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/yellow.png" ) 0 5 0 5 repeat repeat;
 }
 .enyo-progress-bar.big.yellow .enyo-progress-bar-inner {
-	-webkit-border-image: url( '../images/progress_bar/yellow-big.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/yellow-big.png" ) 0 5 0 5 repeat repeat;
 }
 
 .enyo-progress-bar.red .enyo-progress-bar-inner {
-	-webkit-border-image: url( '../images/progress_bar/red.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/red.png" ) 0 5 0 5 repeat repeat;
 }
 .enyo-progress-bar.big.red .enyo-progress-bar-inner {
-	-webkit-border-image: url( '../images/progress_bar/red-big.png' ) 0 5 0 5 repeat repeat;
+	-webkit-border-image: url( "../../assets/progress_bar/red-big.png" ) 0 5 0 5 repeat repeat;
 }
 
 /*****************/

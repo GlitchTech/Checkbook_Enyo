@@ -64,7 +64,7 @@ enyo.kind({
 					kind: enyo.ToolButton,
 					icon: "assets/menu_icons/close.png",
 					style: "top: -25px; right: -10px; position: relative;",
-					onclick: "doClose"
+					ontap: "doClose"
 				}
 			]
 		},

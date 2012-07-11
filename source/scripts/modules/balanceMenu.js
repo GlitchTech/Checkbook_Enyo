@@ -89,7 +89,7 @@ enyo.kind({
 					menuParent: menuParentIn,
 					value: valueIn,
 
-					onclick: "menuItemClick",
+					ontap: "menuItemClick",
 
 					className: "enyo-item enyo-menuitem " + ( selected ? "selected" : "normal" ),
 					style: "min-width: 200px;",

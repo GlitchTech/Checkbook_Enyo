@@ -83,7 +83,7 @@ enyo.kind( {
 													//icon: "assets/menu_icons/transfer.png",
 													//icon: "assets/menu_icons/expense.png",
 
-													onclick: "amountTypeChanged"
+													ontap: "amountTypeChanged"
 												}
 											]
 										}, {
@@ -137,7 +137,7 @@ enyo.kind( {
 									className: "enyo-single",
 									tapHightlight: false,
 
-									onclick: "toggleDateDrawer",
+									ontap: "toggleDateDrawer",
 									components: [
 										{
 											kind: enyo.Image,
@@ -187,7 +187,7 @@ enyo.kind( {
 
 											style: "padding-top: 10px; padding-bottom: 10px;",
 
-											onclick: "categoryTapped",//Change category
+											ontap: "categoryTapped",//Change category
 											onConfirm: "categoryDelete",//Delete category item
 
 											components: [
@@ -205,7 +205,7 @@ enyo.kind( {
 													hint: "0.00",
 													oldValue: "",
 
-													onclick: "categoryAmountTapped",
+													ontap: "categoryAmountTapped",
 													oninput: "categoryAmountContentChanged",//ATM Function
 													onkeypress: "amountKeyPress",//Key possibility filter
 												}
@@ -219,14 +219,14 @@ enyo.kind( {
 											kind: "onyx.Button",
 											caption: "Add Category",
 											className: "enyo-button-dark",
-											onclick: "categoryAddNew",
+											ontap: "categoryAddNew",
 											flex: 3
 										}, {
 											name: "fillValueButton",
 											kind: "onyx.Button",
 											caption: "Fill Values",
 											className: "enyo-button-light",
-											onclick: "categoriesFillValues",
+											ontap: "categoriesFillValues",
 											flex: 1
 										}
 									]
@@ -248,7 +248,7 @@ enyo.kind( {
 									className: "enyo-single",
 									tapHightlight: false,
 
-									onclick: "toggleRecurrenceDrawer",
+									ontap: "toggleRecurrenceDrawer",
 									components: [
 										{
 											kind: enyo.Image,
@@ -342,7 +342,7 @@ enyo.kind( {
 							content: "Delete Transaction",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
-							onclick: "deleteTransaction"
+							ontap: "deleteTransaction"
 						}, {
 							kind: enyo.Spacer,
 							style: "height: 1.5em;"
@@ -363,7 +363,7 @@ enyo.kind( {
 					flex: 2,
 					content: "Cancel",
 					style: "width: 150px",
-					onclick: "doFinish"
+					ontap: "doFinish"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
@@ -373,7 +373,7 @@ enyo.kind( {
 					content: "Save",
 					className: "enyo-button-affirmative deep-green",
 					style: "width: 150px;",
-					onclick: "saveTransaction"
+					ontap: "saveTransaction"
 				}, {
 					kind: enyo.Spacer,
 					flex: 4

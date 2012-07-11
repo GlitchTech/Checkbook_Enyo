@@ -203,21 +203,21 @@ enyo.kind( {
 									name: "btnEdit",
 									kind: "onyx.Button",
 									caption: "Edit",
-									onclick: "editClicked",
+									ontap: "editClicked",
 									flex: 1,
 									className: "enyo-button-dark"
 								}, {
 									name: "btnDelete",
 									kind: "onyx.Button",
 									caption: "Delete",
-									onclick: "deleteClicked",
+									ontap: "deleteClicked",
 									flex: 1,
 									className: "enyo-button-negative"
 								}, {
 									name: "btnCancel",
 									kind: "onyx.Button",
 									caption: "Close",
-									onclick: "close",
+									ontap: "close",
 									flex: 1,
 									className: "enyo-button-light"
 								}

@@ -60,7 +60,7 @@ enyo.kind({
 									icon: "assets/menu_icons/close.png",
 									className: "img-icon",
 									style: "text-align: center;",
-									onclick: "close"
+									ontap: "close"
 								}
 							]
 						}, {
@@ -83,7 +83,7 @@ enyo.kind({
 											layoutKind: enyo.HFlexLayout,
 
 											tapHighlight: true,
-											onclick: "rowClicked",//Select item
+											ontap: "rowClicked",//Select item
 
 											components: [
 												{

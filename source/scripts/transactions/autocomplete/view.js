@@ -47,7 +47,7 @@ enyo.kind( {
 					className: "light narrow-column",
 
 					tapHighlight: true,
-					onclick: "itemTapped",
+					ontap: "itemTapped",
 					onConfirm: "itemDeleted",
 
 					components: [
@@ -75,11 +75,11 @@ enyo.kind( {
 						{
 							caption: "Close",
 							className: "enyo-grouped-toolbutton-dark",
-							onclick: "doFinish"
+							ontap: "doFinish"
 						}, {
 							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark",
-							onclick: ""
+							ontap: ""
 						}
 					]
 				}, {
@@ -91,7 +91,7 @@ enyo.kind( {
 						{
 							icon: "assets/menu_icons/new.png",
 							className: "enyo-grouped-toolbutton-dark",
-							onclick: ""
+							ontap: ""
 						}
 					]
 				}

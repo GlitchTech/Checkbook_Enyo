@@ -21,7 +21,7 @@ enyo.kind({
 			name: "headerWrapper",
 			kind: "onyx.Toolbar",
 			layoutKind: "FittableColumnsLayout",
-			classes: "simple"
+			classes: "transparent"
 		}, {
 			classes: "padding-std light",
 			components: [

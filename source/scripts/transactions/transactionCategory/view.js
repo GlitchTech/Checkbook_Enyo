@@ -44,7 +44,7 @@ enyo.kind({
 					icon: "assets/menu_icons/close.png",
 					className: "img-icon",
 					style: "text-align: center;",
-					onclick: "doClose"
+					ontap: "doClose"
 				}
 			]
 		}, {
@@ -63,7 +63,7 @@ enyo.kind({
 					layoutKind: enyo.VFlexLayout,
 
 					tapHighlight: true,
-					onclick: "editItem",
+					ontap: "editItem",
 					onConfirm: "deleteItem",
 
 					components: [
@@ -71,7 +71,7 @@ enyo.kind({
 							name: "general",
 							kind: enyo.Divider,
 							showing: false,
-							onclick: "dividerTapped"
+							ontap: "dividerTapped"
 						}, {
 							kind: enyo.HFlexBox,
 							className: "account",
@@ -99,7 +99,7 @@ enyo.kind({
 					className: "enyo-button-primary",
 
 					caption: "Create New",
-					onclick: "createNew"
+					ontap: "createNew"
 				}
 			]
 		},

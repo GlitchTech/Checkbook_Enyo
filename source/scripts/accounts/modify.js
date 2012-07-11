@@ -321,7 +321,7 @@ enyo.kind( {
 							content: "Delete Account",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
-							onclick: "deleteAccount"
+							ontap: "deleteAccount"
 						}, {
 							kind: enyo.Spacer,
 							style: "height: 1.5em;"
@@ -342,7 +342,7 @@ enyo.kind( {
 					flex: 2,
 					content: "Cancel",
 					style: "width: 150px",
-					onclick: "doFinish"
+					ontap: "doFinish"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
@@ -352,7 +352,7 @@ enyo.kind( {
 					content: "Save",
 					className: "enyo-button-affirmative deep-green",
 					style: "width: 150px;",
-					onclick: "saveAccount"
+					ontap: "saveAccount"
 				}, {
 					kind: enyo.Spacer,
 					flex: 4

@@ -28,9 +28,7 @@ enyo.kind({
 					onView: "updateTransactionsView"
 				}, {
 					name: "transactions",
-					//kind: "Checkbook.transactions.view",
-
-					content: "TEST TRANSACTIONS",
+					kind: "Checkbook.transactions.view",
 
 					onModify: "showPanePopup",
 					onChanged: "accountBalanceChanged",
@@ -67,17 +65,17 @@ enyo.kind({
 					components: [
 						{
 							caption: "Preferences & Accounts",
-							onclick: "openPreferences"
+							ontap: "openPreferences"
 						}, {
 							showing: false,
 							caption: "Auto-Complete Preferences",
-							onclick: "openACPrefs"
+							ontap: "openACPrefs"
 						}, {
 							caption: "Import Data",
-							onclick: "openImport"
+							ontap: "openImport"
 						}, {
 							caption: "Export Data",
-							onclick: "openExport"
+							ontap: "openExport"
 						}
 					]
 				}, {
@@ -85,23 +83,23 @@ enyo.kind({
 					components: [
 						{
 							caption: "Search",
-							onclick: "openSearch"
+							ontap: "openSearch"
 						}, {
 							caption: "Budget",
-							onclick: "openBudget"
+							ontap: "openBudget"
 						}, {
 							showing: false,
 							caption: "Reports",
-							onclick: "openReports"
+							ontap: "openReports"
 						}
 					]
 				}, {
 					showing: false,
 					caption: "Report Bug",
-					onclick: "errorReport"
+					ontap: "errorReport"
 				}, {
 					caption: "About",
-					onclick: "showPopup",
+					ontap: "showPopup",
 					popup: "about"
 				}
 			]

@@ -87,7 +87,7 @@ enyo.kind({
 					style: "padding-right: 7px;",
 
 					tapHighlight: true,
-					onclick: "tapped",
+					ontap: "tapped",
 					onConfirm: "deleted",
 
 					components: [
@@ -151,11 +151,11 @@ enyo.kind({
 						{
 							caption: "Back",
 							className: "enyo-grouped-toolbutton-dark",
-							onclick: "doFinish"
+							ontap: "doFinish"
 						}, {
 							icon: "assets/menu_icons/sort.png",
 							className: "enyo-grouped-toolbutton-dark",
-							onclick: "sortButtonClicked"
+							ontap: "sortButtontaped"
 						}
 					]
 				}, {
@@ -165,7 +165,7 @@ enyo.kind({
 					kind: enyo.ToolButtonGroup,
 					components: [
 						{
-							onclick: "dateBack",
+							ontap: "dateBack",
 							className: "enyo-grouped-toolbutton-dark",
 							icon: "assets/menu_icons/back.png"
 						}
@@ -183,7 +183,7 @@ enyo.kind({
 					kind: enyo.ToolButtonGroup,
 					components: [
 						{
-							onclick: "dateForward",
+							ontap: "dateForward",
 							className: "enyo-grouped-toolbutton-dark",
 							icon: "assets/menu_icons/forward.png"
 						}
@@ -199,11 +199,11 @@ enyo.kind({
 							toggling: true,
 							className: "enyo-grouped-toolbutton-dark",
 							icon: "assets/menu_icons/lock.png",
-							onclick: "toggleEdit"
+							ontap: "toggleEdit"
 						}, {
 							icon: "assets/menu_icons/new.png",
 							className: "enyo-grouped-toolbutton-dark",
-							onclick: "addBudget"
+							ontap: "addBudget"
 						}
 					]
 				}
@@ -311,7 +311,7 @@ enyo.kind({
 
 	/** Footer Controls **/
 
-	sortButtonClicked: function( inSender, inEvent ) {
+	sortButtontaped: function( inSender, inEvent ) {
 
 		this.$['sortMenu'].openAtControl( inSender, this.sort );
 	},

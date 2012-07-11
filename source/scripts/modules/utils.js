@@ -15,7 +15,7 @@ function formatAmount( amount ) {
 		amount = 0;
 	}
 
-	return amount.formatCurrency( 2, ".", "," );
+	return amount.formatCurrency( 2, "$", ".", "," );
 }
 
 /** Convert amount display version to number **/

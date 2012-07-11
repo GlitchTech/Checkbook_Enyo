@@ -41,7 +41,7 @@ enyo.kind({
 					icon: "assets/menu_icons/close.png",
 					className: "img-icon",
 
-					onclick: "closeImport"
+					ontap: "closeImport"
 				}
 			]
 		},
@@ -179,7 +179,7 @@ enyo.kind({
 									layoutKind: enyo.HFlexLayout,
 
 									tapHighlight: true,
-									onclick: "sheetSelectedChanged",
+									ontap: "sheetSelectedChanged",
 
 									components: [
 										{
@@ -212,7 +212,7 @@ enyo.kind({
 					kind: "onyx.Button",
 					content: "Continue",
 
-					onclick: "prepareCredentials",
+					ontap: "prepareCredentials",
 
 					style: "min-width: 150px;"
 				}, {
@@ -236,7 +236,7 @@ enyo.kind({
 					kind: "onyx.Button",
 					content: "Sign In",
 
-					onclick: "authenticateWithGoogle",
+					ontap: "authenticateWithGoogle",
 
 					className: "enyo-button-affirmative deep-green",
 					style: "min-width: 150px;"
@@ -261,7 +261,7 @@ enyo.kind({
 					kind: "onyx.Button",
 					content: "Import Accounts",
 
-					onclick: "beginImportProcess",
+					ontap: "beginImportProcess",
 
 					className: "enyo-button-affirmative deep-green",
 					style: "min-width: 150px;"
@@ -273,7 +273,7 @@ enyo.kind({
 					kind: "onyx.Button",
 					caption: "Select" + "...",
 
-					onclick: "sheetListSelectOptions",
+					ontap: "sheetListSelectOptions",
 
 					flex: 1
 				}, {

@@ -42,7 +42,7 @@ enyo.kind({
 					icon: "assets/menu_icons/close.png",
 					className: "img-icon",
 					style: "text-align: center;",
-					onclick: "close"
+					ontap: "close"
 				}
 			]
 		}, {
@@ -54,7 +54,7 @@ enyo.kind({
 
 					className: "enyo-first",
 
-					onclick: "categoryTapped",
+					ontap: "categoryTapped",
 					components: [
 						{
 							name: "category",
@@ -130,7 +130,7 @@ enyo.kind({
 					caption: "Cancel",
 
 					flex: 3,
-					onclick: "close"
+					ontap: "close"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
@@ -140,7 +140,7 @@ enyo.kind({
 					caption: "Delete",
 
 					flex: 3,
-					onclick: "delete",
+					ontap: "delete",
 
 					className: "enyo-button-negative"
 				}, {
@@ -151,7 +151,7 @@ enyo.kind({
 					caption: "Save",
 
 					flex: 3,
-					onclick: "save",
+					ontap: "save",
 
 					className: "enyo-button-affirmative"
 				}, {

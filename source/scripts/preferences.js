@@ -191,7 +191,7 @@ enyo.kind({
 									toggling: true,
 
 									content: "Add Account",
-									onclick: "addAccount"
+									ontap: "addAccount"
 								}
 							]
 						}, {
@@ -204,14 +204,14 @@ enyo.kind({
 									toggling: true,
 
 									content: "Edit Account Categories",
-									onclick: "modifyAccountCategories"
+									ontap: "modifyAccountCategories"
 								}, {
 									name: "editTransactionCategories",
 									kind: "onyx.Button",
 									toggling: true,
 
 									content: "Edit Transaction Categories",
-									onclick: "modifyTransactionCategories"
+									ontap: "modifyTransactionCategories"
 								}
 							]
 						}, {
@@ -219,7 +219,7 @@ enyo.kind({
 							content: "Full Wipe",
 							className: "enyo-button-negative",
 							style: "margin-top: 1.5em;",
-							onclick: "fullwipe"
+							ontap: "fullwipe"
 						}
 					]
 				}
@@ -240,7 +240,7 @@ enyo.kind({
 					className: "enyo-button-affirmative deep-green",
 
 					caption: "Done",
-					onclick: "doFinish"
+					ontap: "doFinish"
 				}, {
 					kind: enyo.Spacer,
 					flex: 4

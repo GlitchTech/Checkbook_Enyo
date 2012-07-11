@@ -34,7 +34,7 @@ enyo.kind( {
 					kind: "onyx.Button",
 					content: "Balance",
 					style: "padding: 0 8px; margin: 0;",
-					onclick: "balanceButtonClicked"
+					ontap: "balanceButtonClicked"
 				}
 			]
 		}, {
@@ -53,48 +53,36 @@ enyo.kind( {
 		}, {
 			kind: "onyx.Toolbar",
 			classes: "rich-brown",
+			style: "text-align: center;",
 			components: [
 				{
-					kind: enyo.ToolButtonGroup,
-					components: [
-						{
-							onclick: "showSort",
-							icon: "assets/menu_icons/sort.png",
-							classes: "enyo-grouped-toolbutton-dark"
-						}
-					]
-				}, {
-					kind: enyo.Spacer
-				}, {
-					kind: enyo.ToolButtonGroup,
-					components: [
-						{
-							name: "addAccountButton",
-							onclick: "addAccount",
-							toggling: true,
-							icon: "assets/menu_icons/new.png",
-							classes: "enyo-grouped-toolbutton-dark"
-						}, {
-							name: "editModeToggle",
-							toggling: true,
-							onclick: "toggleLock",
-							icon: "assets/menu_icons/lock.png",
-							classes: "enyo-grouped-toolbutton-dark"
-						}
-					]
-				}, {
-					kind: enyo.Spacer
-				}, {
-					kind: enyo.ToolButtonGroup,
-					components: [
-						{
-							showing: false,
+					kind: "onyx.IconButton",
+					src: "assets/menu_icons/sort.png",
 
-							onclick: "showSearch",
-							icon: "assets/menu_icons/search.png",
-							classes: "enyo-grouped-toolbutton-dark"
-						}
-					]
+					ontap: "showSort",
+					classes: "left"
+				}, {
+					kind: enyo.Spacer
+				}, {
+					name: "addAccountButton",
+					kind: "onyx.Checkbox",
+
+					onchange: "addAccount",
+					classes: "add"
+				}, {
+					name: "editModeToggle",
+					kind: "onyx.Checkbox",
+
+					onchange: "toggleLock",
+					classes: "lock"
+				}, {
+					kind: enyo.Spacer
+				}, {
+					kind: "onyx.IconButton",
+					classes: "right",
+
+					//ontap: "showSearch",
+					//src: "assets/menu_icons/search.png"
 				}
 			]
 		},
@@ -166,6 +154,8 @@ enyo.kind( {
 
 		this.doDelete( account );
 		this.accountBalanceForceUpdate();
+
+		return true;
 	},
 
 	accountBalanceForceUpdate: function() {
@@ -251,17 +241,11 @@ enyo.kind( {
 
 	renderBalanceButton: function() {
 
-		var balanceColor = "neutralBalance";
-		if( this.totalBalance[this.balanceView] > 0 ) {
+		this.$['overallBalance'].setContent( formatAmount( this.totalBalance[this.balanceView] ) );
 
-			balanceColor = "positiveBalance";
-		} else if( this.totalBalance[this.balanceView] < 0 ) {
-
-			balanceColor = "negativeBalance";
-		}
-
-		this.$['overallBalance'].setCaption( formatAmount( this.totalBalance[this.balanceView] ) );
-		this.$['overallBalance'].setclasses( "enyo-button " + balanceColor );
+		this.$['overallBalance'].addRemoveClass( "positiveBalance", this.totalBalance[this.balanceView] > 0 );
+		this.$['overallBalance'].addRemoveClass( "negativeBalance", this.totalBalance[this.balanceView] < 0 );
+		this.$['overallBalance'].addRemoveClass( "neutralBalance", this.totalBalance[this.balanceView] == 0 );
 	},
 
 	balanceButtonClicked: function( inSender ) {
@@ -310,7 +294,7 @@ enyo.kind( {
 	addAccount: function() {
 
 		//Prevent user from launching multiple New Account windows
-		if( this.$['addAccountButton'].getDepressed() && !this.$['addAccountButton'].getDisabled() ) {
+		if( this.$['addAccountButton'].getChecked() && !this.$['addAccountButton'].getDisabled() ) {
 
 			this.$['addAccountButton'].setDisabled( true );
 
@@ -329,7 +313,7 @@ enyo.kind( {
 
 	addAccountComplete: function( inSender, action, actionStatus ) {
 
-		this.$['addAccountButton'].setDepressed( false );
+		this.$['addAccountButton'].setChecked( false );
 		this.$['addAccountButton'].setDisabled( false );
 
 		if( action === 1 && actionStatus === true ) {
@@ -342,13 +326,11 @@ enyo.kind( {
 
 	toggleLock: function() {
 
-		if( this.$['editModeToggle'].getDepressed() ) {
+		if( this.$['editModeToggle'].getChecked() ) {
 
-			this.$['editModeToggle'].setIcon( "assets/menu_icons/unlock.png" );
 			this.$['entries'].setEditMode( true );
 		} else {
 
-			this.$['editModeToggle'].setIcon( "assets/menu_icons/lock.png" );
 			this.$['entries'].setEditMode( false );
 		}
 	},

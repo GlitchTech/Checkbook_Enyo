@@ -42,7 +42,7 @@ enyo.kind( {
 							className: "img-icon",
 							style: "text-align: center;",
 
-							onclick: "badPin"
+							ontap: "badPin"
 						}
 					]
 				}, {
@@ -97,17 +97,17 @@ enyo.kind( {
 									kind: "onyx.Button",
 									caption: "1",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}, {
 									kind: "onyx.Button",
 									caption: "2",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}, {
 									kind: "onyx.Button",
 									caption: "3",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}
 							]
 						}, {
@@ -117,17 +117,17 @@ enyo.kind( {
 									kind: "onyx.Button",
 									caption: "4",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}, {
 									kind: "onyx.Button",
 									caption: "5",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}, {
 									kind: "onyx.Button",
 									caption: "6",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}
 							]
 						}, {
@@ -137,17 +137,17 @@ enyo.kind( {
 									kind: "onyx.Button",
 									caption: "7",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}, {
 									kind: "onyx.Button",
 									caption: "8",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}, {
 									kind: "onyx.Button",
 									caption: "9",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}
 							]
 						}, {
@@ -162,13 +162,13 @@ enyo.kind( {
 									kind: "onyx.Button",
 									caption: "0",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}, {
 									name: "clear",
 									kind: "onyx.Button",
 									caption: "Clear",
 									flex: 1,
-									onclick: "padPressed"
+									ontap: "padPressed"
 								}
 							]
 						}
@@ -183,7 +183,7 @@ enyo.kind( {
 							className: "enyo-button-primary",
 
 							caption: "Cancel",
-							onclick: "badPin"
+							ontap: "badPin"
 						}, {
 							kind: enyo.Spacer,
 							flex: 1
@@ -194,7 +194,7 @@ enyo.kind( {
 							className: "enyo-button-affirmative",
 
 							caption: "Confirm",
-							onclick: "checkPin"
+							ontap: "checkPin"
 						}
 					]
 				}

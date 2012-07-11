@@ -36,7 +36,10 @@ enyo.kind({
 	components: [
 		{
 			name: "entries",
-			kind: "enyo.PulldownList",
+			kind: "enyo.List",
+			touch: true,
+
+			classes: "enyo-fit",
 
 			onReorder: "reorder",
 			onSetupItem: "handleSetupRow",
@@ -44,13 +47,12 @@ enyo.kind({
 			components: [
 				{
 					name: "accountItem",
-					className: "norm-row account-item",
+					classes: "norm-row account-item",
 
-					kind: enyo.SwipeableItem,
-					layoutKind: enyo.VFlexLayout,
+					kind: "onyx.SwipeableItem",
+					preventDragPropagation: true,
 
-					tapHighlight: true,
-					onclick: "accountTapped",
+					ontap: "accountTapped",
 					onConfirm: "accountDeleted",
 
 					components: [
@@ -58,33 +60,32 @@ enyo.kind({
 							name: "catDivider",
 							kind: enyo.Divider,
 							showing: false,
-							onclick: "dividerTapped"
+							ontap: "dividerTapped"
 						}, {
-							kind: enyo.HFlexBox,
-							className: "account",
-							align: "center",
+							layoutKind: "",
+							classes: "account",
 							components: [
 								{
 									name: "icon",
 									kind: enyo.Image,
-									className: "accountIcon"
+									classes: "accountIcon"
 								}, {
 									name: "iconLock",
 									kind: enyo.Image,
 									src: "assets/padlock_1.png",
-									className: "accountLockIcon unlocked"
+									classes: "accountLockIcon unlocked"
 								}, {
 									name: "name",
-									className: "enyo-text-ellipsis accountName",
-									flex: 1
+									classes: "text-ellipsis accountName"
 								}, {
-									name: "balance"
+									name: "balance",
+									classes: "right"
 								}
 							]
 						}, {
 							name: "note",
 							allowHtml: true,
-							className: "note smaller enyo-text-ellipsis"
+							classes: "note smaller text-ellipsis"
 						}
 					]
 				}
@@ -145,7 +146,6 @@ enyo.kind({
 	dataResponse: function( results ) {
 
 		this.accounts = enyo.clone( results );
-		this.$['entries'].setCount( this.accounts.length );
 
 		//Reload list
 		this.punt();
@@ -163,7 +163,8 @@ enyo.kind({
 
 	punt: function() {
 
-		this.$['entries'].punt();
+		this.$['entries'].setCount( this.accounts.length );
+		this.refresh();
 	},
 
 	refresh: function() {
@@ -174,13 +175,14 @@ enyo.kind({
 	dividerTapped: function( inSender, inEvent ) {
 		//Not allowed, block action
 
-		inEvent.stopPropagation();
+		inEvent.preventDefault();
+		return true;
 	},
 
-	accountTapped: function( inSender, inEvent, rowIndex ) {
+	accountTapped: function( inSender, inEvent ) {
 		//Row Tapped
 
-		var row = this.accounts[rowIndex];
+		var row = this.accounts[inEvent.rowIndex];
 
 		if( row ) {
 
@@ -196,7 +198,7 @@ enyo.kind({
 							name: "editAccount",
 							kind: "Checkbook.accounts.modify",
 							acctId: row['acctId'],
-							onFinish: enyo.bind( this, this.editAccountComplete, rowIndex )
+							onFinish: enyo.bind( this, this.editAccountComplete, inEvent.rowIndex )
 						}
 					);
 			} else {
@@ -291,15 +293,21 @@ enyo.kind({
 	accountDeleted: function( inSender, rowIndex ) {
 		//Row deleted
 
+		this.log( arguments );
+
 		Checkbook.globals.accountManager.deleteAccount(
 				this.accounts[rowIndex]['acctId'],
 				{
 					"onSuccess": enyo.bind( this, this.accountDeletedSuccess, this.accounts[rowIndex]['acctId'] )
 				}
 			);
+
+		return true;
 	},
 
 	accountDeletedSuccess: function( acctId ) {
+
+		this.log();
 
 		this.doDelete( acctId );
 		this.renderAccountList();
@@ -307,16 +315,18 @@ enyo.kind({
 
 	/** List Display **/
 
-	setupRow: function( inSender, inIndex ) {
+	setupRow: function( inSender, inEvent ) {
 
-		var row = this.accounts[inIndex];
+		var index = inEvent.index;
+
+		var row = this.accounts[index];
 
 		if( row ) {
 
-			//this.$['accountItem'].addRemoveClass( "alt-row", ( inIndex % 2 === 0 ) );
-			//this.$['accountItem'].addRemoveClass( "norm-row", ( inIndex % 2 !== 0 ) );
+			//this.$['accountItem'].addRemoveClass( "alt-row", ( index % 2 === 0 ) );
+			//this.$['accountItem'].addRemoveClass( "norm-row", ( index % 2 !== 0 ) );
 
-			row['index'] = inIndex;
+			row['index'] = index;
 
 			this.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
 			this.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
@@ -361,12 +371,12 @@ enyo.kind({
 					Checkbook.globals.prefs['custom_sort'] === 0 ||
 					Checkbook.globals.prefs['custom_sort'] === 3
 				) && (
-					inIndex <= 0 ||
-					row['acctCategory'] !== this.accounts[inIndex - 1]['acctCategory']
+					index <= 0 ||
+					row['acctCategory'] !== this.accounts[index - 1]['acctCategory']
 				) ) {
 
 				this.$['catDivider'].show();
-				this.$['catDivider'].setCaption( row['acctCategory'] );
+				this.$['catDivider'].setContent( row['acctCategory'] );
 			} else {
 
 				this.$['catDivider'].hide();

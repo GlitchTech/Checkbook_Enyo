@@ -2,7 +2,7 @@ var dbArgs = {
 		name: "db",
 		database: "ext:checkbook-database",
 		version: "1",
-		debug: true//Only debug when in Beta versions
+		debug: false//Only debug when in Beta versions
 	};
 
 /** Default Data **/

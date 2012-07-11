@@ -8,7 +8,9 @@ enyo.depends(
 	"$lib/canvas-spinner/canvasSpinner.js",
 
 	"$lib/date.format.js",
+
 	"$lib/gts-plugins/PrototypeExt",
+	"$lib/gts-plugins/LazyList",
 
 	"scripts/",
 	"styles/"
