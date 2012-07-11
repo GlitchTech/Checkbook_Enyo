@@ -10,14 +10,12 @@ function prepAmount( amount ) {
 /** Properly format the amount for display **/
 function formatAmount( amount ) {
 
-	var posCheck = ( ( prepAmount( amount ) < 0 ) ? "-" : "" );
+	if( !amount ) {
 
-	var currencyFormatter = new enyo.g11n.NumberFmt( {
-			style: "currency",
-			currencyStyle: "common"
-		});
+		amount = 0;
+	}
 
-	return posCheck + currencyFormatter.format( Math.abs( amount ) );
+	return amount.formatCurrency( 2, ".", "," );
 }
 
 /** Convert amount display version to number **/
