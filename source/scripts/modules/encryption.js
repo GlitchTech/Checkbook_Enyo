@@ -4,7 +4,7 @@
  * Checkbook.encryption ( Component )
  *
  * Control system for encryption of strings using stored spike.
- *	Requires GTS.database to exist in enyo.application.gts_db
+ *	Requires GTS.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind( {
 	name: "Checkbook.encryption",
@@ -22,8 +22,8 @@ enyo.kind( {
 	 */
 	encryptString: function( string, callbackFn ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect( "prefs", [ "spike" ], null ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "prefs", [ "spike" ], null ),
 				{
 					"onSuccess": enyo.bind( this, this.encryptStringSuccess, string, callbackFn ),
 					"onError": enyo.bind( this, this.encryptStringFailure, string, callbackFn )
@@ -69,8 +69,8 @@ enyo.kind( {
 	 */
 	decryptString: function( string, callbackFn ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect( "prefs", [ "spike" ], null ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "prefs", [ "spike" ], null ),
 				{
 					"onSuccess": enyo.bind( this, this.decryptStringSuccess, string, callbackFn ),
 					"onError": enyo.bind( this, this.decryptStringFailure, string, callbackFn )

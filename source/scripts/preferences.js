@@ -258,15 +258,15 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.$['pinLock'].setValue( enyo.application.checkbookPrefs['useCode'] === 1 );
-		this.$['pinCode'].setValue( enyo.application.checkbookPrefs['code'] );
+		this.$['pinLock'].setValue( Checkbook.globals.prefs['useCode'] === 1 );
+		this.$['pinCode'].setValue( Checkbook.globals.prefs['code'] );
 
-		this.$['transPreview'].setValue( enyo.application.checkbookPrefs['transPreview'] === 1 );
-		this.$['updateNotice'].setValue( enyo.application.checkbookPrefs['updateCheckNotification'] === 1 );
-		this.$['errorReporting'].setValue( enyo.application.checkbookPrefs['errorReporting'] === 1 );
-		this.$['dispColor'].setValue( enyo.application.checkbookPrefs['dispColor'] === 1 );
+		this.$['transPreview'].setValue( Checkbook.globals.prefs['transPreview'] === 1 );
+		this.$['updateNotice'].setValue( Checkbook.globals.prefs['updateCheckNotification'] === 1 );
+		this.$['errorReporting'].setValue( Checkbook.globals.prefs['errorReporting'] === 1 );
+		this.$['dispColor'].setValue( Checkbook.globals.prefs['dispColor'] === 1 );
 
-		enyo.application.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
+		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
 
 		this.$['entries'].renderAccountList();
 	},
@@ -275,7 +275,7 @@ enyo.kind({
 
 	togglePINStatus: function() {
 
-		enyo.application.checkbookPrefs['useCode'] = ( this.$['pinLock'].getValue() ? 1 : 0 );
+		Checkbook.globals.prefs['useCode'] = ( this.$['pinLock'].getValue() ? 1 : 0 );
 		this.$['pinLockDrawer'].setOpen( this.$['pinLock'].getValue() );
 
 		this.saveAppPin();
@@ -310,8 +310,8 @@ enyo.kind({
 
 		if( cryptPin.length > 0 ) {
 
-			enyo.application.checkbookPrefs['useCode'] = 1;
-			enyo.application.checkbookPrefs['code'] = cryptPin;
+			Checkbook.globals.prefs['useCode'] = 1;
+			Checkbook.globals.prefs['code'] = cryptPin;
 		}
 
 		this.saveAppPin();
@@ -319,42 +319,42 @@ enyo.kind({
 
 	saveAppPin: function() {
 
-		if( enyo.application.checkbookPrefs['useCode'] === 0 || !enyo.isString( enyo.application.checkbookPrefs['code'] ) || enyo.application.checkbookPrefs['code'].length <= 0 ) {
+		if( Checkbook.globals.prefs['useCode'] === 0 || !enyo.isString( Checkbook.globals.prefs['code'] ) || Checkbook.globals.prefs['code'].length <= 0 ) {
 			//if invalid or set to off;
 
-			enyo.application.checkbookPrefs['useCode'] = 0;
-			enyo.application.checkbookPrefs['code'] = "";
+			Checkbook.globals.prefs['useCode'] = 0;
+			Checkbook.globals.prefs['code'] = "";
 		}
 
-		this.$['pinCode'].setValue( enyo.application.checkbookPrefs['code'] );
+		this.$['pinCode'].setValue( Checkbook.globals.prefs['code'] );
 
-		enyo.application.gts_db.query( enyo.application.gts_db.getUpdate( "prefs", { "useCode": enyo.application.checkbookPrefs['useCode'], "code": enyo.application.checkbookPrefs['code'] }, {} ) );
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "useCode": Checkbook.globals.prefs['useCode'], "code": Checkbook.globals.prefs['code'] }, {} ) );
 	},
 
 	/** General Controls **/
 
 	updateTransPreview: function( inSender, inValue ) {
 
-		enyo.application.checkbookPrefs['transPreview'] = ( inValue ? 1 : 0 );
-		enyo.application.gts_db.query( enyo.application.gts_db.getUpdate( "prefs", { "previewTransaction": enyo.application.checkbookPrefs['transPreview'] }, {} ) );
+		Checkbook.globals.prefs['transPreview'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "previewTransaction": Checkbook.globals.prefs['transPreview'] }, {} ) );
 	},
 
 	updateUpdateNotice: function( inSender, inValue ) {
 
-		enyo.application.checkbookPrefs['updateCheckNotification'] = ( inValue ? 1 : 0 );
-		enyo.application.gts_db.query( enyo.application.gts_db.getUpdate( "prefs", { "updateCheckNotification": enyo.application.checkbookPrefs['updateCheckNotification'] }, {} ) );
+		Checkbook.globals.prefs['updateCheckNotification'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "updateCheckNotification": Checkbook.globals.prefs['updateCheckNotification'] }, {} ) );
 	},
 
 	updateErrorReporting: function( inSender, inValue ) {
 
-		enyo.application.checkbookPrefs['errorReporting'] = ( inValue ? 1 : 0 );
-		enyo.application.gts_db.query( enyo.application.gts_db.getUpdate( "prefs", { "errorReporting": enyo.application.checkbookPrefs['errorReporting'] }, {} ) );
+		Checkbook.globals.prefs['errorReporting'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "errorReporting": Checkbook.globals.prefs['errorReporting'] }, {} ) );
 	},
 
 	updateDispColor: function( inSender, inValue ) {
 
-		enyo.application.checkbookPrefs['dispColor'] = ( inValue ? 1 : 0 );
-		enyo.application.gts_db.query( enyo.application.gts_db.getUpdate( "prefs", { "dispColor": enyo.application.checkbookPrefs['dispColor'] }, {} ) );
+		Checkbook.globals.prefs['dispColor'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "dispColor": Checkbook.globals.prefs['dispColor'] }, {} ) );
 	},
 
 	/** Account Controls **/
@@ -399,7 +399,7 @@ enyo.kind({
 
 		this.$['defaultAccount'].render();
 
-		enyo.application.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.setDefaultAccount ) } );
+		Checkbook.globals.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.setDefaultAccount ) } );
 	},
 
 	setDefaultAccount: function( result ) {
@@ -415,7 +415,7 @@ enyo.kind({
 
 	updateDefaultAccount: function( inSender, newVal, oldVal ) {
 
-		enyo.application.accountManager.updateDefaultAccount( newVal );
+		Checkbook.globals.accountManager.updateDefaultAccount( newVal );
 	},
 
 	addAccount: function() {
@@ -425,7 +425,7 @@ enyo.kind({
 
 			this.$['addAccountButton'].setDisabled( true );
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.doModify,
 					{
@@ -551,7 +551,7 @@ enyo.kind({
 		this.$['wipeProgress'].render();
 		this.$['wipeProgress'].load( "Purging All Data", "Please wait...", 50 );
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				[
 					"DROP TABLE IF EXISTS budget;",
 					"DROP TABLE IF EXISTS rules;",

@@ -51,7 +51,7 @@ enyo.kind( {
 			]
 		}, {
 			name: "entries",
-			kind: enyo.VirtualList,
+			kind: enyo.VirtualList,//GTS.LazyList
 
 			flex: 1,
 			className: "checkbook-stamp",
@@ -450,7 +450,7 @@ enyo.kind( {
 					"onSuccess": enyo.bind( this, this.initialScrollHandler )
 				};
 
-			enyo.application.gts_db.query( qryScrollCount, options );
+			Checkbook.globals.gts_db.query( qryScrollCount, options );
 		}
 	},
 
@@ -488,7 +488,7 @@ enyo.kind( {
 
 			this.account['bal_view'] = inSender.value;
 
-			enyo.application.accountManager.updateAccountBalView(
+			Checkbook.globals.accountManager.updateAccountBalView(
 					this.account['acctId'],
 					this.account['bal_view'],
 					{
@@ -508,7 +508,7 @@ enyo.kind( {
 			this.account['sort'] = inSender.value;
 			this.account['sortQry'] = inSender.qry;
 
-			enyo.application.accountManager.updateAccountSorting(
+			Checkbook.globals.accountManager.updateAccountSorting(
 					this.account['acctId'],
 					this.account['sort']
 				);
@@ -524,7 +524,7 @@ enyo.kind( {
 
 			if( inSender.value.toLowerCase() === "budget" ) {
 
-				enyo.nextTick(
+				enyo.asyncMethod(
 						this,
 						this.doBudgetView,
 						null,
@@ -537,7 +537,7 @@ enyo.kind( {
 				this.log( "Report system go" );
 			} else if( inSender.value.toLowerCase() === "search" ) {
 
-				enyo.nextTick(
+				enyo.asyncMethod(
 						this,
 						this.doSearchView,
 						null,
@@ -586,7 +586,7 @@ enyo.kind( {
 		if( !results ) {
 			//If not called with results of new balance, fetch them
 
-			enyo.application.accountManager.fetchAccountBalance( this.account['acctId'], { "onSuccess": enyo.bind( this, this.balanceChangedHandler, accounts ) } );
+			Checkbook.globals.accountManager.fetchAccountBalance( this.account['acctId'], { "onSuccess": enyo.bind( this, this.balanceChangedHandler, accounts ) } );
 			return;
 		}
 
@@ -672,7 +672,7 @@ enyo.kind( {
 
 		if( transactionSortOptions.length <= 0 ) {
 
-			enyo.application.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
+			Checkbook.globals.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
 		} else {
 
 			this.buildTransactionSorting();
@@ -722,7 +722,7 @@ enyo.kind( {
 
 			this.toggleCreateButtons();
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.doModify,
 					{
@@ -811,7 +811,7 @@ enyo.kind( {
 		delete newTrsn['repeatId'];
 		delete newTrsn['cleared'];
 
-		enyo.nextTick(
+		enyo.asyncMethod(
 				this,
 				this.doModify,
 				{
@@ -829,7 +829,7 @@ enyo.kind( {
 
 		this.log();
 
-		if( enyo.application.checkbookPrefs['transPreview'] === 1 ) {
+		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode
 
 			this.$['viewSingle'].setIndex( rowIndex );
@@ -847,7 +847,7 @@ enyo.kind( {
 		if( this.account['frozen'] !== 1 ) {
 			//account not frozen
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.doModify,
 					{
@@ -872,7 +872,7 @@ enyo.kind( {
 			this.transactions = [];
 			this.$['entries'].punt();
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.scrollTo,
 					rowIndex
@@ -887,7 +887,7 @@ enyo.kind( {
 			this.transactions = [];
 			this.$['entries'].punt();
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.scrollTo,
 					( rowIndex - 1 )
@@ -935,7 +935,7 @@ enyo.kind( {
 
 		var cleared = ( this.transactions[rowIndex]['cleared'] === 1 );
 
-		enyo.application.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], cleared );
+		Checkbook.globals.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], cleared );
 
 		this.$['entries'].refresh();
 
@@ -971,7 +971,7 @@ enyo.kind( {
 				};
 
 		//update database;
-		enyo.application.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
 
 		var balChanged = this.transactions[rowIndex]['amount'];
 		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
@@ -1022,7 +1022,7 @@ enyo.kind( {
 		this.$['entries'].refresh();
 
 		//Fetch row
-		enyo.application.transactionManager.fetchTransactions(
+		Checkbook.globals.transactionManager.fetchTransactions(
 				this.account,
 				{
 					"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
@@ -1084,11 +1084,11 @@ enyo.kind( {
 			//Handle split transactions
 			if( this.account['enableCategories'] === 1 ) {
 
-				this.$['category'].setShowing( true );
-				this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( row['category'], row['category2'], true, "small" ) );
+				this.$['category'].show();
+				this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( row['category'], row['category2'], true, "small" ) );
 			} else {
 
-				this.$['category'].setShowing( false );
+				this.$['category'].hide();
 			}
 			//Check Number
 			this.$['checkNum'].setContent( ( this.account['checkField'] === 1 && row['checkNum'] && row['checkNum'] !== "" ) ? ( "Check #" + row['checkNum'] ) : "" );
@@ -1129,7 +1129,7 @@ enyo.kind( {
 
 			this.loadingDisplay( true );
 
-			enyo.application.transactionManager.fetchTransactions(
+			Checkbook.globals.transactionManager.fetchTransactions(
 					this.account,
 					{
 						"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )

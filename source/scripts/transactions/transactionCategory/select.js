@@ -109,20 +109,20 @@ enyo.kind({
 
 	loadCategories: function( callbackFn ) {
 
-		if( enyo.application.transactionCategoryManager.trsnCategories ) {
+		if( Checkbook.globals.transactionCategoryManager.trsnCategories ) {
 
 			this.log( "transaction categories already built" );
 
 			callbackFn();
 		} else {
 
-			enyo.application.transactionCategoryManager.load( null, { "onSuccess": callbackFn }, null, null );
+			Checkbook.globals.transactionCategoryManager.load( null, { "onSuccess": callbackFn }, null, null );
 		}
 	},
 
 	getCategoryChoice: function( callbackFn, subheader ) {
 
-		this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['mainCats'] );
+		this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'] );
 		//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
 		this.openAtCenter();
@@ -177,7 +177,7 @@ enyo.kind({
 			} else if( row['parent'] === "|-go_back-|" ) {
 				//Parent <- Child
 
-				this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['mainCats'] );
+				this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'] );
 				//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
 				this.$['categoryList'].punt();
@@ -193,7 +193,7 @@ enyo.kind({
 			} else {
 				//Parent -> Child
 
-				this.dispCategories = enyo.clone( enyo.application.transactionCategoryManager.trsnCategories['subCats'][row['content']] );
+				this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][row['content']] );
 
 				if( this.entireGeneral ) {
 
@@ -219,12 +219,12 @@ enyo.kind({
 			if( row['parent'] === "|-add_edit-|" ) {
 				//Edit Categories (category view)
 
-				this.$['arrows'].setShowing( false );
+				this.$['arrows'].hide();
 			} else if( row['parent'] === "|-go_back-|" ) {
 				//Back Item (subcategory view)
 
 				this.$['arrows'].setContent( "<<" );
-				this.$['arrows'].setShowing( true );
+				this.$['arrows'].show();
 			} else if( row['parent'] !== "" ) {
 				//Subcategory View
 
@@ -233,7 +233,7 @@ enyo.kind({
 				this.$['item'].addRemoveClass( 'selected', selected );
 				this.$['item'].addRemoveClass( 'normal', !selected );
 
-				this.$['arrows'].setShowing( false );
+				this.$['arrows'].hide();
 			} else {
 				//Category View
 
@@ -243,7 +243,7 @@ enyo.kind({
 				this.$['item'].addRemoveClass( 'normal', !selected );
 
 				this.$['arrows'].setContent( ">>" );
-				this.$['arrows'].setShowing( true );
+				this.$['arrows'].show();
 			}
 
 			return true;

@@ -4,7 +4,7 @@
  * Checkbook.accounts.list ( Component )
  *
  * Account list display system
- *	Requires GTS.database to exist in enyo.application.gts_db
+ *	Requires GTS.database to exist in Checkbook.globals.gts_db
  *	Requires Checkbook.accounts.manager
  */
 
@@ -36,7 +36,7 @@ enyo.kind({
 	components: [
 		{
 			name: "entries",
-			kind: "List",
+			kind: "enyo.PulldownList",
 
 			onReorder: "reorder",
 			onSetupItem: "handleSetupRow",
@@ -135,7 +135,7 @@ enyo.kind({
 
 		this.accounts = [];
 
-		enyo.application.accountManager.fetchAccounts(
+		Checkbook.globals.accountManager.fetchAccounts(
 				{
 					"onSuccess": enyo.bind( this, this.dataResponse )
 				}
@@ -211,7 +211,7 @@ enyo.kind({
 
 			if( row['acctLocked'] == 1 ) {
 
-				enyo.application.security.authUser(
+				Checkbook.globals.security.authUser(
 						row['acctName'] + " " + "PIN Code",
 						row['lockedCode'],
 						{
@@ -232,7 +232,7 @@ enyo.kind({
 			this.log( "Account edited" );
 
 			//Let transactions page know
-			enyo.application.accountManager.fetchAccount(
+			Checkbook.globals.accountManager.fetchAccount(
 					this.accounts[rowIndex]['acctId'],
 					{
 						"onSuccess": enyo.bind( this, this.doChanged )
@@ -267,7 +267,7 @@ enyo.kind({
 			for( var i = 0; i < this.accounts.length; i++ ) {
 
 				qryOrder.push(
-						enyo.application.gts_db.getUpdate(
+						Checkbook.globals.gts_db.getUpdate(
 								"accounts",
 								{ "sect_order": i },
 								{ "rowid": this.accounts[i]['acctId'] }
@@ -275,14 +275,14 @@ enyo.kind({
 					);
 			}
 
-			if( enyo.application.checkbookPrefs['custom_sort'] !== 1 ) {
+			if( Checkbook.globals.prefs['custom_sort'] !== 1 ) {
 
-				enyo.application.checkbookPrefs['custom_sort'] = 1;
+				Checkbook.globals.prefs['custom_sort'] = 1;
 
-				qryOrder.push( new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ enyo.application.checkbookPrefs['custom_sort'] ] } ) );
+				qryOrder.push( new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ) );
 			}
 
-			enyo.application.gts_db.queries( qryOrder );
+			Checkbook.globals.gts_db.queries( qryOrder );
 
 			this.refresh();
 		}
@@ -291,7 +291,7 @@ enyo.kind({
 	accountDeleted: function( inSender, rowIndex ) {
 		//Row deleted
 
-		enyo.application.accountManager.deleteAccount(
+		Checkbook.globals.accountManager.deleteAccount(
 				this.accounts[rowIndex]['acctId'],
 				{
 					"onSuccess": enyo.bind( this, this.accountDeletedSuccess, this.accounts[rowIndex]['acctId'] )
@@ -358,18 +358,18 @@ enyo.kind({
 
 			//proper sort mode && difference between categories
 			if( (
-					enyo.application.checkbookPrefs['custom_sort'] === 0 ||
-					enyo.application.checkbookPrefs['custom_sort'] === 3
+					Checkbook.globals.prefs['custom_sort'] === 0 ||
+					Checkbook.globals.prefs['custom_sort'] === 3
 				) && (
 					inIndex <= 0 ||
 					row['acctCategory'] !== this.accounts[inIndex - 1]['acctCategory']
 				) ) {
 
-				this.$['catDivider'].setShowing( true );
+				this.$['catDivider'].show();
 				this.$['catDivider'].setCaption( row['acctCategory'] );
 			} else {
 
-				this.$['catDivider'].setShowing( false );
+				this.$['catDivider'].hide();
 			}
 
 /*

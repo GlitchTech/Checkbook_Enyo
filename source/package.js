@@ -7,7 +7,7 @@ enyo.depends(
 	"$lib/canvas-spinner/heartcode_canvas.js",
 	"$lib/canvas-spinner/canvasSpinner.js",
 
-	"$lib/database.js",
+	"$lib/gts-plugins/PrototypeExt",
 
 	"scripts/",
 	"styles/"

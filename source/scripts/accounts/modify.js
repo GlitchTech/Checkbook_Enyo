@@ -449,7 +449,7 @@ enyo.kind( {
 		//Transaction Sort Options
 		if( transactionSortOptions.length <= 0 ) {
 
-			enyo.application.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
+			Checkbook.globals.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
 		} else {
 
 			this.buildTransactionSorting();
@@ -462,7 +462,7 @@ enyo.kind( {
 		this.$['transactionSorting'].render();
 
 		//Transaction Sort Options
-		enyo.application.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAutoTransferLink ) } );
+		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAutoTransferLink ) } );
 	},
 
 	buildAutoTransferLink: function( accounts ) {
@@ -482,7 +482,7 @@ enyo.kind( {
 			this.$['autoTransferLink'].$['listName'].setDisabled( true );
 		}
 
-		enyo.nextTick(
+		enyo.asyncMethod(
 				this,
 				this.setAccountValues
 			);
@@ -490,8 +490,8 @@ enyo.kind( {
 
 	transactionSortingUpdateLabel: function() {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect( "acctTrsnSortOptn", [ "desc" ], { "sortId": this.$['transactionSorting'].getValue() } ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "acctTrsnSortOptn", [ "desc" ], { "sortId": this.$['transactionSorting'].getValue() } ),
 				{
 					"onSuccess": enyo.bind( this, this.transactionSortingUpdateLabelHandler )
 					//"onError": handled by database.js
@@ -547,7 +547,7 @@ enyo.kind( {
 
 	categoryChanged: function( inSender, newVal, oldVal ) {
 
-		if( enyo.application.checkbookPrefs['dispColor'] === 1 ) {
+		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
 
 			if( this.categories['assoc'][oldVal] ) {
 
@@ -617,7 +617,7 @@ enyo.kind( {
 
 		if( this.acctId >= 0 ) {
 
-			enyo.application.accountManager.fetchAccount(
+			Checkbook.globals.accountManager.fetchAccount(
 					this.acctId,
 					{
 						"onSuccess": enyo.bind( this, this.renderDisplayItems ),
@@ -703,10 +703,10 @@ enyo.kind( {
 		if( this.acctId < 0 ) {
 			//Can"t delete an account that doesn"t exist
 
-			this.$['accountDeleteButton'].setShowing( false );
+			this.$['accountDeleteButton'].hide();
 		}
 
-		this.$['loadingScrim'].setShowing( false );
+		this.$['loadingScrim'].hide();
 
 		this.$['accountName'].forceFocusEnableKeyboard();
 	},
@@ -752,10 +752,10 @@ enyo.kind( {
 
 		if( this.acctId < 0 ) {
 
-			enyo.application.accountManager.createAccount( data, options );
+			Checkbook.globals.accountManager.createAccount( data, options );
 		} else {
 
-			enyo.application.accountManager.updateAccount( data, this.acctId, this.pinChanged, options );
+			Checkbook.globals.accountManager.updateAccount( data, this.acctId, this.pinChanged, options );
 		}
 	},
 
@@ -793,7 +793,7 @@ enyo.kind( {
 
 	deleteAccountHandler: function() {
 
-		enyo.application.accountManager.deleteAccount(
+		Checkbook.globals.accountManager.deleteAccount(
 				this.acctId,
 				{
 					"onSuccess": enyo.bind( this, this.doFinish, 2 )

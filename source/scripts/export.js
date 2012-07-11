@@ -296,7 +296,7 @@ enyo.kind({
 		this.prepareCredentials();
 
 		//check for pre-existing g-data log in
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				"SELECT saveGSheetsData, gSheetUser, gSheetPass FROM prefs LIMIT 1;",
 				{
 					"onSuccess": enyo.bind( this, this.fetchUserGData )
@@ -309,8 +309,8 @@ enyo.kind({
 		this.log();
 
 		this.$['credentialsButton'].setDisabled( false );
-		this.$['credentialsBar'].setShowing( true );
-		this.$['accountListBar'].setShowing( false );
+		this.$['credentialsBar'].show();
+		this.$['accountListBar'].hide();
 
 		this.$['credentials'].show();
 		this.$['accountList'].hide();
@@ -439,8 +439,8 @@ enyo.kind({
 					};
 		}
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getUpdate(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getUpdate(
 					"prefs",
 					updateObj,
 					{}
@@ -456,8 +456,8 @@ enyo.kind({
 		this.$['progress'].setMessage( "Retrieving accounts..." );
 		this.$['progress'].setProgress( 50 );
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect(
 						"accounts",
 						[
 							"acctId",
@@ -523,8 +523,8 @@ enyo.kind({
 		this.$['accounts'].render();
 
 		this.$['accountListButton'].setDisabled( false );
-		this.$['credentialsBar'].setShowing( false );
-		this.$['accountListBar'].setShowing( true );
+		this.$['credentialsBar'].hide();
+		this.$['accountListBar'].show();
 
 		this.$['credentials'].hide();
 		this.$['accountList'].show();
@@ -558,7 +558,7 @@ enyo.kind({
 
 		if( this.acctList[inEvent.rowIndex]['acctLocked'] && !this.acctList[inEvent.rowIndex]['bypass'] ) {
 
-				enyo.application.security.authUser(
+				Checkbook.globals.security.authUser(
 						this.acctList[inEvent.rowIndex]['name'] + " " + "PIN Code",
 						this.acctList[inEvent.rowIndex]['lockedCode'],
 						{
@@ -659,8 +659,8 @@ enyo.kind({
 		this.$['progress'].setProgress( ( ( ( index + 1 ) * 1 / 4 ) / accountsToExport.length ) * 100 );
 
 		//fetch account finance data, use SQL to make each line a CSV
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect(
 						"transactions",
 						[
 							"itemId",
@@ -745,7 +745,7 @@ enyo.kind({
 										'"' + row['checkNum'].cleanString() + '",' +
 										'"' + row['note'].cleanString() + '",' +
 										'"' + row['itemId'] + '",' +
-										'"' + enyo.json.stringify( enyo.application.transactionManager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
+										'"' + enyo.json.stringify( Checkbook.globals.transactionManager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
 										'"' + row['linkedRecord'] + '",' +
 										'"' + row['linkedAccountName'].cleanString() + '",' +
 										'"' + row['linkedAccountCat'].cleanString() + '"\n';

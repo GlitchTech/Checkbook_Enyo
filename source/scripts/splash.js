@@ -18,40 +18,20 @@ enyo.kind({
 
 	components: [
 		{
-			layoutKind: enyo.VFlexLayout,
-			pack: "center",
+			name: "headerWrapper",
+			kind: "onyx.Toolbar",
+			layoutKind: "FittableColumnsLayout",
+			classes: "simple"
+		}, {
+			classes: "padding-std light",
 			components: [
 				{
-					layoutKind: enyo.HFlexLayout,
-					pack: "start",
-					components: [
-						{
-							kind: "jmtk.Spinner",
-							color: "#284907",
-							diameter: "90",
-							shape: "spiral",
-
-							style: "margin-right: 5px;",
-
-							showing: true
-						}, {
-							name: "icon",
-							kind: "Image",
-							src: "assets/warning-icon.png",
-							style: "margin-right: 5px;",
-							showing: false
-						}, {
-							name: "title",
-							className: "bold"
-						}
-					]
-				}, {
 					name: "message",
-					className: "smaller medium-margin-bottom",
+					classes: "smaller margin-half-bottom margin-half-top",
 					allowHtml: true
 				}, {
 					name: "splashProgress",
-					kind: enyo.ProgressBar,
+					kind: "onyx.ProgressBar",
 					minimum: 0,
 					maximum: 100,
 					position: 0
@@ -60,53 +40,91 @@ enyo.kind({
 		}
 	],
 
-	create: function() {
+	handlers: {
+		onShow: "buildHeader"
+	},
+
+	/**
+	 * @protected
+	 * @constructs
+	 */
+	constructor: function() {
 
 		this.inherited( arguments );
-
-		this.log();
 
 		//Setup listing of bound methods
 		this._binds = {
 			splashCrash: enyo.bind( this, this.splashCrash ),
 			checkDB: enyo.bind( this, this.checkDB )
 		};
-	},
-
-	rendered: function() {
-
-		this.inherited( arguments );
-
-		this.log();
-
-		this.$['title'].setContent( "Loading Checkbook" );
 
 		this.firstRun = false;
+		this.headerBuilt = false;
+	},
 
-		//this.checkSystem();
+	buildHeader: function() {
+
+		if( !this.headerBuilt ) {
+
+			this.$['headerWrapper'].createComponents(
+					[
+						{
+							name: "spinner",
+							kind: "jmtk.Spinner",
+							color: "#272D70",
+							diameter: "30",
+							shape: "spiral",
+
+							style: "margin-right: 5px;"
+						}, {
+							name: "icon",
+							kind: "Image",
+							src: "assets/warning-icon.png",
+							style: "margin-right: 5px;",
+							showing: false
+						}, {
+							name: "title",
+							classes: "bold"
+						}
+					], {
+						owner: this
+					}
+				);
+
+			this.$['headerWrapper'].render();
+
+			this.headerBuilt = true;
+		}
+
+		this.checkSystem();
+
+		this.reflow();
 	},
 
 	checkSystem: function() {
 
-		this.log();
-
+		this.$['title'].setContent( "Loading Checkbook" );
 		this.$['message'].setContent( "Preparing application." );
-		this.$['splashProgress'].setPosition( 5 );
 
-		if( !enyo.application.gts_db ) {
+		this.$['splashProgress'].animateProgressTo( 5 );
 
-			this.log( "creating database object" );
+		if( !Checkbook.globals ) {
 
-			var db = new GTS.database( dbArgs );
-
-			this.log( "enyo.application.gts_db v" + db.getVersion() + " created." );
+			Checkbook.globals = {};
 		}
 
-		if( !enyo.application.checkbookPrefs ) {
+		if( !Checkbook.globals.gts_db ) {
 
-			this.log( "creating checkbookPrefs{}" );
+			Checkbook.globals.gts_db = new GTS.database( dbArgs );
 
-			enyo.application.checkbookPrefs = {};
+			this.log( "Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created." );
+		}
+
+		if( !Checkbook.globals.prefs ) {
+
+			Checkbook.globals.prefs = {};
+
+			this.log( "creating prefs" );
 		}
 
 		this.checkDB();
@@ -117,9 +135,9 @@ enyo.kind({
 		this.log();
 
 		this.$['message'].setContent( "Checking database version..." );
-		this.$['splashProgress'].setPosition( 10 );
+		this.$['splashProgress'].animateProgressTo( 10 );
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				"SELECT * FROM prefs LIMIT 1;",
 				{
 					"onSuccess": enyo.bind( this, this.checkDBSuccess ),
@@ -142,37 +160,29 @@ enyo.kind({
 
 		if( currVersion === this.versionCheck ) {
 
-			this.$['splashProgress'].setPosition( 75 );
+			this.$['splashProgress'].animateProgressTo( 75 );
 
 			this.log( "DB up to date, preparing to return" );
 
 			//setup pref object
-			enyo.application.checkbookPrefs['version'] = currVersion;//database version
+			Checkbook.globals.prefs['version'] = currVersion;//database version
 
-			enyo.application.checkbookPrefs['useCode'] = results[0]['useCode'];
-			enyo.application.checkbookPrefs['code'] = results[0]['code'];
+			Checkbook.globals.prefs['useCode'] = results[0]['useCode'];
+			Checkbook.globals.prefs['code'] = results[0]['code'];
 
-			enyo.application.checkbookPrefs['transPreview'] = results[0]['previewTransaction'];
-			enyo.application.checkbookPrefs['updateCheck'] = results[0]['updateCheck'];//App version
-			enyo.application.checkbookPrefs['updateCheckNotification'] = results[0]['updateCheckNotification'];
-			enyo.application.checkbookPrefs['errorReporting'] = results[0]['errorReporting'];
+			Checkbook.globals.prefs['transPreview'] = results[0]['previewTransaction'];
+			Checkbook.globals.prefs['updateCheck'] = results[0]['updateCheck'];//App version
+			Checkbook.globals.prefs['updateCheckNotification'] = results[0]['updateCheckNotification'];
+			Checkbook.globals.prefs['errorReporting'] = results[0]['errorReporting'];
 
-			enyo.application.checkbookPrefs['dispColor'] = results[0]['dispColor'];
-			enyo.application.checkbookPrefs['bsSave'] = results[0]['bsSave'];
+			Checkbook.globals.prefs['dispColor'] = results[0]['dispColor'];
+			Checkbook.globals.prefs['bsSave'] = results[0]['bsSave'];
 
-			enyo.application.checkbookPrefs['custom_sort'] = results[0]['custom_sort'];
-
-			if( enyo.fetchDeviceInfo() && enyo.isString( enyo.fetchDeviceInfo().serialNumber ) ) {
-
-				enyo.application.checkbookPrefs['nduid'] = enyo.fetchDeviceInfo().serialNumber;
-			} else {
-
-				enyo.application.checkbookPrefs['nduid'] = "xxxxxxxxxx";
-			}
+			Checkbook.globals.prefs['custom_sort'] = results[0]['custom_sort'];
 
 			//Check for recurring updates using the repeating system
 			this.$['message'].setContent( "Updating transaction data..." );
-			this.$['splashProgress'].setPosition( 85 );
+			this.$['splashProgress'].animateProgressTo( 85 );
 			//this.repeat_updateAll( enyo.bind( this, this.splashFinished ) );
 
 			this.splashFinished();//Temp until repeat system is in place
@@ -193,13 +203,13 @@ enyo.kind({
 
 		this.log();
 
-		this.$['splashProgress'].setPosition( 100 );
+		this.$['splashProgress'].animateProgressTo( 100 );
 
 		//Slight delay to allow for system lag
-		enyo.asyncMethod( this, function() {
-
-				this.doFinish();
-			});
+		enyo.asyncMethod(
+				this,
+				this.doFinish
+			);
 	},
 
 	buildInitialDB: function() {
@@ -209,7 +219,7 @@ enyo.kind({
 		this.firstRun = true;
 
 		this.$['message'].setContent( "Creating application database..." );
-		this.$['splashProgress'].setPosition( 50 );
+		this.$['splashProgress'].animateProgressTo( 50 );
 
 		var chars = ( "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz" + ( new Date() ).getTime() ).split( "" );
 
@@ -223,18 +233,18 @@ enyo.kind({
 
 		var initialStructure = [
 					//Drop all potential conflict
-					enyo.application.gts_db.getDropTable( "accounts" ),
-					enyo.application.gts_db.getDropTable( "accountCategories" ),
-					enyo.application.gts_db.getDropTable( "acctTrsnSortOptn" ),
+					Checkbook.globals.gts_db.getDropTable( "accounts" ),
+					Checkbook.globals.gts_db.getDropTable( "accountCategories" ),
+					Checkbook.globals.gts_db.getDropTable( "acctTrsnSortOptn" ),
 
-					enyo.application.gts_db.getDropTable( "budgets" ),
+					Checkbook.globals.gts_db.getDropTable( "budgets" ),
 
-					enyo.application.gts_db.getDropTable( "transactions" ),
-					enyo.application.gts_db.getDropTable( "expenseCategories" ),
-					enyo.application.gts_db.getDropTable( "transactionSplit" ),
+					Checkbook.globals.gts_db.getDropTable( "transactions" ),
+					Checkbook.globals.gts_db.getDropTable( "expenseCategories" ),
+					Checkbook.globals.gts_db.getDropTable( "transactionSplit" ),
 
-					enyo.application.gts_db.getDropTable( "repeats" ),
-					enyo.application.gts_db.getDropTable( "prefs" ),
+					Checkbook.globals.gts_db.getDropTable( "repeats" ),
+					Checkbook.globals.gts_db.getDropTable( "prefs" ),
 
 					//Build new structure
 					{
@@ -672,7 +682,7 @@ enyo.kind({
 					}
 				];
 
-		enyo.application.gts_db.setSchema(
+		Checkbook.globals.gts_db.setSchema(
 				initialStructure,
 				{
 					"onSuccess": this._binds['checkDB'],
@@ -686,7 +696,7 @@ enyo.kind({
 		this.log();
 
 		this.$['message'].setContent( "Updating database..." );
-		this.$['splashProgress'].setPosition( 50 );
+		this.$['splashProgress'].animateProgressTo( 50 );
 
 		var querySet = [];
 		var updateOptions = {
@@ -732,7 +742,7 @@ enyo.kind({
 				this.versionCheck = 21;
 			case 21:
 				querySet.push(
-						enyo.application.gts_db.getUpdate(
+						Checkbook.globals.gts_db.getUpdate(
 								"acctTrsnSortOptn",
 								{
 									"qry": "IFNULL( NULLIF( checkNum, '' ), ( SELECT IFNULL( MAX( checkNum ), 0 ) FROM transactions LIMIT 1 ) ) ASC, itemId ASC"
@@ -753,7 +763,7 @@ enyo.kind({
 			case 23:
 				//Remove set passwords (encryption system changed)
 				querySet.push(
-						enyo.application.gts_db.getUpdate(
+						Checkbook.globals.gts_db.getUpdate(
 								"prefs",
 								{
 									"useCode": 0,
@@ -763,7 +773,7 @@ enyo.kind({
 							)
 					);
 				querySet.push(
-						enyo.application.gts_db.getUpdate(
+						Checkbook.globals.gts_db.getUpdate(
 								"accounts",
 								{
 									"acctLocked": 0,
@@ -782,7 +792,7 @@ enyo.kind({
 		}
 
 		querySet.push(
-				enyo.application.gts_db.getUpdate(
+				Checkbook.globals.gts_db.getUpdate(
 						"prefs",
 						{
 							"dbVer": this.versionCheck
@@ -791,7 +801,7 @@ enyo.kind({
 					)
 			);
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				querySet,
 				updateOptions
 			);
@@ -801,9 +811,9 @@ enyo.kind({
 
 		this.error( arguments );
 
-		this.$['splashProgress'].setShowing( false );
-		this.$.spinner.setShowing( false );
-		this.$['icon'].setShowing( true );
+		this.$['splashProgress'].hide();
+		this.$['spinner'].hide();
+		this.$['icon'].show();
 
 		this.$['title'].setContent( "Checkbook Load Error" );
 		this.$['message'].setContent(

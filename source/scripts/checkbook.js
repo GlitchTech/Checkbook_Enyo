@@ -11,6 +11,7 @@ enyo.kind({
 			kind: "Panels",
 
 			fit: true,
+			showing: false,
 
 			classes: "app-panels enyo-fit",
 			arrangerKind: "CollapsingArranger",
@@ -42,6 +43,10 @@ enyo.kind({
 		},
 
 		{
+			name: "splashScrim",
+			kind: onyx.Scrim,
+			classes: "onyx-scrim-translucent"
+		}, {
 			name: "splash",
 			kind: "Checkbook.splash",
 			onFinish: "splashFinisher"
@@ -124,12 +129,26 @@ enyo.kind({
 
 	paneStack: [],
 
+	/**
+	 * @protected
+	 * @constructs
+	 */
+	constructor: function() {
+
+		this.inherited( arguments );
+
+		if( enyo.platform.android ) {
+
+			touchEvent.preventDefault();
+		}
+	},
+
 	/** Application Events **/
 
 	backHandler: function( inSender, inEvent ) {
 
 		//this.$.slidingPane.back( inEvent );
-		//
+
 		inEvent.stopPropagation();
 		return -1;
 	},
@@ -140,31 +159,32 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.log();
+		this.$['splashScrim'].show();
+		this.$['splash'].show();
 
 		//Load splash popup. Verifies database.
-		this.$['splash'].show();
 		//this.$['appMenu'].setAutomatic( false );
 	},
 
 	splashFinisher: function() {
 
-		this.log();
-
 		this.notificationType = !this.$['splash'].getFirstRun();
 
 		//Close & remove splash system. Not used again
-		this.$['splash'].close();
+		this.$['splashScrim'].hide();
+		this.$['splash'].hide();
+
+		this.$['splashScrim'].destroy();
 		this.$['splash'].destroy();
 
-		enyo.application.security = this.$['security'];
+		Checkbook.globals.security = this.$['security'];
 
-		if( enyo.application.checkbookPrefs['useCode'] != 0 ) {
+		if( Checkbook.globals.prefs['useCode'] != 0 ) {
 			//App Locked
 
-			enyo.application.security.authUser(
+			Checkbook.globals.security.authUser(
 					"Main Program PIN Code",
-					enyo.application.checkbookPrefs['code'],
+					Checkbook.globals.prefs['code'],
 					{
 						"onSuccess": enyo.bind( this, this.loadCheckbook ),
 						"onFailure": enyo.bind( this, this.appAuthFailure )
@@ -188,15 +208,17 @@ enyo.kind({
 
 	loadCheckbook: function() {
 
-		this.$['mainPane'].setShowing( true );
-		this.$['appMenu'].setAutomatic( true );
+		this.$['container'].show();
+		this.$['container'].render();
 
-		enyo.application.criticalError = this.$['criticalError'];
-		enyo.application.accountManager = new Checkbook.accounts.manager();
-		enyo.application.transactionManager = new Checkbook.transactions.manager();
-		enyo.application.transactionCategoryManager = new Checkbook.transactionCategory.manager();
+		//this.$['appMenu'].setAutomatic( true );
 
-		enyo.nextTick(
+		Checkbook.globals.criticalError = this.$['criticalError'];
+		Checkbook.globals.accountManager = new Checkbook.accounts.manager();
+		Checkbook.globals.transactionManager = new Checkbook.transactions.manager();
+		Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager();
+
+		enyo.asyncMethod(
 				this,
 				this.loadCheckbookStage2
 			);
@@ -204,7 +226,7 @@ enyo.kind({
 
 	loadCheckbookStage2: function() {
 
-		enyo.application.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.loadCheckbookStage3 ) } );
+		Checkbook.globals.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.loadCheckbookStage3 ) } );
 	},
 
 	loadCheckbookStage3: function( result ) {
@@ -214,7 +236,7 @@ enyo.kind({
 			if( result['acctLocked'] === 1 ) {
 				//System security
 
-				enyo.application.security.authUser(
+				Checkbook.globals.security.authUser(
 						result['acctName'] + " " + "PIN Code",
 						result['lockedCode'],
 						{
@@ -229,13 +251,13 @@ enyo.kind({
 
 		this.$['accounts'].renderAccountList();
 
-		if( this.notificationType === true && enyo.application.checkbookPrefs['updateCheckNotification'] == 1 ) {
+		if( this.notificationType === true && Checkbook.globals.prefs['updateCheckNotification'] == 1 ) {
 
 			//Check for notifications
 		} else if( this.notificationType === false ) {
 			//First run notice
 
-			enyo.application.criticalError.load(
+			Checkbook.globals.criticalError.load(
 					"Welcome to " + enyo.fetchAppInfo()['title'],
 					"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
 					"",
@@ -243,8 +265,8 @@ enyo.kind({
 				);
 
 			enyo.asyncMethod(
-					enyo.application.criticalError,
-					enyo.application.criticalError.set,
+					Checkbook.globals.criticalError,
+					Checkbook.globals.criticalError.set,
 					"~|p2t|~",
 					"",
 					"~|mt|~",
@@ -370,7 +392,7 @@ enyo.kind({
 
 			this.notificationType = null;
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.loadCheckbookStage2
 				);
@@ -438,7 +460,7 @@ enyo.kind({
 		if( changesMade === true ) {
 			//Update account and transaction information
 
-			enyo.application.accountManager.updateAccountModTime();
+			Checkbook.globals.accountManager.updateAccountModTime();
 			this.$['accounts'].renderAccountList();
 			this.$['transactions'].reloadSystem();
 		}
@@ -533,7 +555,7 @@ enyo.kind({
 
 		this.log( Object.toJSON( accts ) );
 
-		var acctIndex = accts['account'] >= 0 ? enyo.application.accountManager.fetchAccountIndex( accts['account'] ) : - 1;
+		var acctIndex = accts['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['account'] ) : - 1;
 
 		if( acctIndex >= 0 ) {
 
@@ -545,22 +567,22 @@ enyo.kind({
 					);
 			} else {
 
-				enyo.application.accountManager.fetchAccountBalance( accts['account'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['account'], acctIndex ) } );
+				Checkbook.globals.accountManager.fetchAccountBalance( accts['account'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['account'], acctIndex ) } );
 			}
 		}
 
-		var linkedIndex = accts['linkedAccount'] >= 0 ? enyo.application.accountManager.fetchAccountIndex( accts['linkedAccount'] ) : - 1;
+		var linkedIndex = accts['linkedAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['linkedAccount'] ) : - 1;
 
 		if( linkedIndex >= 0 ) {
 
-			enyo.application.accountManager.fetchAccountBalance( accts['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['linkedAccount'], linkedIndex ) } );
+			Checkbook.globals.accountManager.fetchAccountBalance( accts['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['linkedAccount'], linkedIndex ) } );
 		}
 
-		var atIndex = accts['atAccount'] >= 0 ? enyo.application.accountManager.fetchAccountIndex( accts['atAccount'] ) : - 1;
+		var atIndex = accts['atAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['atAccount'] ) : - 1;
 
 		if( atIndex >= 0 ) {
 
-			enyo.application.accountManager.fetchAccountBalance( accts['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['atAccount'], atIndex ) } );
+			Checkbook.globals.accountManager.fetchAccountBalance( accts['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['atAccount'], atIndex ) } );
 		}
 	},
 

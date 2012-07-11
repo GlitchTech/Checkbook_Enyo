@@ -131,13 +131,13 @@ enyo.kind({
 
 			if( inIndex <= 0 || row['genCat'] !== this.categories[inIndex - 1]['genCat'] ) {
 
-				this.$['general'].setShowing( true );
+				this.$['general'].show();
 				this.$['general'].setCaption( row['genCat'] );
 
 				this.$['general'].parent.addClass( "categoryRow" );
 			} else {
 
-				this.$['general'].setShowing( false );
+				this.$['general'].hide();
 
 				this.$['general'].parent.removeClass( "categoryRow" );
 			}
@@ -158,7 +158,7 @@ enyo.kind({
 
 		if( !this.categories[index] ) {
 
-			enyo.application.transactionCategoryManager.fetchCategories(
+			Checkbook.globals.transactionCategoryManager.fetchCategories(
 					{
 						"onSuccess": enyo.bind( this, this.dataResponse, index )
 					},
@@ -212,7 +212,7 @@ enyo.kind({
 
 		if( row ) {
 
-			enyo.application.transactionCategoryManager.deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, "delete" ) } );
+			Checkbook.globals.transactionCategoryManager.deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, "delete" ) } );
 		}
 	},
 

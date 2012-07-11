@@ -12,7 +12,7 @@
 }
 
 /* on small devices, make each panel fit to the app width */
-@media all and (max-width: 800px) {
+@media all and ( max-width: 800px ) {
 	.app-panels > * {
 		min-width: 100%;
 	}

@@ -7,7 +7,7 @@
  *
  * @requires webOS enyo
  * @requires Prototype JS
- * @requires GTS.database to exist in enyo.application.gts_db
+ * @requires GTS.database to exist in Checkbook.globals.gts_db
  * @requires Checkbook.encrypt
  */
 enyo.kind({
@@ -53,7 +53,7 @@ enyo.kind({
 		this.inherited( arguments );
 
 		//Create DB Object if not build.
-		if( !enyo.application.gts_db ) {
+		if( !Checkbook.globals.gts_db ) {
 
 			this.log( "creating database object." );
 
@@ -113,15 +113,15 @@ enyo.kind({
 			data['lockedCode'] = code;
 		}
 
-		var queries = [ enyo.application.gts_db.getInsert( "accounts", data ) ];
+		var queries = [ Checkbook.globals.gts_db.getInsert( "accounts", data ) ];
 
 		if( data['defaultAccount'] === 1 ) {
 			//Set all other accounts as non-defaults. Use unshift to call before insert.
 
-			queries.unshift( enyo.application.gts_db.getUpdate( "accounts", { "defaultAccount": 0 }, { "0": "0" } ) );
+			queries.unshift( Checkbook.globals.gts_db.getUpdate( "accounts", { "defaultAccount": 0 }, { "0": "0" } ) );
 		}
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				queries,
 				this._prepareModOptions( options )
 			);
@@ -175,15 +175,15 @@ enyo.kind({
 			data['lockedCode'] = code;
 		}//else don"t change things
 
-		var queries = [ enyo.application.gts_db.getUpdate( "accounts", data, { "acctId": acctId } ) ];
+		var queries = [ Checkbook.globals.gts_db.getUpdate( "accounts", data, { "acctId": acctId } ) ];
 
 		if( data['defaultAccount'] === 1 ) {
 			//Set all other accounts as non-defaults. Use unshift to call before update.
 
-			queries.unshift( enyo.application.gts_db.getUpdate( "accounts", { "defaultAccount": 0 } ) );
+			queries.unshift( Checkbook.globals.gts_db.getUpdate( "accounts", { "defaultAccount": 0 } ) );
 		}
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				queries,
 				this._prepareModOptions( options )
 			);
@@ -202,8 +202,8 @@ enyo.kind({
 	 */
 	updateAccountBalView: function( acctId, bal_view, options ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getUpdate(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getUpdate(
 						"accounts",
 						{
 							"bal_view": bal_view
@@ -229,8 +229,8 @@ enyo.kind({
 	 */
 	updateAccountSorting: function( acctId, sort, options ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getUpdate(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getUpdate(
 						"accounts",
 						{
 							"sort": sort
@@ -258,16 +258,16 @@ enyo.kind({
 	deleteAccount: function( acctId, options ) {
 
 		var queries = [
-				enyo.application.gts_db.getDelete( "transactions", { "account": acctId } ),
-				enyo.application.gts_db.getDelete( "repeats", { "rep_acctId": acctId } ),
+				Checkbook.globals.gts_db.getDelete( "transactions", { "account": acctId } ),
+				Checkbook.globals.gts_db.getDelete( "repeats", { "rep_acctId": acctId } ),
 
-				enyo.application.gts_db.getUpdate( "transactions", { "linkedAccount": "", "linkedRecord": "" }, { "linkedAccount": acctId } ),
-				enyo.application.gts_db.getUpdate( "repeats", { "rep_linkedAcctId": "" }, { "rep_linkedAcctId": acctId } ),
+				Checkbook.globals.gts_db.getUpdate( "transactions", { "linkedAccount": "", "linkedRecord": "" }, { "linkedAccount": acctId } ),
+				Checkbook.globals.gts_db.getUpdate( "repeats", { "rep_linkedAcctId": "" }, { "rep_linkedAcctId": acctId } ),
 
-				enyo.application.gts_db.getDelete( "accounts", { "acctId": acctId } )
+				Checkbook.globals.gts_db.getDelete( "accounts", { "acctId": acctId } )
 			];
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				queries,
 				this._prepareModOptions( options )
 			);
@@ -286,8 +286,8 @@ enyo.kind({
 	updateDefaultAccount: function( acctId, options ) {
 
 		var queries = [
-				enyo.application.gts_db.getUpdate( "accounts", { "defaultAccount": 0 }, null ),
-				enyo.application.gts_db.getUpdate( "accounts", { "defaultAccount": 1 }, { "acctId": acctId } )
+				Checkbook.globals.gts_db.getUpdate( "accounts", { "defaultAccount": 0 }, null ),
+				Checkbook.globals.gts_db.getUpdate( "accounts", { "defaultAccount": 1 }, { "acctId": acctId } )
 			];
 
 		var index = this.fetchAccountIndex( acctId );
@@ -299,7 +299,7 @@ enyo.kind({
 			this.updateAccountModTime();
 		}
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				queries,
 				options
 			);
@@ -459,7 +459,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryAccountBalance,
 				{
 					"onSuccess": function( results ) {
@@ -599,7 +599,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryAccounts,
 				{
 					"onSuccess": enyo.bind( this, this.fetchOverallBalancesHandler, options['onSuccess'] ),
@@ -696,7 +696,7 @@ enyo.kind({
 							"IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS balance2 " +
 
 						"FROM accounts " +
-						"ORDER BY " + accountSortOptions[enyo.application.checkbookPrefs['custom_sort']]['query'] +
+						"ORDER BY " + accountSortOptions[Checkbook.globals.prefs['custom_sort']]['query'] +
 						" LIMIT ? OFFSET ?"
 					,
 					"values": [
@@ -710,7 +710,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryAccounts,
 				{
 					"onSuccess": enyo.bind( this, this._buildAccountObjectsHandler, onError, limit, offset ),
@@ -764,7 +764,7 @@ enyo.kind({
 
 				if( enyo.isFunction( obj['func'] ) ) {
 
-					enyo.nextTick(
+					enyo.asyncMethod(
 							null,
 							obj['func']
 						);
@@ -894,10 +894,10 @@ enyo.kind({
 
 		enyo.error( 'Account Control Error: ' + Object.toJSON( arguments ) );
 
-		if( enyo.application.criticalError ) {
+		if( Checkbook.globals.criticalError ) {
 			//Popup alert of error
 
-			enyo.application.criticalError.load( null, 'Account Control Error: ' + Object.toJSON( arguments ), null );
+			Checkbook.globals.criticalError.load( null, 'Account Control Error: ' + Object.toJSON( arguments ), null );
 			//Check preferances & notify GTS if required.
 		}
 	}

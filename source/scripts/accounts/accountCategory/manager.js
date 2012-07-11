@@ -4,7 +4,7 @@
  * Checkbook.accountCategory.manager ( Component )
  *
  * Control system for managing account categories. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in enyo.application.gts_db
+ *	Requires GTS.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind({
 
@@ -16,7 +16,7 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		if( !enyo.application.gts_db ) {
+		if( !Checkbook.globals.gts_db ) {
 
 			this.log( "creating database object." );
 
@@ -38,8 +38,8 @@ enyo.kind({
 	fetchCategories: function( options, limit, offset ) {
 
 		//rowid, name, catOrder, icon, color, view_status
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect( "accountCategories", [ "rowid", "*" ], null, [ "catOrder", "name COLLATE NOCASE" ], limit, offset ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "accountCategories", [ "rowid", "*" ], null, [ "catOrder", "name COLLATE NOCASE" ], limit, offset ),
 				options
 			);
 	},
@@ -58,7 +58,7 @@ enyo.kind({
 	fetchMatchingCount: function( name, id, options ) {
 
 		//rowid, name, catOrder, icon, color, view_status
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
 							"sql": "SELECT COUNT( name ) AS nameCount FROM accountCategories WHERE name LIKE ? AND rowid != ?;",
@@ -95,8 +95,8 @@ enyo.kind({
 	 */
 	createCategory: function( data, options ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getInsert( "accountCategories", data ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getInsert( "accountCategories", data ),
 				{
 					"onSuccess": enyo.bind( this, this.createCategoryFollower, options ),
 					"onError": options['onError']
@@ -110,13 +110,13 @@ enyo.kind({
 	 */
 	createCategoryFollower: function( options ) {
 
-		enyo.application.accountManager.updateAccountModTime();
+		Checkbook.globals.accountManager.updateAccountModTime();
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
 							'sql': "UPDATE accountCategories SET catOrder = ( SELECT IFNULL( MAX( catOrder ) + 1, 0 ) FROM accountCategories LIMIT 1 ) WHERE rowid = ?;",
-							'values': [ enyo.application.gts_db.lastInsertRowId ]
+							'values': [ Checkbook.globals.gts_db.lastInsertRowId ]
 						}
 				),
 				options
@@ -137,14 +137,14 @@ enyo.kind({
 	 */
 	editCategory: function( id, name, icon, color, oldName, options ) {
 
-		enyo.application.accountManager.updateAccountModTime();
+		Checkbook.globals.accountManager.updateAccountModTime();
 
 		var qryCategories = [
-				enyo.application.gts_db.getUpdate( "accountCategories", { "name": name, "icon": icon, "color": color }, { "rowid": id } ),
-				enyo.application.gts_db.getUpdate( "accounts", { "acctCategory": name }, { "acctCategory": oldName } ),
+				Checkbook.globals.gts_db.getUpdate( "accountCategories", { "name": name, "icon": icon, "color": color }, { "rowid": id } ),
+				Checkbook.globals.gts_db.getUpdate( "accounts", { "acctCategory": name }, { "acctCategory": oldName } ),
 			];
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				qryCategories,
 				options
 			);
@@ -160,10 +160,10 @@ enyo.kind({
 	 */
 	deleteCategory: function( id, name, options ) {
 
-		enyo.application.accountManager.updateAccountModTime();
+		Checkbook.globals.accountManager.updateAccountModTime();
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getDelete( "accountCategories", { "rowid": id, "name": name } ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getDelete( "accountCategories", { "rowid": id, "name": name } ),
 				options
 			);
 	},
@@ -181,14 +181,14 @@ enyo.kind({
 	 */
 	reorderCategories: function( inCats, options ) {
 
-		enyo.application.accountManager.updateAccountModTime();
+		Checkbook.globals.accountManager.updateAccountModTime();
 
 		var qryOrder = [];
 
 		for( var i = 0; i < inCats.length; i++ ) {
 
 			qryOrder.push(
-					enyo.application.gts_db.getUpdate(
+					Checkbook.globals.gts_db.getUpdate(
 							"accountCategories",
 							{ "catOrder": i },
 							{ "rowid": inCats[i]['rowid'] }
@@ -196,6 +196,6 @@ enyo.kind({
 				);
 		}
 
-		enyo.application.gts_db.queries( qryOrder, options );
+		Checkbook.globals.gts_db.queries( qryOrder, options );
 	}
 });

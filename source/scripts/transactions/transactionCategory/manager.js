@@ -4,7 +4,7 @@
  * Checkbook.transactionCategory.manager ( Component )
  *
  * Control system for managing transaction categories. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in enyo.application.gts_db
+ *	Requires GTS.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind({
 
@@ -18,7 +18,7 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		if( !enyo.application.gts_db ) {
+		if( !Checkbook.globals.gts_db ) {
 
 			this.log( "creating database object." );
 
@@ -39,8 +39,8 @@ enyo.kind({
 	 */
 	fetchCategories: function( options, limit, offset ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect( "transactionCategories", [ "*" ], null, [ "genCat COLLATE NOCASE", "specCat COLLATE NOCASE" ], limit, offset ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "transactionCategories", [ "*" ], null, [ "genCat COLLATE NOCASE", "specCat COLLATE NOCASE" ], limit, offset ),
 				options
 			);
 	},
@@ -141,7 +141,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryCategories,
 				options
 			);
@@ -186,7 +186,7 @@ enyo.kind({
 				)
 			];
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				qryCategories,
 				options
 			);
@@ -228,7 +228,7 @@ enyo.kind({
 				)
 			];
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				qryCategories,
 				options
 			);
@@ -255,7 +255,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryCategories,
 				options
 			);

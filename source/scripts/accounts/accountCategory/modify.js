@@ -189,12 +189,12 @@ enyo.kind({
 
 		this.$['colorHolder'].addClass( this.color );
 
-		if( enyo.application.checkbookPrefs['dispColor'] === 1 ) {
+		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
 
-			this.$['colorHolder'].setShowing( true );
+			this.$['colorHolder'].show();
 		} else {
 
-			this.$['colorHolder'].setShowing( false );
+			this.$['colorHolder'].hide();
 		}
 	},
 
@@ -221,7 +221,7 @@ enyo.kind({
 		if( newName.length <= 0 ) {
 
 			this.$['errorMessage'].setContent( "Category name may not be blank." );
-			this.$['errorMessageContainer'].setShowing( true );
+			this.$['errorMessageContainer'].show();
 			return;
 		}
 
@@ -233,11 +233,11 @@ enyo.kind({
 		if( count > 0 ) {
 
 			this.$['errorMessage'].setContent( "Category names must be unique." );
-			this.$['errorMessageContainer'].setShowing( true );
+			this.$['errorMessageContainer'].show();
 			return;
 		}
 
-		this.$['errorMessageContainer'].setShowing( false );
+		this.$['errorMessageContainer'].hide();
 
 		if( this.rowid < 0 ) {
 

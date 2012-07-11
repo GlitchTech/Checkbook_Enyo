@@ -249,7 +249,7 @@ enyo.kind( {
 
 			this.errorCount++;
 
-			this.$['errorMessageContainer'].setShowing( true );
+			this.$['errorMessageContainer'].show();
 			this.$['errorMessage'].setContent( "Invalid PIN." ) + "<br />" + this.errorCount + $L( " out of 5 attempts used." );
 			this.$['pin'].setValue( "" )
 

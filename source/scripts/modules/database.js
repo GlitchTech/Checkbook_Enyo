@@ -882,18 +882,18 @@ enyo.kind({
 
 		enyo.error( errorMessage );
 
-		if( enyo.application.criticalError ) {
+		if( Checkbook.globals.criticalError ) {
 			//Popup alert of error
 
 			if( enyo.isString( error.message ) && error.message.toLowerCase().match( "read only database" ) ) {
 
-				enyo.application.criticalError.load( null, "Warning! Your database has become read only. " + enyo.fetchAppInfo()['title'] + " is unable to modify it in any way. Consult your operating system user's manual on how to remove the read only status from a file. For additional help, please <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " - read only issue'>contact " + enyo.fetchAppInfo()['vendor'] + "</a>.", null );
+				Checkbook.globals.criticalError.load( null, "Warning! Your database has become read only. " + enyo.fetchAppInfo()['title'] + " is unable to modify it in any way. Consult your operating system user's manual on how to remove the read only status from a file. For additional help, please <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " - read only issue'>contact " + enyo.fetchAppInfo()['vendor'] + "</a>.", null );
 			} else if( enyo.isString( error.message ) && error.message.toLowerCase().match( "disk i/o error" ) ) {
 
-				enyo.application.criticalError.load( null, "Warning! Your database has become locked. Please restart " + enyo.fetchAppInfo()['title'] + ". This usually occurs if " + enyo.fetchAppInfo()['title'] + " is running while your device was put in USB mode. For additional help, please <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " - disk i/o issue'>contact " + enyo.fetchAppInfo()['vendor'] + "</a>.", null );
+				Checkbook.globals.criticalError.load( null, "Warning! Your database has become locked. Please restart " + enyo.fetchAppInfo()['title'] + ". This usually occurs if " + enyo.fetchAppInfo()['title'] + " is running while your device was put in USB mode. For additional help, please <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " - disk i/o issue'>contact " + enyo.fetchAppInfo()['vendor'] + "</a>.", null );
 			} else {
 
-				enyo.application.criticalError.load( null, errorMessage, null );
+				Checkbook.globals.criticalError.load( null, errorMessage, null );
 			}
 		}
 	},

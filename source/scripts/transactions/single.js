@@ -276,7 +276,7 @@ enyo.kind( {
 
 		if( count <= 5 ) {
 
-			enyo.application.accountManager.fetchAccount( this.account['acctId'], { "onSuccess": enyo.bind( this, this.loadAccount, finishRender ) } );
+			Checkbook.globals.accountManager.fetchAccount( this.account['acctId'], { "onSuccess": enyo.bind( this, this.loadAccount, finishRender ) } );
 		} else {
 
 			this.renderDisplay( finishRender );
@@ -293,16 +293,16 @@ enyo.kind( {
 
 		if( this.account['frozen'] === 1 ) {
 
-			this.$['btnEdit'].setShowing( false );
-			this.$['btnDelete'].setShowing( false );
+			this.$['btnEdit'].hide();
+			this.$['btnDelete'].hide();
 		} else {
 
-			this.$['btnEdit'].setShowing( true );
-			this.$['btnDelete'].setShowing( true );
+			this.$['btnEdit'].show();
+			this.$['btnDelete'].show();
 		}
 
 		//Description
-		this.$['desc'].addRemoveClass( "custom-background legend " + this.account['acctCategoryColor'], ( enyo.application.checkbookPrefs['dispColor'] === 1 ) );
+		this.$['desc'].addRemoveClass( "custom-background legend " + this.account['acctCategoryColor'], ( Checkbook.globals.prefs['dispColor'] === 1 ) );
 		this.$['desc'].setContent( this.transaction['desc'] );
 
 		//Amount
@@ -322,24 +322,24 @@ enyo.kind( {
 
 		if( this.transactionType === "transfer" ) {
 
-			this.$['fromAccountHolder'].setShowing( true );
-			this.$['toAccountHolder'].setShowing( true );
+			this.$['fromAccountHolder'].show();
+			this.$['toAccountHolder'].show();
 
 			if( this.transaction['amount'] < 0 ) {
 				//from here
 
 				this._binds['renderFromAccount']( this.account );
-				enyo.application.accountManager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderToAccount'] } );
+				Checkbook.globals.accountManager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderToAccount'] } );
 			} else {
 				//to here
 
-				enyo.application.accountManager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderFromAccount'] } );
+				Checkbook.globals.accountManager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderFromAccount'] } );
 				this._binds['renderToAccount']( this.account );
 			}
 		} else {
 
-			this.$['fromAccountHolder'].setShowing( false );
-			this.$['toAccountHolder'].setShowing( false );
+			this.$['fromAccountHolder'].hide();
+			this.$['toAccountHolder'].hide();
 		}
 
 		//Date
@@ -349,21 +349,21 @@ enyo.kind( {
 		//Categories
 		if( this.account['enableCategories'] === 1 ) {
 
-			this.$['categoryHolder'].setShowing( true );
-			this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( this.transaction['category'], this.transaction['category2'], false, "" ) );
+			this.$['categoryHolder'].show();
+			this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( this.transaction['category'], this.transaction['category2'], false, "" ) );
 		} else {
 
-			this.$['categoryHolder'].setShowing( false );
+			this.$['categoryHolder'].hide();
 		}
 
 		//Check Number
 		if( this.account['checkField'] === 1 && this.transaction['checkNum'] && this.transaction['checkNum'] !== "" ) {
 
-			this.$['checkNumHolder'].setShowing( true );
+			this.$['checkNumHolder'].show();
 			this.$['checkNum'].setContent( "#" + this.transaction['checkNum'] );
 		} else {
 
-			this.$['checkNumHolder'].setShowing( false );
+			this.$['checkNumHolder'].hide();
 			this.$['checkNum'].setContent( "" );
 		}
 
@@ -373,11 +373,11 @@ enyo.kind( {
 		//Note
 		if( this.transaction['note'] != "" ) {
 
-			this.$['noteHolder'].setShowing( true );
+			this.$['noteHolder'].show();
 			this.$['note'].setContent( this.transaction['note'] );
 		} else {
 
-			this.$['noteHolder'].setShowing( false );
+			this.$['noteHolder'].hide();
 		}
 
 		//Show once content is updated
@@ -389,7 +389,7 @@ enyo.kind( {
 		this.$['fromAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['fromAccount'].setContent( acct['acctName'] );
 
-		if( enyo.application.checkbookPrefs['dispColor'] === 1 ) {
+		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
 
 			this.$['fromAccountHolder'].addClass( acct['acctCategoryColor'] );
 		} else {
@@ -403,7 +403,7 @@ enyo.kind( {
 		this.$['toAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['toAccount'].setContent( acct['acctName'] );
 
-		if( enyo.application.checkbookPrefs['dispColor'] === 1 ) {
+		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
 
 			this.$['toAccountHolder'].addClass( acct['acctCategoryColor'] );
 		} else {
@@ -438,7 +438,7 @@ enyo.kind( {
 	editClicked: function() {
 
 		this.doEdit( this.index );
-		enyo.nextTick( this, this.close );
+		enyo.asyncMethod( this, this.close );
 	},
 
 	deleteClicked: function() {
@@ -471,6 +471,6 @@ enyo.kind( {
 
 		this.deleteTransactionConfirmClose();
 		this.doDelete( this.index );
-		enyo.nextTick( this, this.close );
+		enyo.asyncMethod( this, this.close );
 	}
 });

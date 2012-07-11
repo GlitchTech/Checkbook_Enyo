@@ -10,7 +10,7 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		if( !enyo.application.gts_db ) {
+		if( !Checkbook.globals.gts_db ) {
 
 			this.log( "creating database object." );
 
@@ -32,8 +32,8 @@ enyo.kind({
 	 */
 	createBudget: function( data, options ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getInsert( "budgets", data ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getInsert( "budgets", data ),
 				{
 					"onSuccess": enyo.bind( this, this.createBudgetFollower, options )
 				}
@@ -45,11 +45,11 @@ enyo.kind({
 
 		console.log( arguments );
 
-		var id = enyo.application.gts_db.lastInsertID();
+		var id = Checkbook.globals.gts_db.lastInsertID();
 
 		if( id ) {
 
-			enyo.application.gts_db.query(
+			Checkbook.globals.gts_db.query(
 					new GTS.databaseQuery( {
 							sql: "UPDATE budgets SET budgetOrder = ( SELECT IFNULL( MAX( budgetOrder ) + 1, 0 ) FROM budgets LIMIT 1 ) WHERE budgetId = ?;",
 							values: [ id ]
@@ -77,8 +77,8 @@ enyo.kind({
 	 */
 	updateBudget: function( data, options ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getUpdate( "budgets", data, { "budgetId": data['budgetId'] } ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getUpdate( "budgets", data, { "budgetId": data['budgetId'] } ),
 				options
 			);
 	},
@@ -95,8 +95,8 @@ enyo.kind({
 	 */
 	deleteBudget: function( budgetId, options ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getDelete(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getDelete(
 						"budgets",
 						{
 							"budgetId": budgetId
@@ -142,7 +142,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryTransaction,
 				{
 					"onSuccess": function( results ) {
@@ -196,7 +196,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryTransaction,
 				{
 					"onSuccess": function( results ) {
@@ -234,7 +234,7 @@ enyo.kind({
 		limit = ( Object.validNumber( limit ) ? limit : 100 );
 		offset = ( Object.validNumber( offset ) ? offset : 0 );
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 					{
 						"sql": "SELECT *, " +

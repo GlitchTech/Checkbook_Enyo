@@ -4,7 +4,7 @@
  * Checkbook.transactions.manager ( Component )
  *
  * Control system for managing transactions. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in enyo.application.gts_db
+ *	Requires GTS.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind({
 
@@ -22,7 +22,7 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		if( !enyo.application.gts_db ) {
+		if( !Checkbook.globals.gts_db ) {
 
 			this.log( "creating database object." );
 
@@ -43,7 +43,7 @@ enyo.kind({
 	 */
 	createTransaction: function( data, type, options ) {
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
 							'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
@@ -66,7 +66,7 @@ enyo.kind({
 		data['itemId'] = parseInt( results[0]['maxItemId'] ) + 1;
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				this.generateInsertTransactionSQL( data, type ),
 				{
 					"onSuccess": function() {
@@ -112,7 +112,7 @@ enyo.kind({
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );
 
-		sql.push( enyo.application.gts_db.getInsert( "transactions", data ) );
+		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", data ) );
 
 		if( Object.validNumber( data['linkedRecord'] ) && data['linkedRecord'] >= 0 ) {
 			//Set up Linked Transaction
@@ -123,7 +123,7 @@ enyo.kind({
 			Object.swap( linkedData, 'linkedAccount', 'account' );
 			linkedData['amount'] = -linkedData['amount'];
 
-			sql.push( enyo.application.gts_db.getInsert( "transactions", linkedData ) );
+			sql.push( Checkbook.globals.gts_db.getInsert( "transactions", linkedData ) );
 		}
 
 		if( autoTransfer > 0 && autoTransferLink >= 0 ) {
@@ -199,14 +199,14 @@ enyo.kind({
 
 		var sql = [];
 
-		sql.push( enyo.application.gts_db.getInsert( "transactions", atData ) );
+		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", atData ) );
 
 		//Build linked auto transaction
 		Object.swap( atData, 'linkedRecord', 'itemId' );
 		Object.swap( atData, 'linkedAccount', 'account' );
 		atData['amount'] = -atData['amount'];
 
-		sql.push( enyo.application.gts_db.getInsert( "transactions", atData ) );
+		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", atData ) );
 
 		return sql;
 	},
@@ -226,7 +226,7 @@ enyo.kind({
 	updateTransaction: function( data, type, options ) {
 		//TODO need a param after options for dealing with series transactions
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
 							'sql': "SELECT ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
@@ -271,7 +271,7 @@ enyo.kind({
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );
 
-		sql.push( enyo.application.gts_db.getUpdate( "transactions", data, { "itemId": data['itemId'] } ) );
+		sql.push( Checkbook.globals.gts_db.getUpdate( "transactions", data, { "itemId": data['itemId'] } ) );
 
 		if( Object.validNumber( data['linkedRecord'] ) ) {
 			//Transfer Controls
@@ -285,10 +285,10 @@ enyo.kind({
 
 			delete linkedData['cleared'];
 
-			sql.push( enyo.application.gts_db.getUpdate( "transactions", linkedData, { "itemId": linkedData['itemId'] } ) );
+			sql.push( Checkbook.globals.gts_db.getUpdate( "transactions", linkedData, { "itemId": linkedData['itemId'] } ) );
 		}
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				sql,
 				{
 					"onSuccess": function() {
@@ -401,7 +401,7 @@ enyo.kind({
 				if( !data['linkedRecord'] || isNaN( data['linkedRecord'] ) ) {
 
 					sqlArray.push(
-							enyo.application.gts_db.getInsert(
+							Checkbook.globals.gts_db.getInsert(
 									"transactionSplit",
 									{
 										"genCat": data['category'][i]['category'],
@@ -415,7 +415,7 @@ enyo.kind({
 					//amount is neg in source for linked transactions
 
 					sqlArray.push(
-							enyo.application.gts_db.getInsert(
+							Checkbook.globals.gts_db.getInsert(
 									"transactionSplit",
 									{
 										"genCat": data['category'][i]['category'],
@@ -427,7 +427,7 @@ enyo.kind({
 						);
 
 					sqlArray.push(
-							enyo.application.gts_db.getInsert(
+							Checkbook.globals.gts_db.getInsert(
 									"transactionSplit",
 									{
 										"genCat": data['category'][i]['category'],
@@ -521,14 +521,14 @@ enyo.kind({
 				delete repeatInsert['autoTransfer'];
 				delete repeatInsert['autoTransferLink'];
 
-				sqlArray.unshift( enyo.application.gts_db.getInsert( "repeats", repeatInsert ) );
+				sqlArray.unshift( Checkbook.globals.gts_db.getInsert( "repeats", repeatInsert ) );
 			} else if( data['repeatUnlinked'] != 1 ) {
 				//If transaction is not 'unlinked' from repeating series
 
 				if( data['rObj']['pattern'] == "none" ) {
 					//Delete repeating entry
 
-					sqlArray.push( enyo.application.gts_db.getDelete( "repeats", { "repeatId": data['repeatId'] } ) );
+					sqlArray.push( Checkbook.globals.gts_db.getDelete( "repeats", { "repeatId": data['repeatId'] } ) );
 
 					//Delete future (after curr date) transactions with repeat id except for this one
 					var endOfDay = new Date();
@@ -587,7 +587,7 @@ enyo.kind({
 
 		this.generateSeriesSQL( REPEAT_DATA_ARRAY );
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 					{
 						'sql': "SELECT * " +
@@ -637,7 +637,7 @@ enyo.kind({
 				{
 					"onSuccess": function( results ) {
 
-						enyo.application.gts_db.queries( this.generateSeriesSQL( results ), options );
+						Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
 					},
 					"onError": function() {
 
@@ -807,7 +807,7 @@ enyo.kind({
 
 				//update repeat item
 				sql.push(
-						enyo.application.gts_db.getUpdate(
+						Checkbook.globals.gts_db.getUpdate(
 								"repeats",
 								{
 									"lastOccurrence": Date.parse( serDate ),
@@ -836,8 +836,8 @@ enyo.kind({
 	 */
 	clearTransaction: function( trsnId, cleared, options ) {
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getUpdate(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getUpdate(
 						"transactions",
 						{
 							"cleared": ( cleared ? 1 : 0 )
@@ -861,17 +861,17 @@ enyo.kind({
 	 */
 	deleteTransaction: function( trsnId, options ) {
 
-		enyo.application.gts_db.queries(
+		Checkbook.globals.gts_db.queries(
 				[
 					//Main Transaction
-					enyo.application.gts_db.getDelete(
+					Checkbook.globals.gts_db.getDelete(
 							"transactions",
 							{
 								"itemId": trsnId
 							}
 						),
 					//Linked Transaction
-					enyo.application.gts_db.getDelete(
+					Checkbook.globals.gts_db.getDelete(
 							"transactions",
 							{
 								"linkedRecord": trsnId
@@ -926,7 +926,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryTransaction,
 				{
 					"onSuccess": function( results ) {
@@ -993,7 +993,7 @@ enyo.kind({
 			qryTransactions['values'].push( offset );
 		}
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryTransactions,
 				{
 					"onSuccess": enyo.bind(
@@ -1045,7 +1045,7 @@ enyo.kind({
 				qryBalance['sql'] = "SELECT SUM( amount ) AS balanceToDate FROM transactions WHERE account = ? AND date < ?;";
 			}
 
-			enyo.application.gts_db.query(
+			Checkbook.globals.gts_db.query(
 					qryBalance,
 					{
 						"onSuccess": function( rbResults ) {
@@ -1128,7 +1128,7 @@ enyo.kind({
 			qryTransactions['values'].push( offset );
 		}
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryTransactions,
 				options
 			);
@@ -1159,7 +1159,7 @@ enyo.kind({
 				}
 			);
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				qryTransactions,
 				{
 					"onSuccess": function( results ) {
@@ -1185,7 +1185,7 @@ enyo.kind({
 	 */
 	fetchTransactionSorting: function( options ) {
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				"SELECT * FROM acctTrsnSortOptn ORDER BY groupOrder ASC, label",
 				{
 					"onSuccess": enyo.bind( this, this.buildTransactionSorting, options )
@@ -1250,8 +1250,8 @@ enyo.kind({
 			return;
 		}
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect( "transactions", [ "MAX( checkNum ) AS maxCheckNum" ], { "account": acctId } ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "transactions", [ "MAX( checkNum ) AS maxCheckNum" ], { "account": acctId } ),
 				{
 					"onSuccess": function( results ) {
 

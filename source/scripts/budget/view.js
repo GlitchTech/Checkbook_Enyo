@@ -51,7 +51,7 @@ enyo.kind({
 					style: "margin-top: -5px;"
 				}, {
 					name: "totalProgress",
-					kind: enyo.ProgressBar,
+					kind: "onyx.ProgressBar",
 
 					className: "big",
 					style: "width: 200px; margin-left: 10px; margin-right: 10px;",
@@ -116,7 +116,7 @@ enyo.kind({
 							components: [
 								{
 									name: "progress",
-									kind: enyo.ProgressBar,
+									kind: "onyx.ProgressBar",
 
 									flex: 1,
 									className: "big",
@@ -303,7 +303,7 @@ enyo.kind({
 		this.$['totalCurrent'].setContent( formatAmount( result['spent'] ) );
 		this.$['totalMax'].setContent( formatAmount( result['spending_limit'] ) );
 
-		this.$['totalProgress'].setPosition( progress );
+		this.$['totalProgress'].animateProgressTo( progress );
 
 		this.colorize( this.$['totalProgress'], progress );
 		this.colorize( this.$['totalCurrent'], progress );
@@ -384,7 +384,7 @@ enyo.kind({
 			for( var i = 0; i < this.budgets.length; i++ ) {
 
 				qryOrder.push(
-						enyo.application.gts_db.getUpdate(
+						Checkbook.globals.gts_db.getUpdate(
 								"budgets",
 								{ "budgetOrder": i },
 								{ "budgetId": this.budgets[i]['budgetId'] }
@@ -392,7 +392,7 @@ enyo.kind({
 					);
 			}
 
-			enyo.application.gts_db.queries( qryOrder );
+			Checkbook.globals.gts_db.queries( qryOrder );
 
 			this.sort = 0;
 
@@ -411,7 +411,7 @@ enyo.kind({
 				this.$['modify'].openAtCenter( row );
 			} else {
 
-				enyo.nextTick(
+				enyo.asyncMethod(
 						this,
 						this.doSearchView,
 						null,
@@ -461,7 +461,7 @@ enyo.kind({
 			this.colorize( this.$['progress'], progress );
 			this.colorize( this.$['current'], progress );
 
-			this.$['progress'].setPosition( progress );
+			this.$['progress'].animateProgressTo( progress );
 
 			this.$['search'].setShowing( !this.$['editModeToggle'].getDepressed() );
 			this.$['config'].setShowing( this.$['editModeToggle'].getDepressed() );

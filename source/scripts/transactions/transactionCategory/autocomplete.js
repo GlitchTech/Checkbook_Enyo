@@ -61,7 +61,7 @@ enyo.kind( {
 			return;
 		}
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
 							"sql": "SELECT DISTINCT genCat FROM transactionCategories WHERE genCat LIKE ? LIMIT ?;",

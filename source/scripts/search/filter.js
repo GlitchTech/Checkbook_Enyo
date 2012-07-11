@@ -189,7 +189,7 @@ enyo.kind({
 	load: function( acctId, category, category2, dateStart, dateEnd ) {
 
 		this.$['accountDrawer'].close();
-		enyo.application.accountManager.fetchAccounts( { "onSuccess": enyo.bind( this, this.renderAccountList, acctId, category, category2, dateStart, dateEnd ) } );
+		Checkbook.globals.accountManager.fetchAccounts( { "onSuccess": enyo.bind( this, this.renderAccountList, acctId, category, category2, dateStart, dateEnd ) } );
 	},
 
 	renderAccountList: function( acctId, category, category2, dateStart, dateEnd, results ) {
@@ -308,7 +308,7 @@ enyo.kind({
 
 		if( this.acctList['items'][rowIndex]['acctLocked'] && !this.acctList['items'][rowIndex]['bypass'] ) {
 
-				enyo.application.security.authUser(
+				Checkbook.globals.security.authUser(
 						this.acctList['items'][rowIndex]['name'] + " " + "PIN Code",
 						this.acctList['items'][rowIndex]['lockedCode'],
 						{

@@ -152,7 +152,7 @@ enyo.kind({
 
 		if( transactionSortOptions.length <= 0 ) {
 
-			enyo.application.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
+			Checkbook.globals.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
 		} else {
 
 			this.buildTransactionSorting();
@@ -173,7 +173,7 @@ enyo.kind({
 			this.fetchSearchCountHandler();
 		} else {
 
-			enyo.application.transactionManager.searchTransactionsCount(
+			Checkbook.globals.transactionManager.searchTransactionsCount(
 					this.where['strings'],
 					this.where['arguments'],
 					this.sortQry,
@@ -236,7 +236,7 @@ enyo.kind({
 
 		this.log();
 
-		if( enyo.application.checkbookPrefs['transPreview'] === 1 ) {
+		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode
 
 			this.$['viewSingle'].setIndex( rowIndex );
@@ -270,7 +270,7 @@ enyo.kind({
 
 		this.transactions[rowIndex]['cleared'] = this.transactions[rowIndex]['cleared'] === 1 ? 0 : 1;
 
-		enyo.application.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], ( this.transactions[rowIndex]['cleared'] === 1 ) );
+		Checkbook.globals.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], ( this.transactions[rowIndex]['cleared'] === 1 ) );
 
 		this.$['entries'].refresh();
 
@@ -304,7 +304,7 @@ enyo.kind({
 					repeatId: row['repeatId']
 				};
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.doModify,
 					{
@@ -329,7 +329,7 @@ enyo.kind({
 			this.transactions = [];
 			this.$['entries'].punt();
 /*
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.scrollTo,
 					rowIndex
@@ -345,7 +345,7 @@ enyo.kind({
 			this.resultCount--;
 			this.doResultsFound( this.resultCount );
 /*
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.scrollTo,
 					( rowIndex - 1 )
@@ -365,7 +365,7 @@ enyo.kind({
 		this.doLoading( true );
 
 		//update database;
-		enyo.application.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
 
 		//update list
 		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
@@ -375,7 +375,7 @@ enyo.kind({
 		this.doResultsFound( this.resultCount );
 
 		//Fetch row to fix dynamic fetch
-		enyo.application.transactionManager.searchTransactions(
+		Checkbook.globals.transactionManager.searchTransactions(
 				this.where['strings'],
 				this.where['arguments'],
 				this.sortQry,
@@ -431,11 +431,11 @@ enyo.kind({
 			//Handle split transactions
 			if( row['enableCategories'] === 1 ) {
 
-				this.$['category'].setShowing( true );
-				this.$['category'].setContent( enyo.application.transactionManager.formatCategoryDisplay( row['category'], row['category2'] ) );
+				this.$['category'].show();
+				this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( row['category'], row['category2'] ) );
 			} else {
 
-				this.$['category'].setShowing( false );
+				this.$['category'].hide();
 			}
 
 			//Check Number
@@ -472,7 +472,7 @@ enyo.kind({
 
 			this.doLoading( true );
 
-			enyo.application.transactionManager.searchTransactions(
+			Checkbook.globals.transactionManager.searchTransactions(
 					this.where['strings'],
 					this.where['arguments'],
 					this.sortQry,

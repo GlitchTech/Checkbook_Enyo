@@ -89,7 +89,7 @@ enyo.kind({
 
 	resultCount: function( inSender, count ) {
 
-		this.$['resultCount'].setShowing( true );
+		this.$['resultCount'].show();
 		this.$['resultCount'].setContent( count + " transactions" );
 	},
 

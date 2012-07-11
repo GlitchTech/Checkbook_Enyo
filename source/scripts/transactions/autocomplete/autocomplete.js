@@ -61,7 +61,7 @@ enyo.kind( {
 			return;
 		}
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
 							"sql": "SELECT " +
@@ -117,7 +117,7 @@ enyo.kind( {
 
 	rowClicked: function( inSender, inEvent, rowIndex ) {
 
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
 							"sql": "SELECT " +
@@ -149,7 +149,7 @@ enyo.kind( {
 		var data = {
 				"desc": desc,
 				"linkedAccount": results[0]['linkedAccount'],
-				"category": enyo.application.transactionManager.parseCategoryDB( results[0]['category'].dirtyString(), results[0]['category2'].dirtyString() )
+				"category": Checkbook.globals.transactionManager.parseCategoryDB( results[0]['category'].dirtyString(), results[0]['category2'].dirtyString() )
 			};
 
 		this.doSelect( data );

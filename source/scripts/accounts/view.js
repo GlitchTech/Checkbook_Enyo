@@ -171,7 +171,7 @@ enyo.kind( {
 	accountBalanceForceUpdate: function() {
 
 		//build balance object
-		enyo.application.accountManager.fetchOverallBalances( {
+		Checkbook.globals.accountManager.fetchOverallBalances( {
 				"onSuccess": enyo.bind( this, this.buildBalanceButton, enyo.bind( this, this.renderBalanceButton ) )
 			});
 	},
@@ -214,15 +214,15 @@ enyo.kind( {
 		} else if( inSender.menuParent.toLowerCase() === "accountsortoptions" ) {
 			//Sort Menu
 
-			if( enyo.application.checkbookPrefs['custom_sort'] === inSender.value ) {
+			if( Checkbook.globals.prefs['custom_sort'] === inSender.value ) {
 				//No change, abort
 				return;
 			}
 
-			enyo.application.checkbookPrefs['custom_sort'] = inSender.value;
+			Checkbook.globals.prefs['custom_sort'] = inSender.value;
 
-			enyo.application.gts_db.query(
-					new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ enyo.application.checkbookPrefs['custom_sort'] ] } ),
+			Checkbook.globals.gts_db.query(
+					new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
 					{
 						"onSuccess": enyo.bind( this, this.renderAccountList )
 					}
@@ -304,7 +304,7 @@ enyo.kind( {
 	/** Footer Control **/
 	showSort: function( inSender ) {
 
-		this.$['sortMenu'].openAtControl( inSender, enyo.application.checkbookPrefs['custom_sort'] );
+		this.$['sortMenu'].openAtControl( inSender, Checkbook.globals.prefs['custom_sort'] );
 	},
 
 	addAccount: function() {
@@ -314,7 +314,7 @@ enyo.kind( {
 
 			this.$['addAccountButton'].setDisabled( true );
 
-			enyo.nextTick(
+			enyo.asyncMethod(
 					this,
 					this.doModify,
 					{

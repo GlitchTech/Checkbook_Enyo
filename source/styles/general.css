@@ -1,3 +1,4 @@
+/* Text Size */
 .big {
 	font-size: 110%;
 }
@@ -10,14 +11,6 @@
 	font-size: 140%;
 }
 
-.bold {
-	font-weight: bold;
-}
-
-.medium-margin-bottom {
-	margin-bottom: 0.5em;
-}
-
 .small {
 	font-size: 90%;
 }
@@ -28,6 +21,82 @@
 
 .smallest {
 	font-size: 60%;
+}
+
+/* Text Alignment */
+
+.text-left {
+	text-align: left;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.text-right {
+	text-align: right;
+}
+
+/* Spacing */
+
+.padding-std {
+	padding: 0.5em;
+}
+
+.half-padding-std {
+	padding: .25em;
+}
+
+.margin-top {
+	margin-top: 1em;
+}
+
+.margin-half-top {
+	margin-top: 0.5em;
+}
+
+.margin-bottom {
+	margin-bottom: 1em;
+}
+
+.margin-half-bottom {
+	margin-bottom: 0.5em;
+}
+
+.margin-left {
+	margin-left: 1em;
+}
+
+.margin-half-left {
+	margin-left: 0.5em;
+}
+
+.margin-right {
+	margin-right: 1em;
+}
+
+.margin-half-right {
+	margin-right: 0.5em;
+}
+
+.margin-top-bottom {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.margin-left-right {
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+
+/*****************/
+
+.bold {
+	font-weight: bold;
+}
+
+.half-margin-bottom {
+	margin-bottom: 0.5em;
 }
 
 .small-row-padding {
@@ -60,6 +129,13 @@
 	color: #333333;
 
 	border-radius: 5px;
+}
+
+/*****************/
+
+.onyx-toolbar.simple {
+	background: transparent;
+	border-width: 0;
 }
 
 /*****************/

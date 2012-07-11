@@ -329,9 +329,9 @@ enyo.kind({
 		this.log();
 
 		this.$['instructionsButton'].setDisabled( false );
-		this.$['instructionsBar'].setShowing( true );
-		this.$['credentialsBar'].setShowing( false );
-		this.$['sheetListBar'].setShowing( false );
+		this.$['instructionsBar'].show();
+		this.$['credentialsBar'].hide();
+		this.$['sheetListBar'].hide();
 
 		this.$['instructions'].show();
 		this.$['credentials'].hide();
@@ -340,7 +340,7 @@ enyo.kind({
 		this.resized();
 
 		//check for pre-existing g-data log in
-		enyo.application.gts_db.query(
+		Checkbook.globals.gts_db.query(
 				"SELECT saveGSheetsData, gSheetUser, gSheetPass FROM prefs LIMIT 1;",
 				{
 					"onSuccess": enyo.bind( this, this.fetchUserGData )
@@ -384,9 +384,9 @@ enyo.kind({
 
 		this.$['instructionsButton'].setDisabled( true );
 		this.$['credentialsButton'].setDisabled( false );
-		this.$['instructionsBar'].setShowing( false );
-		this.$['credentialsBar'].setShowing( true );
-		this.$['sheetListBar'].setShowing( false );
+		this.$['instructionsBar'].hide();
+		this.$['credentialsBar'].show();
+		this.$['sheetListBar'].hide();
 
 		this.$['instructions'].hide();
 		this.$['credentials'].show();
@@ -500,8 +500,8 @@ enyo.kind({
 					};
 		}
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getUpdate(
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getUpdate(
 					"prefs",
 					updateObj,
 					{}
@@ -532,9 +532,9 @@ enyo.kind({
 			this.$['spreadsheetList'].render();
 
 			this.$['sheetListButton'].setDisabled( false );
-			this.$['instructionsBar'].setShowing( false );
-			this.$['credentialsBar'].setShowing( false );
-			this.$['sheetListBar'].setShowing( true );
+			this.$['instructionsBar'].hide();
+			this.$['credentialsBar'].hide();
+			this.$['sheetListBar'].show();
 
 			this.$['instructions'].hide();
 			this.$['credentials'].hide();
@@ -648,7 +648,7 @@ enyo.kind({
 
 		this.$['progress'].load( "Importing Data", "Fetching document specifications", 0 );
 
-		enyo.nextTick(
+		enyo.asyncMethod(
 				this,
 				this.fetchDocSummary
 			);
@@ -733,8 +733,8 @@ enyo.kind({
 
 		this.log();
 
-		enyo.application.gts_db.query(
-				enyo.application.gts_db.getSelect( "accounts", [ "acctId", "acctCategory", "acctName" ] ),
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "accounts", [ "acctId", "acctCategory", "acctName" ] ),
 				{
 					"onSuccess": enyo.bind( this, this.processAccountData, callbackFn )
 				}
@@ -1122,7 +1122,7 @@ enyo.kind({
 					)
 			};
 
-		enyo.application.gts_db.insertData( data, options );
+		Checkbook.globals.gts_db.insertData( data, options );
 	},
 
 	saveDocData: function( offset, limit ) {
@@ -1191,7 +1191,7 @@ enyo.kind({
 			if( catObj.length > 1 && this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) {
 				//Split Category && item not new
 
-				catQuery = enyo.application.transactionManager.handleCategoryData( this.importItems[this.documentIndex]['transactions'][i] );
+				catQuery = Checkbook.globals.transactionManager.handleCategoryData( this.importItems[this.documentIndex]['transactions'][i] );
 			} else {
 				//Single Category
 
@@ -1200,7 +1200,7 @@ enyo.kind({
 			}
 
 			queries.push(
-					enyo.application.gts_db.getReplace(
+					Checkbook.globals.gts_db.getReplace(
 							"transactions",
 							this.importItems[this.documentIndex]['transactions'][i]
 						)
@@ -1215,14 +1215,14 @@ enyo.kind({
 			};
 
 		//Insert
-		enyo.application.gts_db.queries( queries, options );
+		Checkbook.globals.gts_db.queries( queries, options );
 	},
 
 	saveDocDataHandler: function( offset, limit ) {
 
 		this.log( "( " + offset + ", " + limit + " )" );
 
-		enyo.application.accountManager.updateAccountModTime();
+		Checkbook.globals.accountManager.updateAccountModTime();
 
 		var trsnProgress = ( offset + limit ) / this.importItems[this.documentIndex]['transactions'].length;
 		trsnProgress = ( trsnProgress > 1 ? 1 : trsnProgress );

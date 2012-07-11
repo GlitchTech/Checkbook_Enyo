@@ -454,13 +454,13 @@ enyo.kind( {
 		if( this.trsnObj['itemId'] < 0 ) {
 
 			this.$['transTypeText'].setContent( "New Transaction" );
-			this.$['transactionDeleteButton'].setShowing( false );
+			this.$['transactionDeleteButton'].hide();
 		} else {
 
 			this.$['transTypeText'].setContent( "Modify Transaction" );
 		}
 
-		enyo.application.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAccountSystems ) } );
+		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAccountSystems ) } );
 	},
 
 	/** Data Load Handlers **/
@@ -507,7 +507,7 @@ enyo.kind( {
 
 		if( count <= 5 ) {
 
-			enyo.application.accountManager.fetchAccount( this.accountObj['acctId'], { "onSuccess": enyo.bind( this, this.initialAccountLoadHandler ) } );
+			Checkbook.globals.accountManager.fetchAccount( this.accountObj['acctId'], { "onSuccess": enyo.bind( this, this.initialAccountLoadHandler ) } );
 		} else {
 
 			this.$['categorySystem'].loadCategories( enyo.bind( this, this.loadTransactionData ) );
@@ -563,7 +563,7 @@ enyo.kind( {
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
-		this.trsnObj['category'] = enyo.application.transactionManager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
+		this.trsnObj['category'] = Checkbook.globals.transactionManager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
 
 		this.renderCategories = true;
 
@@ -575,7 +575,7 @@ enyo.kind( {
 		this.adjustSystemViews();
 		this.dateChanged();
 
-		enyo.nextTick(
+		enyo.asyncMethod(
 				this.$['loadingScrim'],
 				this.$['loadingScrim'].setShowing,
 				false
@@ -611,17 +611,17 @@ enyo.kind( {
 		if( this.accountObj['enableCategories'] == 1 ) {
 
 			this.categoryChanged();
-			this.$['categoryHolder'].setShowing( true );
+			this.$['categoryHolder'].show();
 		} else {
 
-			this.$['categoryHolder'].setShowing( false );
+			this.$['categoryHolder'].hide();
 		}
 
 		if( this.accountObj['checkField'] == 1 ) {
 
-			this.$['checkNumHolder'].setShowing( true );
+			this.$['checkNumHolder'].show();
 
-			enyo.application.transactionManager.fetchMaxCheckNumber(
+			Checkbook.globals.transactionManager.fetchMaxCheckNumber(
 					this.$['account'].getValue(),
 					{
 						"onSuccess": enyo.bind( this, this.adjustMaxCheckNumber )
@@ -629,16 +629,16 @@ enyo.kind( {
 				);
 		} else {
 
-			this.$['checkNumHolder'].setShowing( false );
+			this.$['checkNumHolder'].hide();
 		}
 
-		if( enyo.application.checkbookPrefs['dispColor'] === 1 ) {
+		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
 
 			this.$['account'].addClass( this.accountObj['acctCategoryColor'] );
 
 			if( !this.$['linkedAccount'].getDisabled() && !this.$['linkedAccount'].$['listName'].getDisabled() ) {
 
-				enyo.application.accountManager.fetchAccount( this.$['linkedAccount'].getValue(), { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "set" ) } );
+				Checkbook.globals.accountManager.fetchAccount( this.$['linkedAccount'].getValue(), { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "set" ) } );
 			}
 		} else {
 
@@ -765,7 +765,7 @@ enyo.kind( {
 
 	accountChanged: function( inSender, newIndex, oldIndex ) {
 
-		enyo.application.accountManager.fetchAccount( this.$['account'].getValue(), { "onSuccess": enyo.bind( this, this.accountChangedFollower ) } );
+		Checkbook.globals.accountManager.fetchAccount( this.$['account'].getValue(), { "onSuccess": enyo.bind( this, this.accountChangedFollower ) } );
 	},
 
 	accountChangedFollower: function( result ) {
@@ -783,7 +783,7 @@ enyo.kind( {
 
 	linkedAccountChanged: function( inSender, newAcctId, oldAcctId ) {
 
-		enyo.application.accountManager.fetchAccount( oldAcctId, { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "unset" ) } );
+		Checkbook.globals.accountManager.fetchAccount( oldAcctId, { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "unset" ) } );
 	},
 
 	linkedAccountChangedFollower: function( mode, result ) {
@@ -791,7 +791,7 @@ enyo.kind( {
 		if( mode === "unset" ) {
 
 			this.$['linkedAccount'].removeClass( result['acctCategoryColor'] );
-			enyo.application.accountManager.fetchAccount( this.$['linkedAccount'].getValue(), { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "set" ) } );
+			Checkbook.globals.accountManager.fetchAccount( this.$['linkedAccount'].getValue(), { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "set" ) } );
 		} else if( mode === "set" ) {
 
 			this.$['linkedAccount'].addClass( result['acctCategoryColor'] );
@@ -845,11 +845,11 @@ enyo.kind( {
 					this.$['categoryAmount'].setSelectAllOnFocus( true );
 				}
 
-				this.$['categoryAmount'].setShowing( true );
+				this.$['categoryAmount'].show();
 				this.amountContentChanged( this.$['categoryAmount'], null );
 			} else {
 
-				this.$['categoryAmount'].setShowing( false );
+				this.$['categoryAmount'].hide();
 			}
 
 			return true;
@@ -1027,7 +1027,7 @@ enyo.kind( {
 		if( this.trsnObj['itemId'] < 0 ) {
 			//New transaction
 
-			enyo.application.transactionManager.createTransaction( this.trsnObj, this.transactionType, options );
+			Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, options );
 		} else if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
 			//Modified repeating transaction
 
@@ -1051,7 +1051,7 @@ All transactions in the series will be deleted.
 		} else {
 			//Modified transaction
 
-			enyo.application.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
+			Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
 		}
 	},
 
@@ -1089,7 +1089,7 @@ All transactions in the series will be deleted.
 
 	deleteTransactionHandler: function() {
 
-		enyo.application.transactionManager.deleteTransaction(
+		Checkbook.globals.transactionManager.deleteTransaction(
 				this.trsnObj['itemId'],
 				{
 					"onSuccess": enyo.bind( this, this.doFinish, 2 )
