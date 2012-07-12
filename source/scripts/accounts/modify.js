@@ -51,17 +51,16 @@ enyo.kind( {
 						}, {
 							name: "accountCategory",
 							kind: "GTS.SelectorBar",
-							labelText: "Account Category",
-							subLabelText: "Random other stuff goes here",
+							label: "Account Category",
 							onChange: "categoryChanged"
 						}, {
 							name: "defaultAccount",
-							kind: GTS.ToggleBar,
+							kind: "GTS.ToggleBar",
 							style: "padding-left: 0;",
-							mainText: "Default Account",
-							subText: "This account is launched automatically on start.",
-							onText: "Yes",
-							offText: "No"
+							label: "Default Account",
+							sublabel: "This account is launched automatically on start.",
+							onContent: "Yes",
+							offContent: "No"
 						},
 
 						{
@@ -71,19 +70,19 @@ enyo.kind( {
 							components: [
 								{
 									name: "freezeAccount",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Freeze Internal Transactions",
-									subText: "Prevent any changes from being made only in this account.",
-									onText: "Yes",
-									offText: "No"
+									label: "Freeze Internal Transactions",
+									sublabel: "Prevent any changes from being made only in this account.",
+									onContent: "Yes",
+									offContent: "No"
 								}, {
 									name: "pinLock",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "PIN Lock",
-									onText: "Yes",
-									offText: "No",
+									label: "PIN Lock",
+									onContent: "Yes",
+									offContent: "No",
 									onChange: "togglePINStatus"
 								}, {
 									name: "pinLockDrawer",
@@ -129,13 +128,13 @@ enyo.kind( {
 								{
 									name: "transactionSorting",
 									kind: "GTS.SelectorBar",
-									labelText: "Sorting",
+									label: "Sorting",
 									onChange: "transactionSortingUpdateLabel"
 								}, {
 									name: "accountDisplay",
 									kind: "GTS.SelectorBar",
 									localizeOptions: false,
-									labelText: "Display",
+									label: "Display",
 									onChange: "accountDisplayUpdateLabel",
 									value: 0,
 									choices: [
@@ -153,7 +152,7 @@ enyo.kind( {
 								}, {
 									name: "balance",
 									kind: "GTS.SelectorBar",
-									labelText: "Balance",
+									label: "Balance",
 									onChange: "balanceUpdateLabel",
 									value: 0,
 									choices: [
@@ -173,29 +172,29 @@ enyo.kind( {
 									]
 								}, {
 									name: "showTransTime",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Show Transaction Time",
-									subText: "Displays the transaction time in addition to the date.",
-									onText: "Yes",
-									offText: "No",
+									label: "Show Transaction Time",
+									sublabel: "Displays the transaction time in addition to the date.",
+									onContent: "Yes",
+									offContent: "No",
 									value: true
 								}, {
 									name: "showRunningBal",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Show Running Balance",
-									subText: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
-									onText: "Yes",
-									offText: "No"
+									label: "Show Running Balance",
+									sublabel: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
+									onContent: "Yes",
+									offContent: "No"
 								}, {
 									name: "hideTransNotes",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Hide Transaction Notes",
-									subText: "Transaction notes will be hidden.",
-									onText: "Yes",
-									offText: "No"
+									label: "Hide Transaction Notes",
+									sublabel: "Transaction notes will be hidden.",
+									onContent: "Yes",
+									offContent: "No"
 								}
 							]
 						},
@@ -207,34 +206,34 @@ enyo.kind( {
 							components: [
 								{
 									name: "descriptionMultilineMode",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Description Multiline Mode",
-									subText: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
-									onText: "Yes",
-									offText: "No"
+									label: "Description Multiline Mode",
+									sublabel: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
+									onContent: "Yes",
+									offContent: "No"
 								}, {
 									name: "autoComplete",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Use Auto-Complete",
-									subText: "Displays suggestions for transaction descriptions based on your history.",
-									onText: "Yes",
-									offText: "No",
+									label: "Use Auto-Complete",
+									sublabel: "Displays suggestions for transaction descriptions based on your history.",
+									onContent: "Yes",
+									offContent: "No",
 									value: true
 								}, {
 									name: "atmMode",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Use ATM Mode",
-									subText: "Amount field will be automatically formatted as you type.",
-									onText: "Yes",
-									offText: "No",
+									label: "Use ATM Mode",
+									sublabel: "Amount field will be automatically formatted as you type.",
+									onContent: "Yes",
+									offContent: "No",
 									value: true
 								}, {
 									name: "autoTransfer",
 									kind: "GTS.SelectorBar",
-									labelText: "Auto Transfer",
+									label: "Auto Transfer",
 									onChange: "toggleAutoTransferDrawer",
 									value: 0,
 									choices: [
@@ -256,37 +255,37 @@ enyo.kind( {
 										{
 											name: "autoTransferLink",
 											kind: "GTS.SelectorBar",
-											labelText: "Transfer to...",
+											label: "Transfer to...",
 											classes: "iconListSelector"
 										}
 									]
 								}, {
 									name: "checkNumber",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Add Check Number Field",
-									subText: "Add a field to record the check number in the add/edit transaction screen.",
-									onText: "Yes",
-									offText: "No"
+									label: "Add Check Number Field",
+									sublabel: "Add a field to record the check number in the add/edit transaction screen.",
+									onContent: "Yes",
+									offContent: "No"
 								}, {
 									name: "expenseCategories",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Add Expense Categories",
-									subText: "Add a field to record the expense category in the add/edit transaction screen.",
-									onText: "Yes",
-									offText: "No",
+									label: "Add Expense Categories",
+									sublabel: "Add a field to record the expense category in the add/edit transaction screen.",
+									onContent: "Yes",
+									offContent: "No",
 									value: true
 								}, {
 									showing: false,
 
 									name: "hideCleared",
-									kind: GTS.ToggleBar,
+									kind: "GTS.ToggleBar",
 									style: "padding-left: 0;",
-									mainText: "Hide cleared transactions",
-									subText: "",
-									onText: "Yes",
-									offText: "No"
+									label: "Hide cleared transactions",
+									sublabel: "",
+									onContent: "Yes",
+									offContent: "No"
 								}
 							]
 						},
@@ -495,10 +494,10 @@ enyo.kind( {
 
 		if( results[0]['desc'] ) {
 
-			this.$['transactionSorting'].setSubLabelText( results[0]['desc'] );
+			this.$['transactionSorting'].setSublabel( results[0]['desc'] );
 		} else {
 
-			this.$['transactionSorting'].setSubLabelText( "" );
+			this.$['transactionSorting'].setSublabel( "" );
 		}
 	},
 
@@ -508,13 +507,13 @@ enyo.kind( {
 
 		if( value === 0 ) {
 
-			this.$['accountDisplay'].setSubLabelText( "Account is visible." );
+			this.$['accountDisplay'].setSublabel( "Account is visible." );
 		} else if( value === 1 ) {
 
-			this.$['accountDisplay'].setSubLabelText( "Account is visible, but removed from total balance calculations." );
+			this.$['accountDisplay'].setSublabel( "Account is visible, but removed from total balance calculations." );
 		} else if( value === 2 ) {
 
-			this.$['accountDisplay'].setSubLabelText( "Account is hidden and removed from total balance calculations. Account can still be accessed via Preferences." );
+			this.$['accountDisplay'].setSublabel( "Account is hidden and removed from total balance calculations. Account can still be accessed via Preferences." );
 		}
 	},
 
@@ -524,16 +523,16 @@ enyo.kind( {
 
 		if( value === 0 ) {
 
-			this.$['balance'].setSubLabelText( "Includes all transactions up to current date/time." );
+			this.$['balance'].setSublabel( "Includes all transactions up to current date/time." );
 		} else if( value === 1 ) {
 
-			this.$['balance'].setSubLabelText( "Includes all cleared transactions up to current date/time." );
+			this.$['balance'].setSublabel( "Includes all cleared transactions up to current date/time." );
 		} else if( value === 2 ) {
 
-			this.$['balance'].setSubLabelText( "Includes all transactions." );
+			this.$['balance'].setSublabel( "Includes all transactions." );
 		} else if( value === 3 ) {
 
-			this.$['balance'].setSubLabelText( "Includes all pending transactions." );
+			this.$['balance'].setSublabel( "Includes all pending transactions." );
 		}
 	},
 
@@ -590,13 +589,13 @@ enyo.kind( {
 
 		if( value === 0 ) {
 
-			this.$['autoTransfer'].setSubLabelText( "Do not transfer anything." );
+			this.$['autoTransfer'].setSublabel( "Do not transfer anything." );
 		} else if( value === 1 ) {
 
-			this.$['autoTransfer'].setSubLabelText( "Remainder of dollar amount will be transferred to selected account." );
+			this.$['autoTransfer'].setSublabel( "Remainder of dollar amount will be transferred to selected account." );
 		} else if( value === 2 ) {
 
-			this.$['autoTransfer'].setSubLabelText( "Additional dollar will be transferred to selected account." );
+			this.$['autoTransfer'].setSublabel( "Additional dollar will be transferred to selected account." );
 		}
 
 		this.$['autoTransferDrawer'].setOpen( this.$['autoTransfer'].getValue() > 0	 );

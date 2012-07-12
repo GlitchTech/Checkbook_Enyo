@@ -12,6 +12,7 @@ enyo.depends(
 	"$lib/gts-plugins/PrototypeExt",
 	"$lib/gts-plugins/LazyList",
 	"$lib/gts-plugins/SelectorBar",
+	"$lib/gts-plugins/ToggleBar",
 
 	"scripts/",
 	"styles/"
