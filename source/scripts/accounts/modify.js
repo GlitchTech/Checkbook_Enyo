@@ -56,11 +56,10 @@ enyo.kind( {
 						}, {
 							name: "defaultAccount",
 							kind: "GTS.ToggleBar",
-							style: "padding-left: 0;",
 							label: "Default Account",
 							sublabel: "This account is launched automatically on start.",
 							onContent: "Yes",
-							offContent: "No"
+							offText: "No"
 						},
 
 						{
@@ -71,43 +70,39 @@ enyo.kind( {
 								{
 									name: "freezeAccount",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Freeze Internal Transactions",
 									sublabel: "Prevent any changes from being made only in this account.",
 									onContent: "Yes",
-									offContent: "No"
+									offText: "No"
 								}, {
 									name: "pinLock",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "PIN Lock",
 									onContent: "Yes",
-									offContent: "No",
+									offText: "No",
 									onChange: "togglePINStatus"
 								}, {
 									name: "pinLockDrawer",
-									kind: enyo.BasicDrawer,
+									kind: "onyx.Drawer",
 									components: [
 										{
-											kind: enyo.Item,
-											layoutKind: enyo.HFlexLayout,
-											align: "center",
-
-											tapHightlight: true,
-
+											kind: "onyx.Groupbox",
+											classes: "padding-half-top",
 											components: [
 												{
-													name: "pinCode",
-													kind: enyo.PasswordInput,
-
-													flex: 1,
-
-													onmousedown: "changePinCode",
-													onmouseup: "changePinCode",
-
-													hint: "Tap to set...",
+													kind: "onyx.InputDecorator",
+													layoutKind: "FittableColumnsLayout",
 													components: [
 														{
+															name: "pinCode",
+															kind: "onyx.Input",
+															placeholder: "Tap to set...",
+
+															ontap: "changePinCode",
+
+															disabled: true,
+															fit: true
+														}, {
 															content: "Code",
 															classes: "label"
 														}
@@ -173,28 +168,25 @@ enyo.kind( {
 								}, {
 									name: "showTransTime",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Show Transaction Time",
 									sublabel: "Displays the transaction time in addition to the date.",
 									onContent: "Yes",
-									offContent: "No",
+									offText: "No",
 									value: true
 								}, {
 									name: "showRunningBal",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Show Running Balance",
 									sublabel: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
 									onContent: "Yes",
-									offContent: "No"
+									offText: "No"
 								}, {
 									name: "hideTransNotes",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Hide Transaction Notes",
 									sublabel: "Transaction notes will be hidden.",
 									onContent: "Yes",
-									offContent: "No"
+									offText: "No"
 								}
 							]
 						},
@@ -207,11 +199,10 @@ enyo.kind( {
 								{
 									name: "descriptionMultilineMode",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Description Multiline Mode",
 									sublabel: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
 									onContent: "Yes",
-									offContent: "No"
+									offText: "No"
 								}, {
 									name: "autoComplete",
 									kind: "GTS.ToggleBar",
@@ -219,16 +210,15 @@ enyo.kind( {
 									label: "Use Auto-Complete",
 									sublabel: "Displays suggestions for transaction descriptions based on your history.",
 									onContent: "Yes",
-									offContent: "No",
+									offText: "No",
 									value: true
 								}, {
 									name: "atmMode",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Use ATM Mode",
 									sublabel: "Amount field will be automatically formatted as you type.",
 									onContent: "Yes",
-									offContent: "No",
+									offText: "No",
 									value: true
 								}, {
 									name: "autoTransfer",
@@ -250,7 +240,7 @@ enyo.kind( {
 									]
 								}, {
 									name: "autoTransferDrawer",
-									kind: enyo.BasicDrawer,
+									kind: "onyx.Drawer",
 									components: [
 										{
 											name: "autoTransferLink",
@@ -262,30 +252,27 @@ enyo.kind( {
 								}, {
 									name: "checkNumber",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Add Check Number Field",
 									sublabel: "Add a field to record the check number in the add/edit transaction screen.",
 									onContent: "Yes",
-									offContent: "No"
+									offText: "No"
 								}, {
 									name: "expenseCategories",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Add Expense Categories",
 									sublabel: "Add a field to record the expense category in the add/edit transaction screen.",
 									onContent: "Yes",
-									offContent: "No",
+									offText: "No",
 									value: true
 								}, {
 									showing: false,
 
 									name: "hideCleared",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
 									label: "Hide cleared transactions",
 									sublabel: "",
 									onContent: "Yes",
-									offContent: "No"
+									offText: "No"
 								}
 							]
 						},
@@ -686,8 +673,8 @@ enyo.kind( {
 		this.balanceUpdateLabel();
 
 		//Adjust Drawer elements
-		//this.togglePINStatus();
-		//this.toggleAutoTransferDrawer();
+		this.togglePINStatus();
+		this.toggleAutoTransferDrawer();
 
 		this.categoryChanged( null, this.$['accountCategory'].getValue(), null );
 
