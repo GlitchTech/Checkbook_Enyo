@@ -37,7 +37,6 @@ enyo.kind({
 		{
 			name: "entries",
 			kind: "enyo.List",
-			touch: true,
 
 			classes: "enyo-fit",
 

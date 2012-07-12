@@ -340,7 +340,7 @@ enyo.kind( {
 							name: "transactionDeleteButton",
 							kind: "onyx.Button",
 							content: "Delete Transaction",
-							className: "enyo-button-negative",
+							className: "onyx-negative",
 							style: "margin-top: 1.5em;",
 							ontap: "deleteTransaction"
 						}, {
@@ -371,7 +371,7 @@ enyo.kind( {
 					kind: "onyx.Button",
 					flex: 2,
 					content: "Save",
-					className: "enyo-button-affirmative deep-green",
+					className: "onyx-affirmative deep-green",
 					style: "width: 150px;",
 					ontap: "saveTransaction"
 				}, {

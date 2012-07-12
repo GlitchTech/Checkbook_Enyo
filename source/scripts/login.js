@@ -191,7 +191,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							flex: 2,
-							className: "enyo-button-affirmative",
+							className: "onyx-affirmative",
 
 							caption: "Confirm",
 							ontap: "checkPin"

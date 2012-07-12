@@ -1,5 +1,8 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
+/**
+ * TODO DEFINITION
+ */
 enyo.kind( {
 	name: "Checkbook.accounts.view",
 	layoutKind: "FittableRowsLayout",
@@ -8,6 +11,9 @@ enyo.kind( {
 	totalBalance: [ 0, 0, 0, 0, 0 ],
 	balanceView: 4,
 
+	/**
+	 * TODO DEFINITION
+	 */
 	events: {
 		onModify: "",//Add/Edit Account
 		onView: "",//View Account
@@ -15,6 +21,9 @@ enyo.kind( {
 		onDelete: ""//Deletion made
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	components: [
 		{
 			kind: "onyx.Toolbar",
@@ -51,18 +60,14 @@ enyo.kind( {
 			onChanged: "accountChanged",
 			onDelete: "accountDeleted"
 		}, {
-			kind: "onyx.Toolbar",
-			classes: "rich-brown",
-			style: "text-align: center;",
+			kind: "onyx.MoreToolbar",
+			classes: "rich-brown text-center",
 			components: [
 				{
 					kind: "onyx.IconButton",
 					src: "assets/menu_icons/sort.png",
 
-					ontap: "showSort",
-					classes: "left"
-				}, {
-					kind: enyo.Spacer
+					ontap: "showSort"
 				}, {
 					name: "addAccountButton",
 					kind: "onyx.Checkbox",
@@ -76,13 +81,28 @@ enyo.kind( {
 					onchange: "toggleLock",
 					classes: "lock"
 				}, {
-					kind: enyo.Spacer
-				}, {
-					kind: "onyx.IconButton",
-					classes: "right",
-
-					//ontap: "showSearch",
-					//src: "assets/menu_icons/search.png"
+					kind: "onyx.MenuDecorator",
+					components: [
+						{
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/search.png"
+						}, {
+							kind: "onyx.Menu",
+							floating: true,
+							components: [
+								{
+									content: "Reports",
+									menuParent: "searchMenu"
+								}, {
+									content: "Budget",
+									menuParent: "searchMenu"
+								}, {
+									content: "Search",
+									menuParent: "searchMenu"
+								}
+							]
+						}
+					]
 				}
 			]
 		},
@@ -90,35 +110,33 @@ enyo.kind( {
 		{
 			name: "balanceMenu",
 			//kind: "Checkbook.balanceMenu",
-			onMenuItemClick: "menuItemClick"
+			onMenuItemClick: "menuItemSelected"
 		}, {
 			name: "sortMenu",
 			//kind: "Checkbook.selectedMenu",
 			components: accountSortOptions
-		}, {
-			name: "searchMenu",
-			//kind: "GTS.menu",
-			components: [
-				{
-					caption: "Reports",
-					menuParent: "searchMenu"
-				}, {
-					caption: "Budget",
-					menuParent: "searchMenu"
-				}, {
-					caption: "Search",
-					menuParent: "searchMenu"
-				}
-			]
 		}
 	],
 
+	/**
+	 * TODO DEFINITION
+	 */
+	handlers: {
+		onSelect: "menuItemSelected"
+	},
+
+	/**
+	 * TODO DEFINITION
+	 */
 	renderAccountList: function() {
 
 		this.accountBalanceForceUpdate();
 		this.$['entries'].renderAccountList();
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	accountBalanceViewChanged: function( index, id, mode, callbackFn ) {
 
 		if( !index || index < 0 || index >= this.$['entries'].accounts.length ) {
@@ -144,12 +162,18 @@ enyo.kind( {
 		this.$['entries'].refresh();
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	accountChanged: function( inSender, account ) {
 
 		this.doChanged( account );
 		this.accountBalanceForceUpdate();
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	accountDeleted: function( inSender, account ) {
 
 		this.doDelete( account );
@@ -158,6 +182,9 @@ enyo.kind( {
 		return true;
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	accountBalanceForceUpdate: function() {
 
 		//build balance object
@@ -166,6 +193,9 @@ enyo.kind( {
 			});
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	accountBalanceChanged: function( index, deltaBalanceArr ) {
 
 		if( !Object.isNumber( index ) || index < 0 || index >= this.$['entries'].accounts.length ) {
@@ -182,34 +212,37 @@ enyo.kind( {
 		this.accountBalanceForceUpdate();
 	},
 
-	menuItemClick: function() {
+	/**
+	 * TODO DEFINITION
+	 */
+	menuItemSelected: function( inSender, inEvent ) {
 		//All menu items come here
 
-		//Normally 0 is spot of inSender; for Checkbook.balanceMenu 1 is spot of inSender
-		var inSender = arguments[arguments.length === 2 ? 0 : 1];
-
-		if( inSender.menuParent.toLowerCase() === "searchmenu" ) {
+		var menuParent = inEvent.selected.menuParent.toLowerCase();
+		if( menuParent === "searchmenu" ) {
 			//Search Menu
 
-			if( inSender.value.toLowerCase() === "search" ) {
+			var item = inEvent.content.toLowerCase();
+
+			if( item === "search" ) {
 
 				this.log( "launch search system (overlay like modify account)" );
-			} else if( inSender.value.toLowerCase() === "budget" ) {
+			} else if( item === "budget" ) {
 
 				this.log( "launch budget system (overlay like modify account)" );
-			} else if( inSender.value.toLowerCase() === "reports" ) {
+			} else if( item === "reports" ) {
 
 				this.log( "launch report system (overlay like modify account)" );
 			}
-		} else if( inSender.menuParent.toLowerCase() === "accountsortoptions" ) {
+		} else if( menuParent === "accountsortoptions" ) {
 			//Sort Menu
 
-			if( Checkbook.globals.prefs['custom_sort'] === inSender.value ) {
+			if( Checkbook.globals.prefs['custom_sort'] === inEvent.content ) {
 				//No change, abort
 				return;
 			}
 
-			Checkbook.globals.prefs['custom_sort'] = inSender.value;
+			Checkbook.globals.prefs['custom_sort'] = inEvent.content;
 
 			Checkbook.globals.gts_db.query(
 					new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
@@ -217,11 +250,12 @@ enyo.kind( {
 						"onSuccess": enyo.bind( this, this.renderAccountList )
 					}
 				);
-		} else if( inSender.menuParent.toLowerCase() === "balancemenu" ) {
+		} else if( menuParent === "balancemenu" ) {
 			//Balance Menu
 
-			this.balanceView = inSender.value;
-			this.$['entries'].setBalanceView( inSender.value );
+			this.balanceView = inEvent.content;
+
+			this.$['entries'].setBalanceView( this.balanceView );
 			this.$['entries'].refresh();
 
 			this.renderBalanceButton();
@@ -229,6 +263,10 @@ enyo.kind( {
 	},
 
 	/** Header Control **/
+
+	/**
+	 * TODO DEFINITION
+	 */
 	buildBalanceButton: function( callbackFn, results ) {
 
 		this.totalBalance = results;
@@ -239,6 +277,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	renderBalanceButton: function() {
 
 		this.$['overallBalance'].setContent( formatAmount( this.totalBalance[this.balanceView] ) );
@@ -248,6 +289,9 @@ enyo.kind( {
 		this.$['overallBalance'].addRemoveClass( "neutralBalance", this.totalBalance[this.balanceView] == 0 );
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	balanceButtonClicked: function( inSender ) {
 
 		this.$['balanceMenu'].setItems(
@@ -286,11 +330,18 @@ enyo.kind( {
 	},
 
 	/** Footer Control **/
+
+	/**
+	 * TODO DEFINITION
+	 */
 	showSort: function( inSender ) {
 
 		this.$['sortMenu'].openAtControl( inSender, Checkbook.globals.prefs['custom_sort'] );
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	addAccount: function() {
 
 		//Prevent user from launching multiple New Account windows
@@ -311,6 +362,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	addAccountComplete: function( inSender, action, actionStatus ) {
 
 		this.$['addAccountButton'].setChecked( false );
@@ -324,6 +378,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	toggleLock: function() {
 
 		if( this.$['editModeToggle'].getChecked() ) {
@@ -333,10 +390,5 @@ enyo.kind( {
 
 			this.$['entries'].setEditMode( false );
 		}
-	},
-
-	showSearch: function( inSender ) {
-
-		this.$['searchMenu'].openAtControl( inSender );
 	}
 });

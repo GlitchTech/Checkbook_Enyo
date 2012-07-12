@@ -203,7 +203,7 @@ enyo.kind({
 
 					ontap: "authenticateWithGoogle",
 
-					className: "enyo-button-affirmative deep-green",
+					className: "onyx-affirmative deep-green",
 					style: "min-width: 150px;"
 				}, {
 					kind: enyo.Spacer,
@@ -225,7 +225,7 @@ enyo.kind({
 
 					ontap: "beginExportProcess",
 
-					className: "enyo-button-affirmative deep-green",
+					className: "onyx-affirmative deep-green",
 					style: "min-width: 150px;"
 				}, {
 					kind: enyo.Spacer,

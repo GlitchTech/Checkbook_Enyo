@@ -212,7 +212,7 @@ enyo.kind( {
 									caption: "Delete",
 									ontap: "deleteClicked",
 									flex: 1,
-									className: "enyo-button-negative"
+									className: "onyx-negative"
 								}, {
 									name: "btnCancel",
 									kind: "onyx.Button",

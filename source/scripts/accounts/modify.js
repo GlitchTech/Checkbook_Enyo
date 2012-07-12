@@ -2,9 +2,8 @@
 
 enyo.kind( {
 	name: "Checkbook.accounts.modify",
-	kind: enyo.VFlexBox,
-
-	style: "height: 100%;",
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
 	published: {
 		acctId: -1
@@ -20,45 +19,44 @@ enyo.kind( {
 
 	components: [
 		{
-			kind: enyo.Scroller,
-			autoHorizontal: false,
-			horizontal: false,
-			className: "rich-brown-gradient",
-			flex: 1,
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			classes: "rich-brown-gradient",
+			fit: true,
 			components: [
 				{
-					layoutKind: enyo.VFlexLayout,
-					className: "light narrow-column",
-					flex: 1,
+					classes: "light narrow-column",
+					style: "min-height: 100%;",
 					components: [
 						{
-							kind: enyo.Group,
-							align: "center",
-							tapHightlight: false,
-							layoutKind: enyo.HFlexLayout,
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top",
 							components: [
 								{
-									name: "accountName",
-									kind: enyo.Input,
-									flex: 1,
-									hint: "Enter Account Name...",
+									kind: "onyx.InputDecorator",
+									layoutKind: "FittableColumnsLayout",
 									components: [
 										{
+											name: "accountName",
+											kind: "onyx.Input",
+											placeholder: "Enter Account Name...",
+											fit: true
+										}, {
 											content: "Account Name",
-											className: "enyo-label"
+											classes: "label"
 										}
 									]
 								}
 							]
 						}, {
 							name: "accountCategory",
-							kind: "GTS.ListSelectorBar",
+							kind: "GTS.SelectorBar",
 							labelText: "Account Category",
-							className: "iconListSelector custom-background",
+							subLabelText: "Random other stuff goes here",
 							onChange: "categoryChanged"
 						}, {
 							name: "defaultAccount",
-							kind: "GTS.ToggleBar",
+							kind: GTS.ToggleBar,
 							style: "padding-left: 0;",
 							mainText: "Default Account",
 							subText: "This account is launched automatically on start.",
@@ -73,7 +71,7 @@ enyo.kind( {
 							components: [
 								{
 									name: "freezeAccount",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Freeze Internal Transactions",
 									subText: "Prevent any changes from being made only in this account.",
@@ -81,7 +79,7 @@ enyo.kind( {
 									offText: "No"
 								}, {
 									name: "pinLock",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "PIN Lock",
 									onText: "Yes",
@@ -112,7 +110,7 @@ enyo.kind( {
 													components: [
 														{
 															content: "Code",
-															className: "enyo-label"
+															classes: "label"
 														}
 													]
 												}
@@ -130,52 +128,52 @@ enyo.kind( {
 							components: [
 								{
 									name: "transactionSorting",
-									kind: "GTS.ListSelectorBar",
+									kind: "GTS.SelectorBar",
 									labelText: "Sorting",
 									onChange: "transactionSortingUpdateLabel"
 								}, {
 									name: "accountDisplay",
-									kind: "GTS.ListSelectorBar",
+									kind: "GTS.SelectorBar",
 									localizeOptions: false,
 									labelText: "Display",
 									onChange: "accountDisplayUpdateLabel",
 									value: 0,
 									choices: [
 										{
-											caption: "Show Account",
+											content: "Show Account",
 											value: 0
 										}, {
-											caption: "Mask Account",
+											content: "Mask Account",
 											value: 1
 										}, {
-											caption: "Hide Account",
+											content: "Hide Account",
 											value: 2
 										}
 									]
 								}, {
 									name: "balance",
-									kind: "GTS.ListSelectorBar",
+									kind: "GTS.SelectorBar",
 									labelText: "Balance",
 									onChange: "balanceUpdateLabel",
 									value: 0,
 									choices: [
 										{
-											caption: "Available",
+											content: "Available",
 											value: 0
 										}, {
-											caption: "Cleared",
+											content: "Cleared",
 											value: 1
 										}, {
-											caption: "Pending",
+											content: "Pending",
 											value: 3
 										}, {
-											caption: "Final",
+											content: "Final",
 											value: 2
 										}
 									]
 								}, {
 									name: "showTransTime",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Show Transaction Time",
 									subText: "Displays the transaction time in addition to the date.",
@@ -184,7 +182,7 @@ enyo.kind( {
 									value: true
 								}, {
 									name: "showRunningBal",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Show Running Balance",
 									subText: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
@@ -192,7 +190,7 @@ enyo.kind( {
 									offText: "No"
 								}, {
 									name: "hideTransNotes",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Hide Transaction Notes",
 									subText: "Transaction notes will be hidden.",
@@ -209,7 +207,7 @@ enyo.kind( {
 							components: [
 								{
 									name: "descriptionMultilineMode",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Description Multiline Mode",
 									subText: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
@@ -217,7 +215,7 @@ enyo.kind( {
 									offText: "No"
 								}, {
 									name: "autoComplete",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Use Auto-Complete",
 									subText: "Displays suggestions for transaction descriptions based on your history.",
@@ -226,7 +224,7 @@ enyo.kind( {
 									value: true
 								}, {
 									name: "atmMode",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Use ATM Mode",
 									subText: "Amount field will be automatically formatted as you type.",
@@ -235,19 +233,19 @@ enyo.kind( {
 									value: true
 								}, {
 									name: "autoTransfer",
-									kind: "GTS.ListSelectorBar",
+									kind: "GTS.SelectorBar",
 									labelText: "Auto Transfer",
 									onChange: "toggleAutoTransferDrawer",
 									value: 0,
 									choices: [
 										{
-											caption: "Do not transfer",
+											content: "Do not transfer",
 											value: 0
 										}, {
-											caption: "Transfer remainder",
+											content: "Transfer remainder",
 											value: 1
 										}, {
-											caption: "Transfer additional dollar",
+											content: "Transfer additional dollar",
 											value: 2
 										}
 									]
@@ -257,14 +255,14 @@ enyo.kind( {
 									components: [
 										{
 											name: "autoTransferLink",
-											kind: "GTS.ListSelectorBar",
+											kind: "GTS.SelectorBar",
 											labelText: "Transfer to...",
-											className: "iconListSelector"
+											classes: "iconListSelector"
 										}
 									]
 								}, {
 									name: "checkNumber",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Add Check Number Field",
 									subText: "Add a field to record the check number in the add/edit transaction screen.",
@@ -272,7 +270,7 @@ enyo.kind( {
 									offText: "No"
 								}, {
 									name: "expenseCategories",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Add Expense Categories",
 									subText: "Add a field to record the expense category in the add/edit transaction screen.",
@@ -283,7 +281,7 @@ enyo.kind( {
 									showing: false,
 
 									name: "hideCleared",
-									kind: "GTS.ToggleBar",
+									kind: GTS.ToggleBar,
 									style: "padding-left: 0;",
 									mainText: "Hide cleared transactions",
 									subText: "",
@@ -308,7 +306,7 @@ enyo.kind( {
 									components: [
 										{
 											content: "Notes",
-											className: "enyo-label"
+											classes: "label"
 										}
 									]
 								}
@@ -318,12 +316,14 @@ enyo.kind( {
 						{
 							name: "accountDeleteButton",
 							kind: "onyx.Button",
+
+							ontap: "deleteAccount",
+
 							content: "Delete Account",
-							className: "enyo-button-negative",
-							style: "margin-top: 1.5em;",
-							ontap: "deleteAccount"
+
+							classes: "onyx-negative",
+							style: "margin-top: 1.5em; width: 100%;"
 						}, {
-							kind: enyo.Spacer,
 							style: "height: 1.5em;"
 						}
 					]
@@ -332,47 +332,38 @@ enyo.kind( {
 		},
 
 		{
-			kind: enyo.Toolbar,
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 4
-				}, {
 					kind: "onyx.Button",
-					flex: 2,
 					content: "Cancel",
 					style: "width: 150px",
 					ontap: "doFinish"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
+					style: "width: 50px;"
 				}, {
 					kind: "onyx.Button",
-					flex: 2,
 					content: "Save",
-					className: "enyo-button-affirmative deep-green",
+					classes: "onyx-affirmative",
 					style: "width: 150px;",
 					ontap: "saveAccount"
-				}, {
-					kind: enyo.Spacer,
-					flex: 4
 				}
 			]
 		},
 
 		{
 			name: "loadingScrim",
-			kind: enyo.Scrim,
-			layoutKind: enyo.VFlexLayout,
-			align: "center",
-			pack: "center",
-			showing: true,
-			components: [
-				{
-					kind: "GTS.SpinnerLarge",
-					showing: true
-				}
-			]
+			kind: onyx.Scrim,
+			classes: "onyx-scrim-translucent"
+		}, {
+			name: "loadingSpinner",
+			kind: "jmtk.Spinner",
+			color: "#284907",
+			diameter: "90",
+			shape: "spiral",
+
+			style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 		},
 
 		{
@@ -381,7 +372,7 @@ enyo.kind( {
 			scrim: true,
 			components: [
 				{
-					kind: "EditMenu"
+					//kind: "EditMenu"
 				}
 			]
 		},
@@ -409,6 +400,9 @@ enyo.kind( {
 
 		this.log();
 
+		this.$['loadingScrim'].show();
+		this.$['loadingSpinner'].show();
+
 		//Account Category Options
 		this.$['acctCategoryManager'].fetchCategories( { "onSuccess": enyo.bind( this, this.buildAccountCategories ) } );
 	},
@@ -434,7 +428,7 @@ enyo.kind( {
 
 				this.categories['choices'].push(
 						{
-							caption: row['name'],
+							content: row['name'],
 							icon: "assets/" + row['icon'],
 							color: row['color'],
 							value: row['name']
@@ -444,7 +438,6 @@ enyo.kind( {
 		}
 
 		this.$['accountCategory'].setChoices( this.categories['choices'] );
-		this.$['accountCategory'].render();
 
 		//Transaction Sort Options
 		if( transactionSortOptions.length <= 0 ) {
@@ -459,7 +452,6 @@ enyo.kind( {
 	buildTransactionSorting: function() {
 
 		this.$['transactionSorting'].setChoices( transactionSortOptions );
-		this.$['transactionSorting'].render();
 
 		//Transaction Sort Options
 		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAutoTransferLink ) } );
@@ -472,14 +464,14 @@ enyo.kind( {
 			this.$['autoTransferLink'].setChoices( accounts );
 
 			this.$['autoTransferLink'].setDisabled( false );
-			this.$['autoTransferLink'].$['listName'].setDisabled( false );
+			//this.$['autoTransferLink'].$['listName'].setDisabled( false );
 
 			this.$['autoTransferLink'].render();
 
 		} else {
 
 			this.$['autoTransferLink'].setDisabled( true );
-			this.$['autoTransferLink'].$['listName'].setDisabled( true );
+			//this.$['autoTransferLink'].$['listName'].setDisabled( true );
 		}
 
 		enyo.asyncMethod(
@@ -668,26 +660,26 @@ enyo.kind( {
 		this.$['accountCategory'].setValue( results['acctCategory'] );
 		this.$['accountNotes'].setValue( results['acctNotes'] );
 
-		this.$['freezeAccount'].setValue( results['frozen'] === 1 );
-		this.$['pinLock'].setValue( results['acctLocked'] === 1 );
-		this.$['pinCode'].setValue( results['lockedCode'] );
+		//this.$['freezeAccount'].setValue( results['frozen'] === 1 );
+		//this.$['pinLock'].setValue( results['acctLocked'] === 1 );
+		//this.$['pinCode'].setValue( results['lockedCode'] );
 
 		this.$['transactionSorting'].setValue( results['sort'] );
 		this.$['accountDisplay'].setValue( results['hidden'] );
 		this.$['balance'].setValue( results['bal_view'] );
-		this.$['defaultAccount'].setValue( results['defaultAccount'] === 1 );
-		this.$['showTransTime'].setValue( results['showTransTime'] === 1 );
-		this.$['showRunningBal'].setValue( results['runningBalance'] === 1 );
-		this.$['hideTransNotes'].setValue( results['hideNotes'] === 1 );
+		//this.$['defaultAccount'].setValue( results['defaultAccount'] === 1 );
+		//this.$['showTransTime'].setValue( results['showTransTime'] === 1 );
+		//this.$['showRunningBal'].setValue( results['runningBalance'] === 1 );
+		//this.$['hideTransNotes'].setValue( results['hideNotes'] === 1 );
 
-		this.$['descriptionMultilineMode'].setValue( results['transDescMultiLine'] === 1 );
-		this.$['autoComplete'].setValue( results['useAutoComplete'] === 1 );
-		this.$['atmMode'].setValue( results['atmEntry'] === 1 );
+		//this.$['descriptionMultilineMode'].setValue( results['transDescMultiLine'] === 1 );
+		//this.$['autoComplete'].setValue( results['useAutoComplete'] === 1 );
+		//this.$['atmMode'].setValue( results['atmEntry'] === 1 );
 		this.$['autoTransfer'].setValue( results['auto_savings'] );
 		this.$['autoTransferLink'].setValue( results['auto_savings_link'] );
-		this.$['checkNumber'].setValue( results['checkField'] === 1 );
-		this.$['expenseCategories'].setValue( results['enableCategories'] === 1 );
-		this.$['hideCleared'].setValue( results['hide_cleared'] === 1 );//DNE
+		//this.$['checkNumber'].setValue( results['checkField'] === 1 );
+		//this.$['expenseCategories'].setValue( results['enableCategories'] === 1 );
+		//this.$['hideCleared'].setValue( results['hide_cleared'] === 1 );//DNE
 
 		//Adjust Sublabel elements
 		this.transactionSortingUpdateLabel();
@@ -695,8 +687,8 @@ enyo.kind( {
 		this.balanceUpdateLabel();
 
 		//Adjust Drawer elements
-		this.togglePINStatus();
-		this.toggleAutoTransferDrawer();
+		//this.togglePINStatus();
+		//this.toggleAutoTransferDrawer();
 
 		this.categoryChanged( null, this.$['accountCategory'].getValue(), null );
 
@@ -707,8 +699,9 @@ enyo.kind( {
 		}
 
 		this.$['loadingScrim'].hide();
+		this.$['loadingSpinner'].hide();
 
-		this.$['accountName'].forceFocusEnableKeyboard();
+		//this.$['accountName'].forceFocusEnableKeyboard();
 	},
 
 	saveAccount: function() {

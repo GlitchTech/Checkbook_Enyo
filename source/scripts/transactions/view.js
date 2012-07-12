@@ -51,19 +51,19 @@ enyo.kind( {
 			]
 		}, {
 			name: "entries",
-			kind: "GTS.LazyList",
+			kind: "enyo.List",
 
 			fit: true,
 			classes: "checkbook-stamp",
 
-			onSetupRow: "transactionBuildRow",
-			onAcquirePage: "transactionFetchGroup",
+			onSetupItem: "transactionBuildRow",
+			//onAcquirePage: "transactionFetchGroup",
 
 			components: [
 				{
-					kind: enyo.SwipeableItem,
+					kind: "onyx.SwipeableItem",
+					preventDragPropagation: true,
 
-					tapHighlight: true,
 					ontap: "transactiontapped",
 					onmousehold: "transactionHeld",
 					onConfirm: "transactionDeleted",
@@ -74,7 +74,7 @@ enyo.kind( {
 					components: [
 						{
 							name: "mainBody",
-							layoutKind: enyo.HFlexLayout,
+							//layoutKind: enyo.HFlexLayout,
 							classes: "transactionItemTop",
 
 							components: [
@@ -125,11 +125,10 @@ enyo.kind( {
 			]
 		}, {
 			name: "footer",
-			kind: "onyx.Toolbar",
+			kind: "onyx.MoreToolbar",
 			classes: "deep-green text-center",
 			components: [
 				{
-					classes: "left",
 					components: [
 						{
 							//Doesn't display properly
@@ -169,7 +168,6 @@ enyo.kind( {
 						}
 					]
 				}, {
-					classes: "right",
 					components: [
 						{
 							kind: "onyx.IconButton",
@@ -346,7 +344,8 @@ enyo.kind( {
 				sortQry
 */
 			this.transactions = [];
-			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].setCount( 100 );
+			this.$['entries'].reset();
 			this.initialScroll();
 
 			return;//TEMP
@@ -380,6 +379,7 @@ enyo.kind( {
 		this.account = {};
 		this.transactions = [];
 		this.$['entries'].setCount( this.transactions.length );
+		this.$['entries'].reset();
 
 		this.$['header'].hide();
 		this.$['footer'].hide();
@@ -396,6 +396,7 @@ enyo.kind( {
 
 		this.transactions = [];
 		this.$['entries'].setCount( this.transactions.length );
+		this.$['entries'].reset();
 
 		this.initialScroll();
 		this.balanceChangedHandler();
@@ -405,7 +406,7 @@ enyo.kind( {
 
 		if( !( this.account['sort'] === 0 || this.account['sort'] === 1 || this.account['sort'] === 6 || this.account['sort'] === 7 ) ) {
 
-			this.scrollTo( 0 );
+			this.$['entries'].scrollToRow( 0 );
 			return;
 		}
 
@@ -472,7 +473,7 @@ enyo.kind( {
 
 		this.log( this.account['sort'], scrollToIndex, arguments );
 
-		this.scrollTo( scrollToIndex );
+		this.$['entries'].scrollToRow( scrollToIndex );
 	},
 
 	menuItemClick: function() {
@@ -517,6 +518,7 @@ enyo.kind( {
 
 			this.transactions = [];
 			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].reset();
 			this.initialScroll();
 		} else if( inSender.menuParent.toLowerCase() === "functionmenu" ) {
 
@@ -756,6 +758,7 @@ enyo.kind( {
 			this.transactions = [];
 
 			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].reset();
 			this.initialScroll();
 		}
 	},
@@ -779,24 +782,6 @@ enyo.kind( {
 			this.$['addTransferButton'].setDisabled( true );
 			this.$['addExpenseButton'].setDisabled( true );
 		}
-	},
-
-	/* List Control */
-	scrollTo: function( topIndex ) {
-
-		return;//TEMP
-
-		if( topIndex < 0 ) {
-
-			topIndex = 0;
-		}
-
-		var pageSize = this.$['entries'].getPageSize();
-
-		this.$['entries'].$.scroller.adjustTop( topIndex );
-		this.$['entries'].$.scroller.adjustBottom( topIndex + pageSize );
-		this.$['entries'].$.scroller.top = topIndex;
-		this.$['entries'].$.scroller.bottom = topIndex + pageSize;
 	},
 
 	duplicateTransaction: function( rowIndex ) {
@@ -882,10 +867,11 @@ enyo.kind( {
 
 			this.transactions = [];
 			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].reset();
 
 			enyo.asyncMethod(
-					this,
-					this.scrollTo,
+					this.$['entries'],
+					this.$['entries'].scrollToRow,
 					rowIndex
 				);
 		} else if( action === 2 ) {
@@ -897,10 +883,11 @@ enyo.kind( {
 
 			this.transactions = [];
 			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].reset();
 
 			enyo.asyncMethod(
-					this,
-					this.scrollTo,
+					this.$['entries'],
+					this.$['entries'].scrollToRow,
 					( rowIndex - 1 )
 				);
 		}
@@ -936,6 +923,7 @@ enyo.kind( {
 
 		if( this.account['frozen'] === 1 ) {
 
+			this.$['entries'].setCount( this.transactions.length );
 			this.$['entries'].refresh();
 			return;
 		}
@@ -948,6 +936,7 @@ enyo.kind( {
 
 		Checkbook.globals.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], cleared );
 
+		this.$['entries'].setCount( this.transactions.length );
 		this.$['entries'].refresh();
 
 		this.balanceChangedHandler();
@@ -970,6 +959,7 @@ enyo.kind( {
 
 		if( this.account['frozen'] === 1 ) {
 
+			this.$['entries'].setCount( this.transactions.length );
 			this.$['entries'].refresh();
 			return;
 		}
@@ -1000,6 +990,7 @@ enyo.kind( {
 
 				this.transactions = [];
 				this.$['entries'].setCount( this.transactions.length );
+				this.$['entries'].reset();
 				return;
 			}
 
@@ -1030,6 +1021,7 @@ enyo.kind( {
 			}
 		}
 
+		this.$['entries'].setCount( this.transactions.length );
 		this.$['entries'].refresh();
 
 		//Fetch row
@@ -1045,7 +1037,14 @@ enyo.kind( {
 		this.balanceChangedHandler( accounts );
 	},
 
-	transactionBuildRow: function( inSender, inIndex ) {
+	transactionBuildRow: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		this.$['desc'].setContent( inEvent.index );
+
+		return;
+
+		var inIndex = inEvent.index;
 
 		var row = this.transactions[inIndex];
 
@@ -1120,6 +1119,10 @@ enyo.kind( {
 	},
 
 	transactionFetchGroup: function( inSender, inPage ) {
+
+		//this.log( arguments );
+
+		return;
 
 		var index = inPage * inSender.getPageSize();
 
@@ -1218,6 +1221,7 @@ results = {
 			}
 		}
 
+		this.$['entries'].setCount( this.transactions.length );
 		this.$['entries'].refresh();
 
 		this.loadingDisplay( false );

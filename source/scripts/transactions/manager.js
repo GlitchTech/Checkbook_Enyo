@@ -1209,7 +1209,7 @@ enyo.kind({
 				transactionSortOptions.push(
 							{
 								icon: "assets/sort_icons/" + row['sortGroup'].toLowerCase().replace( " ", "" ) + ".png",
-								caption: row['label'],
+								content: row['label'],
 								value: row['sortId'],
 								qry: row['qry'],
 								sortGroup: row['sortGroup'],

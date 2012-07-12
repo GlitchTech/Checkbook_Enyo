@@ -135,6 +135,8 @@ enyo.kind({
 
 		this.inherited( arguments );
 
+		enyo.Scroller.touchScrolling = true;
+
 		if( enyo.platform.android ) {
 
 			touchEvent.preventDefault();
@@ -318,9 +320,10 @@ enyo.kind({
 		this.createComponent( paneArgs );
 
 		//Display new pane
-		this.$['appMenu'].setAutomatic( false );
+		//this.$['appMenu'].setAutomatic( false );
 		this.$[paneArgs['name']].render();
-		this.$['container'].selectView( this.$[paneArgs['name']] );
+		this.$['container'].hide();
+		this.$[paneArgs['name']].show();
 
 		//Add new pane to the display stack
 		this.paneStack.push( paneArgs['name'] );
@@ -346,12 +349,12 @@ enyo.kind({
 		if( len > 0 ) {
 
 			//show last item in stack
-			this.$['container'].selectView( this.$[this.paneStack[len - 1]] );
+			this.$[this.paneStack[len - 1]].show();
 		} else {
 
 			//show base view
-			this.$['appMenu'].setAutomatic( true );
-			this.$['container'].selectView( this.$['mainPane'] );
+			//this.$['appMenu'].setAutomatic( true );
+			this.$['container'].show();
 		}
 	},
 

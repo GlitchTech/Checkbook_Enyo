@@ -746,7 +746,7 @@ enyo.kind({
 			this.accountObject.idTable[offset + i] = row['acctId'];
 
 			this.accountObject.accountsList[offset + i] = {
-					"caption": row['acctName'],
+					"content": row['acctName'],
 					"icon": "assets/" + row['acctCategoryIcon'],
 					"color": row['acctCategoryColor'],
 					"value": row['acctId']

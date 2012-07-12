@@ -1,5 +1,9 @@
 /* Text Size */
 
+html, body {
+	font-size: 20px;
+}
+
 .big {
 	font-size: 110%;
 }
@@ -46,6 +50,48 @@
 
 .half-padding-std {
 	padding: .25em;
+}
+
+.padding-top {
+	padding-top: 1em;
+}
+
+.padding-half-top {
+	padding-top: 0.5em;
+}
+
+.padding-bottom {
+	padding-bottom: 1em;
+}
+
+.padding-half-bottom {
+	padding-bottom: 0.5em;
+}
+
+.padding-left {
+	padding-left: 1em;
+}
+
+.padding-half-left {
+	padding-left: 0.5em;
+}
+
+.padding-right {
+	padding-right: 1em;
+}
+
+.padding-half-right {
+	padding-right: 0.5em;
+}
+
+.padding-top-bottom {
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+}
+
+.padding-left-right {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
 }
 
 .margin-top {
@@ -101,6 +147,12 @@
 }
 
 /*****************/
+
+.label {
+	color: #1879cd;
+	font-size: .7rem;
+	text-transform: uppercase;
+}
 
 .bold {
 	font-weight: bold;

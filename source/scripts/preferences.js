@@ -217,7 +217,7 @@ enyo.kind({
 						}, {
 							kind: "onyx.Button",
 							content: "Full Wipe",
-							className: "enyo-button-negative",
+							className: "onyx-negative",
 							style: "margin-top: 1.5em;",
 							ontap: "fullwipe"
 						}
@@ -237,7 +237,7 @@ enyo.kind({
 					kind: "onyx.Button",
 
 					flex: 2,
-					className: "enyo-button-affirmative deep-green",
+					className: "onyx-affirmative deep-green",
 
 					caption: "Done",
 					ontap: "doFinish"

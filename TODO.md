@@ -48,13 +48,4 @@ Enyo Update
 ===========
 
 * Update code to run on EnyoJS (2) instead of Enyo 1
-* This update will have to wait for a later revision of Enyo, lists aren't up to it as of yet.
-
-=========
-Completed
-=========
-* Style consistency fix
-* Import date format issue fix
-* Budget system added
-* Globalization updates
-* Bug fix for custom date time picker
+* Check performance on canvas spinner, replace with onyx if causing lag

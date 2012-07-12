@@ -142,7 +142,7 @@ enyo.kind({
 					flex: 3,
 					ontap: "delete",
 
-					className: "enyo-button-negative"
+					className: "onyx-negative"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
@@ -153,7 +153,7 @@ enyo.kind({
 					flex: 3,
 					ontap: "save",
 
-					className: "enyo-button-affirmative"
+					className: "onyx-affirmative"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
