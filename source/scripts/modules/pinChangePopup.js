@@ -1,20 +1,15 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 /**
- * Checkbook.pinChangePopup ( Popup )
+ * @name Checkbook.pinChangePopup
+ * @author Matthew Schott <glitchtechscience@gmail.com>
  *
- * Kind for PIN change popup. Requires new pin & pin confirmation.
+ * For changing the PIN. Requires initial entry and confirmation.
  *
- * Parameters:
- * - onFinish ( function ): function to call when complete. Send new PIN back as argument
- *
- * USAGE:
- * components: [
- *	 {
- *		 name: "pinPopup",
- *		 kind: "Checkbook.pinChangePopup"
- *	 }
- * ]
+ * @class
+ * @version 2.0 (2012/07/13)
+ * @requires onyx 2.0-beta5
+ * @see http://enyojs.com
  */
 enyo.kind({
 	name: "Checkbook.pinChangePopup",
@@ -30,10 +25,27 @@ enyo.kind({
 
 	autoDismiss: false,
 
+	/**
+	 * @public
+	 * Events sent by control
+	 */
 	events: {
+		/** @lends Checkbook.pinChangePopup# */
+
+		/**
+		 * PIN change completed. Pin is sent in inEvent.value.
+		 * @event
+		 * @param {Object} inSender	Event's sender
+		 * @param {Object} inEvent	Event parameters
+		 */
 		onFinish: ""
 	},
 
+	/**
+	 * @private
+	 * @type Array
+	 * Components of the control
+	 */
 	components: [
 		{
 			name: "title",
@@ -132,6 +144,13 @@ enyo.kind({
 		}
 	],
 
+	/**
+	 * @protected
+	 * @function
+	 * @name Checkbook.pinChangePopup#show
+	 *
+	 * Shows UI.
+	 */
 	show: function() {
 
 		this.inherited( arguments );
@@ -139,11 +158,28 @@ enyo.kind({
 		this.$['pin1'].focus();
 	},
 
-	checkPin: function( inSender, kbEvent ) {
+	/**
+	 * @protected
+	 * @function
+	 * @name Checkbook.pinChangePopup#checkPin
+	 *
+	 * Called by input items. Prevents non-numerical characters.
+	 *
+	 * @param {Object} inSender	Event's sender
+	 * @param {Object} inEvent	Event parameters
+	 */
+	checkPin: function( inSender, inEvent ) {
 
 		inSender.setValue( inSender.getValue().replace( /[^0-9]/, "" ).substr( 0, 10 ) );
 	},
 
+	/**
+	 * @protected
+	 * @function
+	 * @name Checkbook.pinChangePopup#updatePin
+	 *
+	 * Checks pin validity. Sends pin to controller.
+	 */
 	updatePin: function() {
 
 		if( this.$['pin1'].getValue() === "" || this.$['pin2'].getValue() === "" ) {

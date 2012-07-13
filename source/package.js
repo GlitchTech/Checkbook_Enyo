@@ -14,6 +14,7 @@ enyo.depends(
 	"$lib/gts-plugins/SelectorBar",
 	"$lib/gts-plugins/ToggleBar",
 	"$lib/gts-plugins/DividerDrawer",
+	"$lib/gts-plugins/SelectedMenu",
 
 	"scripts/",
 	"styles/"

@@ -52,6 +52,7 @@ var transactionSortOptions = [];
 var defaultAcctTrsnSortOptn =	[
 		{/*
 			//Disabled for now, going to bottom of list eats the processor
+			//Will work with lists new ability to go bottom-up
 			"sortGroup": "Date",
 			"groupOrder": 0,
 			"label": "Oldest to Newest, Show Newest",

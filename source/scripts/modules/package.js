@@ -7,6 +7,5 @@ enyo.depends(
 	"defaultData.js",
 	"sortOptionData.js",
 	"balanceMenu.js",
-	"selectedMenu.js",
 	"utils.js"
 );

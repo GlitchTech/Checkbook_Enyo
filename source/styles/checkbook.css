@@ -60,31 +60,31 @@
 }
 
 .repeatIcon {
-	background-image: url( "../images/calendar.png" );
+	background-image: url( "../../assets/calendar.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .repeatTransferIcon {
-	background-image: url( "../images/future_transfer_1.png" );
+	background-image: url( "../../assets/future_transfer_1.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .transferIcon {
-	background-image: url( "../images/transfer_3.png" );
+	background-image: url( "../../assets/transfer_3.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .expenseIcon {
-	background-image: url( "../images/icon-expense.png" );
+	background-image: url( "../../assets/icon-expense.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .incomeIcon {
-	background-image: url( "../images/icon-income.png" );
+	background-image: url( "../../assets/icon-income.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
@@ -133,24 +133,4 @@
 	border-top-right-radius: 8px 8px;
 	height: 65px;
 	padding: 8px;
-}
-
-/** Menu Selection **/
-
-.enyo-item.selected,
-.enyo-popup-menu .selected .enyo-item {
-	padding-right: 40px;
-
-	background-image: url( "../images/sort_icons/status.png" );
-	background-repeat: no-repeat;
-	background-position: right center;
-}
-
-.enyo-item.normal,
-.enyo-popup-menu .normal .enyo-item {
-	padding-right: 40px;
-
-	background-image: url( "../images/sort_icons/empty.png" );
-	background-repeat: no-repeat;
-	background-position: right center;
 }

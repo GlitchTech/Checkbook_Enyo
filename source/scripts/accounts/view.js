@@ -26,6 +26,7 @@ enyo.kind( {
 	 */
 	components: [
 		{
+			name: "header",
 			kind: "onyx.Toolbar",
 			layoutKind: "FittableColumnsLayout",
 			components: [
@@ -39,11 +40,12 @@ enyo.kind( {
 					classes: "big enyo-text-ellipsis",
 					fit: true
 				}, {
-					name: "overallBalance",
-					kind: "onyx.Button",
-					content: "Balance",
-					style: "padding: 0 8px; margin: 0;",
-					ontap: "balanceButtonClicked"
+					name: "balanceMenu",
+					kind: "Checkbook.balanceMenu",
+
+					onChange: "handleBalanceButton",
+
+					style: "padding: 0 8px; margin: 0;"
 				}
 			]
 		}, {
@@ -81,6 +83,7 @@ enyo.kind( {
 					onchange: "toggleLock",
 					classes: "lock"
 				}, {
+					showing: false,
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
@@ -108,10 +111,6 @@ enyo.kind( {
 		},
 
 		{
-			name: "balanceMenu",
-			//kind: "Checkbook.balanceMenu",
-			onMenuItemClick: "menuItemSelected"
-		}, {
 			name: "sortMenu",
 			//kind: "Checkbook.selectedMenu",
 			components: accountSortOptions
@@ -256,15 +255,6 @@ enyo.kind( {
 						"onSuccess": enyo.bind( this, this.renderAccountList )
 					}
 				);
-		} else if( menuParent === "balancemenu" ) {
-			//Balance Menu
-
-			this.balanceView = inEvent.content;
-
-			this.$['entries'].setBalanceView( this.balanceView );
-			this.$['entries'].refresh();
-
-			this.renderBalanceButton();
 		}
 	},
 
@@ -288,51 +278,43 @@ enyo.kind( {
 	 */
 	renderBalanceButton: function() {
 
-		this.$['overallBalance'].setContent( formatAmount( this.totalBalance[this.balanceView] ) );
-
-		this.$['overallBalance'].addRemoveClass( "positiveBalance", this.totalBalance[this.balanceView] > 0 );
-		this.$['overallBalance'].addRemoveClass( "negativeBalance", this.totalBalance[this.balanceView] < 0 );
-		this.$['overallBalance'].addRemoveClass( "neutralBalance", this.totalBalance[this.balanceView] == 0 );
-	},
-
-	/**
-	 * TODO DEFINITION
-	 */
-	balanceButtonClicked: function( inSender ) {
-
-		this.$['balanceMenu'].setItems(
+		this.$['balanceMenu'].setChoices(
 				[
 					{
 						caption: "Default:",
 						balance: this.totalBalance[4],
-						menuParent: "balanceMenu",
 						value: 4
 					}, {
 						caption: "Available:",
 						balance: this.totalBalance[0],
-						menuParent: "balanceMenu",
 						value: 0
 					}, {
 						caption: "Cleared:",
 						balance: this.totalBalance[1],
-						menuParent: "balanceMenu",
 						value: 1
 					}, {
 						caption: "Pending:",
 						balance: this.totalBalance[3],
-						menuParent: "balanceMenu",
 						value: 3
 					}, {
 						caption: "Final:",
 						balance: this.totalBalance[2],
-						menuParent: "balanceMenu",
 						value: 2
 					}
-				],
-				this.balanceView
+				]
 			);
 
-		this.$['balanceMenu'].openAtControl( inSender );
+		this.$['balanceMenu'].setValue( this.balanceView );
+
+		this.$['header'].reflow();
+	},
+
+	handleBalanceButton: function( inSender, inEvent ) {
+
+		this.balanceView = inEvent.value;
+
+		this.$['entries'].setBalanceView( this.balanceView );
+		this.$['entries'].refresh();
 	},
 
 	/** Footer Control **/

@@ -6,112 +6,108 @@
  * Override kind for balance menu items. Need to be changable on the fly so this implements a setItems function (which should exist but doesn't).
  */
 enyo.kind({
-
 	name: "Checkbook.balanceMenu",
-	kind: enyo.Menu,
-
-	allowHtml: true,
-	scrim: true,
-
-	lazy: false,//Prevents oddness when rending for first view
-
-	style: "min-width: 200px;",
+	kind: "onyx.MenuDecorator",
 
 	published: {
-		localize: true
+		choices: [],
+		value: ""
 	},
 
 	events: {
-		onMenuItemClick: ""
+		onChange: ""
 	},
 
+	components: [
+		{
+			name: "display"
+		}, {
+			name: "menu",
+			kind: "GTS.SelectedMenu",
+			floating: true,
+			style: "min-width: 200px;",
+			onChange: "selectionChanged"
+		}
+	],
+
 	/**
-	 * Updates menu items to be as sent in; designed to be balance menu;
+	 * @protected
+	 * @function
+	 * @name Checkbook.balanceMenu#choicesChanged
 	 *
-	 * @param	newItems	(array of objs):
+	 * Updates menu items to be as sent in; designed to be balance menu;
 	 *	each item should have a minimum of caption, balance, value
 	 *	menuParent is optional. If not set, will be balanceMenu
 	 */
-	setItems: function( newItems, selected ) {
+	choicesChanged: function() {
 
-		if( !Object.validNumber( selected ) ) {
+		if( enyo.isArray( this.choices ) ) {
 
-			selected = -1;
-		}
+			var options = [];
 
-		if( enyo.isArray( newItems ) ) {
+			for( var i = 0; i < this.choices.length; i++ ) {
 
-			this.deleteChildren();
+				var balanceColor = "neutralFunds";
 
-			for( var i = 0; i < newItems.length; i++ ) {
+				if( ( Math.round( this.choices[i]['balance'] * 100 ) / 100 ) > 0 ) {
 
-				this.createItemComponent(
-						newItems[i]['caption'],
-						newItems[i]['balance'],
-						newItems[i]['value'],
-						enyo.isString( newItems[i]['menuParent'] ) ? newItems[i]['menuParent'] : "balanceMenu",
-						( selected === newItems[i]['value'] )
-					);
-			}
+					balanceColor = 'positiveFunds';
+				} else if( ( Math.round( this.choices[i]['balance'] * 100 ) / 100 ) < 0 ) {
 
-			this.render();
-		}
-	},
-
-	deleteChildren: function() {
-
-		var componentList = this.getComponents();
-
-		for( var i = 0; i < componentList.length; i++ ) {
-
-			if( enyo.isString( componentList[i]['menuParent'] ) ) {
-
-				componentList[i].destroy();
-			}
-		}
-	},
-
-	createItemComponent: function( captionIn, balanceIn, valueIn, menuParentIn, selected ) {
-
-		var balanceColor = "neutralFunds";
-		if( ( Math.round( balanceIn * 100 ) / 100 ) > 0 ) {
-
-			balanceColor = 'positiveFunds';
-		} else if( ( Math.round( balanceIn * 100 ) / 100 ) < 0 ) {
-
-			balanceColor = 'negativeFunds';
-		}
-
-		this.createComponent(
-				{
-					kind: enyo.HFlexBox,
-
-					menuParent: menuParentIn,
-					value: valueIn,
-
-					ontap: "menuItemClick",
-
-					className: "enyo-item enyo-menuitem " + ( selected ? "selected" : "normal" ),
-					style: "min-width: 200px;",
-
-					components: [
-						{
-							content: ( this.localize ? $L( captionIn ) : captionIn ),
-							className: "enyo-menuitem-caption",
-							flex: 1
-						}, {
-							content: formatAmount( balanceIn ),
-							className: "enyo-menuitem-caption " + balanceColor,
-							style: "margin-left: 10px;"
-						}
-					]
+					balanceColor = 'negativeFunds';
 				}
-			);
+
+				options.push( {
+						layoutKind: "enyo.FittableColumnsLayout",
+
+						value: this.choices[i]['value'],
+
+						ontap: "menuItemClick",
+
+						components: [
+							{
+								content: this.choices[i]['caption'],
+								classes: "margin-right",
+								fit: true
+							}, {
+								content: formatAmount( this.choices[i]['balance'] ),
+								classes: balanceColor
+							}
+						]
+					});
+			}
+
+			this.$['menu'].setChoices( options );
+		}
 	},
 
-	menuItemClick: function( inSender, inEvent ) {
+	valueChanged: function() {
 
-		this.doMenuItemClick( inSender, inEvent );
-		this.close();
+		this.$['menu'].setValue( this.value );
+
+		var display = 0;
+
+		for( var i = 0; i < this.choices.length; i++ ) {
+
+			if( this.choices[i].value === this.value ) {
+
+				display = this.choices[i]['balance'];
+			}
+		}
+
+		this.$['display'].setContent( formatAmount( display ) );
+
+		this.$['display'].addRemoveClass( "positiveBalance", display > 0 );
+		this.$['display'].addRemoveClass( "negativeBalance", display < 0 );
+		this.$['display'].addRemoveClass( "neutralBalance", display == 0 );
+	},
+
+	selectionChanged: function( inSender, inEvent ) {
+
+		this.setValue( inEvent.value );
+
+		this.doChange( inEvent );
+
+		return true;
 	}
 });

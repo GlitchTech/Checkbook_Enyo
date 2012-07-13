@@ -412,25 +412,9 @@ enyo.kind( {
 	/**
 	 * TODO DEFINITION
 	 */
-	constructor: function() {
-
-		this.inherited( arguments );
-
-		this.log();
-
-		//Setup listing of bound methods
-		this._binds = {
-		};
-	},
-
-	/**
-	 * TODO DEFINITION
-	 */
 	rendered: function() {
 
 		this.inherited( arguments );
-
-		this.log();
 
 		this.$['loadingScrim'].show();
 		this.$['loadingSpinner'].show();
@@ -463,6 +447,15 @@ enyo.kind( {
 
 				this.categories['choices'].push(
 						{
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/" + row['icon'],
+									classes: "margin-right"
+								}, {
+									content: row['name'],
+								}
+							],
 							content: row['name'],
 							icon: "assets/" + row['icon'],
 							color: row['color'],
@@ -504,15 +497,13 @@ enyo.kind( {
 
 			this.$['autoTransferLink'].setChoices( accounts );
 
+			this.$['autoTransfer'].setDisabled( false );
 			this.$['autoTransferLink'].setDisabled( false );
-			//this.$['autoTransferLink'].$['listName'].setDisabled( false );
-
-			this.$['autoTransferLink'].render();
-
 		} else {
 
+			this.$['autoTransfer'].setValue( 0 );
+			this.$['autoTransfer'].setDisabled( true );
 			this.$['autoTransferLink'].setDisabled( true );
-			//this.$['autoTransferLink'].$['listName'].setDisabled( true );
 		}
 
 		enyo.asyncMethod(
