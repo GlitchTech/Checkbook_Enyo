@@ -164,6 +164,6 @@ enyo.kind({
 
 		this.$['errorMessageContainer'].hide();
 
-		this.doFinish( this.$['pin1'].getValue() );
+		this.doFinish( { "value": this.$['pin1'].getValue() } );
 	}
 });

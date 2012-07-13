@@ -107,6 +107,8 @@ enyo.kind( {
 														{
 															name: "pinCode",
 															kind: "onyx.Input",
+															type: "password",
+
 															placeholder: "Tap to set...",
 
 															disabled: true,
@@ -637,11 +639,11 @@ enyo.kind( {
 	/**
 	 * TODO DEFINITION
 	 */
-	changePinCodeHandler: function( inSender, newPin ) {
+	changePinCodeHandler: function( inSender, inEvent ) {
 
-		if( enyo.isString( newPin ) ) {
+		if( enyo.isString( inEvent.value ) ) {
 
-			this.$['pinCode'].setValue( newPin );
+			this.$['pinCode'].setValue( inEvent.value );
 			this.pinChanged = true;
 		}
 
