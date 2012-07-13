@@ -218,7 +218,13 @@ enyo.kind( {
 	menuItemSelected: function( inSender, inEvent ) {
 		//All menu items come here
 
+		if( !inEvent.selected ) {
+
+			return;
+		}
+
 		var menuParent = inEvent.selected.menuParent.toLowerCase();
+
 		if( menuParent === "searchmenu" ) {
 			//Search Menu
 

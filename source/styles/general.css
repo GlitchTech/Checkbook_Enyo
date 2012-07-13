@@ -169,7 +169,7 @@ html, body {
 }
 
 .invert {
-	-webkit-transform: rotate(180deg);
+	-webkit-transform: rotate( 180deg );
 }
 
 .img-icon {
@@ -196,11 +196,15 @@ html, body {
 	border-radius: 5px;
 }
 
-.onyx-item {
-	border-top: 1px solid rgba(255, 255, 255, 0.5);
-	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+.onyx-item.bordered {
+	border-top: 1px solid rgba( 255, 255, 255, 0.5 );
+	border-bottom: 1px solid rgba( 0, 0, 0, 0.2 );
 	padding: 10px;
 	font-size: .9rem;
+}
+
+.onyx-item.onyx-swipeable-item.bordered {
+	padding: 0;
 }
 
 /*****************/
@@ -293,12 +297,12 @@ html, body {
 	height:100%;
 }
 
-.enyo-menuitem-icon  {
+.enyo-menuitem-icon {
 	height: 32px;
 	width: 32px;
 }
 
-.iconListSelector .enyo-menuitem-icon  + div {
+.iconListSelector .enyo-menuitem-icon + div {
 	padding-top: 8px;
 }
 

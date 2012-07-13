@@ -46,10 +46,9 @@ enyo.kind({
 			components: [
 				{
 					name: "accountItem",
-					classes: "norm-row account-item",
+					classes: "bordered norm-row account-item",
 
 					kind: "onyx.SwipeableItem",
-					preventDragPropagation: true,
 
 					ontap: "accountTapped",
 					onConfirm: "accountDeleted",

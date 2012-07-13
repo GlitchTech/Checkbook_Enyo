@@ -12,6 +12,7 @@ enyo.kind({
 
 			fit: true,
 			showing: false,
+			draggable: false,
 
 			classes: "app-panels enyo-fit",
 			arrangerKind: "CollapsingArranger",

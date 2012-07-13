@@ -51,12 +51,15 @@ enyo.kind( {
 						}, {
 							name: "accountCategory",
 							kind: "GTS.SelectorBar",
+							classes: "custom-background bordered",
+
 							label: "Account Category",
-							classes: "custom-background",
 							onChange: "categoryChanged"
 						}, {
 							name: "defaultAccount",
 							kind: "GTS.ToggleBar",
+							classes: "bordered",
+
 							label: "Default Account",
 							sublabel: "This account is launched automatically on start.",
 							onContent: "Yes",
@@ -72,6 +75,8 @@ enyo.kind( {
 								{
 									name: "freezeAccount",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Freeze Internal Transactions",
 									sublabel: "Prevent any changes from being made only in this account.",
 									onContent: "Yes",
@@ -79,6 +84,8 @@ enyo.kind( {
 								}, {
 									name: "pinLock",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "PIN Lock",
 									onContent: "Yes",
 									offText: "No",
@@ -126,12 +133,15 @@ enyo.kind( {
 								{
 									name: "transactionSorting",
 									kind: "GTS.SelectorBar",
+									classes: "bordered",
+
 									label: "Sorting",
 									onChange: "transactionSortingUpdateLabel"
 								}, {
 									name: "accountDisplay",
 									kind: "GTS.SelectorBar",
-									localizeOptions: false,
+									classes: "bordered",
+
 									label: "Display",
 									onChange: "accountDisplayUpdateLabel",
 									value: 0,
@@ -150,6 +160,8 @@ enyo.kind( {
 								}, {
 									name: "balance",
 									kind: "GTS.SelectorBar",
+									classes: "bordered",
+
 									label: "Balance",
 									onChange: "balanceUpdateLabel",
 									value: 0,
@@ -171,6 +183,8 @@ enyo.kind( {
 								}, {
 									name: "showTransTime",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Show Transaction Time",
 									sublabel: "Displays the transaction time in addition to the date.",
 									onContent: "Yes",
@@ -179,6 +193,8 @@ enyo.kind( {
 								}, {
 									name: "showRunningBal",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Show Running Balance",
 									sublabel: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
 									onContent: "Yes",
@@ -186,6 +202,8 @@ enyo.kind( {
 								}, {
 									name: "hideTransNotes",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Hide Transaction Notes",
 									sublabel: "Transaction notes will be hidden.",
 									onContent: "Yes",
@@ -202,6 +220,8 @@ enyo.kind( {
 								{
 									name: "descriptionMultilineMode",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Description Multiline Mode",
 									sublabel: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
 									onContent: "Yes",
@@ -209,7 +229,8 @@ enyo.kind( {
 								}, {
 									name: "autoComplete",
 									kind: "GTS.ToggleBar",
-									style: "padding-left: 0;",
+									classes: "bordered",
+
 									label: "Use Auto-Complete",
 									sublabel: "Displays suggestions for transaction descriptions based on your history.",
 									onContent: "Yes",
@@ -218,6 +239,8 @@ enyo.kind( {
 								}, {
 									name: "atmMode",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Use ATM Mode",
 									sublabel: "Amount field will be automatically formatted as you type.",
 									onContent: "Yes",
@@ -226,6 +249,8 @@ enyo.kind( {
 								}, {
 									name: "autoTransfer",
 									kind: "GTS.SelectorBar",
+									classes: "bordered",
+
 									label: "Auto Transfer",
 									onChange: "toggleAutoTransferDrawer",
 									value: 0,
@@ -248,6 +273,7 @@ enyo.kind( {
 										{
 											name: "autoTransferLink",
 											kind: "GTS.SelectorBar",
+
 											label: "Transfer to...",
 											classes: "iconListSelector"
 										}
@@ -255,6 +281,8 @@ enyo.kind( {
 								}, {
 									name: "checkNumber",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Add Check Number Field",
 									sublabel: "Add a field to record the check number in the add/edit transaction screen.",
 									onContent: "Yes",
@@ -262,6 +290,8 @@ enyo.kind( {
 								}, {
 									name: "expenseCategories",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Add Expense Categories",
 									sublabel: "Add a field to record the expense category in the add/edit transaction screen.",
 									onContent: "Yes",
@@ -272,6 +302,8 @@ enyo.kind( {
 
 									name: "hideCleared",
 									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
 									label: "Hide cleared transactions",
 									sublabel: "",
 									onContent: "Yes",

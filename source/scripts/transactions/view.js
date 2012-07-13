@@ -126,9 +126,14 @@ enyo.kind( {
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",
-			classes: "deep-green text-center",
+			classes: "deep-green",
 			components: [
 				{
+					//I do nothing right now
+					showing: false,
+					kind: "onyx.Grabber",
+					style: "margin-right: 10px;"
+				},{
 					components: [
 						{
 							//Doesn't display properly
