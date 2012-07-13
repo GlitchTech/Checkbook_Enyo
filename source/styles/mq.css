@@ -4,16 +4,29 @@
 	height: device-height;
 }
 
-/* set the width and some basic styling for each panel */
+/* Default Styling */
 .app-panels > * {
 	width: 400px;
 	background-color: #EAEAEA;
 	box-shadow: -4px -4px 4px rgba(0,0,0,0.3);
 }
 
-/* on small devices, make each panel fit to the app width */
+.small-input-popup {
+	width: 400px;
+}
+
+/* Adjust for smaller screen sizes */
+
 @media all and ( max-width: 800px ) {
+
 	.app-panels > * {
 		min-width: 100%;
+	}
+}
+
+@media all and ( max-width: 400px ) {
+
+	.small-input-popup {
+		width: 95%;
 	}
 }

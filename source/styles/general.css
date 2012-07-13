@@ -42,6 +42,18 @@ html, body {
 	text-align: right;
 }
 
+.text-top > * {
+	vertical-align: top;
+}
+
+.text-middle > * {
+	vertical-align: middle;
+}
+
+.text-bottom > * {
+	vertical-align: bottom;
+}
+
 /* Spacing */
 
 .padding-std {

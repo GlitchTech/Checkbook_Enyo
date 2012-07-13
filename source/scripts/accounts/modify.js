@@ -98,6 +98,7 @@ enyo.kind( {
 										{
 											kind: "onyx.Groupbox",
 											classes: "padding-half-top",
+											ontap: "changePinCode",
 											components: [
 												{
 													kind: "onyx.InputDecorator",
@@ -107,8 +108,6 @@ enyo.kind( {
 															name: "pinCode",
 															kind: "onyx.Input",
 															placeholder: "Tap to set...",
-
-															ontap: "changePinCode",
 
 															disabled: true,
 															fit: true
@@ -632,7 +631,7 @@ enyo.kind( {
 				}
 			);
 
-		this.$['pinPopup'].openAtCenter();
+		this.$['pinPopup'].show();
 	},
 
 	/**
@@ -646,7 +645,7 @@ enyo.kind( {
 			this.pinChanged = true;
 		}
 
-		this.$['pinPopup'].close();
+		this.$['pinPopup'].hide();
 		this.$['pinPopup'].destroy();
 	},
 
@@ -860,7 +859,7 @@ enyo.kind( {
 				});
 
 			this.$['deleteAccountConfirm'].render();
-			this.$['deleteAccountConfirm'].openAtCenter();
+			this.$['deleteAccountConfirm'].show();
 		}
 	},
 

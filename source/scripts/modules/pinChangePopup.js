@@ -17,19 +17,18 @@
  * ]
  */
 enyo.kind({
-
 	name: "Checkbook.pinChangePopup",
-	kind: enyo.ModalDialog,
+	kind: "onyx.Popup",
 
-	layoutKind: enyo.VFlexLayout,
+	classes: "small-input-popup",
 
-	modal: true,
+	centered: true,
+	floating: true,
+
 	scrim: true,
+	scrimclasses: "onyx-scrim-translucent",
 
-	dismissWithClick: false,
-	dismissWithEscape: false,
-
-	style: "width: 400px;",
+	autoDismiss: false,
 
 	events: {
 		onFinish: ""
@@ -37,105 +36,96 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Header,
+			name: "title",
+			content: "Change PIN Code",
 
-			className: "enyo-header-dark popup-header",
-			style: "border-radius: 10px; margin-bottom: 10px; padding: 0 10px;",
-
+			classes: "bigger"
+		}, {
+			classes: "padding-std light",
 			components: [
 				{
-					name: "title",
-					content: "Change PIN Code",
-
-					className: "bigger"
-				}
-			]
-		}, {
-			content: "Your pin may only contain numeric characters. (0-9)",
-			className: "smaller"
-		}, {
-			kind: enyo.RowGroup,
-			components: [
-				{
-					name: "pin1",
-					kind: enyo.PasswordInput,
-
-					hint: "10 characters max",
-
-					autoKeyModifier: "num-lock",
-					selectAllOnFocus: true,
-					spellcheck: false,
-					autocorrect: false,
-					autoWordComplete: false,
-
-					oninput: "checkPin",
-
+					content: "Your pin may only contain numeric characters. (0-9)",
+					classes: "small bold padding-half-bottom"
+				}, {
+					kind: "onyx.Groupbox",
 					components: [
 						{
-							content: "pin code",
-							className: "small",
-							style: "text-transform: uppercase; color: rgb( 32, 117, 191 );"
+							kind: "onyx.InputDecorator",
+							layoutKind: "FittableColumnsLayout",
+							components: [
+								{
+									name: "pin1",
+									kind: "onyx.Input",
+									type: "password",
+
+									placeholder: "10 characters max",
+
+									fit: true,
+
+									oninput: "checkPin",
+								}, {
+									content: "pin code",
+									classes: "small label"
+								}
+							]
+						}, {
+							kind: "onyx.InputDecorator",
+							layoutKind: "FittableColumnsLayout",
+							components: [
+								{
+									name: "pin2",
+									kind: "onyx.Input",
+									type: "password",
+
+									placeholder: "10 characters max",
+
+									fit: true,
+
+									oninput: "checkPin",
+								}, {
+									content: "confirm",
+									classes: "small label"
+								}
+							]
 						}
 					]
 				}, {
-					name: "pin2",
-					kind: enyo.PasswordInput,
+					name: "errorMessageContainer",
+					layoutKind: "enyo.FittableColumnsLayout",
+					noStretch: true,
 
-					autoKeyModifier: "num-lock",
-					selectAllOnFocus: true,
-					spellcheck: false,
-					autocorrect: false,
-					autoWordComplete: false,
-
-					oninput: "checkPin",
-
-					hint: "10 characters max",
+					showing: false,
+					classes: "padding-half-top text-middle",
 					components: [
 						{
-							content: "confirm",
-							className: "small",
-							style: "text-transform: uppercase; color: rgb( 32, 117, 191 );"
+							kind: "enyo.Image",
+							src: "assets/warning-icon.png",
+							style: "margin-right: 5px;"
+						}, {
+							name: "errorMessage",
+							style: "color: #d70000;",
+							content: "The code entered is invalid."
 						}
 					]
 				}
 			]
 		}, {
-			name: "errorMessageContainer",
-			layoutKind: enyo.HFlexLayout,
-			pack: "start",
-			showing: false,
-			components: [
-				{
-					kind: "Image",
-					src: "assets/warning-icon.png",
-					style: "margin-right: 5px;"
-				}, {
-					name: "errorMessage",
-					style: "color: #d70000;",
-					content: "The code entered is invalid."
-				}
-			]
-		}, {
-			kind: enyo.Toolbar,
+			//kind: "onyx.Toolbar",
+			classes: "padding-std margin-half-top text-center",
 			components: [
 				{
 					kind: "onyx.Button",
 
-					flex: 2,
-					className: "enyo-button-primary",
+					classes: "margin-half-right",
 
-					caption: "Cancel",
+					content: "Cancel",
 					ontap: "doFinish"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
 					kind: "onyx.Button",
 
-					flex: 2,
-					className: "onyx-affirmative",
+					classes: "onyx-affirmative margin-half-left",
 
-					caption: "Change",
+					content: "Change",
 					ontap: "updatePin"
 				}
 			]
@@ -146,7 +136,7 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.$['pin1'].forceFocus();
+		this.$['pin1'].focus();
 	},
 
 	checkPin: function( inSender, kbEvent ) {
