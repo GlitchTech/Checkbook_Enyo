@@ -258,8 +258,10 @@ enyo.kind({
 			//First run notice
 
 			Checkbook.globals.criticalError.load(
-					"Welcome to " + enyo.fetchAppInfo()['title'],
-					"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
+					//"Welcome to " + enyo.fetchAppInfo()['title'],
+					//"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
+					"Welcome to Checkbook",
+					"If you have any questions, visit <a href='http://glitchtechscience.com'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>mailto:glitchtechscience@gmail.com</a>.",
 					"",
 					"assets/icon_1_32x32.png"
 				);

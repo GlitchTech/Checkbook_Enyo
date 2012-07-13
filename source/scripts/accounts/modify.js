@@ -30,7 +30,7 @@ enyo.kind( {
 					components: [
 						{
 							kind: "onyx.Groupbox",
-							classes: "padding-half-top",
+							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
 									kind: "onyx.InputDecorator",
@@ -52,6 +52,7 @@ enyo.kind( {
 							name: "accountCategory",
 							kind: "GTS.SelectorBar",
 							label: "Account Category",
+							classes: "custom-background",
 							onChange: "categoryChanged"
 						}, {
 							name: "defaultAccount",
@@ -63,7 +64,8 @@ enyo.kind( {
 						},
 
 						{
-							kind: enyo.DividerDrawer,
+							name: "securityOptionDrawer",
+							kind: "GTS.DividerDrawer",
 							caption: "Security Options",
 							open: true,
 							components: [
@@ -84,6 +86,7 @@ enyo.kind( {
 								}, {
 									name: "pinLockDrawer",
 									kind: "onyx.Drawer",
+									open: false,
 									components: [
 										{
 											kind: "onyx.Groupbox",
@@ -116,7 +119,7 @@ enyo.kind( {
 						},
 
 						{
-							kind: enyo.DividerDrawer,
+							kind: "GTS.DividerDrawer",
 							caption: "Display Options",
 							open: true,
 							components: [
@@ -192,7 +195,7 @@ enyo.kind( {
 						},
 
 						{
-							kind: enyo.DividerDrawer,
+							kind: "GTS.DividerDrawer",
 							caption: "Transaction Options",
 							open: true,
 							components: [
@@ -369,6 +372,9 @@ enyo.kind( {
 		}
 	],
 
+	/**
+	 * TODO DEFINITION
+	 */
 	constructor: function() {
 
 		this.inherited( arguments );
@@ -380,6 +386,9 @@ enyo.kind( {
 		};
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	rendered: function() {
 
 		this.inherited( arguments );
@@ -393,6 +402,9 @@ enyo.kind( {
 		this.$['acctCategoryManager'].fetchCategories( { "onSuccess": enyo.bind( this, this.buildAccountCategories ) } );
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	buildAccountCategories: function( results ) {
 
 		var row = null;
@@ -435,6 +447,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	buildTransactionSorting: function() {
 
 		this.$['transactionSorting'].setChoices( transactionSortOptions );
@@ -443,6 +458,9 @@ enyo.kind( {
 		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAutoTransferLink ) } );
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	buildAutoTransferLink: function( accounts ) {
 
 		if( accounts.length > 0) {
@@ -466,6 +484,9 @@ enyo.kind( {
 			);
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	transactionSortingUpdateLabel: function() {
 
 		Checkbook.globals.gts_db.query(
@@ -477,6 +498,9 @@ enyo.kind( {
 			);
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	transactionSortingUpdateLabelHandler: function( results ) {
 
 		if( results[0]['desc'] ) {
@@ -488,6 +512,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	accountDisplayUpdateLabel: function() {
 
 		var value = this.$['accountDisplay'].getValue();
@@ -504,6 +531,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	balanceUpdateLabel: function() {
 
 		var value = this.$['balance'].getValue();
@@ -523,27 +553,38 @@ enyo.kind( {
 		}
 	},
 
-	categoryChanged: function( inSender, newVal, oldVal ) {
+	/**
+	 * TODO DEFINITION
+	 */
+	categoryChanged: function() {
 
 		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
 
-			if( this.categories['assoc'][oldVal] ) {
+			for( var i = 0; i < appColors.length; i++ ) {
 
-				this.$['accountCategory'].removeClass( this.categories['assoc'][oldVal]['color'] );
+				this.$['accountCategory'].removeClass( appColors[i]['name'] );
 			}
 
-			if( this.categories['assoc'][newVal] ) {
+			var newCat = this.$['accountCategory'].getValue();
 
-				this.$['accountCategory'].addClass( this.categories['assoc'][newVal]['color'] );
+			if( this.categories['assoc'][newCat] ) {
+
+				this.$['accountCategory'].addClass( this.categories['assoc'][newCat]['color'] );
 			}
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	togglePINStatus: function() {
 
 		this.$['pinLockDrawer'].setOpen( this.$['pinLock'].getValue() );
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	changePinCode: function() {
 
 		this.createComponent(
@@ -558,6 +599,9 @@ enyo.kind( {
 		this.$['pinPopup'].openAtCenter();
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	changePinCodeHandler: function( inSender, newPin ) {
 
 		if( enyo.isString( newPin ) ) {
@@ -570,6 +614,9 @@ enyo.kind( {
 		this.$['pinPopup'].destroy();
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	toggleAutoTransferDrawer: function() {
 
 		var value = this.$['autoTransfer'].getValue();
@@ -588,6 +635,9 @@ enyo.kind( {
 		this.$['autoTransferDrawer'].setOpen( this.$['autoTransfer'].getValue() > 0	 );
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	//Set up UI & Data
 	setAccountValues: function() {
 
@@ -634,6 +684,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	renderDisplayItems: function( results ) {
 
 		if( !results || typeof( results ) === "undefined" ) {
@@ -676,7 +729,7 @@ enyo.kind( {
 		this.togglePINStatus();
 		this.toggleAutoTransferDrawer();
 
-		this.categoryChanged( null, this.$['accountCategory'].getValue(), null );
+		this.categoryChanged();
 
 		if( this.acctId < 0 ) {
 			//Can"t delete an account that doesn"t exist
@@ -690,6 +743,9 @@ enyo.kind( {
 		//this.$['accountName'].forceFocusEnableKeyboard();
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	saveAccount: function() {
 
 		this.log();
@@ -738,6 +794,9 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	deleteAccount: function() {
 
 		if( this.acctId < 0 ) {
@@ -765,11 +824,17 @@ enyo.kind( {
 		}
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	deleteAccountConfirmClose: function() {
 
 		this.$['deleteAccountConfirm'].destroy();
 	},
 
+	/**
+	 * TODO DEFINITION
+	 */
 	deleteAccountHandler: function() {
 
 		Checkbook.globals.accountManager.deleteAccount(
