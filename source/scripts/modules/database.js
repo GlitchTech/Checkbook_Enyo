@@ -239,8 +239,6 @@ enyo.kind({
 		// Run the transaction
 		var DEBUG = this.debug;
 
-		//determine if read only transaction && not android, then use readTransaction
-
 		this.db.transaction( function( transaction ) {
 
 			// Loop over each query and execute it

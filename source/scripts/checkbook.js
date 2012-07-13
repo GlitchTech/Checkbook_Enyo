@@ -529,9 +529,9 @@ enyo.kind({
 		}
 	},
 
-	accoutDeleted: function( inSender, accountId ) {
+	accoutDeleted: function( inSender, inEvent ) {
 
-		if( this.$['transactions'].getAccountId() == accountId ) {
+		if( this.$['transactions'].getAccountId() == inEvent.accountId ) {
 
 			this.$['transactions'].unloadSystem();
 		} else {

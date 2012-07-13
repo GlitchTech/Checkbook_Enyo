@@ -66,7 +66,7 @@ enyo.kind( {
 
 					ontap: "transactiontapped",
 					onmousehold: "transactionHeld",
-					onConfirm: "transactionDeleted",
+					onDelete: "transactionDeleted",
 
 					style: "padding-right: 20px; padding-left: 30px;",
 

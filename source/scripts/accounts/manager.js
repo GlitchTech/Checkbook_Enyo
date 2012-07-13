@@ -846,8 +846,8 @@ enyo.kind({
 
 			opts['onSuccess'] = enyo.bind( this, function() {
 
-						this.updateAccountModTime();
-						userOpts['onSuccess']( true );
+					this.updateAccountModTime();
+					userOpts['onSuccess']( true );//Breaks, why?
 				});
 		} else {
 

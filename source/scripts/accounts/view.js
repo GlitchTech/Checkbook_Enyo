@@ -174,9 +174,9 @@ enyo.kind( {
 	/**
 	 * TODO DEFINITION
 	 */
-	accountDeleted: function( inSender, account ) {
+	accountDeleted: function( inSender, inEvent ) {
 
-		this.doDelete( account );
+		this.doDelete( inEvent );
 		this.accountBalanceForceUpdate();
 
 		return true;
@@ -371,12 +371,12 @@ enyo.kind( {
 	/**
 	 * TODO DEFINITION
 	 */
-	addAccountComplete: function( inSender, action, actionStatus ) {
+	addAccountComplete: function( inSender, inEvent ) {
 
 		this.$['addAccountButton'].setChecked( false );
 		this.$['addAccountButton'].setDisabled( false );
 
-		if( action === 1 && actionStatus === true ) {
+		if( inEvent['action'] === 1 && inEvent['actionStatus'] === true ) {
 
 			this.log( "New account created" );
 

@@ -51,7 +51,7 @@ enyo.kind({
 					kind: "onyx.SwipeableItem",
 
 					ontap: "accountTapped",
-					onConfirm: "accountDeleted",
+					onDelete: "accountDeleted",
 
 					components: [
 						{
@@ -288,15 +288,13 @@ enyo.kind({
 		}
 	},
 
-	accountDeleted: function( inSender, rowIndex ) {
+	accountDeleted: function( inSender, inEvent ) {
 		//Row deleted
 
-		this.log( arguments );
-
 		Checkbook.globals.accountManager.deleteAccount(
-				this.accounts[rowIndex]['acctId'],
+				this.accounts[inEvent.index]['acctId'],
 				{
-					"onSuccess": enyo.bind( this, this.accountDeletedSuccess, this.accounts[rowIndex]['acctId'] )
+					"onSuccess": enyo.bind( this, this.accountDeletedSuccess, this.accounts[inEvent.index]['acctId'] )
 				}
 			);
 
@@ -307,7 +305,7 @@ enyo.kind({
 
 		this.log();
 
-		this.doDelete( acctId );
+		this.doDelete( { "accountId": acctId } );
 		this.renderAccountList();
 	},
 

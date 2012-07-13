@@ -313,23 +313,27 @@ enyo.kind( {
 						},
 
 						{
-							kind: enyo.Group,
-							align: "center",
-							tapHightlight: false,
-							layoutKind: enyo.HFlexLayout,
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top",
 							components: [
 								{
-									name: "accountNotes",
-									kind: enyo.RichText,
-									hint: "Account specific notes",
-									style: "min-height: 150px;",
-									flex: 1,
+									kind: "onyx.InputDecorator",
+									layoutKind: "FittableColumnsLayout",
 									components: [
 										{
+											name: "accountNotes",
+											kind: "onyx.TextArea",
+											placeholder: "Account specific notes",
+
+											style: "min-height: 150px;",
+											fit: true
+										}, {
 											content: "Notes",
-											classes: "label"
+											classes: "label",
+											style: "vertical-align: top;"
 										}
 									]
+
 								}
 							]
 						},
@@ -375,7 +379,7 @@ enyo.kind( {
 
 		{
 			name: "loadingScrim",
-			kind: onyx.Scrim,
+			kind: "onyx.Scrim",
 			classes: "onyx-scrim-translucent"
 		}, {
 			name: "loadingSpinner",
@@ -731,26 +735,26 @@ enyo.kind( {
 		this.$['accountCategory'].setValue( results['acctCategory'] );
 		this.$['accountNotes'].setValue( results['acctNotes'] );
 
-		//this.$['freezeAccount'].setValue( results['frozen'] === 1 );
-		//this.$['pinLock'].setValue( results['acctLocked'] === 1 );
-		//this.$['pinCode'].setValue( results['lockedCode'] );
+		this.$['freezeAccount'].setValue( results['frozen'] === 1 );
+		this.$['pinLock'].setValue( results['acctLocked'] === 1 );
+		this.$['pinCode'].setValue( results['lockedCode'] );
 
 		this.$['transactionSorting'].setValue( results['sort'] );
 		this.$['accountDisplay'].setValue( results['hidden'] );
 		this.$['balance'].setValue( results['bal_view'] );
-		//this.$['defaultAccount'].setValue( results['defaultAccount'] === 1 );
-		//this.$['showTransTime'].setValue( results['showTransTime'] === 1 );
-		//this.$['showRunningBal'].setValue( results['runningBalance'] === 1 );
-		//this.$['hideTransNotes'].setValue( results['hideNotes'] === 1 );
+		this.$['defaultAccount'].setValue( results['defaultAccount'] === 1 );
+		this.$['showTransTime'].setValue( results['showTransTime'] === 1 );
+		this.$['showRunningBal'].setValue( results['runningBalance'] === 1 );
+		this.$['hideTransNotes'].setValue( results['hideNotes'] === 1 );
 
-		//this.$['descriptionMultilineMode'].setValue( results['transDescMultiLine'] === 1 );
-		//this.$['autoComplete'].setValue( results['useAutoComplete'] === 1 );
-		//this.$['atmMode'].setValue( results['atmEntry'] === 1 );
+		this.$['descriptionMultilineMode'].setValue( results['transDescMultiLine'] === 1 );
+		this.$['autoComplete'].setValue( results['useAutoComplete'] === 1 );
+		this.$['atmMode'].setValue( results['atmEntry'] === 1 );
 		this.$['autoTransfer'].setValue( results['auto_savings'] );
 		this.$['autoTransferLink'].setValue( results['auto_savings_link'] );
-		//this.$['checkNumber'].setValue( results['checkField'] === 1 );
-		//this.$['expenseCategories'].setValue( results['enableCategories'] === 1 );
-		//this.$['hideCleared'].setValue( results['hide_cleared'] === 1 );//DNE
+		this.$['checkNumber'].setValue( results['checkField'] === 1 );
+		this.$['expenseCategories'].setValue( results['enableCategories'] === 1 );
+		this.$['hideCleared'].setValue( results['hide_cleared'] === 1 );//DNE
 
 		//Adjust Sublabel elements
 		this.transactionSortingUpdateLabel();
@@ -772,7 +776,7 @@ enyo.kind( {
 		this.$['loadingScrim'].hide();
 		this.$['loadingSpinner'].hide();
 
-		//this.$['accountName'].forceFocusEnableKeyboard();
+		this.$['accountName'].focus();
 	},
 
 	/**
@@ -780,11 +784,10 @@ enyo.kind( {
 	 */
 	saveAccount: function() {
 
-		this.log();
-
 		if( this.$['accountName'].getValue().length <= 0 ) {
 
 			//Alert, you need an account name
+			alert( "you need an account name (replace this)" );
 
 			return;
 		}
@@ -814,7 +817,7 @@ enyo.kind( {
 			};
 
 		var options = {
-				"onSuccess": enyo.bind( this, this.doFinish, 1 )
+				"onSuccess": enyo.bind( this, this.tryFinish )
 			};
 
 		if( this.acctId < 0 ) {
@@ -824,6 +827,11 @@ enyo.kind( {
 
 			Checkbook.globals.accountManager.updateAccount( data, this.acctId, this.pinChanged, options );
 		}
+	},
+
+	tryFinish: function( status ) {
+
+		this.doFinish( { "action": 1, "actionStatus": status } );
 	},
 
 	/**

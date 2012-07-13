@@ -34,6 +34,10 @@ enyo.kind( {
 	/** @protected */
 	encryptStringSuccess: function( string, callbackFn, results ) {
 
+		//TEMP
+		callbackFn( "" );
+		return;
+
 		if( enyo.isFunction( callbackFn ) ) {
 
 			if( results.length > 0 && enyo.isString( string ) && string.length > 0 ) {
@@ -80,6 +84,10 @@ enyo.kind( {
 
 	/** @protected */
 	decryptStringSuccess: function( string, callbackFn, results ) {
+
+		//TEMP
+		callbackFn( "" );
+		return;
 
 		if( enyo.isFunction( callbackFn ) ) {
 
