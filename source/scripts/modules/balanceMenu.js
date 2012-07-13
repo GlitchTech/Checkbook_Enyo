@@ -47,14 +47,14 @@ enyo.kind({
 
 			for( var i = 0; i < this.choices.length; i++ ) {
 
-				var balanceColor = "neutralFunds";
+				var balanceColor = "neutralBalance";
 
 				if( ( Math.round( this.choices[i]['balance'] * 100 ) / 100 ) > 0 ) {
 
-					balanceColor = 'positiveFunds';
+					balanceColor = 'positiveBalance';
 				} else if( ( Math.round( this.choices[i]['balance'] * 100 ) / 100 ) < 0 ) {
 
-					balanceColor = 'negativeFunds';
+					balanceColor = 'negativeBalance';
 				}
 
 				options.push( {
@@ -97,9 +97,9 @@ enyo.kind({
 
 		this.$['display'].setContent( formatAmount( display ) );
 
-		this.$['display'].addRemoveClass( "positiveBalance", display > 0 );
-		this.$['display'].addRemoveClass( "negativeBalance", display < 0 );
-		this.$['display'].addRemoveClass( "neutralBalance", display == 0 );
+		this.$['display'].addRemoveClass( "positiveBalanceLight", display > 0 );
+		this.$['display'].addRemoveClass( "negativeBalanceLight", display < 0 );
+		this.$['display'].addRemoveClass( "neutralBalanceLight", display == 0 );
 	},
 
 	selectionChanged: function( inSender, inEvent ) {

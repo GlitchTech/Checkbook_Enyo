@@ -356,9 +356,9 @@ enyo.kind({
 			row['balance'] = prepAmount( row['balance'] );
 
 			this.$['balance'].setContent( formatAmount( row['balance'] ) );
-			this.$['balance'].addRemoveClass( "positiveFunds", ( row['balance'] > 0 ) );
-			this.$['balance'].addRemoveClass( "negativeFunds", ( row['balance'] < 0 ) );
-			this.$['balance'].addRemoveClass( "neutralFunds", ( row['balance'] == 0 ) );
+			this.$['balance'].addRemoveClass( "positiveBalance", ( row['balance'] > 0 ) );
+			this.$['balance'].addRemoveClass( "negativeBalance", ( row['balance'] < 0 ) );
+			this.$['balance'].addRemoveClass( "neutralBalance", ( row['balance'] == 0 ) );
 
 			this.$['note'].setContent( row['acctNotes'] );
 

@@ -1080,16 +1080,16 @@ enyo.kind( {
 
 				this.$['runningBal'].setContent( "" );
 
-				this.$['amount'].addRemoveClass( "positiveFunds", ( row['amount'] > 0 ) );
-				this.$['amount'].addRemoveClass( "negativeFunds", ( row['amount'] < 0 ) );
-				this.$['amount'].addRemoveClass( "neutralFunds", ( row['amount'] == 0 ) );
+				this.$['amount'].addRemoveClass( "positiveBalance", ( row['amount'] > 0 ) );
+				this.$['amount'].addRemoveClass( "negativeBalance", ( row['amount'] < 0 ) );
+				this.$['amount'].addRemoveClass( "neutralBalance", ( row['amount'] == 0 ) );
 			} else {
 
 				this.$['runningBal'].setContent( formatAmount( row['runningBalance'] ) );
 
-				this.$['runningBal'].addRemoveClass( "positiveFunds", ( row['runningBalance'] > 0 ) );
-				this.$['runningBal'].addRemoveClass( "negativeFunds", ( row['runningBalance'] < 0 ) );
-				this.$['runningBal'].addRemoveClass( "neutralFunds", ( row['runningBalance'] == 0 ) );
+				this.$['runningBal'].addRemoveClass( "positiveBalance", ( row['runningBalance'] > 0 ) );
+				this.$['runningBal'].addRemoveClass( "negativeBalance", ( row['runningBalance'] < 0 ) );
+				this.$['runningBal'].addRemoveClass( "neutralBalance", ( row['runningBalance'] == 0 ) );
 			}
 
 			//Cleared

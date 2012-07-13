@@ -1,32 +1,39 @@
-.negativeBalance,
-.enyo-item .negativeFunds {
-	color: #cc0000;
-}
-.negativeBalanceLight {
+/** Have to use !important tag because onyx stylings sometimes override local **/
 
-	color: #ff0000;
+.negativeBalance,
+.onyx-item .negativeBalance {
+	color: #cc0000 !important;
+}
+.negativeBalanceLight,
+.onyx-menu-item .negativeBalance {
+
+	color: #ff0000 !important;
 }
 
 .positiveBalance,
-.enyo-item .positiveFunds {
-	color: #006600;
+.onyx-item .positiveBalance {
+	color: #006600 !important;
 }
-.positiveBalanceLight {
-	color: #009900;
-}
-
-.neutralFunds,
-.enyo-item .neutralFunds {
-	color: #00009c;
-}
-.neutralBalanceLight {
-	color: #4981CE;
+.positiveBalanceLight,
+.onyx-menu-item .positiveBalance {
+	color: #009900 !important;
 }
 
-.equalFunds,
-.enyo-item .equalFunds {
-	color: #86832c;
+.neutralBalance,
+.onyx-item .neutralBalance {
+	color: #00009c !important;
 }
-.equalBalanceLight {
-	color: #ffdf0f;
+.neutralBalanceLight,
+.onyx-menu-item .neutralBalance {
+	color: #4981CE !important;
+}
+
+/* Budget Balance Color */
+.equalBalance,
+.onyx-item .equalBalance {
+	color: #86832c !important;
+}
+.equalBalanceLight,
+.onyx-menu-item .equalBalance {
+	color: #ffdf0f !important;
 }

@@ -214,7 +214,7 @@ enyo.kind({
 		if( row ) {
 
 			this.$['sheetName'].setContent( row['content'] );
-			this.$['sheetName'].addRemoveClass( "positiveFunds", ( row['parent'] === "|-add_edit-|" ) );
+			this.$['sheetName'].addRemoveClass( "positiveBalance", ( row['parent'] === "|-add_edit-|" ) );
 
 			if( row['parent'] === "|-add_edit-|" ) {
 				//Edit Categories (category view)

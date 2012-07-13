@@ -416,9 +416,9 @@ enyo.kind({
 			//Balance Display
 			this.$['amount'].setContent( formatAmount( row['amount'] ) );
 
-			this.$['amount'].addRemoveClass( "positiveFunds", ( row['amount'] > 0 ) );
-			this.$['amount'].addRemoveClass( "negativeFunds", ( row['amount'] < 0 ) );
-			this.$['amount'].addRemoveClass( "neutralFunds", ( row['amount'] == 0 ) );
+			this.$['amount'].addRemoveClass( "positiveBalance", ( row['amount'] > 0 ) );
+			this.$['amount'].addRemoveClass( "negativeBalance", ( row['amount'] < 0 ) );
+			this.$['amount'].addRemoveClass( "neutralBalance", ( row['amount'] == 0 ) );
 
 			//Cleared
 			this.$['cleared'].setChecked( row['cleared'] === 1 );
