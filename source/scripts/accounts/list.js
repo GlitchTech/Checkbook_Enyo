@@ -223,6 +223,8 @@ enyo.kind({
 				nextAction();
 			}
 		}
+
+		return true;
 	},
 
 	editAccountComplete: function( rowIndex, inSender, action, actionStatus ) {

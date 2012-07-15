@@ -330,6 +330,8 @@ enyo.kind({
 
 		//Add new pane to the display stack
 		this.paneStack.push( paneArgs['name'] );
+
+		return true;
 	},
 
 	hidePanePopup: function( inSender ) {

@@ -58,7 +58,7 @@ enyo.kind( {
 			editMode: false,
 
 			onView: "doView",
-			onModify: "doModify",
+			onModify: "accountModify",
 			onChanged: "accountChanged",
 			onDelete: "accountDeleted"
 		}, {
@@ -159,6 +159,15 @@ enyo.kind( {
 		}
 
 		this.$['entries'].refresh();
+	},
+
+	/**
+	 * TODO DEFINITION
+	 */
+	accountModify: function( inSender, inEvent ) {
+
+		this.doModify( inEvent );
+		return true;
 	},
 
 	/**
