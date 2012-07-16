@@ -1,7 +1,13 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 /**
- * TODO DEFINITION
+ * @name Checkbook.accounts.view
+ * @author Matthew Schott <glitchtechscience@gmail.com>
+ *
+ * View pane for Accounts
+ *
+ * @class
+ * @version 2.0 (2012/07/16)
  */
 enyo.kind( {
 	name: "Checkbook.accounts.view",
@@ -12,17 +18,49 @@ enyo.kind( {
 	balanceView: 4,
 
 	/**
-	 * TODO DEFINITION
+	 * @public
+	 * Events sent by control
 	 */
 	events: {
-		onModify: "",//Add/Edit Account
-		onView: "",//View Account
-		onChanged: "",//Edit made
-		onDelete: ""//Deletion made
+		/** @lends Checkbook.accounts.view# */
+
+		/**
+		 * Account to be created or modified
+		 * @event
+		 * @param {Object} inSender	Event's sender
+		 * @param {Object} inEvent	Event parameters
+		 */
+		onModify: "",
+
+		/**
+		 * Account to be viewed
+		 * @event
+		 * @param {Object} inSender	Event's sender
+		 * @param {Object} inEvent	Event parameters
+		 */
+		onView: "",
+
+		/**
+		 * Account change completed
+		 * @event
+		 * @param {Object} inSender	Event's sender
+		 * @param {Object} inEvent	Event parameters
+		 */
+		onChanged: "",
+
+		/**
+		 * Account to be deleted
+		 * @event
+		 * @param {Object} inSender	Event's sender
+		 * @param {Object} inEvent	Event parameters
+		 */
+		onDelete: ""
 	},
 
 	/**
-	 * TODO DEFINITION
+	 * @private
+	 * @type Array
+	 * Components of the control
 	 */
 	components: [
 		{
@@ -118,14 +156,19 @@ enyo.kind( {
 	],
 
 	/**
-	 * TODO DEFINITION
+	 * @private
+	 * List of events to handle
 	 */
 	handlers: {
 		onSelect: "menuItemSelected"
 	},
 
 	/**
-	 * TODO DEFINITION
+	 * @protected
+	 * @function
+	 * @name Checkbook.accounts.view#renderAccountList
+	 *
+	 * Called to force an update to the account lists and balance.
 	 */
 	renderAccountList: function() {
 

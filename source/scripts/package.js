@@ -11,7 +11,6 @@ enyo.depends(
 	"export.js",
 
 	"about.js",
-	"login.js",
 
 	"accounts/",
 	"transactions/",

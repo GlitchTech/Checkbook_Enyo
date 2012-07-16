@@ -1,11 +1,13 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.depends(
-	"database.js",
-	"encryption.js",
-	"pinChangePopup.js",
-	"defaultData.js",
-	"sortOptionData.js",
 	"balanceMenu.js",
+	"database.js",
+	"defaultData.js",
+	"encryption.js",
+	"login.js",
+	"pinChangePopup.js",
+	"sortOptionData.js",
+	"systemError.js",
 	"utils.js"
 );

@@ -52,6 +52,21 @@ enyo.kind({
 		},
 
 		{
+			name: "criticalError",
+			kind: "Checkbook.systemError",
+
+			errTitle: "~|p2t|~",
+			errMessage: "",
+			errMessage2: "~|mt|~" ,
+			onFinish: "closePopup"
+		},
+
+		{
+			name: "security",
+			kind: "Checkbook.login"
+		},
+
+		{
 			kind: "Signals",
 			onBack: "goBack"
 		}
@@ -108,21 +123,6 @@ enyo.kind({
 			name: "about",
 			kind: "Checkbook.about",
 			onClose: "closePopup"
-		},
-
-		{
-			name: "criticalError",
-			kind: "GTS.system_error",
-
-			errTitle: "~|p2t|~",
-			errMessage: "",
-			errMessage2: "~|mt|~" ,
-			onFinish: "closePopup"
-		},
-
-		{
-			name: "security",
-			kind: "Checkbook.login"
 		}*/
 	],
 
@@ -260,9 +260,9 @@ enyo.kind({
 
 			Checkbook.globals.criticalError.load(
 					//"Welcome to " + enyo.fetchAppInfo()['title'],
-					//"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
+					//"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "' target='_blank'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
 					"Welcome to Checkbook",
-					"If you have any questions, visit <a href='http://glitchtechscience.com'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>mailto:glitchtechscience@gmail.com</a>.",
+					"If you have any questions, visit <a href='http://glitchtechscience.com' target='_blank'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>glitchtechscience@gmail.com</a>.",
 					"",
 					"assets/icon_1_32x32.png"
 				);
@@ -290,15 +290,15 @@ enyo.kind({
 
 		if( popup ) {
 
-			this.$['appMenu'].setAutomatic( false );
-			popup.openAtCenter();
+			//this.$['appMenu'].setAutomatic( false );
+			popup.show();
 		}
 	},
 
 	closePopup: function( inSender ) {
 
-		this.$['appMenu'].setAutomatic( true );
-		inSender.close();
+		//this.$['appMenu'].setAutomatic( true );
+		inSender.hide();
 	},
 
 	errorReport: function() {
@@ -390,7 +390,7 @@ enyo.kind({
 
 	importComplete: function( inSender, importStatus ) {
 
-		this.$['appMenu'].setAutomatic( true );
+		//this.$['appMenu'].setAutomatic( true );
 
 		if( importStatus === true ) {
 
