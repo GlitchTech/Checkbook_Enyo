@@ -125,7 +125,7 @@ enyo.kind( {
 			]
 		}, {
 			name: "footer",
-			kind: "onyx.MoreToolbar",
+			kind: "onyx.MoreToolbar",//Doesn't work with fittable.
 			classes: "deep-green",
 			components: [
 				{

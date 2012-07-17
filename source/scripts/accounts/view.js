@@ -69,7 +69,7 @@ enyo.kind( {
 			layoutKind: "FittableColumnsLayout",
 			components: [
 				{
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: "assets/dollar_sign_1.png",
 					classes: "img-icon",
 					style: "margin-right: 0.25em; height: 32px;"
@@ -100,28 +100,43 @@ enyo.kind( {
 			onChanged: "accountChanged",
 			onDelete: "accountDeleted"
 		}, {
-			kind: "onyx.MoreToolbar",
-			classes: "rich-brown text-center",
+			kind: "onyx.Toolbar",
+			layoutKind: "enyo.FittableColumnsLayout",
+			classes: "rich-brown",
 			components: [
 				{
-					kind: "onyx.IconButton",
-					src: "assets/menu_icons/sort.png",
-
-					ontap: "showSort"
+					kind: "onyx.MenuDecorator",
+					components: [
+						{
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/sort.png"
+						}, {
+							name: "sortMenu",
+							kind: "GTS.SelectedMenu",
+							floating: true,
+							style: "min-width: 225px;",
+							components: accountSortOptions
+						}
+					]
 				}, {
-					name: "addAccountButton",
-					kind: "onyx.Checkbox",
+					classes: "text-center",
+					fit: true,
+					components: [
+						{
+							name: "addAccountButton",
+							kind: "onyx.Checkbox",
 
-					onchange: "addAccount",
-					classes: "add"
-				}, {
-					name: "editModeToggle",
-					kind: "onyx.Checkbox",
+							onchange: "addAccount",
+							classes: "add"
+						}, {
+							name: "editModeToggle",
+							kind: "onyx.Checkbox",
 
-					onchange: "toggleLock",
-					classes: "lock"
+							onchange: "toggleLock",
+							classes: "lock"
+						}
+					]
 				}, {
-					showing: false,
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
@@ -146,12 +161,6 @@ enyo.kind( {
 					]
 				}
 			]
-		},
-
-		{
-			name: "sortMenu",
-			//kind: "Checkbook.selectedMenu",
-			components: accountSortOptions
 		}
 	],
 
@@ -174,6 +183,8 @@ enyo.kind( {
 
 		this.accountBalanceForceUpdate();
 		this.$['entries'].renderAccountList();
+
+		this.$['sortMenu'].setValue( Checkbook.globals.prefs['custom_sort'] );
 	},
 
 	/**
@@ -370,14 +381,6 @@ enyo.kind( {
 	},
 
 	/** Footer Control **/
-
-	/**
-	 * TODO DEFINITION
-	 */
-	showSort: function( inSender ) {
-
-		this.$['sortMenu'].openAtControl( inSender, Checkbook.globals.prefs['custom_sort'] );
-	},
 
 	/**
 	 * TODO DEFINITION
