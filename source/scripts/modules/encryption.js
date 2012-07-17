@@ -85,7 +85,7 @@ enyo.kind( {
 
 			if( results.length > 0 && enyo.isString( string ) && string.length > 0 ) {
 
-				callbackFn( CryptoJS.AES.decrypt( encrypted, results[0]['spike'] ).toString( CryptoJS.enc.Utf8 ) );
+				callbackFn( CryptoJS.AES.decrypt( string, results[0]['spike'] ).toString( CryptoJS.enc.Utf8 ) );
 			} else {
 
 				callbackFn( "" );

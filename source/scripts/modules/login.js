@@ -221,12 +221,12 @@ enyo.kind( {
 
 	checkPin: function() {
 
-		this.$['encryption'].encryptString( this.$['pin'].getValue(), enyo.bind( this, this.checkPinHandler ) );
+		this.$['encryption'].decryptString( this.pin, enyo.bind( this, this.checkPinHandler ) );
 	},
 
-	checkPinHandler: function( userEntry ) {
+	checkPinHandler: function( userPin ) {
 
-		if( userEntry != this.pin ) {
+		if( userPin != this.$['pin'].getValue() ) {
 
 			this.errorCount++;
 
@@ -241,6 +241,7 @@ enyo.kind( {
 		} else {
 
 			this.hide();
+			this.$['errorMessage'].hide();
 
 			if( enyo.isFunction( this.options.onSuccess ) ) {
 
