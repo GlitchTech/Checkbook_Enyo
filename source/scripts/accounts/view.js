@@ -137,6 +137,8 @@ enyo.kind( {
 						}
 					]
 				}, {
+					showing: false,
+
 					kind: "onyx.MenuDecorator",
 					components: [
 						{

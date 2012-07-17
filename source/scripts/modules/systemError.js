@@ -54,7 +54,7 @@ enyo.kind({
 					kind: "onyx.Button",
 
 					content: "X",
-					onclick: "closeMe",
+					ontap: "closeMe",
 
 					classes: "onyx-blue",
 					style: "padding: 2px 6px;"
@@ -81,7 +81,7 @@ enyo.kind({
 				{
 					kind: "onyx.Button",
 					content: "Okay",
-					onclick: "closeMe"
+					ontap: "closeMe"
 				}
 			]
 		}

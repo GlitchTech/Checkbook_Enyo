@@ -1,3 +1,10 @@
+/** Login Popup **/
+.login-system .pin-pad button,
+.login-system .pin-pad .dummy-button {
+	width: 125px;
+	display: inline-block;
+}
+
 /** Account List **/
 
 .account-item {

@@ -2,198 +2,185 @@
 
 enyo.kind( {
 	name: "Checkbook.login",
-	kind: enyo.Control,
+	kind: "onyx.Popup",
+
+	classes: "login-system small-input-popup",
+
+	centered: true,
+	floating: true,
+
+	scrim: true,
+	scrimclasses: "onyx-scrim-translucent",
+
+	autoDismiss: false,
+
+	pin: "",
+	errorCount: 0,
+	options: {},
 
 	components: [
 		{
-			name: "loginPopup",
-			kind: enyo.Popup,
-			layoutKind: enyo.VFlexLayout,
-
-			modal: true,
-			scrim: true,
-
-			dismissWithClick: false,
-			dismissWithEscape: false,
-
-			lazy: false,
-
+			kind: "enyo.FittableColumns",
+			classes: "text-middle margin-bottom",
+			noStretch: true,
 			components: [
 				{
-					kind: enyo.Header,
-					layoutKind: enyo.HFlexLayout,
-					align: "center",
+					name: "title",
+					content: "",
 
-					className: "enyo-header-dark popup-header",
-					style: "border-radius: 10px; margin-bottom: 10px;",
-
-					components: [
-						{
-							name: "title",
-							content: "",
-
-							className: "bigger",
-							style: "text-align: center; padding: 0 10px;",
-							flex: 1
-						}, {
-							kind: enyo.ToolButton,
-							icon: "assets/menu_icons/close.png",
-
-							className: "img-icon",
-							style: "text-align: center;",
-
-							ontap: "badPin"
-						}
-					]
+					classes: "bigger text-left margin-half-right",
+					fit: true
 				}, {
-					kind: enyo.RowGroup,
+					kind: "onyx.Button",
+
+					content: "X",
+					ontap: "badPin",
+
+					classes: "onyx-blue",
+					style: "padding: 2px 6px;"
+				}
+			]
+		}, {
+			kind: "onyx.Groupbox",
+			components: [
+				{
+					kind: "onyx.InputDecorator",
+					layoutKind: "FittableColumnsLayout",
+					classes: "onyx-focused margin-bottom",
 					components: [
 						{
 							name: "pin",
-							kind: enyo.PasswordInput,
+							kind: "onyx.Input",
+							type: "password",
 
-							hint: "Enter PIN using key pad.",
+							placeholder: "Enter PIN using key pad.",
 
-							autoKeyModifier: "num-lock",
-							spellcheck: false,
-							autocorrect: false,
-							autoWordComplete: false,
+							fit: true,
 
-							disabled: true,
-
-							components: [
-								{
-									content: "pin code",
-									className: "small",
-									style: "text-transform: uppercase; color: rgb( 32, 117, 191 );"
-								}
-							]
+							disabled: true
+						}, {
+							content: "pin code",
+							classes: "small label"
 						}
 					]
-				}, {
-					name: "errorMessageContainer",
-					layoutKind: enyo.HFlexLayout,
-					pack: "start",
-					showing: false,
+				}
+			]
+		}, {
+			name: "errorMessage",
+			kind: "GTS.InlineNotification",
+			type: "error",
+
+			content: "",
+
+			showing: false
+		}, {
+			classes: "margin-bottom pin-pad",
+			components: [
+				{
+					classes: "margin-half-bottom",
 					components: [
 						{
-							kind: "Image",
-							src: "assets/warning-icon.png",
-							style: "margin-right: 5px;"
+							kind: "onyx.Button",
+							content: "1",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
 						}, {
-							name: "errorMessage",
-							style: "color: #d70000;",
-							content: "",
-							allowHtml: true
+							kind: "onyx.Button",
+							content: "2",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
+						}, {
+							kind: "onyx.Button",
+							content: "3",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
 						}
 					]
 				}, {
-					style: "margin-bottom: 10px;",
+					classes: "margin-half-bottom",
 					components: [
 						{
-							layoutKind: enyo.HFlexLayout,
-							components: [
-								{
-									kind: "onyx.Button",
-									caption: "1",
-									flex: 1,
-									ontap: "padPressed"
-								}, {
-									kind: "onyx.Button",
-									caption: "2",
-									flex: 1,
-									ontap: "padPressed"
-								}, {
-									kind: "onyx.Button",
-									caption: "3",
-									flex: 1,
-									ontap: "padPressed"
-								}
-							]
+							kind: "onyx.Button",
+							content: "4",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
 						}, {
-							layoutKind: enyo.HFlexLayout,
-							components: [
-								{
-									kind: "onyx.Button",
-									caption: "4",
-									flex: 1,
-									ontap: "padPressed"
-								}, {
-									kind: "onyx.Button",
-									caption: "5",
-									flex: 1,
-									ontap: "padPressed"
-								}, {
-									kind: "onyx.Button",
-									caption: "6",
-									flex: 1,
-									ontap: "padPressed"
-								}
-							]
+							kind: "onyx.Button",
+							content: "5",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
 						}, {
-							layoutKind: enyo.HFlexLayout,
-							components: [
-								{
-									kind: "onyx.Button",
-									caption: "7",
-									flex: 1,
-									ontap: "padPressed"
-								}, {
-									kind: "onyx.Button",
-									caption: "8",
-									flex: 1,
-									ontap: "padPressed"
-								}, {
-									kind: "onyx.Button",
-									caption: "9",
-									flex: 1,
-									ontap: "padPressed"
-								}
-							]
-						}, {
-							layoutKind: enyo.HFlexLayout,
-							components: [
-								{
-									//Spacer; 2 to 1 ratio doesn't look right
-									kind: "onyx.Button",
-									style: "visibility: hidden;",
-									flex: 1
-								}, {
-									kind: "onyx.Button",
-									caption: "0",
-									flex: 1,
-									ontap: "padPressed"
-								}, {
-									name: "clear",
-									kind: "onyx.Button",
-									caption: "Clear",
-									flex: 1,
-									ontap: "padPressed"
-								}
-							]
+							kind: "onyx.Button",
+							content: "6",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
 						}
 					]
 				}, {
-					kind: enyo.Toolbar,
+					classes: "margin-half-bottom",
+					components: [
+						{
+							kind: "onyx.Button",
+							content: "7",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
+						}, {
+							kind: "onyx.Button",
+							content: "8",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
+						}, {
+							kind: "onyx.Button",
+							content: "9",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
+						}
+					]
+				}, {
+					classes: "margin-bottom",
+					components: [
+						{
+							content: " ",
+
+							classes: "dummy-button margin-half-right"
+						}, {
+							kind: "onyx.Button",
+							content: "0",
+
+							classes: "margin-half-right",
+							ontap: "padPressed"
+						}, {
+							name: "clear",
+							kind: "onyx.Button",
+							content: "Clear",
+							ontap: "padPressed"
+						}
+					]
+				}, {
+					classes: "text-center",
 					components: [
 						{
 							kind: "onyx.Button",
 
-							flex: 2,
-							className: "enyo-button-primary",
+							classes: "margin-right",
 
-							caption: "Cancel",
+							content: "Cancel",
 							ontap: "badPin"
 						}, {
-							kind: enyo.Spacer,
-							flex: 1
-						}, {
 							kind: "onyx.Button",
 
-							flex: 2,
-							className: "onyx-affirmative",
+							classes: "onyx-affirmative",
 
-							caption: "Confirm",
+							content: "Confirm",
 							ontap: "checkPin"
 						}
 					]
@@ -207,13 +194,9 @@ enyo.kind( {
 		}
 	],
 
-	pin: "",
-	errorCount: 0,
-	options: {},
-
 	authUser: function( title, inPin, inOptions ) {
 
-		this.$['loginPopup'].openAtCenter();
+		this.show();
 		this.$['title'].setContent( title );
 		this.$['pin'].setValue( "" );
 
@@ -232,7 +215,7 @@ enyo.kind( {
 			this.$['pin'].setValue( "" );
 		} else if( curr.length < 10 ) {
 
-			this.$['pin'].setValue( curr + inSender.caption );
+			this.$['pin'].setValue( curr + inSender.content );
 		}
 	},
 
@@ -243,14 +226,12 @@ enyo.kind( {
 
 	checkPinHandler: function( userEntry ) {
 
-		this.log( this.pin, userEntry );
-
 		if( userEntry != this.pin ) {
 
 			this.errorCount++;
 
-			this.$['errorMessageContainer'].show();
-			this.$['errorMessage'].setContent( "Invalid PIN." ) + "<br />" + this.errorCount + $L( " out of 5 attempts used." );
+			this.$['errorMessage'].show();
+			this.$['errorMessage'].setContent( "Invalid PIN." ) + "<br />" + this.errorCount + " out of 5 attempts used.";
 			this.$['pin'].setValue( "" )
 
 			if( this.errorCount >= 5 ) {
@@ -259,7 +240,7 @@ enyo.kind( {
 			}
 		} else {
 
-			this.$['loginPopup'].close();
+			this.hide();
 
 			if( enyo.isFunction( this.options.onSuccess ) ) {
 
@@ -270,7 +251,7 @@ enyo.kind( {
 
 	badPin: function() {
 
-		this.$['loginPopup'].close();
+		this.hide();
 
 		if( enyo.isFunction( this.options.onFailure ) ) {
 

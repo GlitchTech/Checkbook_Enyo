@@ -5,6 +5,8 @@
  *
  * Control system for encryption of strings using stored spike.
  *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *
+ * @see http://code.google.com/p/crypto-js/
  */
 enyo.kind( {
 	name: "Checkbook.encryption",
@@ -34,17 +36,11 @@ enyo.kind( {
 	/** @protected */
 	encryptStringSuccess: function( string, callbackFn, results ) {
 
-		//TEMP
-		callbackFn( "" );
-		return;
-
 		if( enyo.isFunction( callbackFn ) ) {
 
 			if( results.length > 0 && enyo.isString( string ) && string.length > 0 ) {
 
-				//Or is it just PalmSystem.encrypt? Verify on device.
-
-				callbackFn( window.PalmSystem.encrypt( results[0]['spike'], string ) );
+				callbackFn( CryptoJS.AES.encrypt( string, results[0]['spike'] ) + "" );
 			} else {
 
 				callbackFn( "" );
@@ -85,15 +81,11 @@ enyo.kind( {
 	/** @protected */
 	decryptStringSuccess: function( string, callbackFn, results ) {
 
-		//TEMP
-		callbackFn( "" );
-		return;
-
 		if( enyo.isFunction( callbackFn ) ) {
 
 			if( results.length > 0 && enyo.isString( string ) && string.length > 0 ) {
 
-				callbackFn( window.PalmSystem.decrypt( results[0]['spike'], string ) );
+				callbackFn( CryptoJS.AES.decrypt( encrypted, results[0]['spike'] ).toString( CryptoJS.enc.Utf8 ) );
 			} else {
 
 				callbackFn( "" );
