@@ -49,3 +49,4 @@ Enyo Update
 
 * Update code to run on EnyoJS (2) instead of Enyo 1
 * Check performance on canvas spinner, replace with onyx if causing lag
+* Convert event chains to enyo.Signals (https://github.com/enyojs/enyo/wiki/Event-Handling)

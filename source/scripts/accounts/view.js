@@ -18,46 +18,6 @@ enyo.kind( {
 	balanceView: 4,
 
 	/**
-	 * @public
-	 * Events sent by control
-	 */
-	events: {
-		/** @lends Checkbook.accounts.view# */
-
-		/**
-		 * Account to be created or modified
-		 * @event
-		 * @param {Object} inSender	Event's sender
-		 * @param {Object} inEvent	Event parameters
-		 */
-		onModify: "",
-
-		/**
-		 * Account to be viewed
-		 * @event
-		 * @param {Object} inSender	Event's sender
-		 * @param {Object} inEvent	Event parameters
-		 */
-		onView: "",
-
-		/**
-		 * Account change completed
-		 * @event
-		 * @param {Object} inSender	Event's sender
-		 * @param {Object} inEvent	Event parameters
-		 */
-		onChanged: "",
-
-		/**
-		 * Account to be deleted
-		 * @event
-		 * @param {Object} inSender	Event's sender
-		 * @param {Object} inEvent	Event parameters
-		 */
-		onDelete: ""
-	},
-
-	/**
 	 * @private
 	 * @type Array
 	 * Components of the control
@@ -93,12 +53,7 @@ enyo.kind( {
 
 			balanceView: 4,
 
-			editMode: false,
-
-			onView: "doView",
-			onModify: "accountModify",
-			onChanged: "accountChanged",
-			onDelete: "accountDeleted"
+			editMode: false
 		}, {
 			kind: "onyx.Toolbar",
 			layoutKind: "enyo.FittableColumnsLayout",
@@ -163,6 +118,13 @@ enyo.kind( {
 					]
 				}
 			]
+		},
+
+		{
+			kind: "Signals",
+
+			accountChanged: "renderAccountList",
+			balanceChanged: "refresh"
 		}
 	],
 
@@ -184,7 +146,6 @@ enyo.kind( {
 	renderAccountList: function() {
 
 		this.accountBalanceForceUpdate();
-		this.$['entries'].renderAccountList();
 
 		this.$['sortMenu'].setValue( Checkbook.globals.prefs['custom_sort'] );
 	},
@@ -215,35 +176,6 @@ enyo.kind( {
 		}
 
 		this.$['entries'].refresh();
-	},
-
-	/**
-	 * TODO DEFINITION
-	 */
-	accountModify: function( inSender, inEvent ) {
-
-		this.doModify( inEvent );
-		return true;
-	},
-
-	/**
-	 * TODO DEFINITION
-	 */
-	accountChanged: function( inSender, account ) {
-
-		this.doChanged( account );
-		this.accountBalanceForceUpdate();
-	},
-
-	/**
-	 * TODO DEFINITION
-	 */
-	accountDeleted: function( inSender, inEvent ) {
-
-		this.doDelete( inEvent );
-		this.accountBalanceForceUpdate();
-
-		return true;
 	},
 
 	/**
@@ -307,17 +239,20 @@ enyo.kind( {
 		} else if( menuParent === "accountsortoptions" ) {
 			//Sort Menu
 
-			if( Checkbook.globals.prefs['custom_sort'] === inEvent.content ) {
+			if( Checkbook.globals.prefs['custom_sort'] === inEvent.selected.value ) {
 				//No change, abort
 				return;
 			}
 
-			Checkbook.globals.prefs['custom_sort'] = inEvent.content;
+			Checkbook.globals.prefs['custom_sort'] = inEvent.selected.value;
 
 			Checkbook.globals.gts_db.query(
 					new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
 					{
-						"onSuccess": enyo.bind( this, this.renderAccountList )
+						"onSuccess": function() {
+
+							enyo.Signals.send( "accountChanged" );
+						}
 					}
 				);
 		}
@@ -394,9 +329,8 @@ enyo.kind( {
 
 			this.$['addAccountButton'].setDisabled( true );
 
-			enyo.asyncMethod(
-					this,
-					this.doModify,
+			enyo.Signals.send(
+					"editAccount",
 					{
 						name: "newAccount",
 						kind: "Checkbook.accounts.modify",
@@ -417,9 +351,7 @@ enyo.kind( {
 
 		if( inEvent['action'] === 1 && inEvent['actionStatus'] === true ) {
 
-			this.log( "New account created" );
-
-			this.renderAccountList();
+			enyo.Signals.send( "accountChanged" );
 		}
 	},
 

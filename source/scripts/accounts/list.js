@@ -17,12 +17,7 @@ enyo.kind({
 	accounts: [],
 
 	events: {
-		onSetupRow: "",
-
-		onView: "",
-		onModify: "",
-		onChanged: "",
-		onDelete: ""
+		onSetupRow: ""
 	},
 
 	published: {
@@ -103,6 +98,13 @@ enyo.kind({
 			shape: "spiral",
 
 			style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+		},
+
+		{
+			kind: "Signals",
+
+			accountChanged: "renderAccountList",
+			balanceChanged: "refresh"
 		}
 	],
 
@@ -185,28 +187,25 @@ enyo.kind({
 		if( row ) {
 
 			var nextAction;
+			var nextActionEvent = {};
 
 			if( this.editMode ) {
 				//Edit Account
 
-				nextAction = enyo.bind(
-						this,
-						this.doModify,
-						{
-							name: "editAccount",
-							kind: "Checkbook.accounts.modify",
-							acctId: row['acctId'],
-							onFinish: enyo.bind( this, this.editAccountComplete, inEvent.rowIndex )
-						}
-					);
+				nextAction = "editAccount";
+				nextActionEvent = {
+						name: "editAccount",
+						kind: "Checkbook.accounts.modify",
+						acctId: this.accounts[inEvent.rowIndex]['acctId'],
+						onFinish: enyo.bind( this, this.editAccountComplete, inEvent.rowIndex )
+					};
 			} else {
 				//View Account
 
-				nextAction = enyo.bind(
-						this,
-						this.doView,
-						row
-					);
+				nextAction = "viewAccount";
+				nextActionEvent = {
+						account: row
+					};
 			}
 
 			if( row['acctLocked'] == 1 ) {
@@ -215,40 +214,42 @@ enyo.kind({
 						row['acctName'] + " " + "PIN Code",
 						row['lockedCode'],
 						{
-							"onSuccess": nextAction
+							"onSuccess": function() {
+
+								enyo.Signals.send( nextAction, nextActionEvent );
+							}
 						}
 					);
 			} else {
 
-				nextAction();
+				enyo.Signals.send( nextAction, nextActionEvent );
 			}
 		}
 
 		return true;
 	},
 
-	editAccountComplete: function( rowIndex, inSender, action, actionStatus ) {
+	editAccountComplete: function( rowIndex, inSender, inEvent ) {
 
-		if( action === 1 && actionStatus === true ) {
+		if( inEvent.action === 1 && inEvent.actionStatus === true ) {
 
-			this.log( "Account edited" );
+			var self = this;
 
 			//Let transactions page know
 			Checkbook.globals.accountManager.fetchAccount(
 					this.accounts[rowIndex]['acctId'],
 					{
-						"onSuccess": enyo.bind( this, this.doChanged )
+						"onSuccess": function() {
+
+							enyo.Signals.send( "accountChanged", { "accountId": self.accounts[rowIndex]['acctId'] } );
+						}
 					}
 				);
-
-			this.renderAccountList();
-		} else if( action === 2 ) {
+		} else if( inEvent.action === 2 ) {
 
 			this.log( "Account deleted" );
 
-			this.doDelete( this.accounts[rowIndex]['acctId'] );
-
-			this.renderAccountList();
+			enyo.Signals.send( "accountChanged", { "accountId": this.accounts[rowIndex]['acctId'], "deleted": true } );
 		}
 	},
 
@@ -293,22 +294,19 @@ enyo.kind({
 	accountDeleted: function( inSender, inEvent ) {
 		//Row deleted
 
+		var self = this;
+
 		Checkbook.globals.accountManager.deleteAccount(
 				this.accounts[inEvent.index]['acctId'],
 				{
-					"onSuccess": enyo.bind( this, this.accountDeletedSuccess, this.accounts[inEvent.index]['acctId'] )
+					"onSuccess": function() {
+
+						enyo.Signals.send( "accountChanged", { "accountId": self.accounts[inEvent.index]['acctId'], "deleted": true } );
+					}
 				}
 			);
 
 		return true;
-	},
-
-	accountDeletedSuccess: function( acctId ) {
-
-		this.log();
-
-		this.doDelete( { "accountId": acctId } );
-		this.renderAccountList();
 	},
 
 	/** List Display **/

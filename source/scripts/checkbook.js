@@ -20,13 +20,7 @@ enyo.kind({
 			components: [
 				{
 					name: "accounts",
-					kind: "Checkbook.accounts.view",
-
-					onModify: "showPanePopup",
-					onChanged: "accoutChanged",
-					onDelete: "accoutDeleted",
-
-					onView: "updateTransactionsView"
+					kind: "Checkbook.accounts.view"
 				}, {
 					name: "transactions",
 					kind: "Checkbook.transactions.view",
@@ -68,7 +62,9 @@ enyo.kind({
 
 		{
 			kind: "Signals",
-			onBack: "goBack"
+			onBack: "goBack",
+
+			editAccount: "showPanePopup"
 		}
 
 		/*{
@@ -241,16 +237,19 @@ enyo.kind({
 						result['acctName'] + " " + "PIN Code",
 						result['lockedCode'],
 						{
-							"onSuccess": enyo.bind( this, this.updateTransactionsView, null, result )
+							"onSuccess": function() {
+
+								enyo.Signals.send( "viewAccount", { account: result } );
+							}
 						}
 					);
 			} else {
 
-				this.updateTransactionsView( null, result );
+				enyo.Signals.send( "viewAccount", { account: result } );
 			}
 		}
 
-		this.$['accounts'].renderAccountList();
+		enyo.Signals.send( "accountChanged" );
 
 		if( this.notificationType === true && Checkbook.globals.prefs['updateCheckNotification'] == 1 ) {
 
@@ -467,7 +466,8 @@ enyo.kind({
 			//Update account and transaction information
 
 			Checkbook.globals.accountManager.updateAccountModTime();
-			this.$['accounts'].renderAccountList();
+
+			enyo.Signals.send( "accountChanged" );
 			this.$['transactions'].reloadSystem();
 		}
 
@@ -497,14 +497,14 @@ enyo.kind({
 			);
 	},
 
-	prefAccoutChanged: function() {
+	prefAccoutChanged: function( inSender, inAccount ) {
 
-		this.$['accounts'].renderAccountList();
+		enyo.Signals.send( "accountChanged" );
 
-		if( arguments.length > 1 ) {
+		if( inAccount ) {
 			//Needs to have more than inSender
 
-			this.accoutChanged.apply( this, arguments );
+			enyo.Signals.send( "viewAccount", { account: inAccount, force: true } )
 		}
 	},
 
@@ -512,34 +512,9 @@ enyo.kind({
 
 		this.log( "Update account list", arguments );
 
-		this.$['accounts'].renderAccountList();
+		enyo.Signals.send( "accountChanged" );
+
 		this.accoutDeleted.apply( this, arguments );
-	},
-
-	/** ( Checkbook.accounts.view --> Checkbook.transactions.view ) Communication Channels **/
-
-	updateTransactionsView: function( inSender, account ) {
-
-		this.$['transactions'].changeAccount( account );
-	},
-
-	accoutChanged: function( inSender, result ) {
-
-		if( this.$['transactions'].getAccountId() === result['acctId'] ) {
-
-			this.$['transactions'].changeAccount( result, true );
-		}
-	},
-
-	accoutDeleted: function( inSender, inEvent ) {
-
-		if( this.$['transactions'].getAccountId() == inEvent.accountId ) {
-
-			this.$['transactions'].unloadSystem();
-		} else {
-
-			this.$['transactions'].reloadSystem();
-		}
 	},
 
 	/** ( Checkbook.transactions.view --> Checkbook.accounts.view ) Communication Channels **/
@@ -558,8 +533,6 @@ enyo.kind({
 	},
 
 	accountBalanceChanged: function( inSender, accts, deltaBalanceArr ) {
-
-		this.log( Object.toJSON( accts ) );
 
 		var acctIndex = accts['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['account'] ) : - 1;
 

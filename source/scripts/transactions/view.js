@@ -62,7 +62,6 @@ enyo.kind( {
 			components: [
 				{
 					kind: "onyx.SwipeableItem",
-					preventDragPropagation: true,
 
 					ontap: "transactiontapped",
 					onmousehold: "transactionHeld",
@@ -144,10 +143,6 @@ enyo.kind( {
 							kind: "onyx.IconButton",
 							ontap: "sortButtontaped",
 							src: "assets/menu_icons/sort.png"
-						}, {
-							kind: "onyx.IconButton",
-							ontap: "reloadSystem",
-							src: "assets/menu_icons/refresh.png"
 						}
 					]
 				}, {
@@ -272,6 +267,13 @@ enyo.kind( {
 					menuParent: "functionMenu"
 				}
 			]
+		},
+
+		{
+			kind: "Signals",
+
+			viewAccount: "viewAccount",
+			accountChanged: "accountChanged"
 		}
 	],
 
@@ -279,19 +281,28 @@ enyo.kind( {
 
 		this.inherited( arguments );
 
-		this.log();
-
 		this.$['header'].hide();
 		this.$['footer'].hide();
 
 		this.loadingDisplay( false );
 	},
 
-	changeAccount: function( accountObj, force ) {
+	accountChanged: function( inSender, inEvent ) {
 
-		force = typeof( force ) !== 'undefined' ? force : false;
+		if( inEvent && inEvent.deleted && this.getAccountId() === inEvent.accountId ) {
 
-		if( !accountObj || !accountObj['acctId'] ) {
+			this.unloadSystem();
+		} else {
+
+			this.reloadSystem();
+		}
+	},
+
+	viewAccount: function( inSender, inEvent ) {
+
+		inEvent['force'] = typeof( inEvent['force'] ) !== 'undefined' ? inEvent['force'] : false;
+
+		if( !inEvent['account'] || !inEvent['account']['acctId'] ) {
 
 			this.unloadSystem();
 			return;
@@ -305,16 +316,17 @@ enyo.kind( {
 			this.reflow();
 		}
 
-		if( force || !this.account['acctId'] || this.account['acctId'] !== accountObj['acctId'] ) {
+		if( inEvent['force'] || !this.account['acctId'] || this.account['acctId'] !== inEvent['account']['acctId'] ) {
 
 			//Make a clone; else unable to modify account
-			this.account = enyo.clone( accountObj );
+			this.account = enyo.clone( inEvent['account'] );
 
 			this.$['acctName'].setContent( this.account['acctName'] );
 			this.$['acctTypeIcon'].setSrc( "assets/" + this.account['acctCategoryIcon'] );
 
 			this.renderBalanceButton();
 			this.renderSortButton();
+
 /*
 				acctId
 				acctName
@@ -348,9 +360,8 @@ enyo.kind( {
 				balance2
 				sortQry
 */
-			this.transactions = [];
-			this.$['entries'].setCount( 100 );
-			this.$['entries'].reset();
+			this.reloadTransactionList();
+
 			this.initialScroll();
 
 			return;//TEMP
@@ -382,9 +393,8 @@ enyo.kind( {
 	unloadSystem: function() {
 
 		this.account = {};
-		this.transactions = [];
-		this.$['entries'].setCount( this.transactions.length );
-		this.$['entries'].reset();
+
+		this.reloadTransactionList();
 
 		this.$['header'].hide();
 		this.$['footer'].hide();
@@ -399,12 +409,16 @@ enyo.kind( {
 			return false;
 		}
 
+		this.reloadTransactionList();
+		this.initialScroll();
+		this.balanceChangedHandler();
+	},
+
+	reloadTransactionList: function() {
+
 		this.transactions = [];
 		this.$['entries'].setCount( this.transactions.length );
 		this.$['entries'].reset();
-
-		this.initialScroll();
-		this.balanceChangedHandler();
 	},
 
 	initialScroll: function() {
@@ -1044,11 +1058,6 @@ enyo.kind( {
 
 	transactionBuildRow: function( inSender, inEvent ) {
 
-		this.log( arguments );
-		this.$['desc'].setContent( inEvent.index );
-
-		return;
-
 		var inIndex = inEvent.index;
 
 		var row = this.transactions[inIndex];
@@ -1125,7 +1134,7 @@ enyo.kind( {
 
 	transactionFetchGroup: function( inSender, inPage ) {
 
-		//this.log( arguments );
+		this.log( arguments );
 
 		return;
 
