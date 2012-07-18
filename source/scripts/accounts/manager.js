@@ -749,7 +749,17 @@ enyo.kind({
 					"content": row['acctName'],
 					"icon": "assets/" + row['acctCategoryIcon'],
 					"color": row['acctCategoryColor'],
-					"value": row['acctId']
+					"value": row['acctId'],
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/" + row['acctCategoryIcon'],
+							classes: "margin-right img-icon"
+						}, {
+							content: row['acctName']
+						}
+					]
 				};
 
 			this.accountObject.accounts[offset + i] = row;

@@ -124,7 +124,8 @@ enyo.kind( {
 			kind: "Signals",
 
 			accountChanged: "renderAccountList",
-			balanceChanged: "refresh"
+			balanceChanged: "refresh",
+			balanceViewChanged: "accountBalanceViewChanged"
 		}
 	],
 
@@ -153,26 +154,26 @@ enyo.kind( {
 	/**
 	 * TODO DEFINITION
 	 */
-	accountBalanceViewChanged: function( index, id, mode, callbackFn ) {
+	accountBalanceViewChanged: function( inSender, inEvent ) {
 
-		if( !index || index < 0 || index >= this.$['entries'].accounts.length ) {
+		if( Object.isUndefined( inEvent.index ) || inEvent.index < 0 || inEvent.index >= this.$['entries'].accounts.length ) {
 
 			for( var i = 0; i < this.$['entries'].accounts.length; i++ ) {
 
-				if( this.$['entries'].accounts[i]['acctId'] === id ) {
+				if( this.$['entries'].accounts[i]['acctId'] === inEvent.id ) {
 
-					this.$['entries'].accounts[i]['bal_view'] = mode;
+					this.$['entries'].accounts[i]['bal_view'] = inEvent.mode;
 
-					if( enyo.isFunction( callbackFn ) ) {
+					if( enyo.isFunction( inEvent.callbackFn ) ) {
 
-						callbackFn( i );
+						inEvent.callbackFn( i );
 					}
 					break;
 				}
 			}
 		} else {
 
-			this.$['entries'].accounts[index]['bal_view'] = mode;
+			this.$['entries'].accounts[inEvent.index]['bal_view'] = inEvent.mode;
 		}
 
 		this.$['entries'].refresh();
@@ -236,6 +237,8 @@ enyo.kind( {
 
 				this.log( "launch report system (overlay like modify account)" );
 			}
+
+			return true;
 		} else if( menuParent === "accountsortoptions" ) {
 			//Sort Menu
 
@@ -251,10 +254,13 @@ enyo.kind( {
 					{
 						"onSuccess": function() {
 
+							Checkbook.globals.accountManager.updateAccountModTime();
 							enyo.Signals.send( "accountChanged" );
 						}
 					}
 				);
+
+			return true;
 		}
 	},
 
@@ -281,23 +287,23 @@ enyo.kind( {
 		this.$['balanceMenu'].setChoices(
 				[
 					{
-						caption: "Default:",
+						content: "Default:",
 						balance: this.totalBalance[4],
 						value: 4
 					}, {
-						caption: "Available:",
+						content: "Available:",
 						balance: this.totalBalance[0],
 						value: 0
 					}, {
-						caption: "Cleared:",
+						content: "Cleared:",
 						balance: this.totalBalance[1],
 						value: 1
 					}, {
-						caption: "Pending:",
+						content: "Pending:",
 						balance: this.totalBalance[3],
 						value: 3
 					}, {
-						caption: "Final:",
+						content: "Final:",
 						balance: this.totalBalance[2],
 						value: 2
 					}

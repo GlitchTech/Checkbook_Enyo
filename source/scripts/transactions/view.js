@@ -9,18 +9,14 @@ enyo.kind( {
 
 	events: {
 		onModify: "",//Add/Edit Transaction
-		onChanged: "",//Edit Made
-		onBalanceViewChanged: "",//Balance mode changed
-
-		onBudgetView: "",//Show Budget Pane
-		onSearchView: "",//Show Search Pane
+		onChanged: ""//Edit Made
 	},
 
 	components: [
 		{
 			name: "header",
 			kind: "onyx.Toolbar",
-			layoutKind: "FittableColumnsLayout",
+			layoutKind: "enyo.FittableColumnsLayout",
 			components: [
 				{//Swap between icon for account & spinner when loading data in the background.
 					name: "acctTypeIcon",
@@ -31,9 +27,11 @@ enyo.kind( {
 				}, {
 					name: "loadingSpinner",
 					kind: "jmtk.Spinner",
+
 					color: "#284907",
 					diameter: "32",
 					shape: "spiral",
+
 					style: "margin: 0 15px 0 0;"
 				}, {
 					name: "acctName",
@@ -42,11 +40,12 @@ enyo.kind( {
 					style: "margin-top: -6px;",
 					fit: true
 				}, {
-					name: "balanceButton",
-					kind: "onyx.Button",
-					style: "padding: 0 8px; margin: 0;",
-					caption: "Balance",
-					ontap: "balanceButtontaped"
+					name: "balanceMenu",
+					kind: "Checkbook.balanceMenu",
+
+					onChange: "handleBalanceButton",
+
+					style: "padding: 0 8px; margin: 0;"
 				}
 			]
 		}, {
@@ -62,9 +61,10 @@ enyo.kind( {
 			components: [
 				{
 					kind: "onyx.SwipeableItem",
+					tapHighlight: true,
 
 					ontap: "transactiontapped",
-					onmousehold: "transactionHeld",
+					//onhold: "transactionHeld",
 					onDelete: "transactionDeleted",
 
 					style: "padding-right: 20px; padding-left: 30px;",
@@ -102,8 +102,8 @@ enyo.kind( {
 									]
 								}, {
 									name: "cleared",
-									ontap: "transactionCleared",
 									kind: enyo.CheckBox,
+									ontap: "transactionCleared",
 
 									style: "margin-left: 15px;"
 								}
@@ -131,18 +131,21 @@ enyo.kind( {
 					//I do nothing right now
 					showing: false,
 					kind: "onyx.Grabber",
-					style: "margin-right: 10px;"
+					classes: "margin-right"
 				},{
+					kind: "onyx.MenuDecorator",
 					components: [
 						{
-							//Doesn't display properly
-							showing: false,
-							kind: "onyx.Grabber",
-							style: "margin-right: 50px;"
-						}, {
 							kind: "onyx.IconButton",
-							ontap: "sortButtontaped",
 							src: "assets/menu_icons/sort.png"
+						}, {
+							name: "sortMenu",
+							kind: "GTS.SelectedMenu",
+							floating: true,
+
+							onChange: "transactionSortingChanged",
+
+							style: "min-width: 225px;"
 						}
 					]
 				}, {
@@ -168,21 +171,85 @@ enyo.kind( {
 						}
 					]
 				}, {
+					showing: false,
+					kind: "onyx.MenuDecorator",
 					components: [
 						{
 							kind: "onyx.IconButton",
-							ontap: "searchButtontaped",
 							src: "assets/menu_icons/search.png"
 						}, {
+							kind: "onyx.Menu",
+							floating: true,
+							onSelect: "searchSelected",
+							components: [
+								{
+									content: "Reports"
+								}, {
+									content: "Budget"
+								}, {
+									content: "Search"
+								}
+							]
+						}
+					]
+				}, {
+					showing: false,
+					kind: "onyx.MenuDecorator",
+					components: [
+						{
 							kind: "onyx.IconButton",
-							//ontap: "functionButtontaped",
-							//src: "assets/menu_icons/config.png"
+							src: "assets/menu_icons/config.png"
+						}, {
+							kind: "onyx.Menu",
+							floating: true,
+							onSelect: "functionSelected",
+							components: [
+								{
+									content: "Purge Transactions",
+									value: "purge"
+								}, {
+									content: "Combine Transactions",
+									value: "combine"
+								}, {
+									content: "Clear Multiple Transactions",
+									value: "clear"
+								}
+							]
 						}
 					]
 				}
 			]
 		},
+		{
+			kind: "Signals",
 
+			viewAccount: "viewAccount",
+			accountChanged: "accountChanged"
+		},
+
+		{
+			name: "transactonMenu",
+			kind: "onyx.Menu",
+			showOnTop: true,
+			floating: true,
+			components: [
+				{
+					name: "tmClear",
+					content: "Clear Transaction",
+					value: "clear"
+				}, {
+					content: "Edit Transaction",
+					value: "edit"
+				}, {
+					content: "Duplicate Transaction",
+					value: "duplicate"
+				}, {
+					content: "Delete Transaction",
+					value: "delete"
+				}
+			]
+		}
+/*
 		{
 			name: "viewSingle",
 			//kind: "Checkbook.transactions.viewSingle",
@@ -202,79 +269,8 @@ enyo.kind( {
 
 			onYes: "deleteTransactionConfirmHandler",
 			onNo: "deleteTransactionConfirmClose"
-		},
-
-		//All menu item actions call 'menuItemClick'
-		{
-			name: "transactonMenu",
-			//kind: "GTS.menu",
-			lazy: false,
-			components: [
-				{
-					name: "tmClear",
-					caption: "Clear Transaction",
-					value: "clear",
-					menuParent: "transactonMenu"
-				}, {
-					caption: "Edit Transaction",
-					value: "edit",
-					menuParent: "transactonMenu"
-				}, {
-					caption: "Duplicate Transaction",
-					value: "duplicate",
-					menuParent: "transactonMenu"
-				}, {
-					caption: "Delete Transaction",
-					value: "delete",
-					menuParent: "transactonMenu"
-				}
-			]
-		}, {
-			name: "balanceMenu",
-			//kind: "Checkbook.balanceMenu"
-		}, {
-			name: "sortMenu",
-			//kind: "Checkbook.selectedMenu"
-		}, {
-			name: "searchMenu",
-			//kind: "GTS.menu",
-			components: [
-				{
-					showing: false,
-
-					caption: "Reports",
-					menuParent: "searchMenu"
-				}, {
-					caption: "Budget",
-					menuParent: "searchMenu"
-				}, {
-					caption: "Search",
-					menuParent: "searchMenu"
-				}
-			]
-		}, {
-			name: "functionMenu",
-			//kind: "GTS.menu",
-			components: [
-				{
-					caption: "Purge Transactions",
-					menuParent: "functionMenu"
-				}, {
-					caption: "Combine Transactions",
-					menuParent: "functionMenu"
-				}, {
-					caption: "Clear Multiple Transactions",
-					menuParent: "functionMenu"
-				}
-			]
-		},
-
-		{
-			kind: "Signals",
-
-			viewAccount: "viewAccount",
-			accountChanged: "accountChanged"
 		}
+*/
 	],
 
 	rendered: function() {
@@ -312,8 +308,6 @@ enyo.kind( {
 
 			this.$['header'].show();
 			this.$['footer'].show();
-
-			this.reflow();
 		}
 
 		if( inEvent['force'] || !this.account['acctId'] || this.account['acctId'] !== inEvent['account']['acctId'] ) {
@@ -364,8 +358,6 @@ enyo.kind( {
 
 			this.initialScroll();
 
-			return;//TEMP
-
 			if( this.account['frozen'] === 1 ) {
 
 				this.$['addIncomeButton'].setDisabled( true );
@@ -378,6 +370,10 @@ enyo.kind( {
 				this.$['addExpenseButton'].setDisabled( false );
 			}
 		}
+
+		this.$['header'].reflow();
+		this.$['footer'].reflow();
+		this.reflow();
 	},
 
 	getAccountId: function() {
@@ -386,6 +382,8 @@ enyo.kind( {
 	},
 
 	setAccountIndex: function( index ) {
+
+		this.log( arguments );
 
 		this.account['index'] = index;
 	},
@@ -495,107 +493,6 @@ enyo.kind( {
 		this.$['entries'].scrollToRow( scrollToIndex );
 	},
 
-	menuItemClick: function() {
-		//All menu items come here
-
-		var inSender = arguments[arguments.length === 2 ? 0 : 1];
-
-		if( inSender.menuParent.toLowerCase() === "balancemenu" ) {
-			//Balance menu
-
-			if( this.account['bal_view'] === inSender.value ) {
-				//No change, abort
-				return;
-			}
-
-			this.account['bal_view'] = inSender.value;
-
-			Checkbook.globals.accountManager.updateAccountBalView(
-					this.account['acctId'],
-					this.account['bal_view'],
-					{
-						"onSuccess": enyo.bind( this, this.renderBalanceButton )
-					}
-				);
-
-			this.doBalanceViewChanged( this.account['index'], this.account['acctId'], this.account['bal_view'] );
-		} else if( inSender.menuParent.toLowerCase() === "transactionsortoptions" ) {
-			//Sort menu
-
-			if( this.account['sort'] === inSender.value ) {
-				//No change, abort
-				return;
-			}
-
-			this.account['sort'] = inSender.value;
-			this.account['sortQry'] = inSender.qry;
-
-			Checkbook.globals.accountManager.updateAccountSorting(
-					this.account['acctId'],
-					this.account['sort']
-				);
-
-			this.transactions = [];
-			this.$['entries'].setCount( this.transactions.length );
-			this.$['entries'].reset();
-			this.initialScroll();
-		} else if( inSender.menuParent.toLowerCase() === "functionmenu" ) {
-
-			this.log( "functionMenu", arguments );
-		} else if( inSender.menuParent.toLowerCase() === "searchmenu" ) {
-			//Tool Menu
-
-			if( inSender.value.toLowerCase() === "budget" ) {
-
-				enyo.asyncMethod(
-						this,
-						this.doBudgetView,
-						null,
-						{
-							accountObj: this.account
-						}
-					);
-			} else if( inSender.value.toLowerCase() === "reports" ) {
-
-				this.log( "Report system go" );
-			} else if( inSender.value.toLowerCase() === "search" ) {
-
-				enyo.asyncMethod(
-						this,
-						this.doSearchView,
-						null,
-						{
-							acctId: this.account['acctId']
-						}
-					);
-			}
-		} else if( inSender.menuParent.toLowerCase() === "transactonmenu" ) {
-			//Transction Menu
-
-			var rowIndex = this.$['transactonMenu'].rowIndex;
-
-			if( !Object.validNumber( rowIndex ) || rowIndex < 0 ) {
-
-				return;
-			}
-
-			if( inSender.value === "clear" ) {
-
-				this.vsCleared( null, rowIndex );
-			} else if( inSender.value === "edit" ) {
-
-				this.vsEdit( null, rowIndex );
-			} else if( inSender.value === "duplicate" ) {
-
-				this.duplicateTransaction( rowIndex );
-			} else if( inSender.value === "delete" ) {
-
-				this.$['deleteTransactionConfirm'].rowIndex = rowIndex;
-				this.$['deleteTransactionConfirm'].openAtCenter();
-			}
-		}
-	},
-
 	balanceChangedHandler: function( accounts, results ) {
 
 		if( !accounts ) {
@@ -643,56 +540,67 @@ enyo.kind( {
 	/* Header Control */
 	renderBalanceButton: function() {
 
-		var balance = this.account['balance' + this.account['bal_view']];
-
-		var balanceColor = "neutralBalance";
-		if( balance > 0 ) {
-
-			balanceColor = "positiveBalance";
-		} else if( balance < 0 ) {
-
-			balanceColor = "negativeBalance";
-		}
-
-		this.$['balanceButton'].setContent( formatAmount( balance ) );
-		//this.$['balanceButton'].setclasses( "enyo-button " + balanceColor );
-	},
-
-	balanceButtontaped: function( inSender ) {
-
-		return;//TEMP
-
-		this.$['balanceMenu'].setItems(
+		this.$['balanceMenu'].setChoices(
 				[
 					{
-						caption: "Available:",
+						content: "Available:",
 						balance: this.account['balance0'],
-						menuParent: "balanceMenu",
 						value: 0,
 					}, {
-						caption: "Cleared:",
+						content: "Cleared:",
 						balance: this.account['balance1'],
-						menuParent: "balanceMenu",
 						value: 1
 					}, {
-						caption: "Pending:",
+						content: "Pending:",
 						balance: this.account['balance3'],
-						menuParent: "balanceMenu",
 						value: 3
 					}, {
-						caption: "Final:",
+						content: "Final:",
 						balance: this.account['balance2'],
-						menuParent: "balanceMenu",
 						value: 2
 					}
-				],
-				this.account['bal_view']
+				]
 			);
 
-		this.$['balanceMenu'].openAtControl( inSender );
+		this.$['balanceMenu'].setValue( this.account['bal_view'] );
+
+		this.$['header'].reflow();
+	},
+
+	handleBalanceButton: function( inSender, inEvent ) {
+
+		if( this.account['bal_view'] === inEvent.value ) {
+			//No change, abort
+
+			return true;
+		}
+
+		this.account['bal_view'] = inEvent.value;
+
+		Checkbook.globals.accountManager.updateAccountBalView(
+				this.account['acctId'],
+				this.account['bal_view'],
+				{
+					"onSuccess": enyo.bind( this, this.renderBalanceButton )
+				}
+			);
+
+		enyo.Signals.send(
+				"balanceViewChanged",
+				{
+					"index": this.account['index'],
+					"id": this.account['acctId'],
+					"mode": this.account['bal_view'],
+					"callbackFn": enyo.bind( this, this.setAccountIndex )
+				}
+			);
+
+		this.loadingDisplay( false );
+		return true;
 	},
 
 	/* Footer Control */
+
 	renderSortButton: function() {
 
 		if( transactionSortOptions.length <= 0 ) {
@@ -706,24 +614,34 @@ enyo.kind( {
 
 	buildTransactionSorting: function() {
 
-		return;//TEMP
+		if( enyo.isArray( transactionSortOptions ) ) {
 
-		this.$['sortMenu'].setItems( transactionSortOptions );
+			this.$['sortMenu'].setChoices( transactionSortOptions );
+
+			this.$['sortMenu'].setValue( this.account['sort'] );
+		}
 	},
 
-	sortButtontaped: function( inSender, inEvent ) {
+	transactionSortingChanged: function( inSender, inEvent ) {
 
-		this.$['sortMenu'].openAtControl( inSender, this.account['sort'] );
-	},
+		if( this.account['sort'] === inEvent.value ) {
+			//No change, abort
 
-	searchButtontaped: function( inSender, inEvent ) {
+			return true;
+		}
 
-		this.$['searchMenu'].openAtControl( inSender );
-	},
+		this.account['sort'] = inEvent.value;
+		this.account['sortQry'] = inEvent.qry;
 
-	functionButtontaped: function( inSender, inEvent ) {
+		Checkbook.globals.accountManager.updateAccountSorting(
+				this.account['acctId'],
+				this.account['sort']
+			);
 
-		this.$['functionMenu'].openAtControl( inSender );
+		this.reloadTransactionList();
+		this.initialScroll();
+
+		return true;
 	},
 
 	addIncome: function() {
@@ -740,6 +658,36 @@ enyo.kind( {
 
 		this.newTransaction( "Expense" );
 	},
+
+	searchSelected: function( inSender, inEvent ) {
+
+		if( inEvent.content.toLowerCase() === "budget" ) {
+
+			this.log( "Budget system go" );
+			return true;
+
+			enyo.Signals.send( "showBudget", { "account": this.account } );
+		} else if( inEvent.content.toLowerCase() === "reports" ) {
+
+			this.log( "Report system go" );
+			return true;
+
+			//enyo.Signals.send( "?????", { "account": this.account } );
+		} else if( inEvent.content.toLowerCase() === "search" ) {
+
+			this.log( "Search system go" );
+			return true;
+
+			enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'] } );
+		}
+	},
+
+	functionSelected: function( inSender, inEvent ) {
+
+		this.log( inEvent.selected );
+	},
+
+	/* Transaction & List Control */
 
 	newTransaction: function( type ) {
 
@@ -914,11 +862,10 @@ enyo.kind( {
 
 	transactionHeld: function( inSender, inEvent ) {
 
-		this.log();
+		this.log( "I DO NOT WORK YET", arguments );
+		return;
 
-		//enyo-held class isn't being removed on mouse up either
-
-		if( this.transactions[inEvent.rowIndex]['cleared'] === 1 ) {
+		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
 
 			this.$['tmClear'].setContent( "Unclear Transaction" );
 		} else {
@@ -926,8 +873,39 @@ enyo.kind( {
 			this.$['tmClear'].setContent( "Clear Transaction" );
 		}
 
-		this.$['transactonMenu'].rowIndex = inEvent.rowIndex;
-		this.$['transactonMenu'].openAtEvent( inEvent );
+		this.$['transactonMenu'].rowIndex = inEvent.index;
+
+		this.waterfallDown( "onRequestShowMenu", { activator: inEvent.originator } );
+	},
+
+	transactionHeldHandler: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		return true;
+
+		var rowIndex = this.$['transactonMenu'].rowIndex;
+
+		if( !Object.validNumber( rowIndex ) || rowIndex < 0 ) {
+
+			return;
+		}
+
+		if( inSender.value === "clear" ) {
+
+			this.vsCleared( null, rowIndex );
+		} else if( inSender.value === "edit" ) {
+
+			this.vsEdit( null, rowIndex );
+		} else if( inSender.value === "duplicate" ) {
+
+			this.duplicateTransaction( rowIndex );
+		} else if( inSender.value === "delete" ) {
+
+			this.$['deleteTransactionConfirm'].rowIndex = rowIndex;
+			this.$['deleteTransactionConfirm'].openAtCenter();
+		}
+
+		return true;
 	},
 
 	transactionCleared: function( inSender, inEvent ) {
@@ -1057,6 +1035,9 @@ enyo.kind( {
 	},
 
 	transactionBuildRow: function( inSender, inEvent ) {
+
+		this.$['desc'].setContent( inEvent.index );
+		return;
 
 		var inIndex = inEvent.index;
 

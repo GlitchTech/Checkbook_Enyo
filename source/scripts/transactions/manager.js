@@ -1212,8 +1212,7 @@ enyo.kind({
 								content: row['label'],
 								value: row['sortId'],
 								qry: row['qry'],
-								sortGroup: row['sortGroup'],
-								menuParent: "transactionSortOptions"
+								sortGroup: row['sortGroup']
 							}
 					);
 			}

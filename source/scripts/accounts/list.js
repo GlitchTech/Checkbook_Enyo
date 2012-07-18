@@ -44,6 +44,7 @@ enyo.kind({
 					classes: "bordered norm-row account-item",
 
 					kind: "onyx.SwipeableItem",
+					tapHighlight: true,
 
 					ontap: "accountTapped",
 					onDelete: "accountDeleted",

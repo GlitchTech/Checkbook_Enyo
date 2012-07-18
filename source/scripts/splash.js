@@ -5,8 +5,10 @@ enyo.kind({
 	kind: "onyx.Popup",
 
 	centered: true,
-	modal: true,
 	floating: true,
+
+	scrim: true,
+	scrimclasses: "onyx-scrim-translucent",
 
 	published: {
 		firstRun: false

@@ -4,7 +4,8 @@
 	//See how email does it & retains connection to main app
 enyo.kind( {
 	name: "Checkbook.transactions.modify",
-	kind: enyo.VFlexBox,
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
 	style: "height: 100%;",
 
@@ -23,118 +24,114 @@ enyo.kind( {
 
 	components: [
 		{
-			kind: enyo.PageHeader,
-			layoutKind: enyo.HFlexLayout,
-			pack: "center",
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
 					name: "transTypeText",
 					content: "Modify Transaction",
-					className: "bigger"
+					classes: "bigger"
 				}
 			]
 		},
 
 		{
-			kind: enyo.Scroller,
-			autoHorizontal: false,
-			horizontal: false,
-			className: "light",//"deep-green-gradient",
-			flex: 1,
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			classes: "deep-green-gradient",
+			fit: true,
 			components: [
 				{
-					layoutKind: enyo.VFlexLayout,
-					className: "light narrow-column",
-					flex: 1,
+					classes: "light narrow-column",
+					style: "min-height: 100%;",
 					components: [
 						{
-							kind: enyo.Group,
-							tapHightlight: false,
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
-									kind: enyo.Item,
-									tapHightlight: false,
+									kind: "onyx.InputDecorator",
 									components: [
 										{
 											name: "desc",
-											kind: enyo.RichText,
-											hint: "Enter Description",
+											kind: "onyx.Input",
+
+											placeholder: "Enter Description",
 
 											onkeypress: "descKeyPress",
 											oninput: "descContentChanged",
 											autoKeyModifier: "shift-single",
-
-											flex: 1
 										}
 									]
 								}, {
-									kind: enyo.Item,
-									layoutKind: enyo.HFlexLayout,
-									tapHightlight: false,
+									kind: "onyx.InputDecorator",
+									layoutKind: "FittableColumnsLayout",
+									noStretch: true,
 									components: [
 										{
-											kind: enyo.ToolButtonGroup,
-											style: "padding-right: 1em;",
-											components: [
-												{
-													name: "transTypeIcon",
-													className: "enyo-radiobutton-dark",
-													//icon: "assets/menu_icons/income.png",
-													//icon: "assets/menu_icons/transfer.png",
-													//icon: "assets/menu_icons/expense.png",
+											name: "transTypeIcon",
+											kind: "onyx.Icon",
 
-													ontap: "amountTypeChanged"
-												}
-											]
+											ontap: "amountTypeChanged",
+
+											classes: "margin-right"
+											//src: "assets/menu_icons/income.png",
+											//src: "assets/menu_icons/transfer.png",
+											//src: "assets/menu_icons/expense.png",
 										}, {
 											name: "amount",
-											kind: enyo.Input,
-											hint: "0.00",
+											kind: "onyx.Input",
+
+											fit: true,
+
+											placeholder: "0.00",
 											oldValue: "",
 
 											//inputType: "number",//Does not work
 											//autoKeyModifier: "num-lock",//Does not work
 
 											oninput: "amountContentChanged",//ATM Function
-											onkeypress: "amountKeyPress",//Key possibility filter
-
-											flex: 1,
-											components: [
-												{
-													content: "Amount",
-													className: "enyo-label"
-												}
-											]
+											onkeypress: "amountKeyPress"//Key possibility filter
+										}, {
+											content: "Amount",
+											classes: "label"
 										}
 									]
 								}, {
 									name: "account",
-									kind: "GTS.ListSelectorBar",
-									labelText: "Account",
+									kind: "GTS.SelectorBar",
+
+									label: "Account",
 									onChange: "accountChanged",
-									className: "iconListSelector custom-background"
+
+									classes: "custom-background bordered"
 								}, {
 									name: "linkedAccount",
-									kind: "GTS.ListSelectorBar",
-									labelText: "Transfer To...",
+									kind: "GTS.SelectorBar",
+
+									label: "Transfer To...",
 									onChange: "linkedAccountChanged",
-									className: "iconListSelector custom-background"
+
+									classes: "custom-background"
 								}
 							]
 						}, {
-							kind: enyo.Group,
-							caption: "Date",
+							kind: "onyx.Groupbox",
 							tapHightlight: false,
 
-							className: "dividerDrawerBlack",
+							classes: "dividerDrawerBlack",
 							style: "padding:2px;",
 
 							components: [
 								{
+									kind: "onyx.GroupboxHeader",
+									content: "Date",
+									classes: "padding-std"
+								}, {
 									kind: enyo.Item,
 									layoutKind: enyo.HFlexLayout,
 
-									className: "enyo-single",
+									classes: "enyo-single",
 									tapHightlight: false,
 
 									ontap: "toggleDateDrawer",
@@ -142,7 +139,7 @@ enyo.kind( {
 										{
 											kind: enyo.Image,
 											src: "assets/calendar.png",
-											className: "img-icon",
+											classes: "img-icon",
 											style: "margin-right: 1em;"
 										}, {
 											name: "dateDisplay",
@@ -150,7 +147,7 @@ enyo.kind( {
 											flex: 1
 										}, {
 											name: "dateArrow",
-											className: "enyo-listselector-arrow"
+											classes: "enyo-listselector-arrow"
 										}
 									]
 								}, {
@@ -161,7 +158,7 @@ enyo.kind( {
 									components: [
 										{
 											name: "date",
-											kind: "GTS.DateTimePicker",
+											//kind: "GTS.DateTimePicker",
 											onChange: "dateChanged"
 										}
 									]
@@ -193,7 +190,7 @@ enyo.kind( {
 											components: [
 												{
 													name: "categoryText",
-													className: "enyo-text-ellipsis",
+													classes: "enyo-text-ellipsis",
 
 													flex: 3
 												}, {
@@ -218,14 +215,14 @@ enyo.kind( {
 										{
 											kind: "onyx.Button",
 											caption: "Add Category",
-											className: "enyo-button-dark",
+											classes: "enyo-button-dark",
 											ontap: "categoryAddNew",
 											flex: 3
 										}, {
 											name: "fillValueButton",
 											kind: "onyx.Button",
 											caption: "Fill Values",
-											className: "enyo-button-light",
+											classes: "enyo-button-light",
 											ontap: "categoriesFillValues",
 											flex: 1
 										}
@@ -237,7 +234,7 @@ enyo.kind( {
 							caption: "Recurrence",
 							tapHightlight: false,
 
-							className: "dividerDrawerBlack",
+							classes: "dividerDrawerBlack",
 							style: "padding:2px;",
 
 							components: [
@@ -245,7 +242,7 @@ enyo.kind( {
 									kind: enyo.Item,
 									layoutKind: enyo.HFlexLayout,
 
-									className: "enyo-single",
+									classes: "enyo-single",
 									tapHightlight: false,
 
 									ontap: "toggleRecurrenceDrawer",
@@ -253,7 +250,7 @@ enyo.kind( {
 										{
 											kind: enyo.Image,
 											src: "assets/repeat.png",
-											className: "img-icon",
+											classes: "img-icon",
 											style: "margin-right: 1em;"
 										}, {
 											name: "recurrenceDisplay",
@@ -261,7 +258,7 @@ enyo.kind( {
 											flex: 1
 										}, {
 											name: "recurrenceArrow",
-											className: "enyo-listselector-arrow"
+											classes: "enyo-listselector-arrow"
 										}
 									]
 								}, {
@@ -272,7 +269,7 @@ enyo.kind( {
 									components: [
 										{
 											name: "recurrence",
-											kind: "Checkbook.transactions.repeat.select",
+											//kind: "Checkbook.transactions.repeat.select",
 											onChange: "recurrenceChanged"
 										}
 									]
@@ -291,14 +288,14 @@ enyo.kind( {
 									components: [
 										{
 											content: "Check Number",
-											className: "enyo-label"
+											classes: "enyo-label"
 										}
 									]
 								}
 							]
 						}, {
 							name: "cleared",
-							kind: "GTS.ToggleBarRev",
+							//kind: "GTS.ToggleBarRev",
 							mainText: "Cleared",
 							subText: "",
 
@@ -308,7 +305,7 @@ enyo.kind( {
 							value: false
 						}, {
 							name: "autoTrans",
-							kind: "GTS.ToggleBarRev",
+							//kind: "GTS.ToggleBarRev",
 							mainText: "Auto Transfer",
 							subText: "",
 
@@ -340,9 +337,11 @@ enyo.kind( {
 							name: "transactionDeleteButton",
 							kind: "onyx.Button",
 							content: "Delete Transaction",
-							className: "onyx-negative",
-							style: "margin-top: 1.5em;",
-							ontap: "deleteTransaction"
+
+							ontap: "deleteTransaction",
+
+							classes: "onyx-negative margin-top",
+							style: "width: 100%;"
 						}, {
 							kind: enyo.Spacer,
 							style: "height: 1.5em;"
@@ -353,30 +352,25 @@ enyo.kind( {
 		},
 
 		{
-			kind: enyo.Toolbar,
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 4
-				}, {
 					kind: "onyx.Button",
-					flex: 2,
 					content: "Cancel",
+
+					ontap: "doFinish",
+
 					style: "width: 150px",
-					ontap: "doFinish"
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
+					classes: "margin-half-right"
 				}, {
 					kind: "onyx.Button",
-					flex: 2,
 					content: "Save",
-					className: "onyx-affirmative deep-green",
+
+					ontap: "saveTransaction",
+
 					style: "width: 150px;",
-					ontap: "saveTransaction"
-				}, {
-					kind: enyo.Spacer,
-					flex: 4
+					classes: "onyx-affirmative deep-green margin-half-left"
 				}
 			]
 		},
@@ -390,11 +384,12 @@ enyo.kind( {
 			showing: true,
 			components: [
 				{
-					kind: "GTS.SpinnerLarge",
+					//kind: "GTS.SpinnerLarge",
 					showing: true
 				}
 			]
 		},
+		/*
 
 		{
 			name: "appMenu",
@@ -416,12 +411,10 @@ enyo.kind( {
 		{
 			name: "categorySystem",
 			kind: "Checkbook.transactionCategory.select"
-		}
+		}*/
 	],
 
 	rendered: function() {
-
-		this.log();
 
 		this.inherited( arguments );
 
@@ -475,7 +468,6 @@ enyo.kind( {
 		this.$['account'].setChoices( this.accountList );
 
 		this.$['account'].setDisabled( false );
-		this.$['account'].$['listName'].setDisabled( false );
 
 		this.$['account'].render();
 
@@ -485,14 +477,12 @@ enyo.kind( {
 			this.$['linkedAccount'].setChoices( this.accountList );
 
 			this.$['linkedAccount'].setDisabled( false );
-			this.$['linkedAccount'].$['listName'].setDisabled( false );
 
 			this.$['linkedAccount'].render();
 
 		} else {
 
 			this.$['linkedAccount'].setDisabled( true );
-			this.$['linkedAccount'].$['listName'].setDisabled( true );
 		}
 
 		//Check this.accountObj properties
@@ -568,7 +558,7 @@ enyo.kind( {
 		this.renderCategories = true;
 
 		//Run the formatters
-		this.$['transTypeIcon'].setIcon( "assets/menu_icons/" + this.transactionType + ".png" );
+		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
 
 		//TODO set repeat values
 
@@ -700,7 +690,7 @@ enyo.kind( {
 				break;
 		}
 
-		this.$['transTypeIcon'].setIcon( "assets/menu_icons/" + this.transactionType + ".png" );
+		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
 	},
 
 	/** All Amount Field Controls **/

@@ -26,9 +26,17 @@ enyo.kind({
 			kind: "GTS.SelectedMenu",
 			floating: true,
 			style: "min-width: 200px;",
-			onChange: "selectionChanged"
+			onChange: "balanceSelectionChanged"
 		}
 	],
+
+	/**
+	 * @private
+	 * List of events to handle
+	 */
+	handlers: {
+		onSelect: "preventEvent"
+	},
 
 	/**
 	 * @protected
@@ -36,7 +44,7 @@ enyo.kind({
 	 * @name Checkbook.balanceMenu#choicesChanged
 	 *
 	 * Updates menu items to be as sent in; designed to be balance menu;
-	 *	each item should have a minimum of caption, balance, value
+	 *	each item should have a minimum of content, balance, value
 	 *	menuParent is optional. If not set, will be balanceMenu
 	 */
 	choicesChanged: function() {
@@ -58,20 +66,15 @@ enyo.kind({
 				}
 
 				options.push( {
-						layoutKind: "enyo.FittableColumnsLayout",
-
 						value: this.choices[i]['value'],
-
-						ontap: "menuItemClick",
 
 						components: [
 							{
-								content: this.choices[i]['caption'],
-								classes: "margin-right",
-								fit: true
+								content: this.choices[i]['content'],
+								classes: "margin-right"
 							}, {
 								content: formatAmount( this.choices[i]['balance'] ),
-								classes: balanceColor
+								classes: balanceColor + " right"
 							}
 						]
 					});
@@ -102,11 +105,17 @@ enyo.kind({
 		this.$['display'].addRemoveClass( "neutralBalanceLight", display == 0 );
 	},
 
-	selectionChanged: function( inSender, inEvent ) {
+	balanceSelectionChanged: function( inSender, inEvent ) {
 
-		this.setValue( inEvent.value );
+		this.value = inEvent.value;
+		this.valueChanged();
 
 		this.doChange( inEvent );
+
+		return true;
+	},
+
+	preventEvent: function() {
 
 		return true;
 	}

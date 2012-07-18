@@ -16,8 +16,7 @@ enyo.kind({
 	},
 
 	events: {
-		onFinish: "",
-		onSearchView: ""
+		onFinish: ""
 	},
 
 	components: [
@@ -411,16 +410,14 @@ enyo.kind({
 				this.$['modify'].openAtCenter( row );
 			} else {
 
-				enyo.asyncMethod(
-						this,
-						this.doSearchView,
-						null,
+				enyo.Signals.send(
+						"showSearch",
 						{
-							category: row['category'],
-							category2: row['category2'],
-							dateStart: this.$['date'].getValue().setStartOfMonth(),
-							dateEnd: this.$['date'].getValue().setEndOfMonth(),
-							onFinish: enyo.bind( this, this.dateChanged, null, this.$['date'].getValue() )
+							"category": row['category'],
+							"category2": row['category2'],
+							"dateStart": this.$['date'].getValue().setStartOfMonth(),
+							"dateEnd": this.$['date'].getValue().setEndOfMonth(),
+							"onFinish": enyo.bind( this, this.dateChanged, null, this.$['date'].getValue() )
 						}
 					);
 			}

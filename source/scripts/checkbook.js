@@ -26,20 +26,12 @@ enyo.kind({
 					kind: "Checkbook.transactions.view",
 
 					onModify: "showPanePopup",
-					onChanged: "accountBalanceChanged",
-					onBalanceViewChanged: "tranasactionBalanceViewChanged",
-
-					onBudgetView: "openBudget",
-					onSearchView: "openSearch"
+					onChanged: "accountBalanceChanged"
 				}
 			]
 		},
 
 		{
-			name: "splashScrim",
-			kind: onyx.Scrim,
-			classes: "onyx-scrim-translucent"
-		}, {
 			name: "splash",
 			kind: "Checkbook.splash",
 			onFinish: "splashFinisher"
@@ -64,7 +56,9 @@ enyo.kind({
 			kind: "Signals",
 			onBack: "goBack",
 
-			editAccount: "showPanePopup"
+			editAccount: "showPanePopup",
+			showBudget: "openBudget",
+			showSearch: "openSearch"
 		}
 
 		/*{
@@ -156,7 +150,6 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.$['splashScrim'].show();
 		this.$['splash'].show();
 
 		//Load splash popup. Verifies database.
@@ -168,10 +161,7 @@ enyo.kind({
 		this.notificationType = !this.$['splash'].getFirstRun();
 
 		//Close & remove splash system. Not used again
-		this.$['splashScrim'].hide();
 		this.$['splash'].hide();
-
-		this.$['splashScrim'].destroy();
 		this.$['splash'].destroy();
 
 		Checkbook.globals.security = this.$['security'];
@@ -419,44 +409,42 @@ enyo.kind({
 
 	/** Checkbook.budget.* **/
 
-	openBudget: function( inSender, inEvent, args ) {
+	openBudget: function( inSender, inEvent ) {
 
-		var budgetArgs = enyo.mixin(
-				{
-					name: "budget",
-					kind: "Checkbook.budget.view",
-					onSearchView: "openSearch"
-				},
-				args
-			);
+		this.log( arguments );
+		return;
 
 		this.showPanePopup(
 				null,
-				budgetArgs
+				enyo.mixin(
+						{
+							name: "budget",
+							kind: "Checkbook.budget.view"
+						},
+						inEvent
+					)
 			);
 	},
 
 	/** Checkbook.search **/
 
-	openSearch: function( inSender, inEvent, args ) {
-
-		var searchArgs = enyo.mixin(
-				args,
-				{
-					name: "search",
-					kind: "Checkbook.search.pane",
-					onModify: "showPanePopup",
-					onFinish: enyo.bind(
-							this,
-							this.closeSearch
-						),
-					doNext: ( args && enyo.isFunction( args['onFinish'] ) ? args['onFinish'] : null )
-				}
-			);
+	openSearch: function( inSender, inEvent ) {
 
 		this.showPanePopup(
 				null,
-				searchArgs
+				enyo.mixin(
+						inEvent,
+						{
+							name: "search",
+							kind: "Checkbook.search.pane",
+							onModify: "showPanePopup",
+							onFinish: enyo.bind(
+									this,
+									this.closeSearch
+								),
+							doNext: ( inEvent && enyo.isFunction( inEvent['onFinish'] ) ? inEvent['onFinish'] : null )
+						}
+					)
 			);
 	},
 
@@ -518,19 +506,6 @@ enyo.kind({
 	},
 
 	/** ( Checkbook.transactions.view --> Checkbook.accounts.view ) Communication Channels **/
-
-	tranasactionBalanceViewChanged: function( inSender, index, id, mode ) {
-
-		this.$['accounts'].accountBalanceViewChanged(
-				index,
-				id,
-				mode,
-				enyo.bind(
-						this.$['transactions'],
-						this.$['transactions'].setAccountIndex
-					)
-			);
-	},
 
 	accountBalanceChanged: function( inSender, accts, deltaBalanceArr ) {
 
