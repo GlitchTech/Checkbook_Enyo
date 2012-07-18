@@ -18,6 +18,8 @@ enyo.depends(
 	"$lib/gts-plugins/DividerDrawer",
 	"$lib/gts-plugins/SelectedMenu",
 	"$lib/gts-plugins/InlineNotification",
+	"$lib/gts-plugins/DatePicker",
+	"$lib/gts-plugins/TimePicker",
 
 	"scripts/",
 	"styles/"

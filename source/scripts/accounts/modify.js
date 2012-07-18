@@ -63,7 +63,7 @@ enyo.kind( {
 							label: "Default Account",
 							sublabel: "This account is launched automatically on start.",
 							onContent: "Yes",
-							offText: "No"
+							offContent: "No"
 						},
 
 						{
@@ -80,7 +80,7 @@ enyo.kind( {
 									label: "Freeze Internal Transactions",
 									sublabel: "Prevent any changes from being made only in this account.",
 									onContent: "Yes",
-									offText: "No"
+									offContent: "No"
 								}, {
 									name: "pinLock",
 									kind: "GTS.ToggleBar",
@@ -88,7 +88,7 @@ enyo.kind( {
 
 									label: "PIN Lock",
 									onContent: "Yes",
-									offText: "No",
+									offContent: "No",
 									onChange: "togglePINStatus"
 								}, {
 									name: "pinLockDrawer",
@@ -189,7 +189,7 @@ enyo.kind( {
 									label: "Show Transaction Time",
 									sublabel: "Displays the transaction time in addition to the date.",
 									onContent: "Yes",
-									offText: "No",
+									offContent: "No",
 									value: true
 								}, {
 									name: "showRunningBal",
@@ -199,7 +199,7 @@ enyo.kind( {
 									label: "Show Running Balance",
 									sublabel: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
 									onContent: "Yes",
-									offText: "No"
+									offContent: "No"
 								}, {
 									name: "hideTransNotes",
 									kind: "GTS.ToggleBar",
@@ -208,7 +208,7 @@ enyo.kind( {
 									label: "Hide Transaction Notes",
 									sublabel: "Transaction notes will be hidden.",
 									onContent: "Yes",
-									offText: "No"
+									offContent: "No"
 								}
 							]
 						},
@@ -226,7 +226,7 @@ enyo.kind( {
 									label: "Description Multiline Mode",
 									sublabel: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
 									onContent: "Yes",
-									offText: "No"
+									offContent: "No"
 								}, {
 									name: "autoComplete",
 									kind: "GTS.ToggleBar",
@@ -235,7 +235,7 @@ enyo.kind( {
 									label: "Use Auto-Complete",
 									sublabel: "Displays suggestions for transaction descriptions based on your history.",
 									onContent: "Yes",
-									offText: "No",
+									offContent: "No",
 									value: true
 								}, {
 									name: "atmMode",
@@ -245,7 +245,7 @@ enyo.kind( {
 									label: "Use ATM Mode",
 									sublabel: "Amount field will be automatically formatted as you type.",
 									onContent: "Yes",
-									offText: "No",
+									offContent: "No",
 									value: true
 								}, {
 									name: "autoTransfer",
@@ -287,7 +287,7 @@ enyo.kind( {
 									label: "Add Check Number Field",
 									sublabel: "Add a field to record the check number in the add/edit transaction screen.",
 									onContent: "Yes",
-									offText: "No"
+									offContent: "No"
 								}, {
 									name: "expenseCategories",
 									kind: "GTS.ToggleBar",
@@ -296,7 +296,7 @@ enyo.kind( {
 									label: "Add Expense Categories",
 									sublabel: "Add a field to record the expense category in the add/edit transaction screen.",
 									onContent: "Yes",
-									offText: "No",
+									offContent: "No",
 									value: true
 								}, {
 									showing: false,
@@ -308,7 +308,7 @@ enyo.kind( {
 									label: "Hide cleared transactions",
 									sublabel: "",
 									onContent: "Yes",
-									offText: "No"
+									offContent: "No"
 								}
 							]
 						},
@@ -608,6 +608,7 @@ enyo.kind( {
 	togglePINStatus: function() {
 
 		this.$['pinLockDrawer'].setOpen( this.$['pinLock'].getValue() );
+		return true;
 	},
 
 	/**

@@ -87,9 +87,6 @@ enyo.kind( {
 											placeholder: "0.00",
 											oldValue: "",
 
-											//inputType: "number",//Does not work
-											//autoKeyModifier: "num-lock",//Does not work
-
 											oninput: "amountContentChanged",//ATM Function
 											onkeypress: "amountKeyPress"//Key possibility filter
 										}, {
@@ -117,24 +114,19 @@ enyo.kind( {
 							]
 						}, {
 							kind: "onyx.Groupbox",
-							tapHightlight: false,
-
-							classes: "dividerDrawerBlack",
-							style: "padding:2px;",
-
 							components: [
 								{
 									kind: "onyx.GroupboxHeader",
 									content: "Date",
 									classes: "padding-std"
 								}, {
-									kind: enyo.Item,
-									layoutKind: enyo.HFlexLayout,
+									kind: "enyo.FittableColumns",
+									noStretch: true,
 
-									classes: "enyo-single",
-									tapHightlight: false,
+									classes: "padding-std",
 
 									ontap: "toggleDateDrawer",
+
 									components: [
 										{
 											kind: enyo.Image,
@@ -152,14 +144,23 @@ enyo.kind( {
 									]
 								}, {
 									name: "dateDrawer",
-									kind: enyo.Drawer,
-									open: false,
+									kind: "onyx.Drawer",
+									open: true,
 
 									components: [
 										{
+											kind: "GTS.TimePicker",
+
+											showTime: true,
+											timeFormat: "12"
+										},
+										{
 											name: "date",
-											//kind: "GTS.DateTimePicker",
-											onChange: "dateChanged"
+											kind: "GTS.DatePicker",
+											onChange: "dateChanged",
+
+											showTime: true,
+											timeFormat: "12"
 										}
 									]
 								}
@@ -277,58 +278,69 @@ enyo.kind( {
 							]
 						}, {
 							name: "checkNumHolder",
-							kind: enyo.Item,
-							tapHightlight: false,
+							kind: "onyx.InputDecorator",
+							layoutKind: "FittableColumnsLayout",
+							noStretch: true,
 							components: [
 								{
 									name: "checkNum",
-									kind: enyo.Input,
-									hint: "# (optional)",
-									onfocus: "autofillCheckNo",
-									components: [
-										{
-											content: "Check Number",
-											classes: "enyo-label"
-										}
-									]
+									kind: "onyx.Input",
+									fit: true,
+
+									placeholder: "# (optional)",
+
+									onfocus: "autofillCheckNo"
+								}, {
+									content: "Check Number",
+									classes: "label"
 								}
 							]
 						}, {
 							name: "cleared",
-							//kind: "GTS.ToggleBarRev",
-							mainText: "Cleared",
-							subText: "",
+							kind: "GTS.ToggleBar",
+							classes: "bordered",
 
-							onText: "Cleared",
-							offText: "Pending",
+							label: "Cleared",
+							sublabel: "",
+							onContent: "Cleared",
+							offContent: "Pending",
 
 							value: false
 						}, {
 							name: "autoTrans",
-							//kind: "GTS.ToggleBarRev",
-							mainText: "Auto Transfer",
-							subText: "",
+							kind: "GTS.ToggleBar",
+							classes: "bordered",
 
-							onText: "On",
-							offText: "Off",
+							label: "Auto Transfer",
+							sublabel: "",
+							onContent: "Yes",
+							offContent: "No",
 
 							value: true
 						},
 
 						{
-							kind: enyo.Group,
-							align: "center",
-							tapHightlight: false,
-							layoutKind: enyo.HFlexLayout,
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top",
 							components: [
 								{
-									name: "notes",
-									kind: enyo.RichText,
-									hint: "Transaction Notes",
-									flex: 1,
+									kind: "onyx.InputDecorator",
+									layoutKind: "FittableColumnsLayout",
+									components: [
+										{
+											name: "notes",
+											kind: "onyx.TextArea",
+											placeholder: "Transaction Notes",
 
-									style: "min-height: 150px;",
-									alwaysLooksFocused: true
+											style: "min-height: 150px;",
+											fit: true
+										}, {
+											content: "Notes",
+											classes: "label",
+											style: "vertical-align: top;"
+										}
+									]
+
 								}
 							]
 						},
@@ -377,17 +389,16 @@ enyo.kind( {
 
 		{
 			name: "loadingScrim",
-			kind: enyo.Scrim,
-			layoutKind: enyo.VFlexLayout,
-			align: "center",
-			pack: "center",
-			showing: true,
-			components: [
-				{
-					//kind: "GTS.SpinnerLarge",
-					showing: true
-				}
-			]
+			kind: "onyx.Scrim",
+			classes: "onyx-scrim-translucent"
+		}, {
+			name: "loadingSpinner",
+			kind: "jmtk.Spinner",
+			color: "#272D70",
+			diameter: "90",
+			shape: "spiral",
+
+			style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 		},
 		/*
 
@@ -406,17 +417,20 @@ enyo.kind( {
 			name: "autocomplete",
 			kind: "Checkbook.transactions.autocomplete",
 			onSelect: "descAutoSuggestMade"
-		},
+		},*/
 
 		{
 			name: "categorySystem",
 			kind: "Checkbook.transactionCategory.select"
-		}*/
+		}
 	],
 
 	rendered: function() {
 
 		this.inherited( arguments );
+
+		this.$['loadingScrim'].show();
+		this.$['loadingSpinner'].show();
 
 		//Delete useless data
 		delete this.trsnObj['dispRunningBalance'];
@@ -565,11 +579,8 @@ enyo.kind( {
 		this.adjustSystemViews();
 		this.dateChanged();
 
-		enyo.asyncMethod(
-				this.$['loadingScrim'],
-				this.$['loadingScrim'].setShowing,
-				false
-			);
+		this.$['loadingScrim'].hide();
+		this.$['loadingSpinner'].hide();
 	},
 
 	adjustSystemViews: function() {
@@ -578,7 +589,7 @@ enyo.kind( {
 
 		this.$['linkedAccount'].setShowing( this.transactionType === "transfer" );
 
-		this.$['date'].setShowTime( this.accountObj['showTransTime'] == 1 );
+		//this.$['date'].setShowTime( this.accountObj['showTransTime'] == 1 );
 
 		this.$['autoTrans'].setShowing(
 				this.trsnObj['itemId'] < 0 &&
@@ -590,10 +601,11 @@ enyo.kind( {
 		if( this.accountObj['atmEntry'] == 1 ) {
 
 			this.$['amount'].setValue( deformatAmount( this.$['amount'].getValue() ).toFixed( 2 ) );
-			this.$['amount'].setSelectAllOnFocus( false );
+			//this.$['amount'].setSelectAllOnFocus( false );
+			//amount does have an onfocus event
 		} else {
 
-			this.$['amount'].setSelectAllOnFocus( true );
+			//this.$['amount'].setSelectAllOnFocus( true );
 		}
 
 		this.amountContentChanged( this.$['amount'], null );
@@ -626,7 +638,7 @@ enyo.kind( {
 
 			this.$['account'].addClass( this.accountObj['acctCategoryColor'] );
 
-			if( !this.$['linkedAccount'].getDisabled() && !this.$['linkedAccount'].$['listName'].getDisabled() ) {
+			if( !this.$['linkedAccount'].getDisabled() ) {
 
 				Checkbook.globals.accountManager.fetchAccount( this.$['linkedAccount'].getValue(), { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "set" ) } );
 			}
@@ -636,7 +648,7 @@ enyo.kind( {
 			this.$['linkedAccount'].removeClass( "custom-background" );
 		}
 
-		this.$['desc'].forceFocus();
+		this.$['desc'].focus();
 	},
 
 	/** Data Change Handlers **/
@@ -698,6 +710,8 @@ enyo.kind( {
 	amountContentChanged: function( inSender, inEvent ) {
 		//ATM Mode
 
+		return;
+
 		var amountStr = inSender.getValue()
 
 		if( this.accountObj['atmEntry'] === 1 ) {
@@ -706,7 +720,7 @@ enyo.kind( {
 			var oldAmountStr = inSender.oldValue.trim();
 
 			//Save cursor position
-			var curPos = this.$['amount'].getSelection();
+			var curPos = this.$['amount'].getSelection();//https://developer.mozilla.org/en/DOM/HTMLTextAreaElement
 
 			if( !amountStr || amountStr.length <= 0 ) {
 
@@ -794,14 +808,15 @@ enyo.kind( {
 
 		this.$['dateArrow'].addRemoveClass( "invert", !this.$['dateDrawer'].getOpen() );
 
-		this.$['dateDrawer'].toggleOpen();
+		this.$['dateDrawer'].setOpen( !this.$['dateDrawer'].getOpen() );
+		this.$['date'].render();
 	},
 
 	dateChanged: function( inSender, inDate ) {
 
-		this.$['dateDisplay'].setContent( this.$['date'].getValue().format( { date: 'long', time: ( this.accountObj['showTransTime'] === 1 ? 'short' : '' ) } ) );
+		this.$['dateDisplay'].setContent( this.$['date'].getValue().format( { date: 'longDate', time: ( this.accountObj['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
 
-		this.$['recurrence'].setDate( this.$['date'].getValue() );
+		//this.$['recurrence'].setDate( this.$['date'].getValue() );//TEMP
 	},
 
 	/** Category Controls **/
@@ -945,7 +960,7 @@ enyo.kind( {
 
 		this.$['recurrenceArrow'].addRemoveClass( "invert", !this.$['recurrenceDrawer'].getOpen() );
 
-		this.$['recurrenceDrawer'].toggleOpen();
+		this.$['recurrenceDrawer'].setOpen( !this.$['recurrenceDrawer'].getOpen() );
 	},
 
 	recurrenceChanged: function( inSender, rObj ) {

@@ -637,14 +637,18 @@ enyo.kind({
 			sql += ' ORDER BY ' + orderby;
 		}
 
-		if( !isNaN( limit ) && ( ( limit - limit.floor() ) === 0 ) ) {
+		limit = parseInt( limit );
+
+		if( !isNaN( limit ) ) {
 			//is valid integer
 
 			sql += " LIMIT ?";
 			sqlValues.push( limit );
 		}
 
-		if( !isNaN( offset ) && ( ( offset - offset.floor() ) === 0 ) ) {
+		limit = parseInt( offset );
+
+		if( !isNaN( offset ) ) {
 			//is valid integer
 
 			sql += " OFFSET ?";
