@@ -189,6 +189,24 @@ html, body {
 	width: 32px;
 }
 
+.arrow,
+.arrow:active:hover:not( [disabled] ),
+.arrow.active {
+	height: 32px;
+	padding-right: 32px;
+
+	background-repeat: no-repeat;
+	background-position: center right;
+
+	background-image: url( "../../assets/menu-arrow.png" );
+}
+
+.arrow.dark,
+.arrow.dark:active:hover:not( [disabled] ),
+.arrow.dark {
+	background-image: url( "../../assets/menu-arrow-light.png" );
+}
+
 /*****************/
 
 .popup-header .enyo-header-inner {

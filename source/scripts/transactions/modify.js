@@ -114,6 +114,7 @@ enyo.kind( {
 							]
 						}, {
 							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
 									kind: "onyx.GroupboxHeader",
@@ -129,17 +130,17 @@ enyo.kind( {
 
 									components: [
 										{
-											kind: enyo.Image,
+											kind: "enyo.Image",
 											src: "assets/calendar.png",
 											classes: "img-icon",
 											style: "margin-right: 1em;"
 										}, {
 											name: "dateDisplay",
 											style: "margin-top: 2px;",
-											flex: 1
+											fit: true
 										}, {
 											name: "dateArrow",
-											classes: "enyo-listselector-arrow"
+											classes: "arrow"
 										}
 									]
 								}, {
@@ -149,38 +150,42 @@ enyo.kind( {
 
 									components: [
 										{
-											kind: "GTS.TimePicker",
-
-											showTime: true,
-											timeFormat: "12"
-										},
-										{
 											name: "date",
 											kind: "GTS.DatePicker",
 											onChange: "dateChanged",
 
-											showTime: true,
-											timeFormat: "12"
+											components: [
+												{
+													name: "time",
+													kind: "GTS.TimePicker",
+
+													minuteInterval: 5,
+													is24HrMode: false,
+
+													label: "Time"
+												}
+											]
 										}
 									]
 								}
 							]
-						}, {
+						}, {//TODO
 							name: "categoryHolder",
-							kind: enyo.Group,
-							caption: "Category",
-
-							style: "padding:2px;",
-
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
+									kind: "onyx.GroupboxHeader",
+									content: "Category",
+									classes: "padding-std"
+								}, {
 									name: "categoryList",
-									kind: enyo.VirtualRepeater,
+									kind: enyo.VirtualRepeater,//Change to repeater, scroll needed?
 									onSetupRow: "getCategoryItem",
 
 									components: [
 										{
-											kind: enyo.SwipeableItem,
+											kind: enyo.SwipeableItem,//No swipe. button with minus symbol on it (right)
 											layoutKind: enyo.HFlexLayout,
 
 											style: "padding-top: 10px; padding-bottom: 10px;",
@@ -211,66 +216,77 @@ enyo.kind( {
 										}
 									]
 								}, {
-									kind: enyo.HFlexBox,
+									kind: "enyo.FittableColumns",
+									noStretch: true,
+
+									classes: "padding-std",
+
 									components: [
 										{
 											kind: "onyx.Button",
-											caption: "Add Category",
-											classes: "enyo-button-dark",
+											content: "Add Category",
+
 											ontap: "categoryAddNew",
-											flex: 3
+
+											classes: "margin-right",
+											style: "min-width: 45%;"
+										}, {
+											fit: true
 										}, {
 											name: "fillValueButton",
 											kind: "onyx.Button",
-											caption: "Fill Values",
-											classes: "enyo-button-light",
+											content: "Fill Values",
+
 											ontap: "categoriesFillValues",
-											flex: 1
+
+											classes: "margin-left",
+											style: "min-width: 25%;"
 										}
 									]
 								}
 							]
-						}, {
-							kind: enyo.Group,
-							caption: "Recurrence",
-							tapHightlight: false,
+						}, {//TODO
+							showing: false,
 
-							classes: "dividerDrawerBlack",
-							style: "padding:2px;",
-
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
-									kind: enyo.Item,
-									layoutKind: enyo.HFlexLayout,
+									kind: "onyx.GroupboxHeader",
+									content: "Recurrence",
+									classes: "padding-std"
+								}, {
+									kind: "enyo.FittableColumns",
+									noStretch: true,
 
-									classes: "enyo-single",
-									tapHightlight: false,
+									classes: "padding-std",
 
 									ontap: "toggleRecurrenceDrawer",
+
 									components: [
 										{
-											kind: enyo.Image,
+											kind: "enyo.Image",
 											src: "assets/repeat.png",
 											classes: "img-icon",
 											style: "margin-right: 1em;"
 										}, {
 											name: "recurrenceDisplay",
 											style: "margin-top: 2px;",
-											flex: 1
+											fit: true
 										}, {
 											name: "recurrenceArrow",
-											classes: "enyo-listselector-arrow"
+											classes: "arrow"
 										}
 									]
 								}, {
 									name: "recurrenceDrawer",
-									kind: enyo.Drawer,
+									kind: "onyx.Drawer",
 									open: false,
 
 									components: [
 										{
 											name: "recurrence",
-											//kind: "Checkbook.transactions.repeat.select",
+											content: "Checkbook.transactions.repeat.select",
 											onChange: "recurrenceChanged"
 										}
 									]
@@ -278,21 +294,28 @@ enyo.kind( {
 							]
 						}, {
 							name: "checkNumHolder",
-							kind: "onyx.InputDecorator",
-							layoutKind: "FittableColumnsLayout",
-							noStretch: true,
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
-									name: "checkNum",
-									kind: "onyx.Input",
-									fit: true,
+									kind: "onyx.InputDecorator",
+									layoutKind: "FittableColumnsLayout",
+									noStretch: true,
+									classes: "padding-half-top",
+									components: [
+										{
+											name: "checkNum",
+											kind: "onyx.Input",
+											fit: true,
 
-									placeholder: "# (optional)",
+											placeholder: "# (optional)",
 
-									onfocus: "autofillCheckNo"
-								}, {
-									content: "Check Number",
-									classes: "label"
+											onfocus: "autofillCheckNo"
+										}, {
+											content: "Check Number",
+											classes: "label"
+										}
+									]
 								}
 							]
 						}, {
@@ -814,9 +837,15 @@ enyo.kind( {
 
 	dateChanged: function( inSender, inDate ) {
 
-		this.$['dateDisplay'].setContent( this.$['date'].getValue().format( { date: 'longDate', time: ( this.accountObj['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
+		var date = this.$['date'].getValue();
+		var time = this.$['time'].getValue();
 
-		//this.$['recurrence'].setDate( this.$['date'].getValue() );//TEMP
+		date.setHours( time.getHours() );
+		date.setMinutes( time.getMinutes() );
+
+		this.$['dateDisplay'].setContent( date.format( { date: 'longDate', time: ( this.accountObj['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
+
+		//this.$['recurrence'].setDate( date );//TEMP
 	},
 
 	/** Category Controls **/
@@ -999,7 +1028,10 @@ enyo.kind( {
 		this.trsnObj['linkedAccount'] = this.$['linkedAccount'].getValue();
 		//this.trsnObj['linkedRecord']
 
+		var time = this.$['time'].getValue();
 		this.trsnObj['date'] = this.$['date'].getValue();
+		this.trsnObj['date'].setHours( time.getHours() );
+		this.trsnObj['date'].setMinutes( time.getMinutes() );
 
 		//this.trsnObj['category']
 		//this.trsnObj['category2']
