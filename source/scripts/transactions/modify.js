@@ -180,42 +180,55 @@ enyo.kind( {
 									classes: "padding-std"
 								}, {
 									name: "categoryList",
-									kind: enyo.VirtualRepeater,//Change to repeater, scroll needed?
-									onSetupRow: "getCategoryItem",
+									kind: "enyo.Repeater",
+
+									onSetupItem: "getCategoryItem",
+
+									classes: "transaction-category-list",
 
 									components: [
 										{
-											kind: enyo.SwipeableItem,//No swipe. button with minus symbol on it (right)
-											layoutKind: enyo.HFlexLayout,
-
-											style: "padding-top: 10px; padding-bottom: 10px;",
-
-											ontap: "categoryTapped",//Change category
-											onConfirm: "categoryDelete",//Delete category item
-
+											kind: "enyo.FittableColumns",
+											classes: "onyx-item text-middle bordered",
 											components: [
 												{
 													name: "categoryText",
-													classes: "enyo-text-ellipsis",
+													classes: "margin-right",
+													fit: true,
 
-													flex: 3
+													ontap: "categoryTapped"//Change category
 												}, {
-													name: "categoryAmount",
-													kind: enyo.Input,
+													kind: "onyx.InputDecorator",
 
-													flex: 1,
+													classes: "margin-right",
+													style: "display: inline-block;",
 
-													hint: "0.00",
-													oldValue: "",
+													components: [
+														{
+															name: "categoryAmount",
+															kind: "onyx.Input",
 
-													ontap: "categoryAmountTapped",
-													oninput: "categoryAmountContentChanged",//ATM Function
-													onkeypress: "amountKeyPress",//Key possibility filter
+															placeholder: "0.00",
+															oldValue: "",
+
+															oninput: "categoryAmountContentChanged",//ATM Function
+															onkeypress: "amountKeyPress",//Key possibility filter
+														}
+													]
+												}, {
+													name: "categoryDelete",
+													kind: "onyx.Button",
+													content: "-",
+
+													classes: "small-padding",
+
+													ontap: "categoryDelete"//Delete category
 												}
 											]
 										}
 									]
 								}, {
+									name: "categoryFooter",
 									kind: "enyo.FittableColumns",
 									noStretch: true,
 
@@ -624,11 +637,11 @@ enyo.kind( {
 		if( this.accountObj['atmEntry'] == 1 ) {
 
 			this.$['amount'].setValue( deformatAmount( this.$['amount'].getValue() ).toFixed( 2 ) );
-			//this.$['amount'].setSelectAllOnFocus( false );
+			//this.$['amount'].setSelectAllOnFocus( false );//TEMP
 			//amount does have an onfocus event
 		} else {
 
-			//this.$['amount'].setSelectAllOnFocus( true );
+			//this.$['amount'].setSelectAllOnFocus( true );//TEMP
 		}
 
 		this.amountContentChanged( this.$['amount'], null );
@@ -850,7 +863,7 @@ enyo.kind( {
 
 	/** Category Controls **/
 
-	getCategoryItem: function( inSender, inIndex ) {
+	getCategoryItem: function( inSender, inEvent ) {
 
 		if( !this.renderCategories ) {
 			//Don't build before data is ready
@@ -858,11 +871,12 @@ enyo.kind( {
 			return;
 		}
 
-		var row = this.trsnObj['category'][inIndex];
+		var row = this.trsnObj['category'][inEvent.index];
+		var item = inEvent.item;
 
-		if( row ) {
+		if( row && item ) {
 
-			this.$['categoryText'].setContent( ( row['category'] + " >> " + row['category2'] ).dirtyString() );
+			item.$['categoryText'].setContent( ( row['category'] + " >> " + row['category2'] ).dirtyString() );
 
 			if( this.trsnObj['category'].length > 1 ) {
 				//If only one category, takes up full amount
@@ -871,29 +885,34 @@ enyo.kind( {
 
 				if( this.accountObj['atmEntry'] == 1 ) {
 
-					this.$['categoryAmount'].setValue( deformatAmount( row['amount'] ).toFixed( 2 ) );
-					this.$['categoryAmount'].setSelectAllOnFocus( false );
+					item.$['categoryAmount'].setValue( deformatAmount( row['amount'] ).toFixed( 2 ) );
+					//item.$['categoryAmount'].setSelectAllOnFocus( false );//TEMP
 				} else {
 
-					this.$['categoryAmount'].setValue( row['amount'] );
-					this.$['categoryAmount'].setSelectAllOnFocus( true );
+					item.$['categoryAmount'].setValue( row['amount'] );
+					//item.$['categoryAmount'].setSelectAllOnFocus( true );//TEMP
 				}
 
-				this.$['categoryAmount'].show();
-				this.amountContentChanged( this.$['categoryAmount'], null );
+				item.$['categoryAmount'].setDisabled( false );
+				item.$['categoryDelete'].setDisabled( false );
+				this.amountContentChanged( item.$['categoryAmount'], null );
 			} else {
 
-				this.$['categoryAmount'].hide();
+				item.$['categoryAmount'].setDisabled( true );
+				item.$['categoryDelete'].setDisabled( true );
 			}
 
 			return true;
 		}
 	},
 
-	categoryTapped: function( inSender, inEvent, inIndex ) {
+	categoryTapped: function( inSender, inEvent ) {
 		//Show category selector based on current row
 
-		this.$['categorySystem'].getCategoryChoice( enyo.bind( this, this.categorySelected, inIndex ), this.trsnObj['category'][inIndex] );
+		this.log( inEvent );
+		return;
+
+		this.$['categorySystem'].getCategoryChoice( enyo.bind( this, this.categorySelected, inEvent.index ), this.trsnObj['category'][inEvent.index] );
 	},
 
 	categorySelected: function( index, catObj ) {
@@ -903,17 +922,11 @@ enyo.kind( {
 		this.categoryChanged();
 	},
 
-	categoryAmountTapped: function( inSender, inEvent ) {
-		//Don't show category selector; only focus on amount field
+	categoryAmountContentChanged: function( inSender, inEvent ) {
 
-		inEvent.stopPropagation();
-	},
+		this.amountContentChanged( inSender, inEvent, inSender.getValue() );
 
-	categoryAmountContentChanged: function( inSender, inEvent, inValue ) {
-
-		this.amountContentChanged( inSender, inEvent, inValue );
-
-		this.trsnObj['category'][inEvent.rowIndex]['amount'] = inSender.getValue();
+		this.trsnObj['category'][inEvent.index]['amount'] = inSender.getValue();
 	},
 
 	categoriesFillValues: function( inSender, inEvent ) {
@@ -979,8 +992,9 @@ enyo.kind( {
 	categoryChanged: function() {
 
 		this.$['fillValueButton'].setShowing( this.trsnObj['category'].length > 1 );
+		this.$['categoryFooter'].reflow();
 
-		this.$['categoryList'].render();
+		this.$['categoryList'].setCount( this.trsnObj['category'].length );
 	},
 
 	/** Recurrence Controls **/

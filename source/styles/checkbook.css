@@ -141,3 +141,7 @@
 	height: 65px;
 	padding: 8px;
 }
+
+.transaction-category-list label {
+	width: 100px;
+}

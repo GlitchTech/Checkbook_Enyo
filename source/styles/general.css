@@ -237,6 +237,10 @@ html, body {
 	padding: 0;
 }
 
+.onyx-input-decorator > input {
+	width: 100%;
+}
+
 /*****************/
 
 .onyx-toolbar.transparent {
@@ -255,6 +259,10 @@ html, body {
 
 .onyx-button.transparent {
 	background-color: transparent;
+}
+
+.onyx-button.small-padding {
+	padding: 2px 6px;
 }
 
 /* Custom Checkbox States */

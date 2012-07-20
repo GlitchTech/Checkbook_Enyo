@@ -36,8 +36,7 @@ enyo.kind( {
 					content: "X",
 					ontap: "badPin",
 
-					classes: "onyx-blue",
-					style: "padding: 2px 6px;"
+					classes: "onyx-blue small-padding"
 				}
 			]
 		}, {
