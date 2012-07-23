@@ -80,15 +80,11 @@ enyo.kind( {
 											//src: "assets/menu_icons/expense.png",
 										}, {
 											name: "amount",
-											kind: "onyx.Input",
+											kind: "GTS.DecimalInput",
 
 											fit: true,
 
-											placeholder: "0.00",
-											oldValue: "",
-
-											oninput: "amountContentChanged",//ATM Function
-											onkeypress: "amountKeyPress"//Key possibility filter
+											placeholder: "0.00"
 										}, {
 											content: "Amount",
 											classes: "label"
@@ -146,7 +142,7 @@ enyo.kind( {
 								}, {
 									name: "dateDrawer",
 									kind: "onyx.Drawer",
-									open: true,
+									open: false,
 
 									components: [
 										{
@@ -169,7 +165,7 @@ enyo.kind( {
 									]
 								}
 							]
-						}, {//TODO
+						}, {
 							name: "categoryHolder",
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
@@ -206,13 +202,9 @@ enyo.kind( {
 													components: [
 														{
 															name: "categoryAmount",
-															kind: "onyx.Input",
+															kind: "GTS.DecimalInput",
 
-															placeholder: "0.00",
-															oldValue: "",
-
-															oninput: "categoryAmountContentChanged",//ATM Function
-															onkeypress: "amountKeyPress",//Key possibility filter
+															placeholder: "0.00"
 														}
 													]
 												}, {
@@ -636,15 +628,13 @@ enyo.kind( {
 
 		if( this.accountObj['atmEntry'] == 1 ) {
 
-			this.$['amount'].setValue( deformatAmount( this.$['amount'].getValue() ).toFixed( 2 ) );
-			//this.$['amount'].setSelectAllOnFocus( false );//TEMP
-			//amount does have an onfocus event
+			this.$['amount'].setAtm( true );
+			this.$['amount'].setSelectAllOnFocus( false );
 		} else {
 
-			//this.$['amount'].setSelectAllOnFocus( true );//TEMP
+			this.$['amount'].setAtm( false );
+			this.$['amount'].setSelectAllOnFocus( true );
 		}
-
-		this.amountContentChanged( this.$['amount'], null );
 
 		if( this.accountObj['enableCategories'] == 1 ) {
 
@@ -741,66 +731,6 @@ enyo.kind( {
 		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
 	},
 
-	/** All Amount Field Controls **/
-
-	amountContentChanged: function( inSender, inEvent ) {
-		//ATM Mode
-
-		return;
-
-		var amountStr = inSender.getValue()
-
-		if( this.accountObj['atmEntry'] === 1 ) {
-
-			amountStr = amountStr.trim();
-			var oldAmountStr = inSender.oldValue.trim();
-
-			//Save cursor position
-			var curPos = this.$['amount'].getSelection();//https://developer.mozilla.org/en/DOM/HTMLTextAreaElement
-
-			if( !amountStr || amountStr.length <= 0 ) {
-
-				curPos['start'] = 4;
-				curPos['end'] = 4;
-			} else if( ( oldAmountStr.length - 1 ) === amountStr.length ) {
-				//Char deleted
-
-				curPos['start']++;
-				curPos['end']++;
-			}
-
-			//Format number
-			if( amountStr == "" || amountStr == 0 ) {
-
-				amountStr = "0.00";
-			} else {
-
-				amountStr = amountStr.replace( /[^0-9]/g, "" );
-				amountStr = amountStr.replace( /^0*/, "" );
-
-				amountStr = ( parseInt( amountStr ) / 100 ).toFixed( 2 );
-			}
-
-			//Update values
-			inSender.oldValue = amountStr;
-			inSender.setValue( amountStr );
-
-			//Restore cursor position
-			inSender.setSelection( curPos );//Ignoring command when string length < 4
-		} else {
-
-			inSender.setValue( amountStr.trim().replace( /[^0-9\.]/g, "" ) );
-		}
-	},
-
-	amountKeyPress: function( inSender, inEvent ) {
-
-		if( !( inEvent.keyCode >= 48 && inEvent.keyCode <= 57 ) && inEvent.keyCode !== 46 ) {
-
-			inEvent.preventDefault();
-		}
-	},
-
 	/** Account Controls **/
 
 	accountChanged: function( inSender, newIndex, oldIndex ) {
@@ -885,21 +815,24 @@ enyo.kind( {
 
 				if( this.accountObj['atmEntry'] == 1 ) {
 
-					item.$['categoryAmount'].setValue( deformatAmount( row['amount'] ).toFixed( 2 ) );
-					//item.$['categoryAmount'].setSelectAllOnFocus( false );//TEMP
+					item.$['categoryAmount'].setValue( deformatAmount( row['amount'] ) );
+
+					item.$['categoryAmount'].setAtm( true );
+					item.$['categoryAmount'].setSelectAllOnFocus( false );
 				} else {
 
-					item.$['categoryAmount'].setValue( row['amount'] );
-					//item.$['categoryAmount'].setSelectAllOnFocus( true );//TEMP
+					item.$['categoryAmount'].setAtm( false );
+					item.$['categoryAmount'].setSelectAllOnFocus( true );
 				}
 
 				item.$['categoryAmount'].setDisabled( false );
 				item.$['categoryDelete'].setDisabled( false );
-				this.amountContentChanged( item.$['categoryAmount'], null );
 			} else {
 
 				item.$['categoryAmount'].setDisabled( true );
 				item.$['categoryDelete'].setDisabled( true );
+
+				row['amount'] = 0;
 			}
 
 			return true;
@@ -920,13 +853,6 @@ enyo.kind( {
 		enyo.mixin( this.trsnObj['category'][index], catObj );
 
 		this.categoryChanged();
-	},
-
-	categoryAmountContentChanged: function( inSender, inEvent ) {
-
-		this.amountContentChanged( inSender, inEvent, inSender.getValue() );
-
-		this.trsnObj['category'][inEvent.index]['amount'] = inSender.getValue();
 	},
 
 	categoriesFillValues: function( inSender, inEvent ) {
@@ -982,9 +908,9 @@ enyo.kind( {
 		this.categoryChanged();
 	},
 
-	categoryDelete: function( inSender, inIndex ) {
+	categoryDelete: function( inSender, inEvent ) {
 
-		this.trsnObj['category'].splice( inIndex, 1 );
+		this.trsnObj['category'].splice( inEvent.index, 1 );
 
 		this.categoryChanged();
 	},
