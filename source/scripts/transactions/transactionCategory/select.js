@@ -7,14 +7,19 @@
  */
 enyo.kind({
 	name: "Checkbook.transactionCategory.select",
-	kind: enyo.ModalDialog,
+	kind: "onyx.Popup",
 
-	lazy: false,
+	classes: "small-input-popup",
 
-	scrim: false,
-	dismissWithClick: true,
+	centered: true,
+	floating: true,
 
-	style: "width: 400px;",
+	scrim: true,
+	scrimclasses: "onyx-scrim-translucent",
+
+	autoDismiss: false,
+
+	style: "max-height: 95%;",
 
 	categories: {},
 	dispCategories: [],
@@ -28,74 +33,60 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Pane,
-			className: "modal-pane-view",
+			kind: "enyo.FittableColumns",
+			classes: "text-middle margin-bottom",
+			noStretch: true,
 			components: [
 				{
-					kind: enyo.VFlexBox,
+					classes: "bigger text-left ",
+					fit: true,
 					components: [
 						{
-							kind: enyo.Header,
-							layoutKind: enyo.HFlexLayout,
-							align: "center",
-
-							className: "enyo-header-dark popup-header",
-							style: "border-radius: 10px; margin-bottom: 10px;",
-
-							components: [
-								{
-									style: "text-align: center; margin-right: -32px;",
-									flex: 1,
-									components: [
-										{
-											content: "Select a Category",
-											className: "bigger"
-										}, {
-											name: "subheader",
-											className: "smaller"
-										}
-									]
-								}, {
-									kind: enyo.ToolButton,
-									icon: "assets/menu_icons/close.png",
-									className: "img-icon",
-									style: "text-align: center;",
-									ontap: "close"
-								}
-							]
+							content: "Select a Category",
+							classes: "bigger"
 						}, {
-							kind: enyo.VFlexBox,
-							className: "group",
-							flex: 1,
+							name: "subheader",
+							classes: "smaller"
+						}
+					]
+				}, {
+					kind: "onyx.Button",
+
+					content: "X",
+					ontap: "hide",
+
+					classes: "onyx-blue small-padding"
+				}
+			]
+		}, {
+			kind: "enyo.Scroller",
+
+			horizontal: "hidden",
+
+			classes: "light popup-scroller",
+			components: [
+				{
+					name: "categoryList",
+					kind: "enyo.Repeater",
+
+					onSetupItem: "setupRow",
+
+					components: [
+						{
+							name: "item",
+							kind: "enyo.FittableColumns",
+							classes: "onyx-item text-middle bordered",
+
+							tapHighlight: true,
+							ontap: "rowClicked",//Select item
+
 							components: [
 								{
-									name: "categoryList",
-									kind: enyo.VirtualList,
-
-									onSetupRow: "setupRow",
-
-									flex: 1,
-
-									components: [
-										{
-											name: "item",
-											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-
-											tapHighlight: true,
-											ontap: "rowClicked",//Select item
-
-											components: [
-												{
-													name: "sheetName",
-													flex: 1
-												}, {
-													name: "arrows",
-													content: ""
-												}
-											]
-										}
-									]
+									name: "sheetName",
+									fit: true
+								}, {
+									name: "arrows",
+									content: ""
 								}
 							]
 						}
@@ -125,10 +116,10 @@ enyo.kind({
 		this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'] );
 		//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
-		this.openAtCenter();
+		this.show();
 		//Popup loaded, now can do UI changes
 
-		this.$['categoryList'].punt();
+		this.datasetChanged();
 
 		this.doCategorySelect = callbackFn;
 
@@ -145,23 +136,17 @@ enyo.kind({
 		}
 	},
 
-	returnedFromView: function() {
+	rowClicked: function( inSender, inEvent ) {
 
-		this.$['transactionCategoryView'].close();
-		this.$['transactionCategoryView'].destroy();
-
-		this.$['categoryList'].punt();
-	},
-
-	rowClicked: function( inSender, inEvent, rowIndex ) {
-
-		var row = this.dispCategories[rowIndex];
+		var row = this.dispCategories[inEvent.index];
 
 		if( row ) {
 
 			if( row['parent'] === "|-add_edit-|" ) {
 				//Add/Edit Transaction Category system
 
+				//NON FUNCTIONAL
+				/*
 				this.createComponent( {
 						name: "transactionCategoryView",
 						kind: "Checkbook.transactionCategory.view",
@@ -174,13 +159,14 @@ enyo.kind({
 				//DOM ERROR caused here.
 				this.$['transactionCategoryView'].render();
 				this.$['transactionCategoryView'].openAtCenter();
+				*/
 			} else if( row['parent'] === "|-go_back-|" ) {
 				//Parent <- Child
 
 				this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'] );
 				//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
-				this.$['categoryList'].punt();
+				this.datasetChanged();
 			} else if( row['parent'] !== "" ) {
 				//Return selected category set
 
@@ -189,7 +175,7 @@ enyo.kind({
 					this.doCategorySelect( { "category": row['parent'], "category2": ( row['content'] === "All Sub Categories" ? "%" : row['content'] ) } );
 				}
 
-				this.close();
+				this.hide();
 			} else {
 				//Parent -> Child
 
@@ -202,48 +188,64 @@ enyo.kind({
 
 				this.dispCategories.push( { "content": "Back", "parent": "|-go_back-|" } );
 
-				this.$['categoryList'].punt();
+				this.datasetChanged();
 			}
 		}
 	},
 
-	setupRow: function( inSender, inIndex ) {
+	datasetChanged: function() {
 
-		var row = this.dispCategories[inIndex];
+		this.$['categoryList'].setCount( this.dispCategories.length );
 
-		if( row ) {
+		this.reflow();
+	},
 
-			this.$['sheetName'].setContent( row['content'] );
-			this.$['sheetName'].addRemoveClass( "positiveBalance", ( row['parent'] === "|-add_edit-|" ) );
+	returnedFromView: function() {
+
+		this.$['transactionCategoryView'].hide();
+		this.$['transactionCategoryView'].destroy();
+
+		this.datasetChanged();
+	},
+
+	setupRow: function( inSender, inEvent ) {
+
+		var row = this.dispCategories[inEvent.index];
+		var item = inEvent.item;
+
+		if( row && item ) {
+
+			item.$['sheetName'].setContent( row['content'] );
+			item.$['sheetName'].addRemoveClass( "positiveBalance", ( row['parent'] === "|-add_edit-|" ) );
 
 			if( row['parent'] === "|-add_edit-|" ) {
 				//Edit Categories (category view)
 
-				this.$['arrows'].hide();
+				item.$['arrows'].hide();
 			} else if( row['parent'] === "|-go_back-|" ) {
 				//Back Item (subcategory view)
 
-				this.$['arrows'].setContent( "<<" );
-				this.$['arrows'].show();
+				item.$['arrows'].setContent( "<<" );
+				item.$['arrows'].show();
 			} else if( row['parent'] !== "" ) {
 				//Subcategory View
 
 				var selected = ( this.selected['category2'] === row['content'] );
 
-				this.$['item'].addRemoveClass( 'selected', selected );
-				this.$['item'].addRemoveClass( 'normal', !selected );
+				item.$['item'].addRemoveClass( 'selected', selected );
+				item.$['item'].addRemoveClass( 'normal', !selected );
 
-				this.$['arrows'].hide();
+				item.$['arrows'].hide();
 			} else {
 				//Category View
 
 				var selected = ( this.selected['category'] === row['content'] );
 
-				this.$['item'].addRemoveClass( 'selected', selected );
-				this.$['item'].addRemoveClass( 'normal', !selected );
+				item.$['item'].addRemoveClass( 'selected', selected );
+				item.$['item'].addRemoveClass( 'normal', !selected );
 
-				this.$['arrows'].setContent( ">>" );
-				this.$['arrows'].show();
+				item.$['arrows'].setContent( ">>" );
+				item.$['arrows'].show();
 			}
 
 			return true;

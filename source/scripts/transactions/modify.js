@@ -192,7 +192,7 @@ enyo.kind( {
 													classes: "margin-right",
 													fit: true,
 
-													ontap: "categoryTapped"//Change category
+													ontap: "categoryTapped"
 												}, {
 													kind: "onyx.InputDecorator",
 
@@ -203,6 +203,7 @@ enyo.kind( {
 														{
 															name: "categoryAmount",
 															kind: "GTS.DecimalInput",
+															oninput: "categoryAmountChanged",
 
 															placeholder: "0.00"
 														}
@@ -214,7 +215,7 @@ enyo.kind( {
 
 													classes: "small-padding",
 
-													ontap: "categoryDelete"//Delete category
+													ontap: "categoryDelete"
 												}
 											]
 										}
@@ -842,9 +843,6 @@ enyo.kind( {
 	categoryTapped: function( inSender, inEvent ) {
 		//Show category selector based on current row
 
-		this.log( inEvent );
-		return;
-
 		this.$['categorySystem'].getCategoryChoice( enyo.bind( this, this.categorySelected, inEvent.index ), this.trsnObj['category'][inEvent.index] );
 	},
 
@@ -895,6 +893,11 @@ enyo.kind( {
 		}
 
 		this.categoryChanged();
+	},
+
+	categoryAmountChanged: function( inSender, inEvent ) {
+
+		this.trsnObj['category'][inEvent.index]['amount'] = inSender.getValueAsNumber();
 	},
 
 	categoryAddNew: function() {

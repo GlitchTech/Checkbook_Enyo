@@ -15,6 +15,10 @@
 	width: 400px;
 }
 
+.popup-scroller {
+	max-height: 500px;
+}
+
 /* Adjust for smaller screen sizes */
 
 @media all and ( max-width: 800px ) {
@@ -28,5 +32,26 @@
 
 	.small-input-popup {
 		width: 95%;
+	}
+}
+
+@media all and ( max-height: 600px ) {
+
+	.popup-scroller {
+		max-height: 400px;
+	}
+}
+
+@media all and ( max-height: 500px ) {
+
+	.popup-scroller {
+		max-height: 300px;
+	}
+}
+
+@media all and ( max-height: 400px ) {
+
+	.popup-scroller {
+		max-height: 200px;
 	}
 }

@@ -123,25 +123,3 @@
 	border-bottom-right-radius: 5px;
 	border-right: 1px solid rgba( 0, 0, 0, 0.2 );
 }
-
-/** Transaction Preview && Similar **/
-
-.modal-pane-view {
-	font-size: 18px;
-	height: 600px;
-}
-
-.modal-pane-view .group .enyo-scroller {
-	margin: -12px
-}
-
-.modal-pane-view .group .enyo-first {
-	border-top-left-radius: 8px 8px;
-	border-top-right-radius: 8px 8px;
-	height: 65px;
-	padding: 8px;
-}
-
-.transaction-category-list label {
-	width: 100px;
-}
