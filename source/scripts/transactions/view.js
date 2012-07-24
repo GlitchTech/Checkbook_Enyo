@@ -712,9 +712,12 @@ enyo.kind( {
 		}
 	},
 
-	addTransactionComplete: function( inSender, action, accounts, actionStatus ) {
+	addTransactionComplete: function( inSender, accounts, actionStatus ) {
 
 		this.toggleCreateButtons();
+
+		var action = accounts['status'];
+		delete accounts['status'];
 
 		if( action === 1 && actionStatus === true ) {
 
@@ -825,7 +828,10 @@ enyo.kind( {
 		}
 	},
 
-	modifyTransactionComplete: function( rowIndex, inSender, action, accounts, actionStatus ) {
+	modifyTransactionComplete: function( rowIndex, inSender, accounts, actionStatus ) {
+
+		var action = accounts['status'];
+		delete accounts['status'];
 
 		if( action === 1 && actionStatus === true ) {
 			//edited

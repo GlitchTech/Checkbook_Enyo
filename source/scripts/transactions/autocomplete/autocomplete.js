@@ -5,12 +5,7 @@
  */
 enyo.kind( {
 	name: "Checkbook.transactions.autocomplete",
-	kind: enyo.Popup,
-	layoutKind: enyo.VFlexLayout,
-
-	lazy: false,
-
-	style: "max-width: 450px; height: 350px; border-width: 8px;",
+	kind: "enyo.Popup",
 
 	published: {
 		searchValue: "",
@@ -57,7 +52,7 @@ enyo.kind( {
 
 		if( this.searchValue.length <= 0 ) {
 
-			this.close();
+			this.hide();
 			return;
 		}
 
@@ -90,7 +85,7 @@ enyo.kind( {
 
 		if( results.length <= 0 ) {
 
-			this.close();
+			this.hide();
 			return;
 		}
 
@@ -155,6 +150,6 @@ enyo.kind( {
 		this.doSelect( data );
 
 		this.searchValue = "";
-		this.close();
+		this.hide();
 	}
 });

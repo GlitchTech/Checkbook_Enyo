@@ -51,16 +51,23 @@ enyo.kind( {
 							components: [
 								{
 									kind: "onyx.InputDecorator",
+									layoutKind: "enyo.FittableColumnsLayout",
+									noStretch: true,
 									components: [
 										{
 											name: "desc",
 											kind: "onyx.Input",
 
+											fit: true,
 											placeholder: "Enter Description",
 
 											onkeypress: "descKeyPress",
 											oninput: "descContentChanged",
 											autoKeyModifier: "shift-single",
+										},{
+											name: "autosuggestIcon",
+											kind: "enyo.Image",
+											src: "assets/search.png"
 										}
 									]
 								}, {
@@ -429,8 +436,16 @@ enyo.kind( {
 
 			style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 		},
-		/*
 
+		{
+			name: "autocomplete",
+			kind: "Checkbook.transactions.autocomplete",
+			onSelect: "descAutoSuggestMade"
+		}, {
+			name: "categorySystem",
+			kind: "Checkbook.transactionCategory.select"
+		},
+/*
 		{
 			name: "appMenu",
 			kind: enyo.AppMenu,
@@ -440,18 +455,8 @@ enyo.kind( {
 					kind: "EditMenu"
 				}
 			]
-		},
-
-		{
-			name: "autocomplete",
-			kind: "Checkbook.transactions.autocomplete",
-			onSelect: "descAutoSuggestMade"
-		},*/
-
-		{
-			name: "categorySystem",
-			kind: "Checkbook.transactionCategory.select"
 		}
+*/
 	],
 
 	rendered: function() {
@@ -610,6 +615,8 @@ enyo.kind( {
 
 		this.$['loadingScrim'].hide();
 		this.$['loadingSpinner'].hide();
+
+		this.reflow();
 	},
 
 	adjustSystemViews: function() {
@@ -619,6 +626,8 @@ enyo.kind( {
 		this.$['linkedAccount'].setShowing( this.transactionType === "transfer" );
 
 		//this.$['date'].setShowTime( this.accountObj['showTransTime'] == 1 );
+
+		this.$['autosuggestIcon'].setShowing( this.accountObj['useAutoComplete'] === 1 );
 
 		this.$['autoTrans'].setShowing(
 				this.trsnObj['itemId'] < 0 &&
@@ -983,7 +992,7 @@ enyo.kind( {
 		this.trsnObj['cleared'] = this.$['cleared'].getValue();
 		this.trsnObj['note'] = this.$['notes'].getValue();
 
-		this.trsnObj['rObj'] = this.$['recurrence'].getValue();
+		this.trsnObj['rObj'] = { "pattern": "none" };//this.$['recurrence'].getValue();//TEMP
 		//this.trsnObj['repeatId']
 		//this.trsnObj['repeatUnlinked']
 
@@ -994,8 +1003,8 @@ enyo.kind( {
 				"onSuccess": enyo.bind(
 						this,
 						this.doFinish,
-						1,
 						{
+							"status": 1,
 							"account": this.trsnObj['account'],
 							"linkedAccount": ( this.transactionType == 'transfer' ? this.trsnObj['linkedAccount'] : -1 ),
 							"atAccount": ( ( this.trsnObj['autoTransfer'] > 0 && this.trsnObj['autoTransferLink'] >= 0 ) ? this.trsnObj['autoTransferLink'] : -1 )
@@ -1039,7 +1048,7 @@ All transactions in the series will be deleted.
 
 		if( this.trsnObj['itemId'] < 0 ) {
 
-			this.doFinish( 0 );
+			this.doFinish( { status: 0 } );
 		} else {
 
 			this.createComponent( {
@@ -1072,7 +1081,7 @@ All transactions in the series will be deleted.
 		Checkbook.globals.transactionManager.deleteTransaction(
 				this.trsnObj['itemId'],
 				{
-					"onSuccess": enyo.bind( this, this.doFinish, 2 )
+					"onSuccess": enyo.bind( this, this.doFinish, { status: "2" } )
 				}
 			);
 	}
