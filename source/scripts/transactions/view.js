@@ -50,78 +50,10 @@ enyo.kind( {
 			]
 		}, {
 			name: "entries",
-			kind: "enyo.List",
+			kind: "Checkbook.transactions.list",
 
 			fit: true,
-			classes: "checkbook-stamp",
-
-			onSetupItem: "transactionBuildRow",
-			//onAcquirePage: "transactionFetchGroup",
-
-			components: [
-				{
-					kind: "onyx.SwipeableItem",
-					tapHighlight: true,
-
-					ontap: "transactiontapped",
-					//onhold: "transactionHeld",
-					onDelete: "transactionDeleted",
-
-					style: "padding-right: 20px; padding-left: 30px;",
-
-					//Vertical Layout
-					components: [
-						{
-							name: "mainBody",
-							//layoutKind: enyo.HFlexLayout,
-							classes: "transactionItemTop",
-
-							components: [
-								{
-									flex: 1,
-									//Vertical Layout
-									components: [
-										{
-											name: "desc",
-											classes: "description enyo-text-ellipsis bold"
-										}, {
-											name: "time",
-											classes: "date smaller"
-										}
-									]
-								}, {
-									//Vertical Layout
-									style: "text-align: right;",
-
-									components: [
-										{
-											name: "amount"
-										}, {
-											name: "runningBal"
-										}
-									]
-								}, {
-									name: "cleared",
-									kind: enyo.CheckBox,
-									ontap: "transactionCleared",
-
-									style: "margin-left: 15px;"
-								}
-							]
-						}, {
-							name: "category",
-							allowHtml: true
-						}, {
-							name: "checkNum",
-							classes: "small"
-						}, {
-							name: "note",
-							classes: "small",
-							allowHtml: true
-						}
-					]
-				}
-			]
+			classes: "checkbook-stamp"
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",//Doesn't work with fittable.
@@ -220,57 +152,13 @@ enyo.kind( {
 				}
 			]
 		},
+
 		{
 			kind: "Signals",
 
 			viewAccount: "viewAccount",
 			accountChanged: "accountChanged"
-		},
-
-		{
-			name: "transactonMenu",
-			kind: "onyx.Menu",
-			showOnTop: true,
-			floating: true,
-			components: [
-				{
-					name: "tmClear",
-					content: "Clear Transaction",
-					value: "clear"
-				}, {
-					content: "Edit Transaction",
-					value: "edit"
-				}, {
-					content: "Duplicate Transaction",
-					value: "duplicate"
-				}, {
-					content: "Delete Transaction",
-					value: "delete"
-				}
-			]
 		}
-/*
-		{
-			name: "viewSingle",
-			//kind: "Checkbook.transactions.viewSingle",
-			onClear: "vsCleared",
-			onEdit: "vsEdit",
-			onDelete: "transactionDeleted"
-		},
-
-		{
-			name: "deleteTransactionConfirm",
-			//kind: "GTS.deleteConfirm",
-
-			confirmTitle: "Delete Transaction",
-			confirmMessage: "Are you sure you want to delete this transaction?",
-			confirmButtonYes: "Delete",
-			confirmButtonNo: "Cancel",
-
-			onYes: "deleteTransactionConfirmHandler",
-			onNo: "deleteTransactionConfirmClose"
-		}
-*/
 	],
 
 	rendered: function() {
@@ -735,21 +623,25 @@ enyo.kind( {
 
 	toggleCreateButtons: function() {
 
-		return;//TEMP
-
 		if( this.$['addIncomeButton'].getDisabled() ) {
 
-			this.$['addIncomeButton'].setDepressed( false );
-			this.$['addTransferButton'].setDepressed( false );
-			this.$['addExpenseButton'].setDepressed( false );
-
+			this.$['addIncomeButton'].setChecked( false );
 			this.$['addIncomeButton'].setDisabled( false );
+
+			this.$['addTransferButton'].setChecked( false );
 			this.$['addTransferButton'].setDisabled( false );
+
+			this.$['addExpenseButton'].setChecked( false );
 			this.$['addExpenseButton'].setDisabled( false );
 		} else {
 
+			this.$['addIncomeButton'].setChecked( true );
 			this.$['addIncomeButton'].setDisabled( true );
+
+			this.$['addTransferButton'].setChecked( true );
 			this.$['addTransferButton'].setDisabled( true );
+
+			this.$['addExpenseButton'].setChecked( true );
 			this.$['addExpenseButton'].setDisabled( true );
 		}
 	},

@@ -1,0 +1,736 @@
+/* Copyright © 2011-2012, GlitchTech Science */
+
+enyo.kind( {
+	name: "Checkbook.transactions.list",
+
+	transactions: [],
+	account: {},
+
+	events: {
+	},
+
+	components: [
+		{
+			kind: "enyo.List",
+
+			classes: "checkbook-stamp",
+
+			onSetupItem: "transactionBuildRow",
+			//onAcquirePage: "transactionFetchGroup",
+			components: [
+				{
+					kind: "onyx.SwipeableItem",
+					tapHighlight: true,
+
+					ontap: "transactiontapped",
+					//onhold: "transactionHeld",
+					onDelete: "transactionDeleted",
+
+					style: "padding-right: 20px; padding-left: 30px;",
+
+					//Vertical Layout
+					components: [
+						{
+							name: "mainBody",
+							//layoutKind: enyo.HFlexLayout,
+							classes: "transactionItemTop",
+
+							components: [
+								{
+									flex: 1,
+									//Vertical Layout
+									components: [
+										{
+											name: "desc",
+											classes: "description enyo-text-ellipsis bold"
+										}, {
+											name: "time",
+											classes: "date smaller"
+										}
+									]
+								}, {
+									//Vertical Layout
+									style: "text-align: right;",
+
+									components: [
+										{
+											name: "amount"
+										}, {
+											name: "runningBal"
+										}
+									]
+								}, {
+									name: "cleared",
+									kind: enyo.CheckBox,
+									ontap: "transactionCleared",
+
+									style: "margin-left: 15px;"
+								}
+							]
+						}, {
+							name: "category",
+							allowHtml: true
+						}, {
+							name: "checkNum",
+							classes: "small"
+						}, {
+							name: "note",
+							classes: "small",
+							allowHtml: true
+						}
+					]
+				}
+			]
+		},
+
+		{
+			name: "transactonMenu",
+			kind: "onyx.Menu",
+			showOnTop: true,
+			floating: true,
+			components: [
+				{
+					name: "tmClear",
+					content: "Clear Transaction",
+					value: "clear"
+				}, {
+					content: "Edit Transaction",
+					value: "edit"
+				}, {
+					content: "Duplicate Transaction",
+					value: "duplicate"
+				}, {
+					content: "Delete Transaction",
+					value: "delete"
+				}
+			]
+		}
+
+		{
+			name: "viewSingle",
+			//kind: "Checkbook.transactions.viewSingle",
+			onClear: "vsCleared",
+			onEdit: "vsEdit",
+			onDelete: "transactionDeleted"
+		},
+
+		{
+			name: "deleteTransactionConfirm",
+			//kind: "GTS.deleteConfirm",
+
+			confirmTitle: "Delete Transaction",
+			confirmMessage: "Are you sure you want to delete this transaction?",
+			confirmButtonYes: "Delete",
+			confirmButtonNo: "Cancel",
+
+			onYes: "deleteTransactionConfirmHandler",
+			onNo: "deleteTransactionConfirmClose"
+		}
+	],
+
+	accountChanged: function( inSender, inEvent ) {
+
+		if( inEvent && inEvent.deleted && this.getAccountId() === inEvent.accountId ) {
+
+			this.unloadSystem();
+		} else {
+
+			this.reloadSystem();
+		}
+	},
+
+	unloadSystem: function() {
+
+		this.account = {};
+
+		this.reloadTransactionList();
+
+		this.$['header'].hide();
+		this.$['footer'].hide();
+	},
+
+	reloadSystem: function() {
+
+		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
+
+			this.log( "System not ready yet" );
+
+			return false;
+		}
+
+		this.reloadTransactionList();
+		this.initialScroll();
+		this.balanceChangedHandler();
+	},
+
+	reloadTransactionList: function() {
+
+		this.transactions = [];
+		this.$['entries'].setCount( this.transactions.length );
+		this.$['entries'].reset();
+	},
+
+	initialScroll: function() {
+
+		if( !( this.account['sort'] === 0 || this.account['sort'] === 1 || this.account['sort'] === 6 || this.account['sort'] === 7 ) ) {
+
+			this.$['entries'].scrollToRow( 0 );
+			return;
+		}
+
+		var currDate = new Date();
+
+		if( this.account['showTransTime'] !== 1 ) {
+
+			currDate.setHours( 23, 59, 59, 999 );
+		}
+		currDate = Date.parse( currDate );
+
+		var qryScrollCount = null;
+
+		switch( this.account['sort'] ) {
+			case 0://oldest >> newest, show newest
+				qryScrollCount = new GTS.databaseQuery( {
+						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date ASC, itemId ASC;",
+						'values': [ this.account['acctId'], currDate ]
+					});
+				break;
+			case 1://newest >> oldest, show newest
+				qryScrollCount = new GTS.databaseQuery( {
+						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date DESC, itemId DESC;",
+						'values': [ this.account['acctId'], currDate ]
+					});
+				break;
+			case 6://cleared first
+				qryScrollCount = new GTS.databaseQuery( {
+						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 1;",
+						'values': [ this.account['acctId'] ]
+					});
+				break;
+			case 7://pending first
+				qryScrollCount = new GTS.databaseQuery( {
+						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 0;",
+						'values': [ this.account['acctId'] ]
+					});
+				break;
+		}
+
+		if( qryScrollCount ) {
+
+			var options = {
+					"onSuccess": enyo.bind( this, this.initialScrollHandler )
+				};
+
+			Checkbook.globals.gts_db.query( qryScrollCount, options );
+		}
+	},
+
+	initialScrollHandler: function( results ) {
+
+		var scrollToIndex = 0;
+
+		if( this.account['sort'] === 1 ) {
+
+			scrollToIndex = this.account['itemCount'] - results[0]['itemIndex'] - 3;
+		} else {
+
+			scrollToIndex = results[0]['itemIndex'] - 3;
+		}
+
+		scrollToIndex = ( scrollToIndex >= 0 ? scrollToIndex : 0 );
+
+		this.log( this.account['sort'], scrollToIndex, arguments );
+
+		this.$['entries'].scrollToRow( scrollToIndex );
+	},
+
+	duplicateTransaction: function( rowIndex ) {
+
+		this.toggleCreateButtons();
+
+		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
+
+		if( Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
+
+			type = "transfer";
+		} else if( newTrsn['amount'] < 0 ) {
+
+			type = "expense";
+		} else {
+
+			type = "income";
+		}
+
+		delete newTrsn['date'];
+		delete newTrsn['itemId'];
+		delete newTrsn['linkedRecord'];
+		delete newTrsn['repeatId'];
+		delete newTrsn['cleared'];
+
+		enyo.asyncMethod(
+				this,
+				this.doModify,
+				{
+					name: "createTransaction",
+					kind: "Checkbook.transactions.modify",
+					accountObj: this.account,
+					trsnObj: newTrsn,
+					transactionType: type.toLowerCase(),
+					onFinish: enyo.bind( this, this.addTransactionComplete )
+				}
+			);
+	},
+
+	transactiontapped: function( inSender, inEvent, rowIndex ) {
+
+		this.log();
+
+		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
+			//preview mode
+
+			this.$['viewSingle'].setIndex( rowIndex );
+			this.$['viewSingle'].setTransaction( this.transactions[rowIndex] );
+			this.$['viewSingle'].setAccount( this.account );
+			this.$['viewSingle'].openAtCenter();
+		} else {
+
+			this.vsEdit( null, rowIndex );
+		}
+	},
+
+	vsEdit: function( inSender, rowIndex ) {
+
+		if( this.account['frozen'] !== 1 ) {
+			//account not frozen
+
+			enyo.asyncMethod(
+					this,
+					this.doModify,
+					{
+						name: "editTransaction",
+						kind: "Checkbook.transactions.modify",
+						accountObj: this.account,
+						trsnObj: enyo.clone( this.transactions[rowIndex] ),
+						transactionType: "",
+						onFinish: enyo.bind( this, this.modifyTransactionComplete, rowIndex )
+					}
+				);
+		}
+	},
+
+	modifyTransactionComplete: function( rowIndex, inSender, accounts, actionStatus ) {
+
+		var action = accounts['status'];
+		delete accounts['status'];
+
+		if( action === 1 && actionStatus === true ) {
+			//edited
+
+			this.balanceChangedHandler( accounts );
+
+			this.transactions = [];
+			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].reset();
+
+			enyo.asyncMethod(
+					this.$['entries'],
+					this.$['entries'].scrollToRow,
+					rowIndex
+				);
+		} else if( action === 2 ) {
+			//deleted
+
+			this.balanceChangedHandler( accounts );
+
+			this.account['itemCount']--;
+
+			this.transactions = [];
+			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].reset();
+
+			enyo.asyncMethod(
+					this.$['entries'],
+					this.$['entries'].scrollToRow,
+					( rowIndex - 1 )
+				);
+		}
+	},
+
+	transactionHeld: function( inSender, inEvent ) {
+
+		this.log( "I DO NOT WORK YET", arguments );
+		return;
+
+		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
+
+			this.$['tmClear'].setContent( "Unclear Transaction" );
+		} else {
+
+			this.$['tmClear'].setContent( "Clear Transaction" );
+		}
+
+		this.$['transactonMenu'].rowIndex = inEvent.index;
+
+		this.waterfallDown( "onRequestShowMenu", { activator: inEvent.originator } );
+	},
+
+	transactionHeldHandler: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		return true;
+
+		var rowIndex = this.$['transactonMenu'].rowIndex;
+
+		if( !Object.validNumber( rowIndex ) || rowIndex < 0 ) {
+
+			return;
+		}
+
+		if( inSender.value === "clear" ) {
+
+			this.vsCleared( null, rowIndex );
+		} else if( inSender.value === "edit" ) {
+
+			this.vsEdit( null, rowIndex );
+		} else if( inSender.value === "duplicate" ) {
+
+			this.duplicateTransaction( rowIndex );
+		} else if( inSender.value === "delete" ) {
+
+			this.$['deleteTransactionConfirm'].rowIndex = rowIndex;
+			this.$['deleteTransactionConfirm'].openAtCenter();
+		}
+
+		return true;
+	},
+
+	transactionCleared: function( inSender, inEvent ) {
+
+		this.vsCleared( null, inEvent.rowIndex );
+
+		//Don't 'click' the row
+		inEvent.stopPropagation();
+		return true;
+	},
+
+	vsCleared: function( inSender, rowIndex ) {
+
+		if( this.account['frozen'] === 1 ) {
+
+			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].refresh();
+			return;
+		}
+
+		this.loadingDisplay( true );
+
+		this.transactions[rowIndex]['cleared'] = this.transactions[rowIndex]['cleared'] === 1 ? 0 : 1;
+
+		var cleared = ( this.transactions[rowIndex]['cleared'] === 1 );
+
+		Checkbook.globals.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], cleared );
+
+		this.$['entries'].setCount( this.transactions.length );
+		this.$['entries'].refresh();
+
+		this.balanceChangedHandler();
+
+		return this.transactions[rowIndex]['cleared'];
+	},
+
+	deleteTransactionConfirmHandler: function() {
+
+		this.transactionDeleted( null, this.$['deleteTransactionConfirm'].rowIndex );
+		this.deleteTransactionConfirmClose();
+	},
+
+	deleteTransactionConfirmClose: function() {
+
+		this.$['deleteTransactionConfirm'].close();
+	},
+
+	transactionDeleted: function( inSender, rowIndex ) {
+
+		if( this.account['frozen'] === 1 ) {
+
+			this.$['entries'].setCount( this.transactions.length );
+			this.$['entries'].refresh();
+			return;
+		}
+
+		this.loadingDisplay( true );
+
+		var accounts = {
+					"account": this.transactions[rowIndex]['account'],
+					"linkedAccount": this.transactions[rowIndex]['linkedAccount']
+				};
+
+		//update database;
+		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+
+		var balChanged = this.transactions[rowIndex]['amount'];
+		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
+
+		if( this.account['runningBalance'] === 1 &&
+				(
+					this.account['sort'] === 0 ||
+					this.account['sort'] === 1 ||
+					this.account['sort'] === 6 ||
+					this.account['sort'] === 7 ||
+					this.account['sort'] === 8
+				) ) {
+
+			if( rowIndex === 0 ) {
+
+				this.transactions = [];
+				this.$['entries'].setCount( this.transactions.length );
+				this.$['entries'].reset();
+				return;
+			}
+
+			//Update running balance in paging distance
+				//Really should update entire transaction object...
+			var start = ( rowIndex > this.$['entries'].getPageSize() ) ? ( rowIndex - this.$['entries'].getPageSize() ) : 0;
+			var end = ( rowIndex + this.$['entries'].getPageSize() < this.transactions.length ) ? ( rowIndex + this.$['entries'].getPageSize() ) : this.transactions.length;
+
+			var index = start;
+
+			var currentBalance = this.transactions[index]['runningBalance'] - balChanged;
+
+			while( index < end && this.transactions[index] ) {
+
+				if( this.account['sort'] === 0 || this.account['sort'] === 6 || this.account['sort'] === 8 ) {
+
+					currentBalance += this.transactions[index]['amount'];
+				}
+
+				this.transactions[index]['runningBalance'] = prepAmount( currentBalance );
+
+				if( this.account['sort'] !== 0 && this.account['sort'] !== 6 && this.account['sort'] !== 8 ) {
+
+					currentBalance -= this.transactions[index]['amount'];
+				}
+
+				index++;
+			}
+		}
+
+		this.$['entries'].setCount( this.transactions.length );
+		this.$['entries'].refresh();
+
+		//Fetch row
+		Checkbook.globals.transactionManager.fetchTransactions(
+				this.account,
+				{
+					"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
+				},
+				1,//Limit
+				this.transactions.length//Offset
+			);
+
+		this.balanceChangedHandler( accounts );
+	},
+
+	transactionBuildRow: function( inSender, inEvent ) {
+
+		this.$['desc'].setContent( inEvent.index );
+		return;
+
+		var inIndex = inEvent.index;
+
+		var row = this.transactions[inIndex];
+
+		if( row ) {
+
+			this.$.swipeableItem.addRemoveClass( "alt-row", ( inIndex % 2 === 0 ) );
+			this.$.swipeableItem.addRemoveClass( "norm-row", ( inIndex % 2 !== 0 ) );
+
+			//Description
+			this.$['desc'].setContent( row['desc'] );
+
+			//Date
+			var dateObj = new Date( parseInt( row['date'] ) );
+			this.$['time'].setContent( dateObj.format( { date: 'long', time: ( this.account['showTransTime'] === 1 ? 'short' : '' ) } ) );
+
+			var today = new Date();
+			if( this.account['showTransTime'] !== 1 ) {
+
+				today.setHours( 23, 59, 59, 999 );
+			}
+
+			this.$.swipeableItem.addRemoveClass( "futureTransaction", ( row['date'] > Date.parse( today ) ) );
+
+			//Balance Display
+			this.$['amount'].setContent( formatAmount( row['amount'] ) );
+
+			if( !row['dispRunningBalance'] ) {
+
+				this.$['runningBal'].setContent( "" );
+
+				this.$['amount'].addRemoveClass( "positiveBalance", ( row['amount'] > 0 ) );
+				this.$['amount'].addRemoveClass( "negativeBalance", ( row['amount'] < 0 ) );
+				this.$['amount'].addRemoveClass( "neutralBalance", ( row['amount'] == 0 ) );
+			} else {
+
+				this.$['runningBal'].setContent( formatAmount( row['runningBalance'] ) );
+
+				this.$['runningBal'].addRemoveClass( "positiveBalance", ( row['runningBalance'] > 0 ) );
+				this.$['runningBal'].addRemoveClass( "negativeBalance", ( row['runningBalance'] < 0 ) );
+				this.$['runningBal'].addRemoveClass( "neutralBalance", ( row['runningBalance'] == 0 ) );
+			}
+
+			//Cleared
+			this.$['cleared'].setChecked( row['cleared'] === 1 );
+
+			//Categories
+			//Handle split transactions
+			if( this.account['enableCategories'] === 1 ) {
+
+				this.$['category'].show();
+				this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( row['category'], row['category2'], true, "small" ) );
+			} else {
+
+				this.$['category'].hide();
+			}
+			//Check Number
+			this.$['checkNum'].setContent( ( this.account['checkField'] === 1 && row['checkNum'] && row['checkNum'] !== "" ) ? ( "Check #" + row['checkNum'] ) : "" );
+
+			//Notes
+			this.$['note'].setContent( ( this.account['hideNotes'] === 1 ? "" : row['note'] ) );
+
+			//Row Icons
+			var transferCheck = ( row['linkedRecord'] && !isNaN( row['linkedRecord'] ) && row['linkedRecord'] != "" );
+			var repeatCheck = ( row['repeatId'] && !isNaN( row['repeatId'] ) && row['repeatId'] != "" );
+
+			this.$['mainBody'].addRemoveClass( "repeatTransferIcon", ( transferCheck && repeatCheck ) );
+			this.$['mainBody'].addRemoveClass( "transferIcon", ( transferCheck && !repeatCheck ) );
+			this.$['mainBody'].addRemoveClass( "repeatIcon", ( !transferCheck && repeatCheck ) );
+
+			return true;
+		}
+	},
+
+	transactionFetchGroup: function( inSender, inPage ) {
+
+		this.log( arguments );
+
+		return;
+
+		var index = inPage * inSender.getPageSize();
+
+		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
+
+			this.log( "System not ready yet" );
+
+			return false;
+		}
+
+		if( index < 0 ) {
+			//No indexes below zero, don't bother calling
+
+			return;
+		}
+
+		if( !this.transactions[index] ) {
+
+			this.loadingDisplay( true );
+
+			Checkbook.globals.transactionManager.fetchTransactions(
+					this.account,
+					{
+						"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
+					},
+					inSender.getPageSize(),//Limit
+					index//Offset
+				);
+		}
+	},
+
+	transactionFetchGroupHandler: function( offset, results, rbResults ) {
+		//Parse page data
+
+		var currentBalance = 0;
+
+		if( rbResults.length > 0 ) {
+
+			if( offset > 0 || ( this.account['sort'] !== "0" && this.account['sort'] !== "6" && this.account['sort'] !== "8" ) ) {
+
+				currentBalance = rbResults[0]['balanceToDate'];
+			}
+		}
+
+		var dispRunningBalance = (
+				this.account['runningBalance'] === 1 &&
+				(
+					this.account['sort'] === 0 ||
+					this.account['sort'] === 1 ||
+					this.account['sort'] === 6 ||
+					this.account['sort'] === 7 ||
+					this.account['sort'] === 8
+				)
+			);
+
+		for( var i = 0; i < results.length; i++ ) {
+/*
+results = {
+	account
+	amount
+	category
+	category2
+	checkNum
+	cleared
+	date
+	desc
+	itemId
+	linkedAccount
+	linkedRecord
+	note
+	repeatId
+}
+*/
+			if( this.account['sort'] === 0 || this.account['sort'] === 6 || this.account['sort'] === 8 ) {
+
+				currentBalance += results[i]['amount'];
+			}
+
+			this.transactions[offset + i] = enyo.mixin(
+					{
+						"dispRunningBalance": dispRunningBalance,
+						"runningBalance": prepAmount( currentBalance ),
+						"amount": prepAmount( results[i]['amount'] )
+					},
+					results[i]//fetched properties
+				);
+
+			this.transactions[offset + i]['desc'] = this.transactions[offset + i]['desc'].dirtyString();
+			this.transactions[offset + i]['category'] = this.transactions[offset + i]['category'].dirtyString();
+			this.transactions[offset + i]['category2'] = this.transactions[offset + i]['category2'].dirtyString();
+			this.transactions[offset + i]['note'] = this.transactions[offset + i]['note'].dirtyString();
+
+			if( this.account['sort'] !== 0 && this.account['sort'] !== 6 && this.account['sort'] !== 8 ) {
+
+				currentBalance -= this.transactions[offset + i]['amount'];
+			}
+		}
+
+		this.$['entries'].setCount( this.transactions.length );
+		this.$['entries'].refresh();
+
+		this.loadingDisplay( false );
+	},
+
+	loadingDisplay: function( status ) {
+
+		//convert to event calls
+
+		if( status ) {
+
+			this.$['loadingSpinner'].show();
+			this.$['acctTypeIcon'].hide();
+		} else {
+
+			this.$['loadingSpinner'].hide();
+			this.$['acctTypeIcon'].show();
+		}
+	}
+});

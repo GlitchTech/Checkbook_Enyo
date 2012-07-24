@@ -4,6 +4,7 @@ enyo.depends(
 	"manager.js",
 
 	"view.js",
+	"list.js",
 	"single.js",
 
 	"modify.js",
