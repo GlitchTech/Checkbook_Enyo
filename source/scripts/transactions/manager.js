@@ -73,14 +73,14 @@ enyo.kind({
 
 						if( enyo.isFunction( options['onSuccess'] ) ) {
 
-							options['onSuccess']( true );
+							options['onSuccess']();
 						}
 					},
 					"onError": function() {
 
 						if( enyo.isFunction( options['onError'] ) ) {
 
-							options['onError']( false );
+							options['onError']();
 						}
 					}
 				}
@@ -295,14 +295,14 @@ enyo.kind({
 
 						if( enyo.isFunction( options['onSuccess'] ) ) {
 
-							options['onSuccess']( true );
+							options['onSuccess']();
 						}
 					},
 					"onError": function() {
 
 						if( enyo.isFunction( options['onError'] ) ) {
 
-							options['onError']( false );
+							options['onError']();
 						}
 					}
 				}

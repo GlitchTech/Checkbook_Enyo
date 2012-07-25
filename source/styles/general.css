@@ -158,6 +158,10 @@ html, body {
 	float: right;
 }
 
+.clear {
+	clear: both;
+}
+
 /*****************/
 
 .label {

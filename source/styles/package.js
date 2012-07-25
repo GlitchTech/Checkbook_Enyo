@@ -2,6 +2,7 @@
 
 enyo.depends(
 	"mq.css",
+	"flexbox.css",
 	"general.css",
 	"checkbook.css",
 	"backgrounds.css",

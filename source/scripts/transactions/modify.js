@@ -1004,7 +1004,7 @@ enyo.kind( {
 						this,
 						this.doFinish,
 						{
-							"status": 1,
+							"modifyStatus": 1,
 							"account": this.trsnObj['account'],
 							"linkedAccount": ( this.transactionType == 'transfer' ? this.trsnObj['linkedAccount'] : -1 ),
 							"atAccount": ( ( this.trsnObj['autoTransfer'] > 0 && this.trsnObj['autoTransferLink'] >= 0 ) ? this.trsnObj['autoTransferLink'] : -1 )

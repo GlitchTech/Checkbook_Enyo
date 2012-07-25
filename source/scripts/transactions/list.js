@@ -11,19 +11,21 @@ enyo.kind( {
 
 	components: [
 		{
-			kind: "enyo.List",
+			name: "list",
+			kind: "GTS.LazyList",
 
-			classes: "checkbook-stamp",
+			classes: "checkbook-stamp enyo-fit",
 
 			onSetupItem: "transactionBuildRow",
-			//onAcquirePage: "transactionFetchGroup",
+			onAcquirePage: "transactionFetchGroup",
 			components: [
 				{
-					kind: "onyx.SwipeableItem",
+					name: "transactionWrapper",
+					kind: "onyx.Item",//SwipeableItem
 					tapHighlight: true,
 
 					ontap: "transactiontapped",
-					//onhold: "transactionHeld",
+					onhold: "transactionHeld",
 					onDelete: "transactionDeleted",
 
 					style: "padding-right: 20px; padding-left: 30px;",
@@ -32,39 +34,40 @@ enyo.kind( {
 					components: [
 						{
 							name: "mainBody",
-							//layoutKind: enyo.HFlexLayout,
-							classes: "transactionItemTop",
+							classes: "transaction-item-top h-box",
 
 							components: [
 								{
-									flex: 1,
-									//Vertical Layout
+									classes: "box-flex-1",
 									components: [
 										{
+											//long desc can push down amount & cleared fields
 											name: "desc",
-											classes: "description enyo-text-ellipsis bold"
+											classes: "description text-ellipsis bold"
 										}, {
 											name: "time",
 											classes: "date smaller"
 										}
 									]
 								}, {
-									//Vertical Layout
-									style: "text-align: right;",
-
+									classes: "margin-left text-top",
 									components: [
 										{
-											name: "amount"
+											classes: "amount-block text-right",
+
+											components: [
+												{
+													name: "amount"
+												}, {
+													name: "runningBal"
+												}
+											]
 										}, {
-											name: "runningBal"
+											name: "cleared",
+											ontap: "transactionCleared",
+											classes: "onyx-checkbox checkbox-clone margin-left"
 										}
 									]
-								}, {
-									name: "cleared",
-									kind: enyo.CheckBox,
-									ontap: "transactionCleared",
-
-									style: "margin-left: 15px;"
 								}
 							]
 						}, {
@@ -72,10 +75,10 @@ enyo.kind( {
 							allowHtml: true
 						}, {
 							name: "checkNum",
-							classes: "small"
+							classes: "smaller"
 						}, {
 							name: "note",
-							classes: "small",
+							classes: "smaller",
 							allowHtml: true
 						}
 					]
@@ -104,11 +107,11 @@ enyo.kind( {
 					value: "delete"
 				}
 			]
-		}
+		},
 
 		{
 			name: "viewSingle",
-			//kind: "Checkbook.transactions.viewSingle",
+			kind: "Checkbook.transactions.viewSingle",
 			onClear: "vsCleared",
 			onEdit: "vsEdit",
 			onDelete: "transactionDeleted"
@@ -128,6 +131,10 @@ enyo.kind( {
 		}
 	],
 
+balanceChangedHandler: function() {this.log("TEMP");},
+
+	/** External Controls **/
+
 	accountChanged: function( inSender, inEvent ) {
 
 		if( inEvent && inEvent.deleted && this.getAccountId() === inEvent.accountId ) {
@@ -142,11 +149,7 @@ enyo.kind( {
 	unloadSystem: function() {
 
 		this.account = {};
-
-		this.reloadTransactionList();
-
-		this.$['header'].hide();
-		this.$['footer'].hide();
+		this.$['list'].empty();
 	},
 
 	reloadSystem: function() {
@@ -166,15 +169,14 @@ enyo.kind( {
 	reloadTransactionList: function() {
 
 		this.transactions = [];
-		this.$['entries'].setCount( this.transactions.length );
-		this.$['entries'].reset();
+		this.$['list'].reload();
 	},
 
 	initialScroll: function() {
 
 		if( !( this.account['sort'] === 0 || this.account['sort'] === 1 || this.account['sort'] === 6 || this.account['sort'] === 7 ) ) {
 
-			this.$['entries'].scrollToRow( 0 );
+			this.$['list'].scrollToRow( 0 );
 			return;
 		}
 
@@ -241,300 +243,12 @@ enyo.kind( {
 
 		this.log( this.account['sort'], scrollToIndex, arguments );
 
-		this.$['entries'].scrollToRow( scrollToIndex );
+		this.$['list'].scrollToRow( scrollToIndex );
 	},
 
-	duplicateTransaction: function( rowIndex ) {
-
-		this.toggleCreateButtons();
-
-		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
-
-		if( Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
-
-			type = "transfer";
-		} else if( newTrsn['amount'] < 0 ) {
-
-			type = "expense";
-		} else {
-
-			type = "income";
-		}
-
-		delete newTrsn['date'];
-		delete newTrsn['itemId'];
-		delete newTrsn['linkedRecord'];
-		delete newTrsn['repeatId'];
-		delete newTrsn['cleared'];
-
-		enyo.asyncMethod(
-				this,
-				this.doModify,
-				{
-					name: "createTransaction",
-					kind: "Checkbook.transactions.modify",
-					accountObj: this.account,
-					trsnObj: newTrsn,
-					transactionType: type.toLowerCase(),
-					onFinish: enyo.bind( this, this.addTransactionComplete )
-				}
-			);
-	},
-
-	transactiontapped: function( inSender, inEvent, rowIndex ) {
-
-		this.log();
-
-		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
-			//preview mode
-
-			this.$['viewSingle'].setIndex( rowIndex );
-			this.$['viewSingle'].setTransaction( this.transactions[rowIndex] );
-			this.$['viewSingle'].setAccount( this.account );
-			this.$['viewSingle'].openAtCenter();
-		} else {
-
-			this.vsEdit( null, rowIndex );
-		}
-	},
-
-	vsEdit: function( inSender, rowIndex ) {
-
-		if( this.account['frozen'] !== 1 ) {
-			//account not frozen
-
-			enyo.asyncMethod(
-					this,
-					this.doModify,
-					{
-						name: "editTransaction",
-						kind: "Checkbook.transactions.modify",
-						accountObj: this.account,
-						trsnObj: enyo.clone( this.transactions[rowIndex] ),
-						transactionType: "",
-						onFinish: enyo.bind( this, this.modifyTransactionComplete, rowIndex )
-					}
-				);
-		}
-	},
-
-	modifyTransactionComplete: function( rowIndex, inSender, accounts, actionStatus ) {
-
-		var action = accounts['status'];
-		delete accounts['status'];
-
-		if( action === 1 && actionStatus === true ) {
-			//edited
-
-			this.balanceChangedHandler( accounts );
-
-			this.transactions = [];
-			this.$['entries'].setCount( this.transactions.length );
-			this.$['entries'].reset();
-
-			enyo.asyncMethod(
-					this.$['entries'],
-					this.$['entries'].scrollToRow,
-					rowIndex
-				);
-		} else if( action === 2 ) {
-			//deleted
-
-			this.balanceChangedHandler( accounts );
-
-			this.account['itemCount']--;
-
-			this.transactions = [];
-			this.$['entries'].setCount( this.transactions.length );
-			this.$['entries'].reset();
-
-			enyo.asyncMethod(
-					this.$['entries'],
-					this.$['entries'].scrollToRow,
-					( rowIndex - 1 )
-				);
-		}
-	},
-
-	transactionHeld: function( inSender, inEvent ) {
-
-		this.log( "I DO NOT WORK YET", arguments );
-		return;
-
-		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
-
-			this.$['tmClear'].setContent( "Unclear Transaction" );
-		} else {
-
-			this.$['tmClear'].setContent( "Clear Transaction" );
-		}
-
-		this.$['transactonMenu'].rowIndex = inEvent.index;
-
-		this.waterfallDown( "onRequestShowMenu", { activator: inEvent.originator } );
-	},
-
-	transactionHeldHandler: function( inSender, inEvent ) {
-
-		this.log( arguments );
-		return true;
-
-		var rowIndex = this.$['transactonMenu'].rowIndex;
-
-		if( !Object.validNumber( rowIndex ) || rowIndex < 0 ) {
-
-			return;
-		}
-
-		if( inSender.value === "clear" ) {
-
-			this.vsCleared( null, rowIndex );
-		} else if( inSender.value === "edit" ) {
-
-			this.vsEdit( null, rowIndex );
-		} else if( inSender.value === "duplicate" ) {
-
-			this.duplicateTransaction( rowIndex );
-		} else if( inSender.value === "delete" ) {
-
-			this.$['deleteTransactionConfirm'].rowIndex = rowIndex;
-			this.$['deleteTransactionConfirm'].openAtCenter();
-		}
-
-		return true;
-	},
-
-	transactionCleared: function( inSender, inEvent ) {
-
-		this.vsCleared( null, inEvent.rowIndex );
-
-		//Don't 'click' the row
-		inEvent.stopPropagation();
-		return true;
-	},
-
-	vsCleared: function( inSender, rowIndex ) {
-
-		if( this.account['frozen'] === 1 ) {
-
-			this.$['entries'].setCount( this.transactions.length );
-			this.$['entries'].refresh();
-			return;
-		}
-
-		this.loadingDisplay( true );
-
-		this.transactions[rowIndex]['cleared'] = this.transactions[rowIndex]['cleared'] === 1 ? 0 : 1;
-
-		var cleared = ( this.transactions[rowIndex]['cleared'] === 1 );
-
-		Checkbook.globals.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], cleared );
-
-		this.$['entries'].setCount( this.transactions.length );
-		this.$['entries'].refresh();
-
-		this.balanceChangedHandler();
-
-		return this.transactions[rowIndex]['cleared'];
-	},
-
-	deleteTransactionConfirmHandler: function() {
-
-		this.transactionDeleted( null, this.$['deleteTransactionConfirm'].rowIndex );
-		this.deleteTransactionConfirmClose();
-	},
-
-	deleteTransactionConfirmClose: function() {
-
-		this.$['deleteTransactionConfirm'].close();
-	},
-
-	transactionDeleted: function( inSender, rowIndex ) {
-
-		if( this.account['frozen'] === 1 ) {
-
-			this.$['entries'].setCount( this.transactions.length );
-			this.$['entries'].refresh();
-			return;
-		}
-
-		this.loadingDisplay( true );
-
-		var accounts = {
-					"account": this.transactions[rowIndex]['account'],
-					"linkedAccount": this.transactions[rowIndex]['linkedAccount']
-				};
-
-		//update database;
-		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
-
-		var balChanged = this.transactions[rowIndex]['amount'];
-		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
-
-		if( this.account['runningBalance'] === 1 &&
-				(
-					this.account['sort'] === 0 ||
-					this.account['sort'] === 1 ||
-					this.account['sort'] === 6 ||
-					this.account['sort'] === 7 ||
-					this.account['sort'] === 8
-				) ) {
-
-			if( rowIndex === 0 ) {
-
-				this.transactions = [];
-				this.$['entries'].setCount( this.transactions.length );
-				this.$['entries'].reset();
-				return;
-			}
-
-			//Update running balance in paging distance
-				//Really should update entire transaction object...
-			var start = ( rowIndex > this.$['entries'].getPageSize() ) ? ( rowIndex - this.$['entries'].getPageSize() ) : 0;
-			var end = ( rowIndex + this.$['entries'].getPageSize() < this.transactions.length ) ? ( rowIndex + this.$['entries'].getPageSize() ) : this.transactions.length;
-
-			var index = start;
-
-			var currentBalance = this.transactions[index]['runningBalance'] - balChanged;
-
-			while( index < end && this.transactions[index] ) {
-
-				if( this.account['sort'] === 0 || this.account['sort'] === 6 || this.account['sort'] === 8 ) {
-
-					currentBalance += this.transactions[index]['amount'];
-				}
-
-				this.transactions[index]['runningBalance'] = prepAmount( currentBalance );
-
-				if( this.account['sort'] !== 0 && this.account['sort'] !== 6 && this.account['sort'] !== 8 ) {
-
-					currentBalance -= this.transactions[index]['amount'];
-				}
-
-				index++;
-			}
-		}
-
-		this.$['entries'].setCount( this.transactions.length );
-		this.$['entries'].refresh();
-
-		//Fetch row
-		Checkbook.globals.transactionManager.fetchTransactions(
-				this.account,
-				{
-					"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
-				},
-				1,//Limit
-				this.transactions.length//Offset
-			);
-
-		this.balanceChangedHandler( accounts );
-	},
+	/** List Display **/
 
 	transactionBuildRow: function( inSender, inEvent ) {
-
-		this.$['desc'].setContent( inEvent.index );
-		return;
 
 		var inIndex = inEvent.index;
 
@@ -542,15 +256,15 @@ enyo.kind( {
 
 		if( row ) {
 
-			this.$.swipeableItem.addRemoveClass( "alt-row", ( inIndex % 2 === 0 ) );
-			this.$.swipeableItem.addRemoveClass( "norm-row", ( inIndex % 2 !== 0 ) );
+			this.$['transactionWrapper'].addRemoveClass( "alt-row", ( inIndex % 2 === 0 ) );
+			this.$['transactionWrapper'].addRemoveClass( "norm-row", ( inIndex % 2 !== 0 ) );
 
 			//Description
 			this.$['desc'].setContent( row['desc'] );
 
 			//Date
 			var dateObj = new Date( parseInt( row['date'] ) );
-			this.$['time'].setContent( dateObj.format( { date: 'long', time: ( this.account['showTransTime'] === 1 ? 'short' : '' ) } ) );
+			this.$['time'].setContent( dateObj.format( { date: 'longDate', time: ( this.account['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
 
 			var today = new Date();
 			if( this.account['showTransTime'] !== 1 ) {
@@ -558,7 +272,7 @@ enyo.kind( {
 				today.setHours( 23, 59, 59, 999 );
 			}
 
-			this.$.swipeableItem.addRemoveClass( "futureTransaction", ( row['date'] > Date.parse( today ) ) );
+			this.$['transactionWrapper'].addRemoveClass( "futureTransaction", ( row['date'] > Date.parse( today ) ) );
 
 			//Balance Display
 			this.$['amount'].setContent( formatAmount( row['amount'] ) );
@@ -580,7 +294,7 @@ enyo.kind( {
 			}
 
 			//Cleared
-			this.$['cleared'].setChecked( row['cleared'] === 1 );
+			this.$['cleared'].addRemoveClass( "checked", row['cleared'] === 1 );
 
 			//Categories
 			//Handle split transactions
@@ -610,13 +324,9 @@ enyo.kind( {
 		}
 	},
 
-	transactionFetchGroup: function( inSender, inPage ) {
+	transactionFetchGroup: function( inSender, inEvent ) {
 
-		this.log( arguments );
-
-		return;
-
-		var index = inPage * inSender.getPageSize();
+		var index = inEvent['page'] * inEvent['pageSize'];
 
 		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
 
@@ -640,7 +350,7 @@ enyo.kind( {
 					{
 						"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
 					},
-					inSender.getPageSize(),//Limit
+					inEvent['pageSize'],//Limit
 					index//Offset
 				);
 		}
@@ -713,15 +423,305 @@ results = {
 			}
 		}
 
-		this.$['entries'].setCount( this.transactions.length );
-		this.$['entries'].refresh();
+		this.$['list'].setCount( this.transactions.length );
+		this.$['list'].refresh();
 
 		this.loadingDisplay( false );
+	},
+
+	/** List Reaction Events **/
+
+	duplicateTransaction: function( rowIndex ) {
+
+		this.toggleCreateButtons();
+
+		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
+
+		if( Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
+
+			type = "transfer";
+		} else if( newTrsn['amount'] < 0 ) {
+
+			type = "expense";
+		} else {
+
+			type = "income";
+		}
+
+		delete newTrsn['date'];
+		delete newTrsn['itemId'];
+		delete newTrsn['linkedRecord'];
+		delete newTrsn['repeatId'];
+		delete newTrsn['cleared'];
+
+		enyo.asyncMethod(
+				this,
+				this.doModify,
+				{
+					name: "createTransaction",
+					kind: "Checkbook.transactions.modify",
+					accountObj: this.account,
+					trsnObj: newTrsn,
+					transactionType: type.toLowerCase(),
+					onFinish: enyo.bind( this, this.addTransactionComplete )
+				}
+			);
+	},
+
+	transactiontapped: function( inSender, inEvent ) {
+
+		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
+			//preview mode
+
+			this.$['viewSingle'].setIndex( inEvent.index );
+			this.$['viewSingle'].setTransaction( this.transactions[inEvent.index] );
+			this.$['viewSingle'].setAccount( this.account );
+			this.$['viewSingle'].show();
+		} else {
+
+			this.vsEdit( null, inEvent );
+		}
+	},
+
+	vsEdit: function( inSender, inEvent ) {
+
+		if( this.account['frozen'] !== 1 ) {
+			//account not frozen
+
+			enyo.asyncMethod(
+					this,
+					this.doModify,
+					{
+						name: "editTransaction",
+						kind: "Checkbook.transactions.modify",
+						accountObj: this.account,
+						trsnObj: enyo.clone( this.transactions[inEvent.index] ),
+						transactionType: "",
+						onFinish: enyo.bind( this, this.modifyTransactionComplete, inEvent.index )
+					}
+				);
+		}
+	},
+
+	modifyTransactionComplete: function( rowIndex, inSender, accounts ) {
+
+		this.log( arguments );
+
+		var action = accounts['modifyStatus'];
+		delete accounts['modifyStatus'];
+
+		if( action === 1 ) {
+			//edited
+
+			this.balanceChangedHandler( accounts );
+
+			this.transactions = [];
+			this.$['list'].setCount( this.transactions.length );
+			this.$['list'].reset();
+
+			enyo.asyncMethod(
+					this.$['list'],
+					this.$['list'].scrollToRow,
+					rowIndex
+				);
+		} else if( action === 2 ) {
+			//deleted
+
+			this.balanceChangedHandler( accounts );
+
+			this.account['itemCount']--;
+
+			this.transactions = [];
+			this.$['list'].setCount( this.transactions.length );
+			this.$['list'].reset();
+
+			enyo.asyncMethod(
+					this.$['list'],
+					this.$['list'].scrollToRow,
+					( rowIndex - 1 )
+				);
+		}
+	},
+
+	transactionHeld: function( inSender, inEvent ) {
+
+		this.log( "I DO NOT WORK YET", arguments );
+		return;
+
+		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
+
+			this.$['tmClear'].setContent( "Unclear Transaction" );
+		} else {
+
+			this.$['tmClear'].setContent( "Clear Transaction" );
+		}
+
+		this.$['transactonMenu'].rowIndex = inEvent.index;
+
+		this.waterfallDown( "onRequestShowMenu", { activator: inEvent.originator } );
+	},
+
+	transactionHeldHandler: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		return true;
+
+		var rowIndex = this.$['transactonMenu'].rowIndex;
+
+		if( !Object.validNumber( rowIndex ) || rowIndex < 0 ) {
+
+			return;
+		}
+
+		if( inSender.value === "clear" ) {
+
+			this.vsCleared( null, rowIndex );
+		} else if( inSender.value === "edit" ) {
+
+			this.vsEdit( null, rowIndex );
+		} else if( inSender.value === "duplicate" ) {
+
+			this.duplicateTransaction( rowIndex );
+		} else if( inSender.value === "delete" ) {
+
+			this.$['deleteTransactionConfirm'].rowIndex = rowIndex;
+			this.$['deleteTransactionConfirm'].openAtCenter();
+		}
+
+		return true;
+	},
+
+	transactionCleared: function( inSender, inEvent ) {
+
+		this.vsCleared( null, inEvent );
+
+		//Don't 'click' the row
+		inEvent.preventDefault();
+		return true;
+	},
+
+	vsCleared: function( inSender, inEvent ) {
+
+		var index = inEvent.rowIndex;
+
+		if( this.account['frozen'] === 1 ) {
+
+			this.$['list'].refresh();
+			return;
+		}
+
+		this.loadingDisplay( true );
+
+		this.transactions[index]['cleared'] = this.transactions[index]['cleared'] === 1 ? 0 : 1;
+
+		var cleared = ( this.transactions[index]['cleared'] === 1 );
+
+		Checkbook.globals.transactionManager.clearTransaction( this.transactions[index]['itemId'], cleared );
+
+		this.$['list'].refresh();
+
+		this.balanceChangedHandler();
+
+		return this.transactions[index]['cleared'];
+	},
+
+	deleteTransactionConfirmHandler: function() {
+
+		this.transactionDeleted( null, this.$['deleteTransactionConfirm'].rowIndex );
+		this.deleteTransactionConfirmClose();
+	},
+
+	deleteTransactionConfirmClose: function() {
+
+		this.$['deleteTransactionConfirm'].close();
+	},
+
+	transactionDeleted: function( inSender, rowIndex ) {
+
+		if( this.account['frozen'] === 1 ) {
+
+			this.$['list'].setCount( this.transactions.length );
+			this.$['list'].refresh();
+			return;
+		}
+
+		this.loadingDisplay( true );
+
+		var accounts = {
+					"account": this.transactions[rowIndex]['account'],
+					"linkedAccount": this.transactions[rowIndex]['linkedAccount']
+				};
+
+		//update database;
+		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+
+		var balChanged = this.transactions[rowIndex]['amount'];
+		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
+
+		if( this.account['runningBalance'] === 1 &&
+				(
+					this.account['sort'] === 0 ||
+					this.account['sort'] === 1 ||
+					this.account['sort'] === 6 ||
+					this.account['sort'] === 7 ||
+					this.account['sort'] === 8
+				) ) {
+
+			if( rowIndex === 0 ) {
+
+				this.transactions = [];
+				this.$['list'].setCount( this.transactions.length );
+				this.$['list'].reset();
+				return;
+			}
+
+			//Update running balance in paging distance
+				//Really should update entire transaction object...
+			var start = ( rowIndex > this.$['list'].getPageSize() ) ? ( rowIndex - this.$['list'].getPageSize() ) : 0;
+			var end = ( rowIndex + this.$['list'].getPageSize() < this.transactions.length ) ? ( rowIndex + this.$['list'].getPageSize() ) : this.transactions.length;
+
+			var index = start;
+
+			var currentBalance = this.transactions[index]['runningBalance'] - balChanged;
+
+			while( index < end && this.transactions[index] ) {
+
+				if( this.account['sort'] === 0 || this.account['sort'] === 6 || this.account['sort'] === 8 ) {
+
+					currentBalance += this.transactions[index]['amount'];
+				}
+
+				this.transactions[index]['runningBalance'] = prepAmount( currentBalance );
+
+				if( this.account['sort'] !== 0 && this.account['sort'] !== 6 && this.account['sort'] !== 8 ) {
+
+					currentBalance -= this.transactions[index]['amount'];
+				}
+
+				index++;
+			}
+		}
+
+		this.$['list'].setCount( this.transactions.length );
+		this.$['list'].refresh();
+
+		//Fetch row
+		Checkbook.globals.transactionManager.fetchTransactions(
+				this.account,
+				{
+					"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
+				},
+				1,//Limit
+				this.transactions.length//Offset
+			);
+
+		this.balanceChangedHandler( accounts );
 	},
 
 	loadingDisplay: function( status ) {
 
 		//convert to event calls
+		return;
 
 		if( status ) {
 

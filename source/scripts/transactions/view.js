@@ -4,7 +4,6 @@ enyo.kind( {
 	name: "Checkbook.transactions.view",
 	layoutKind: "FittableRowsLayout",
 
-	transactions: [],
 	account: {},
 
 	events: {
@@ -53,7 +52,8 @@ enyo.kind( {
 			kind: "Checkbook.transactions.list",
 
 			fit: true,
-			classes: "checkbook-stamp"
+			classes: "checkbook-stamp",
+			style: "position: relative;"
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",//Doesn't work with fittable.
@@ -202,6 +202,7 @@ enyo.kind( {
 
 			//Make a clone; else unable to modify account
 			this.account = enyo.clone( inEvent['account'] );
+			this.$['entries'].account = enyo.clone( inEvent['account'] );
 
 			this.$['acctName'].setContent( this.account['acctName'] );
 			this.$['acctTypeIcon'].setSrc( "assets/" + this.account['acctCategoryIcon'] );
@@ -244,7 +245,7 @@ enyo.kind( {
 */
 			this.reloadTransactionList();
 
-			this.initialScroll();
+			this.$['entries'].initialScroll();
 
 			if( this.account['frozen'] === 1 ) {
 
@@ -294,15 +295,13 @@ enyo.kind( {
 		}
 
 		this.reloadTransactionList();
-		this.initialScroll();
+		this.$['entries'].initialScroll();
 		this.balanceChangedHandler();
 	},
 
 	reloadTransactionList: function() {
 
-		this.transactions = [];
-		this.$['entries'].setCount( this.transactions.length );
-		this.$['entries'].reset();
+		this.$['entries'].reloadSystem();
 	},
 
 	balanceChangedHandler: function( accounts, results ) {
@@ -451,7 +450,7 @@ enyo.kind( {
 			);
 
 		this.reloadTransactionList();
-		this.initialScroll();
+		this.$['entries'].initialScroll();
 
 		return true;
 	},
@@ -524,24 +523,21 @@ enyo.kind( {
 		}
 	},
 
-	addTransactionComplete: function( inSender, accounts, actionStatus ) {
+	addTransactionComplete: function( inSender, inEvent ) {
 
 		this.toggleCreateButtons();
 
-		var action = accounts['status'];
-		delete accounts['status'];
+		var action = inEvent['modifyStatus'];
+		delete inEvent['modifyStatus'];
 
-		if( action === 1 && actionStatus === true ) {
+		if( action === 1 ) {
 
-			this.balanceChangedHandler( accounts );
+			this.balanceChangedHandler( inEvent );
 
 			//Reload full list
 			this.account['itemCount']++;
-			this.transactions = [];
-
-			this.$['entries'].setCount( this.transactions.length );
-			this.$['entries'].reset();
-			this.initialScroll();
+			this.reloadTransactionList();
+			this.$['entries'].initialScroll();
 		}
 	},
 

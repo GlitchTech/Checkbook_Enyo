@@ -2,18 +2,19 @@
 
 enyo.kind( {
 	name: "Checkbook.transactions.viewSingle",
-	kind: enyo.ModalDialog,
+	kind: "onyx.Popup",
 
-	lazy: false,
+	classes: "large-input-popup",
+
+	centered: true,
+	floating: true,
 
 	scrim: true,
-	dismissWithClick: true,
+	scrimclasses: "onyx-scrim-translucent",
 
-	style: "width: 500px;",
+	autoDismiss: false,
 
 	published: {
-		caption: "Transaction Details",
-
 		index: -1,
 		account: null,
 		transaction: null
@@ -27,203 +28,199 @@ enyo.kind( {
 
 	components: [
 		{
-			kind: enyo.Pane,
-			className: "modal-pane-view",
+			content: "Transaction Details",
+			classes: "biggest bold text-center padding-half-bottom"
+		},
+		{
+			kind: "enyo.Scroller",
+
+			horizontal: "hidden",
+
+			classes: "light popup-scroller",
 			components: [
 				{
-					kind: enyo.VFlexBox,
+					kind: "onyx.Groupbox",
 					components: [
 						{
-							kind: enyo.VFlexBox,
-							className: "group",
-							flex: 1,
+							name: "desc",
+							classes: "bordered bigger padding-std",
+							style: "height: 65px;"
+						}, {
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "bordered padding-std text-middle",
+
 							components: [
 								{
-									kind: enyo.Scroller,
-									autoHorizontal: false,
-									horizontal: false,
-									flex: 1,
+									classes: "img-icon margin-half-right",
+									style: "overflow: hidden;",
 									components: [
 										{
-											name: "desc",
-											className: "enyo-first bigger"
-										}, {
-											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-											align: "center",
-											className: "first",
-
-											components: [
-												{
-													className: "img-icon",
-													style: "overflow: hidden; margin-right: 1em;",
-													components: [
-														{
-															name: "transTypeIcon",
-															kind: enyo.Image,
-															style: "width: 32px; height: 64px;"
-														}
-													]
-												}, {
-													name: "amount",
-													className: "big",
-													flex: 1
-												}, {
-													content: "amount",
-													className: "enyo-label"
-												}
-											]
-										}, {
-											name: "fromAccountHolder",
-											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-											align: "center",
-											className: "expenseIcon custom-background",
-
-											components: [
-												{
-													name: "fromAccountImg",
-													kind: enyo.Image,
-													className: "img-icon",
-													style: "margin-right: 1em;"
-												}, {
-													name: "fromAccount",
-													flex: 1
-												}, {
-													content: "from",
-													className: "enyo-label"
-												}
-											]
-										}, {
-											name: "toAccountHolder",
-											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-											align: "center",
-											className: "incomeIcon custom-background",
-
-											components: [
-												{
-													name: "toAccountImg",
-													kind: enyo.Image,
-													className: "img-icon",
-													style: "margin-right: 1em;"
-												}, {
-													name: "toAccount",
-													flex: 1
-												}, {
-													content: "to",
-													className: "enyo-label"
-												}
-											]
-										}, {
-											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-											align: "center",
-
-											components: [
-												{
-													kind: enyo.Image,
-													src: "assets/calendar.png",
-													className: "img-icon",
-													style: "margin-right: 1em;"
-												}, {
-													name: "time"
-												}
-											]
-										}, {
-											showing: false,
-											kind: enyo.RowItem,
-											content: "Repeat"
-										}, {
-											name: "categoryHolder",
-											kind: enyo.RowItem,
-
-											components: [
-												{
-													content: "category",
-													className: "enyo-label",
-													style: "text-align: right;"
-												}, {
-													name: "category",
-													allowHtml: true,
-													flex: 1
-												}
-											]
-										}, {
-											name: "checkNumHolder",
-											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-											align: "center",
-											components: [
-												{
-													name: "checkNum",
-													flex: 1
-												}, {
-													content: "check number",
-													className: "enyo-label"
-												}
-											]
-										}, {
-											name: "cleared",
-											kind: "GTS.ToggleBarRev",
-
-											mainText: "Cleared",
-											subText: "",
-
-											onText: "Cleared",
-											offText: "Pending",
-
-											onChange: "clearToggled"
-										}, {
-											name: "noteHolder",
-											kind: enyo.RowItem,
-											layoutKind: enyo.HFlexLayout,
-
-											align: "center",
-											className: "enyo-last",
-
-											components: [
-												{
-													name: "note",
-													allowHtml: true,
-													flex: 1
-												}, {
-													content: "note",
-													className: "enyo-label"
-												}
-											]
+											name: "transTypeIcon",
+											kind: "enyo.Image",
+											style: "width: 32px; height: 64px;"
 										}
 									]
-								},
+								}, {
+									name: "amount",
+									classes: "big",
+									fit: true
+								}, {
+									content: "amount",
+									classes: "label"
+								}
+							]
+						},{
+							name: "fromAccountHolder",
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "expenseIcon custom-background bordered padding-std padding-left text-middle",
+
+							components: [
+								{
+									name: "fromAccountImg",
+									kind: "enyo.Image",
+									classes: "img-icon margin-right"
+								}, {
+									name: "fromAccount",
+									fit: true
+								}, {
+									content: "from",
+									classes: "label"
+								}
 							]
 						}, {
-							kind: enyo.VFlexBox,
-							components:[
+							name: "toAccountHolder",
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "incomeIcon custom-background bordered padding-std padding-left text-middle",
+
+							components: [
 								{
-									name: "btnEdit",
-									kind: "onyx.Button",
-									caption: "Edit",
-									ontap: "editClicked",
-									flex: 1,
-									className: "enyo-button-dark"
+									name: "toAccountImg",
+									kind: "enyo.Image",
+									classes: "img-icon margin-right"
 								}, {
-									name: "btnDelete",
-									kind: "onyx.Button",
-									caption: "Delete",
-									ontap: "deleteClicked",
-									flex: 1,
-									className: "onyx-negative"
+									name: "toAccount",
+									fit: true
 								}, {
-									name: "btnCancel",
-									kind: "onyx.Button",
-									caption: "Close",
-									ontap: "close",
-									flex: 1,
-									className: "enyo-button-light"
+									content: "to",
+									classes: "label"
+								}
+							]
+						}, {
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "bordered padding-std text-middle",
+
+							components: [
+								{
+									kind: "enyo.Image",
+									src: "assets/calendar.png",
+									classes: "img-icon margin-right"
+								}, {
+									name: "time"
+								}
+							]
+						}, {
+							showing: false,
+							content: "Repeat"
+						}, {
+							name: "categoryHolder",
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "bordered padding-std text-middle",
+
+							components: [
+								{
+									name: "category",
+									allowHtml: true,
+									fit: true
+								}, {
+									content: "category",
+									classes: "label"
+								}
+							]
+						}, {
+							name: "checkNumHolder",
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "bordered padding-std text-middle",
+
+							components: [
+								{
+									name: "checkNum",
+									fit: true
+								}, {
+									content: "check number",
+									classes: "label"
+								}
+							]
+						}, {
+							name: "cleared",
+							kind: "GTS.ToggleBar",
+							classes: "bordered",
+
+							label: "Cleared",
+							sublabel: "",
+							onContent: "Cleared",
+							offContent: "Pending",
+
+							onChange: "clearToggled"
+						}, {
+							name: "noteHolder",
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "bordered padding-std text-top",
+
+							components: [
+								{
+									name: "note",
+									allowHtml: true,
+									fit: true
+								}, {
+									content: "note",
+									classes: "label"
 								}
 							]
 						}
 					]
+				}
+			]
+		}, {
+			classes: "padding-std text-center h-box pack-center",
+			components:[
+				{
+					name: "btnCancel",
+					kind: "onyx.Button",
+					content: "Close",
+
+					ontap: "hide",
+
+					classes: "margin-right box-flex"
+				}, {
+					name: "btnDelete",
+					kind: "onyx.Button",
+					content: "Delete",
+
+					ontap: "deleteClicked",
+
+					classes: "onyx-negative box-flex"
+				}, {
+					name: "btnEdit",
+					kind: "onyx.Button",
+					content: "Edit",
+
+					ontap: "editClicked",
+
+					classes: "onyx-affirmative margin-left box-flex"
 				}
 			]
 		}
@@ -253,12 +250,12 @@ enyo.kind( {
 		this.$['cleared'].setStyle( "padding-left: 10px;" );
 	},
 
-	openAtCenter: function() {
+	show: function() {
 
 		if( !this.account['acctId'] ) {
 
 			this.inherited( arguments );
-			this.close();
+			this.hide();
 			return;
 		}
 
@@ -281,6 +278,22 @@ enyo.kind( {
 
 			this.renderDisplay( finishRender );
 		}
+
+		this.reflow();
+	},
+
+	hide: function() {
+
+		for( var i = 0; i < appColors.length; i++ ) {
+
+			this.$['desc'].removeClass( appColors[i]['name'] );
+			this.$['toAccountHolder'].removeClass( appColors[i]['name'] );
+			this.$['fromAccountHolder'].removeClass( appColors[i]['name'] );
+		}
+
+		this.$['desc'].removeClass( "custom-background legend" );
+
+		this.inherited( arguments );
 	},
 
 	loadAccount: function( finishRender, result ) {
@@ -344,7 +357,7 @@ enyo.kind( {
 
 		//Date
 		var dateObj = new Date( parseInt( this.transaction['date'] ) );
-		this.$['time'].setContent( dateObj.format( { date: 'long', time: ( this.account['showTransTime'] === 1 ? 'short' : '' ) } ) );
+		this.$['time'].setContent( dateObj.format( { date: "longDate", time: ( this.account["showTransTime"] === 1 ? "shortTime" : "" ) } ) );
 
 		//Categories
 		if( this.account['enableCategories'] === 1 ) {
@@ -412,20 +425,6 @@ enyo.kind( {
 		}
 	},
 
-	close: function() {
-
-		for( var i = 0; i < appColors.length; i++ ) {
-
-			this.$['desc'].removeClass( appColors[i]['name'] );
-			this.$['toAccountHolder'].removeClass( appColors[i]['name'] );
-			this.$['fromAccountHolder'].removeClass( appColors[i]['name'] );
-		}
-
-		this.$['desc'].removeClass( "custom-background legend" );
-
-		this.inherited( arguments );
-	},
-
 	/** Event Handlers **/
 
 	clearToggled: function() {
@@ -438,7 +437,7 @@ enyo.kind( {
 	editClicked: function() {
 
 		this.doEdit( this.index );
-		enyo.asyncMethod( this, this.close );
+		enyo.asyncMethod( this, this.hide );
 	},
 
 	deleteClicked: function() {
@@ -459,7 +458,7 @@ enyo.kind( {
 			});
 
 		this.$['deleteTransactionConfirm'].render();
-		this.$['deleteTransactionConfirm'].openAtCenter();
+		this.$['deleteTransactionConfirm'].show();
 	},
 
 	deleteTransactionConfirmClose: function() {
@@ -471,6 +470,6 @@ enyo.kind( {
 
 		this.deleteTransactionConfirmClose();
 		this.doDelete( this.index );
-		enyo.asyncMethod( this, this.close );
+		enyo.asyncMethod( this, this.hide );
 	}
 });

@@ -58,12 +58,20 @@
 
 /** Transaction List **/
 
-.transactionItemTop {
+.transaction-item-top {
 	margin-left: -25px;
 	padding-left: 10px;
 
 	margin-top: -5px;
 	padding-top: 5px;
+}
+
+.transaction-item-top .amount-block {
+	display: inline-block;
+}
+
+.transaction-item-top .checkbox-clone.checked {
+	background-position: 0px -32px;
 }
 
 .repeatIcon {
