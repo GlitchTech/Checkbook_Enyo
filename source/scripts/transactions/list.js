@@ -119,15 +119,19 @@ enyo.kind( {
 
 		{
 			name: "deleteTransactionConfirm",
-			//kind: "GTS.deleteConfirm",
+			kind: "gts.ConfirmDialog",
 
-			confirmTitle: "Delete Transaction",
-			confirmMessage: "Are you sure you want to delete this transaction?",
-			confirmButtonYes: "Delete",
-			confirmButtonNo: "Cancel",
+			title: "Delete Transaction",
+			message: "Are you sure you want to delete this transaction?",
 
-			onYes: "deleteTransactionConfirmHandler",
-			onNo: "deleteTransactionConfirmClose"
+			confirmText: "Delete",
+			confirmClass: "onyx-negative",
+
+			cancelText: "Cancel",
+			cancelClass: "",
+
+			onConfirm: "deleteTransactionConfirmHandler",
+			onCancel: "deleteTransactionConfirmClose"
 		}
 	],
 
@@ -612,17 +616,18 @@ results = {
 
 		this.loadingDisplay( true );
 
-		this.transactions[index]['cleared'] = this.transactions[index]['cleared'] === 1 ? 0 : 1;
-
-		var cleared = ( this.transactions[index]['cleared'] === 1 );
-
+		//Update cleared value
+		var cleared = this.transactions[index]['cleared'] !== 1;
+		this.transactions[index]['cleared'] = cleared ? 1 : 0;
 		Checkbook.globals.transactionManager.clearTransaction( this.transactions[index]['itemId'], cleared );
 
-		this.$['list'].refresh();
+		//Update row UI
+		this.$['list'].renderRow( index );
 
 		this.balanceChangedHandler();
 
-		return this.transactions[index]['cleared'];
+		//Return status
+		return cleared;
 	},
 
 	deleteTransactionConfirmHandler: function() {
@@ -636,7 +641,9 @@ results = {
 		this.$['deleteTransactionConfirm'].close();
 	},
 
-	transactionDeleted: function( inSender, rowIndex ) {
+	transactionDeleted: function( inSender, inEvent ) {
+
+		var rowIndex = inEvent.rowIndex;
 
 		if( this.account['frozen'] === 1 ) {
 
@@ -656,7 +663,9 @@ results = {
 		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
 
 		var balChanged = this.transactions[rowIndex]['amount'];
-		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
+		this.transactions.splice( rowIndex, 1 );
+
+		//TODO Get list dynamics running
 
 		if( this.account['runningBalance'] === 1 &&
 				(

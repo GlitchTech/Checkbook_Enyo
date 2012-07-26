@@ -21,6 +21,7 @@ enyo.depends(
 	"$lib/gts-plugins/DatePicker",
 	"$lib/gts-plugins/TimePicker",
 	"$lib/gts-plugins/DecimalInput",
+	"$lib/gts-plugins/ConfirmDialog",
 
 	"scripts/",
 	"styles/"

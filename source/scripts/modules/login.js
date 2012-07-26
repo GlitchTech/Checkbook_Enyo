@@ -8,6 +8,7 @@ enyo.kind( {
 
 	centered: true,
 	floating: true,
+	modal: true,
 
 	scrim: true,
 	scrimclasses: "onyx-scrim-translucent",

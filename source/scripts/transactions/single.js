@@ -44,7 +44,7 @@ enyo.kind( {
 						{
 							name: "desc",
 							classes: "bordered bigger padding-std",
-							style: "height: 65px;"
+							style: "min-height: 65px;"
 						}, {
 							kind: "enyo.FittableColumns",
 							noStretch: true,
@@ -254,7 +254,6 @@ enyo.kind( {
 
 		if( !this.account['acctId'] ) {
 
-			this.inherited( arguments );
 			this.hide();
 			return;
 		}
@@ -429,14 +428,16 @@ enyo.kind( {
 
 	clearToggled: function() {
 
-		var cleared = this.doClear( this.index );
+		var cleared = this.doClear( { "rowIndex": this.index } );
 
-		this.$['cleared'].setValue( cleared == 1 );
+		this.$['cleared'].setValue( cleared );
+
+		return true;
 	},
 
 	editClicked: function() {
 
-		this.doEdit( this.index );
+		this.doEdit( { "rowIndex": this.index } );
 		enyo.asyncMethod( this, this.hide );
 	},
 
@@ -444,20 +445,21 @@ enyo.kind( {
 
 		this.createComponent( {
 				name: "deleteTransactionConfirm",
-				kind: "GTS.deleteConfirm",
+				kind: "gts.ConfirmDialog",
 
-				owner: this,
+				title: "Delete Transaction",
+				message: "Are you sure you want to delete this transaction?",
 
-				confirmTitle: "Delete Transaction",
-				confirmMessage: "Are you sure you want to delete this transaction?",
-				confirmButtonYes: "Delete",
-				confirmButtonNo: "Cancel",
+				confirmText: "Delete",
+				confirmClass: "onyx-negative",
 
-				onYes: "deleteTransactionHandler",
-				onNo: "deleteTransactionConfirmClose"
+				cancelText: "Cancel",
+				cancelClass: "",
+
+				onConfirm: "deleteTransactionHandler",
+				onCancel: "deleteTransactionConfirmClose"
 			});
 
-		this.$['deleteTransactionConfirm'].render();
 		this.$['deleteTransactionConfirm'].show();
 	},
 
@@ -469,7 +471,7 @@ enyo.kind( {
 	deleteTransactionHandler: function() {
 
 		this.deleteTransactionConfirmClose();
-		this.doDelete( this.index );
+		this.doDelete( { "rowIndex": this.index } );
 		enyo.asyncMethod( this, this.hide );
 	}
 });
