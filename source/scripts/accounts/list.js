@@ -193,7 +193,7 @@ enyo.kind({
 			if( this.editMode ) {
 				//Edit Account
 
-				nextAction = "editAccount";
+				nextAction = "modifyAccount";
 				nextActionEvent = {
 						name: "editAccount",
 						kind: "Checkbook.accounts.modify",

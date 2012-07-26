@@ -7,10 +7,14 @@ enyo.kind( {
 	account: {},
 
 	events: {
-		onModify: "",//Add/Edit Transaction
 		onChanged: ""//Edit Made
 	},
 
+	/**
+	 * @private
+	 * @type Array
+	 * Components of the control
+	 */
 	components: [
 		{
 			name: "header",
@@ -53,17 +57,19 @@ enyo.kind( {
 
 			fit: true,
 			classes: "checkbook-stamp",
-			style: "position: relative;"
+			style: "position: relative;",
+
+			ondragstart: "listDrag",
+			ondrag: "listDrag",
+			ondragfinish: "listDrag"
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",//Doesn't work with fittable.
 			classes: "deep-green",
 			components: [
 				{
-					//I do nothing right now
-					showing: false,
 					kind: "onyx.Grabber",
-					classes: "margin-right"
+					classes: "margin-right",
 				},{
 					kind: "onyx.MenuDecorator",
 					components: [
@@ -161,6 +167,13 @@ enyo.kind( {
 		}
 	],
 
+	/**
+	 * @protected
+	 * @function
+	 * @name GTS.SelectorBar#rendered
+	 *
+	 * Called by Enyo when UI is rendered.
+	 */
 	rendered: function() {
 
 		this.inherited( arguments );
@@ -169,6 +182,22 @@ enyo.kind( {
 		this.$['footer'].hide();
 
 		this.loadingDisplay( false );
+	},
+
+	/**
+	 * @private
+	 * @function
+	 * @name Checkbook.transactions.view#listDrag
+	 *
+	 * Prevent panels from interfering with swipe to delete
+	 *
+	 * @param {object} inSender	The event sender
+	 * @param {object} inEvent	Event object
+	 */
+	listDrag: function( inSender, inEvent ) {
+
+		inEvent.preventDefault();
+		return true;
 	},
 
 	accountChanged: function( inSender, inEvent ) {
@@ -508,9 +537,8 @@ enyo.kind( {
 
 			this.toggleCreateButtons();
 
-			enyo.asyncMethod(
-					this,
-					this.doModify,
+			enyo.Signals.send(
+					"modifyTransaction",
 					{
 						name: "createTransaction",
 						kind: "Checkbook.transactions.modify",

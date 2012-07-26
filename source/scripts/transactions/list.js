@@ -458,16 +458,15 @@ results = {
 		delete newTrsn['repeatId'];
 		delete newTrsn['cleared'];
 
-		enyo.asyncMethod(
-				this,
-				this.doModify,
+		enyo.Signals.send(
+				"modifyTransaction",
 				{
 					name: "createTransaction",
 					kind: "Checkbook.transactions.modify",
 					accountObj: this.account,
 					trsnObj: newTrsn,
 					transactionType: type.toLowerCase(),
-					onFinish: enyo.bind( this, this.addTransactionComplete )
+					onFinish: enyo.bind( this, this.addTransactionComplete )//TODO
 				}
 			);
 	},
@@ -492,9 +491,8 @@ results = {
 		if( this.account['frozen'] !== 1 ) {
 			//account not frozen
 
-			enyo.asyncMethod(
-					this,
-					this.doModify,
+			enyo.Signals.send(
+					"modifyTransaction",
 					{
 						name: "editTransaction",
 						kind: "Checkbook.transactions.modify",

@@ -12,7 +12,7 @@ enyo.kind({
 
 			fit: true,
 			showing: false,
-			draggable: false,
+			draggable: true,
 
 			classes: "app-panels enyo-fit",
 			arrangerKind: "CollapsingArranger",
@@ -25,7 +25,6 @@ enyo.kind({
 					name: "transactions",
 					kind: "Checkbook.transactions.view",
 
-					onModify: "showPanePopup",
 					onChanged: "accountBalanceChanged"
 				}
 			]
@@ -56,7 +55,8 @@ enyo.kind({
 			kind: "Signals",
 			onBack: "goBack",
 
-			editAccount: "showPanePopup",
+			modifyAccount: "showPanePopup",
+			modifyTransaction: "showPanePopup",
 			showBudget: "openBudget",
 			showSearch: "openSearch"
 		}
