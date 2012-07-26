@@ -59,6 +59,7 @@ enyo.kind({
 				}
 			]
 		}, {
+			name: "scroller",
 			kind: "enyo.Scroller",
 
 			horizontal: "hidden",
@@ -198,6 +199,19 @@ enyo.kind({
 		this.$['categoryList'].setCount( this.dispCategories.length );
 
 		this.reflow();
+	},
+
+	/**
+	 * @protected
+	 * @extends onyx.Popup#reflow
+	 */
+	reflow: function() {
+
+		this.$['scroller'].applyStyle( "height", null );
+
+		this.inherited( arguments );
+
+		this.$['scroller'].applyStyle( "height", this.$['scroller'].getBounds().height + "px" );
 	},
 
 	returnedFromView: function() {

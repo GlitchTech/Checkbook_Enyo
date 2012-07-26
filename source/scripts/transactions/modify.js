@@ -321,12 +321,12 @@ enyo.kind( {
 											kind: "onyx.Input",
 											fit: true,
 
-											placeholder: "# (optional)",
-
-											onfocus: "autofillCheckNo"
+											placeholder: "# (optional)"
 										}, {
+											kind: "onyx.Button",
 											content: "Check Number",
-											classes: "label"
+											classes: "label",
+											ontap: "autofillCheckNo"
 										}
 									]
 								}
@@ -996,6 +996,8 @@ enyo.kind( {
 		//this.trsnObj['repeatId']
 		//this.trsnObj['repeatUnlinked']
 
+		this.log( this.trsnObj['rObj'], this.trsnObj['repeatId'], this.trsnObj['repeatUnlinked'] );
+
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );
 		this.trsnObj['autoTransferLink'] = this.accountObj['auto_savings_link'];
 
@@ -1017,7 +1019,7 @@ enyo.kind( {
 			//New transaction
 
 			Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, options );
-		} else if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
+		//} else if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
 			//Modified repeating transaction
 
 //if this.trsnObj['rObj']['pattern'] == "none"

@@ -305,7 +305,7 @@ balanceChangedHandler: function() {this.log("TEMP");},
 			if( this.account['enableCategories'] === 1 ) {
 
 				this.$['category'].show();
-				this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( row['category'], row['category2'], true, "small" ) );
+				this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( row['category'], row['category2'], true, "smaller" ) );
 			} else {
 
 				this.$['category'].hide();
@@ -473,11 +473,12 @@ results = {
 
 	transactiontapped: function( inSender, inEvent ) {
 
+
 		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode
 
-			this.$['viewSingle'].setIndex( inEvent.index );
-			this.$['viewSingle'].setTransaction( this.transactions[inEvent.index] );
+			this.$['viewSingle'].setIndex( inEvent.rowIndex );
+			this.$['viewSingle'].setTransaction( this.transactions[inEvent.rowIndex] );
 			this.$['viewSingle'].setAccount( this.account );
 			this.$['viewSingle'].show();
 		} else {
@@ -497,9 +498,9 @@ results = {
 						name: "editTransaction",
 						kind: "Checkbook.transactions.modify",
 						accountObj: this.account,
-						trsnObj: enyo.clone( this.transactions[inEvent.index] ),
+						trsnObj: enyo.clone( this.transactions[inEvent.rowIndex] ),
 						transactionType: "",
-						onFinish: enyo.bind( this, this.modifyTransactionComplete, inEvent.index )
+						onFinish: enyo.bind( this, this.modifyTransactionComplete, inEvent.rowIndex )
 					}
 				);
 		}

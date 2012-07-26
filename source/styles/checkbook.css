@@ -117,7 +117,7 @@
 	margin-left: -10px;
 }
 
-.splitCatContainer  .categoryGroup div {
+.splitCatContainer .categoryGroup div {
 	border-top-left-radius: 5px;
 	border-bottom-left-radius: 5px;
 	border-left: 1px solid rgba( 0, 0, 0, 0.2 );
@@ -126,8 +126,14 @@
 .splitCatContainer .categoryAmount {
 }
 
-.splitCatContainer  .categoryAmount div {
+.splitCatContainer .categoryAmount div {
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
 	border-right: 1px solid rgba( 0, 0, 0, 0.2 );
+}
+
+.splitCatContainer .cat-item {
+	border-top: 1px solid rgba( 255, 255, 255, 0.5 );
+	border-bottom: 1px solid rgba( 0, 0, 0, 0.2 );
+	padding: 10px;
 }

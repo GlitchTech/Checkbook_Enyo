@@ -10,7 +10,9 @@ function prepAmount( amount ) {
 /** Properly format the amount for display **/
 function formatAmount( amount ) {
 
-	if( !amount ) {
+	amount = parseFloat( amount );
+
+	if( !amount || isNaN( amount ) ) {
 
 		amount = 0;
 	}

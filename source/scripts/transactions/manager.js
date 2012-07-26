@@ -1338,19 +1338,19 @@ enyo.kind({
 			//Build for proper display
 
 			//JSON formatted string [{ category, category2, amount }]
-			var catObj = category.evalJSON();
+			var catObj = enyo.json.parse( category );
 			var leftCol = "";
 			var rightCol = "";
 
 			for( var i = 0; i < ( ( catObj.length > 3 && truncate ) ? 2 : catObj.length ); i++ ) {
 
-				leftCol += "<div class='enyo-item " + additionalClasses + "'>" + catObj[i]['category'] + " &raquo; " + catObj[i]['category2'] + "</div>";
+				leftCol += "<div class='cat-item " + additionalClasses + "'>" + catObj[i]['category'] + " &raquo; " + catObj[i]['category2'] + "</div>";
 
-				rightCol += "<div class='enyo-item " + additionalClasses + "'>" + formatAmount( catObj[i]['amount'] ) + "</div>";
+				rightCol += "<div class='cat-item " + additionalClasses + "'>" + formatAmount( catObj[i]['amount'] ) + "</div>";
 			}
 
 			catDisplayItem = "<div style='margin-bottom: 0.5em;'>" +
-						"<div class='splitCatContainer enyo-hflexbox'>" +
+						"<div class='splitCatContainer h-box'>" +
 							"<div class='categoryGroup'>" + leftCol + "</div>" +
 							"<div class='categoryAmount'>" + rightCol + "</div>" +
 						"</div>" +

@@ -32,6 +32,7 @@ enyo.kind( {
 			classes: "biggest bold text-center padding-half-bottom"
 		},
 		{
+			name: "scroller",
 			kind: "enyo.Scroller",
 
 			horizontal: "hidden",
@@ -242,14 +243,17 @@ enyo.kind( {
 
 	/**
 	 * @protected
+	 * @extends onyx.Popup#rendered
 	 */
 	rendered: function() {
 
 		this.inherited( arguments );
-
-		this.$['cleared'].setStyle( "padding-left: 10px;" );
 	},
 
+	/**
+	 * @protected
+	 * @extends onyx.Popup#show
+	 */
 	show: function() {
 
 		if( !this.account['acctId'] ) {
@@ -281,6 +285,23 @@ enyo.kind( {
 		this.reflow();
 	},
 
+	/**
+	 * @protected
+	 * @extends onyx.Popup#reflow
+	 */
+	reflow: function() {
+
+		this.$['scroller'].applyStyle( "height", null );
+
+		this.inherited( arguments );
+
+		this.$['scroller'].applyStyle( "height", this.$['scroller'].getBounds().height + "px" );
+	},
+
+	/**
+	 * @protected
+	 * @extends onyx.Popup#hide
+	 */
 	hide: function() {
 
 		for( var i = 0; i < appColors.length; i++ ) {

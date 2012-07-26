@@ -1,6 +1,8 @@
 /** Horizontal Box **/
 
 .h-box {
+	display: inline-block;/* fallback for crappy browsers */
+
 	display: -webkit-box;
 	-webkit-box-orient: horizontal;
 	-webkit-box-align: stretch;
