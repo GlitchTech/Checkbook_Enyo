@@ -19,6 +19,7 @@
 	color: #0000cc;
 }
 
+.account-item .onyx-item,
 .account-item .onyx-swipeable-item-content {
 	padding: 9px 3px;
 }

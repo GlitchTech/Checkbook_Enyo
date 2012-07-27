@@ -3,7 +3,6 @@
 enyo.depends(
 	"$lib/layout",
 	"$lib/onyx",
-	"$lib/onyx/source/SwipeableItem.js",//Temp while WIP
 
 	"$lib/canvas-spinner/heartcode_canvas.js",
 	"$lib/canvas-spinner/canvasSpinner.js",

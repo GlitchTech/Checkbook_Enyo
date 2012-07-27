@@ -221,7 +221,7 @@ enyo.kind( {
 
 					ontap: "editClicked",
 
-					classes: "onyx-affirmative margin-left box-flex"
+					classes: "tardis-blue margin-left box-flex"
 				}
 			]
 		}
@@ -253,33 +253,41 @@ enyo.kind( {
 	/**
 	 * @protected
 	 * @extends onyx.Popup#show
+	 *
+	 * @param boolean shortTerm Hide popup without closing procedure
 	 */
-	show: function() {
+	show: function( shortTerm ) {
 
-		if( !this.account['acctId'] ) {
+		if( !shortTerm ) {
 
-			this.hide();
-			return;
-		}
+			if( !this.account['acctId'] ) {
 
-		//Check this.account properties
-		var count = 0;
-		for( var k in this.account ) {
-
-			if( this.account.hasOwnProperty( k ) ) {
-
-				count++;
+				this.hide();
+				return;
 			}
-		}
 
-		var finishRender = enyo.bind( this, this.inherited, arguments );
+			//Check this.account properties
+			var count = 0;
+			for( var k in this.account ) {
 
-		if( count <= 5 ) {
+				if( this.account.hasOwnProperty( k ) ) {
 
-			Checkbook.globals.accountManager.fetchAccount( this.account['acctId'], { "onSuccess": enyo.bind( this, this.loadAccount, finishRender ) } );
+					count++;
+				}
+			}
+
+			var finishRender = enyo.bind( this, this.inherited, arguments );
+
+			if( count <= 5 ) {
+
+				Checkbook.globals.accountManager.fetchAccount( this.account['acctId'], { "onSuccess": enyo.bind( this, this.loadAccount, finishRender ) } );
+			} else {
+
+				this.renderDisplay( finishRender );
+			}
 		} else {
 
-			this.renderDisplay( finishRender );
+			this.inherited( arguments );
 		}
 
 		this.reflow();
@@ -301,17 +309,22 @@ enyo.kind( {
 	/**
 	 * @protected
 	 * @extends onyx.Popup#hide
+	 *
+	 * @param boolean shortTerm Hide popup without closing procedure
 	 */
-	hide: function() {
+	hide: function( shortTerm ) {
 
-		for( var i = 0; i < appColors.length; i++ ) {
+		if( !shortTerm ) {
 
-			this.$['desc'].removeClass( appColors[i]['name'] );
-			this.$['toAccountHolder'].removeClass( appColors[i]['name'] );
-			this.$['fromAccountHolder'].removeClass( appColors[i]['name'] );
+			for( var i = 0; i < appColors.length; i++ ) {
+
+				this.$['desc'].removeClass( appColors[i]['name'] );
+				this.$['toAccountHolder'].removeClass( appColors[i]['name'] );
+				this.$['fromAccountHolder'].removeClass( appColors[i]['name'] );
+			}
+
+			this.$['desc'].removeClass( "custom-background legend" );
 		}
-
-		this.$['desc'].removeClass( "custom-background legend" );
 
 		this.inherited( arguments );
 	},
@@ -481,12 +494,14 @@ enyo.kind( {
 				onCancel: "deleteTransactionConfirmClose"
 			});
 
+		this.hide( true );
 		this.$['deleteTransactionConfirm'].show();
 	},
 
 	deleteTransactionConfirmClose: function() {
 
 		this.$['deleteTransactionConfirm'].destroy();
+		this.show( true );
 	},
 
 	deleteTransactionHandler: function() {

@@ -173,7 +173,7 @@ balanceChangedHandler: function() {this.log("TEMP");},
 	reloadTransactionList: function() {
 
 		this.transactions = [];
-		this.$['list'].reload();
+		this.$['list'].lazyLoad();
 	},
 
 	initialScroll: function() {
@@ -330,7 +330,7 @@ balanceChangedHandler: function() {this.log("TEMP");},
 
 	transactionFetchGroup: function( inSender, inEvent ) {
 
-		var index = inEvent['page'] * inEvent['pageSize'];
+		var index = inEvent['page'] * 50;//inEvent['pageSize'];
 
 		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
 
@@ -342,10 +342,10 @@ balanceChangedHandler: function() {this.log("TEMP");},
 		if( index < 0 ) {
 			//No indexes below zero, don't bother calling
 
-			return;
+			return false;
 		}
 
-		if( !this.transactions[index] ) {
+		if( this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
 
 			this.loadingDisplay( true );
 
@@ -354,9 +354,11 @@ balanceChangedHandler: function() {this.log("TEMP");},
 					{
 						"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
 					},
-					inEvent['pageSize'],//Limit
+					50,//inEvent['pageSize'],//Limit
 					index//Offset
 				);
+
+			return true;
 		}
 	},
 

@@ -43,7 +43,7 @@ enyo.kind({
 					name: "accountItem",
 					classes: "bordered norm-row account-item",
 
-					kind: "onyx.SwipeableItem",
+					kind: "onyx.Item",//SwipeableItem
 					tapHighlight: true,
 
 					ontap: "accountTapped",
@@ -320,10 +320,10 @@ enyo.kind({
 
 		if( row ) {
 
-			//this.$['accountItem'].addRemoveClass( "alt-row", ( index % 2 === 0 ) );
-			//this.$['accountItem'].addRemoveClass( "norm-row", ( index % 2 !== 0 ) );
-
 			row['index'] = index;
+
+			this.$['accountItem'].addRemoveClass( "alt-row", ( row['index'] % 2 === 0 ) );
+			this.$['accountItem'].addRemoveClass( "norm-row", ( row['index'] % 2 !== 0 ) );
 
 			this.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
 			this.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
@@ -368,8 +368,8 @@ enyo.kind({
 					Checkbook.globals.prefs['custom_sort'] === 0 ||
 					Checkbook.globals.prefs['custom_sort'] === 3
 				) && (
-					index <= 0 ||
-					row['acctCategory'] !== this.accounts[index - 1]['acctCategory']
+					row['index'] <= 0 ||
+					row['acctCategory'] !== this.accounts[row['index'] - 1]['acctCategory']
 				) ) {
 
 				this.$['catDivider'].show();

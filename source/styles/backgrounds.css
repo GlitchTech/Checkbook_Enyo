@@ -24,7 +24,8 @@
 }
 
 .deep-green {
-	background-color: #284907;
+	background-color: #284907 !important;
+	color: #f1f1f1 !important;
 }
 
 .deep-green-gradient {
@@ -44,7 +45,7 @@
 }
 
 .rich-brown {
-	background-color: #382513;
+	background-color: #382513 !important;
 }
 
 .rich-brown-gradient {
@@ -64,7 +65,8 @@
 }
 
 .tardis-blue {
-	background-color: #272D70;
+	background-color: #272d70 !important;
+	color: #f1f1f1 !important;
 }
 
 .tardis-blue-gradient {

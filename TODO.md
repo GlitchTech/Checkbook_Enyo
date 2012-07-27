@@ -29,20 +29,10 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 	- Data: json of object to sync
 	- Where: where args for edit, delete
 
-# Will Need:
-	- Learn service (for HD version)
-		- can a service access the Checkbook DB?
-		- should service run when Checkbook is closed?
-			- what's needed for this to happen, how does a service even work?
-	- service will run in background of app and will need to notify app of changes
-
 Phone Mode
 ==========
 
 Needs to be tested on an actual device to see behaviour. Work on optimizing list loading (ie only when in view).
-
-Phone Mode
-==========
 
 Enyo Update
 ===========
@@ -50,3 +40,4 @@ Enyo Update
 * Update code to run on EnyoJS (2) instead of Enyo 1
 * Check performance on canvas spinner, replace with onyx if causing lag
 * Convert event chains to enyo.Signals (https://github.com/enyojs/enyo/wiki/Event-Handling)
+* Integrate Backbone.js (?) (http://documentcloud.github.com/backbone/#)

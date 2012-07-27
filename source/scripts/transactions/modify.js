@@ -418,7 +418,7 @@ enyo.kind( {
 					ontap: "saveTransaction",
 
 					style: "width: 150px;",
-					classes: "onyx-affirmative deep-green margin-half-left"
+					classes: "deep-green margin-half-left"
 				}
 			]
 		},
@@ -596,6 +596,7 @@ enyo.kind( {
 		this.$['linkedAccount'].setValue( this.trsnObj['linkedAccount'] );
 
 		this.$['date'].setValue( this.trsnObj['date'] );
+		this.$['time'].setValue( this.trsnObj['date'] );
 
 		this.$['checkNum'].setValue( this.trsnObj['checkNum'] );
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
