@@ -132,16 +132,48 @@ enyo.kind({
 
 			touchEvent.preventDefault();
 		}
+
+		try {
+			//Phonegap
+
+			BackButton.override();
+		} catch( err ) {}
+
+		//App-wide events to handle
+		document.addEventListener( "keydown", enyo.bind( this, this.keyboardHandler ) );
+		document.addEventListener( "menuKeyDown", enyo.bind( this, this.menuHandler ) );
+		document.addEventListener( "backKeyDown", enyo.bind( this, this.backHandler ) );
 	},
 
 	/** Application Events **/
 
-	backHandler: function( inSender, inEvent ) {
+	keyboardHandler: function( inEvent ) {
 
-		//this.$.slidingPane.back( inEvent );
+		if( inEvent.which === 18 ) {
+			//alt key
+
+			return this.menuHandler( inEvent );
+		} else if( inEvent.which === 27 ) {
+			//escape key
+
+			return this.backHandler( inEvent );
+		}
+	},
+
+	menuHandler: function( inEvent ) {
+
+		this.log();
 
 		inEvent.stopPropagation();
-		return -1;
+		return true;
+	},
+
+	backHandler: function( inEvent ) {
+
+		this.log();
+
+		inEvent.stopPropagation();
+		return true;
 	},
 
 	/** Splash Controls **/

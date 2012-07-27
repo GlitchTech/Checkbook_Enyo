@@ -173,6 +173,8 @@ balanceChangedHandler: function() {this.log("TEMP");},
 	reloadTransactionList: function() {
 
 		this.transactions = [];
+		this.$['list'].setCount( 0 );
+		this.$['list'].reset();
 		this.$['list'].lazyLoad();
 	},
 
@@ -520,9 +522,7 @@ results = {
 
 			this.balanceChangedHandler( accounts );
 
-			this.transactions = [];
-			this.$['list'].setCount( this.transactions.length );
-			this.$['list'].reset();
+			this.reloadTransactionList();
 
 			enyo.asyncMethod(
 					this.$['list'],
@@ -536,9 +536,7 @@ results = {
 
 			this.account['itemCount']--;
 
-			this.transactions = [];
-			this.$['list'].setCount( this.transactions.length );
-			this.$['list'].reset();
+			this.reloadTransactionList();
 
 			enyo.asyncMethod(
 					this.$['list'],
@@ -679,9 +677,7 @@ results = {
 
 			if( rowIndex === 0 ) {
 
-				this.transactions = [];
-				this.$['list'].setCount( this.transactions.length );
-				this.$['list'].reset();
+				this.reloadTransactionList();
 				return;
 			}
 
