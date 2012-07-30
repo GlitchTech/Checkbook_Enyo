@@ -131,6 +131,9 @@ enyo.kind({
 		if( enyo.platform.android ) {
 
 			touchEvent.preventDefault();
+		} else {
+
+			//show menu bar
 		}
 
 		try {
@@ -356,8 +359,6 @@ enyo.kind({
 	},
 
 	hidePanePopup: function( inSender ) {
-
-		this.log( arguments );
 
 		//If a prevous callback existed, call it with any arguments applied
 		if( enyo.isFunction( inSender.onFinishFollower ) ) {

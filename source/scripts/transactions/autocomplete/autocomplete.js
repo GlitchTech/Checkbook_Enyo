@@ -5,7 +5,7 @@
  */
 enyo.kind( {
 	name: "Checkbook.transactions.autocomplete",
-	kind: "enyo.Popup",
+	kind: "onyx.Popup",
 
 	published: {
 		searchValue: "",
@@ -19,10 +19,9 @@ enyo.kind( {
 	suggestResults: [],
 
 	components: [
-		{
+		{//repeater
 			name: "suggestionList",
-			kind: enyo.VirtualList,
-			flex: 1,
+			kind: "enyo.Repeater",
 
 			onSetupRow: "setupRow",
 
@@ -92,10 +91,23 @@ enyo.kind( {
 		if( this.getOwner().$['desc'] ) {
 
 			this.suggestResults = results;
-			this.$['suggestionList'].punt();
+			this.$['suggestionList'].setCount( this.suggestResults.length );
 
-			this.openAtControl( this.getOwner().$['desc'], { "top": ( this.getOwner().$['desc'].getBounds().height ), "left": 25 } );
+			this.show();
+			this.updatePosition();
 		}
+	},
+
+	updatePosition: function() {
+
+		//Set to below defined component
+		var d = this.calcViewportSize();
+		var b = this.getBounds();
+
+		this.addStyles( "top: " + Math.max( ( ( d.height - b.height ) / 2 ), 0 ) + "px; left: " + Math.max( ( ( d.width - b.width ) / 2 ), 0 ) + "px;" );
+
+		var descNode = this.getOwner().$['desc'];
+		//, { "top": ( this.getOwner().$['desc'].getBounds().height ), "left": 25 }
 	},
 
 	setupRow: function( inSender, inIndex ) {
