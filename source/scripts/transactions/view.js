@@ -23,19 +23,10 @@ enyo.kind( {
 			components: [
 				{//Swap between icon for account & spinner when loading data in the background.
 					name: "acctTypeIcon",
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: "assets/dollar_sign_1.png",
 					classes: "img-icon",
 					style: "margin: 0 15px 0 0; height: 32px;"
-				}, {
-					name: "loadingSpinner",
-					kind: "jmtk.Spinner",
-
-					color: "#284907",
-					diameter: "32",
-					shape: "spiral",
-
-					style: "margin: 0 15px 0 0;"
 				}, {
 					name: "acctName",
 					content: "Checkbook",
@@ -58,6 +49,8 @@ enyo.kind( {
 			fit: true,
 			classes: "checkbook-stamp",
 			style: "position: relative;",
+
+			onBalanceChanged: "balanceChangedEvent",
 
 			ondragstart: "listDrag",
 			ondrag: "listDrag",
@@ -180,8 +173,6 @@ enyo.kind( {
 
 		this.$['header'].hide();
 		this.$['footer'].hide();
-
-		this.loadingDisplay( false );
 	},
 
 	/**
@@ -333,6 +324,19 @@ enyo.kind( {
 		this.$['entries'].reloadSystem();
 	},
 
+	balanceChangedEvent: function( inSender, inEvent ) {
+
+		if( !Object.isUndefined( inEvent.account ) && !Object.isUndefined( inEvent.linkedAccount ) ) {
+
+			this.balanceChangedHandler( inEvent );
+		} else {
+
+			this.balanceChangedHandler();
+		}
+
+		return true;
+	},
+
 	balanceChangedHandler: function( accounts, results ) {
 
 		if( !accounts ) {
@@ -373,8 +377,6 @@ enyo.kind( {
 		}
 
 		this.doChanged( accounts );
-
-		this.loadingDisplay( false );
 	},
 
 	/* Header Control */
@@ -435,7 +437,6 @@ enyo.kind( {
 				}
 			);
 
-		this.loadingDisplay( false );
 		return true;
 	},
 
@@ -591,19 +592,6 @@ enyo.kind( {
 
 			this.$['addExpenseButton'].setChecked( true );
 			this.$['addExpenseButton'].setDisabled( true );
-		}
-	},
-
-	loadingDisplay: function( status ) {
-
-		if( status ) {
-
-			this.$['loadingSpinner'].show();
-			this.$['acctTypeIcon'].hide();
-		} else {
-
-			this.$['loadingSpinner'].hide();
-			this.$['acctTypeIcon'].show();
 		}
 	}
 });

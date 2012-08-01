@@ -7,6 +7,7 @@ enyo.kind( {
 	account: {},
 
 	events: {
+		onBalanceChanged: ""
 	},
 
 	components: [
@@ -135,8 +136,6 @@ enyo.kind( {
 		}
 	],
 
-balanceChangedHandler: function() {this.log("TEMP");},
-
 	/** External Controls **/
 
 	accountChanged: function( inSender, inEvent ) {
@@ -167,7 +166,7 @@ balanceChangedHandler: function() {this.log("TEMP");},
 
 		this.reloadTransactionList();
 		this.initialScroll();
-		this.balanceChangedHandler();
+		this.doBalanceChanged();
 	},
 
 	reloadTransactionList: function() {
@@ -349,8 +348,6 @@ balanceChangedHandler: function() {this.log("TEMP");},
 
 		if( this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
 
-			this.loadingDisplay( true );
-
 			Checkbook.globals.transactionManager.fetchTransactions(
 					this.account,
 					{
@@ -433,8 +430,6 @@ results = {
 
 		this.$['list'].setCount( this.transactions.length );
 		this.$['list'].refresh();
-
-		this.loadingDisplay( false );
 	},
 
 	/** List Reaction Events **/
@@ -520,7 +515,7 @@ results = {
 		if( action === 1 ) {
 			//edited
 
-			this.balanceChangedHandler( accounts );
+			this.doBalanceChanged( accounts );
 
 			this.reloadTransactionList();
 
@@ -532,7 +527,7 @@ results = {
 		} else if( action === 2 ) {
 			//deleted
 
-			this.balanceChangedHandler( accounts );
+			this.doBalanceChanged( accounts );
 
 			this.account['itemCount']--;
 
@@ -613,8 +608,6 @@ results = {
 			return;
 		}
 
-		this.loadingDisplay( true );
-
 		//Update cleared value
 		var cleared = this.transactions[index]['cleared'] !== 1;
 		this.transactions[index]['cleared'] = cleared ? 1 : 0;
@@ -623,7 +616,7 @@ results = {
 		//Update row UI
 		this.$['list'].renderRow( index );
 
-		this.balanceChangedHandler();
+		this.doBalanceChanged();
 
 		//Return status
 		return cleared;
@@ -650,8 +643,6 @@ results = {
 			this.$['list'].refresh();
 			return;
 		}
-
-		this.loadingDisplay( true );
 
 		var accounts = {
 					"account": this.transactions[rowIndex]['account'],
@@ -721,22 +712,6 @@ results = {
 				this.transactions.length//Offset
 			);
 
-		this.balanceChangedHandler( accounts );
-	},
-
-	loadingDisplay: function( status ) {
-
-		//convert to event calls
-		return;
-
-		if( status ) {
-
-			this.$['loadingSpinner'].show();
-			this.$['acctTypeIcon'].hide();
-		} else {
-
-			this.$['loadingSpinner'].hide();
-			this.$['acctTypeIcon'].show();
-		}
+		this.doBalanceChanged( accounts );
 	}
 });

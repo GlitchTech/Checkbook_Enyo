@@ -40,17 +40,8 @@ enyo.kind( {
 					]
 				}
 			]
-		},
-
-		{
-			kind: "Signals",
-			keydown: "test"
 		}
 	],
-
-	test: function() {
-		this.log( arguments );
-	},
 
 	searchValueChanged: function() {
 
