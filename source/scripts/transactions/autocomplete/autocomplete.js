@@ -23,15 +23,13 @@ enyo.kind( {
 			name: "suggestionList",
 			kind: "enyo.Repeater",
 
-			onSetupRow: "setupRow",
+			onSetupItem: "setupRow",
 
 			components: [
 				{
-					kind: enyo.Item,
-					layoutKind: enyo.HFlexLayout,
-
-					tapHighlight: true,
+					kind: "onyx.Item",
 					ontap: "rowClicked",
+					style: "width: 100%;",
 
 					components: [
 						{
@@ -42,8 +40,17 @@ enyo.kind( {
 					]
 				}
 			]
+		},
+
+		{
+			kind: "Signals",
+			keydown: "test"
 		}
 	],
+
+	test: function() {
+		this.log( arguments );
+	},
 
 	searchValueChanged: function() {
 
@@ -88,7 +95,7 @@ enyo.kind( {
 			return;
 		}
 
-		if( this.getOwner().$['desc'] ) {
+		if( this.getOwner().$['descWrapper'] ) {
 
 			this.suggestResults = results;
 			this.$['suggestionList'].setCount( this.suggestResults.length );
@@ -100,29 +107,50 @@ enyo.kind( {
 
 	updatePosition: function() {
 
-		//Set to below defined component
-		var d = this.calcViewportSize();
-		var b = this.getBounds();
+		var descNode = this.getOwner().$['descWrapper'];
 
-		this.addStyles( "top: " + Math.max( ( ( d.height - b.height ) / 2 ), 0 ) + "px; left: " + Math.max( ( ( d.width - b.width ) / 2 ), 0 ) + "px;" );
+		if( descNode.getBounds() ) {
 
-		var descNode = this.getOwner().$['desc'];
-		//, { "top": ( this.getOwner().$['desc'].getBounds().height ), "left": 25 }
+			var d = this.calcViewportSize();
+			var b = descNode.getBounds();
+
+			this.applyStyle( "left", b.left + "px" );
+			this.applyStyle( "width", b.width + "px" );
+
+			var t = 0;
+
+			if( descNode.hasNode() ) {
+
+				var obj = descNode.hasNode();
+
+				do {
+
+					t += obj.offsetTop;
+				} while( obj = obj.offsetParent );
+			} else {
+
+				t = b.top;
+			}
+
+			this.applyStyle( "top", ( t + b.height ) + "px" );
+		}
 	},
 
-	setupRow: function( inSender, inIndex ) {
+	setupRow: function( inSender, inEvent ) {
 
-		var row = this.suggestResults[inIndex];
+		var item = inEvent.item;
 
-		if( row ) {
+		var row = this.suggestResults[inEvent.index];
 
-			this.$['desc'].setContent( row['desc'] );
+		if( row && item ) {
+
+			item.$['desc'].setContent( row['desc'] );
 
 			return true;
 		}
 	},
 
-	rowClicked: function( inSender, inEvent, rowIndex ) {
+	rowClicked: function( inSender, inEvent ) {
 
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
@@ -142,11 +170,11 @@ enyo.kind( {
 									"GROUP BY category " +
 								"ORDER BY count DESC " +
 								"LIMIT 1;",
-							"values": [ this.getOwner().$['account'].getValue(), this.suggestResults[rowIndex]['desc'] ]
+							"values": [ this.getOwner().$['account'].getValue(), this.suggestResults[inEvent.index]['desc'] ]
 						}
 					),
 				{
-					"onSuccess": enyo.bind( this, this.dataHandler, this.suggestResults[rowIndex]['desc'] )
+					"onSuccess": enyo.bind( this, this.dataHandler, this.suggestResults[inEvent.index]['desc'] )
 				}
 			);
 	},

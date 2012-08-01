@@ -50,6 +50,7 @@ enyo.kind( {
 							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
+									name: "descWrapper",
 									kind: "onyx.InputDecorator",
 									layoutKind: "enyo.FittableColumnsLayout",
 									noStretch: true,
@@ -508,8 +509,6 @@ enyo.kind( {
 
 	buildAccountSystems: function( accounts ) {
 
-		this.log();
-
 		//Setup main account
 		this.accountList = accounts;
 
@@ -622,8 +621,6 @@ enyo.kind( {
 
 	adjustSystemViews: function() {
 
-		this.log();
-
 		this.$['linkedAccount'].setShowing( this.transactionType === "transfer" );
 
 		//this.$['date'].setShowTime( this.accountObj['showTransTime'] == 1 );
@@ -721,7 +718,7 @@ enyo.kind( {
 		this.trsnObj['category'] = suggestTrsnObj['category'];
 		this.categoryChanged();
 
-		this.$['amount'].forceFocus();
+		this.$['amount'].focus();
 	},
 
 	/** Total Amount Controls **/
