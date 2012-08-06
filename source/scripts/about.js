@@ -30,7 +30,6 @@ var appInfo = {
 };
 
 enyo.kind({
-
 	name: "Checkbook.about",
 	kind: "onyx.Popup",
 
@@ -66,7 +65,7 @@ enyo.kind({
 					kind: "onyx.Button",
 
 					content: "X",
-					ontap: "hide",
+					ontap: "doFinish",
 
 					classes: "onyx-blue small-padding"
 				}
@@ -100,7 +99,7 @@ enyo.kind({
 					kind: "enyo.Image",
 					src: "assets/application-web.png",
 				}, {
-					content: "<a href='http://forums.precentral.net/glitchtech-science/'>Discussion Forums</a>",
+					content: "<a href='http://forums.precentral.net/glitchtech-science/' target='_blank'>Discussion Forums</a>",
 					classes: "padding-left dark-link",
 					allowHtml: true
 				}
@@ -116,7 +115,7 @@ enyo.kind({
 					kind: "enyo.Image",
 					src: "assets/application-web.png",
 				}, {
-					content: "<a href='" + appInfo['vendorurl'] + "'>" + appInfo['vendor'] + " Website</a>",
+					content: "<a href='" + appInfo['vendorurl'] + "' target='_blank'>" + appInfo['vendor'] + " Website</a>",
 					classes: "padding-left dark-link",
 					allowHtml: true
 				}
@@ -132,7 +131,7 @@ enyo.kind({
 					kind: "enyo.Image",
 					src: "assets/twitter-icon.png",
 				}, {
-					content: "<a href='http://twitter.com/#!/glitchtech'>" + appInfo['vendor'] + " Twitter</a>",
+					content: "<a href='http://twitter.com/#!/glitchtech' target='_blank'>" + appInfo['vendor'] + " Twitter</a>",
 					classes: "padding-left dark-link",
 					allowHtml: true
 				}
@@ -148,7 +147,7 @@ enyo.kind({
 					kind: "enyo.Image",
 					src: "assets/application-email.png",
 				}, {
-					content: "<a href='mailto:" + appInfo['vendoremail'] + "?subject=" + appInfo['title'] + " Support'>Send Email</a>",
+					content: "<a href='mailto:" + appInfo['vendoremail'] + "?subject=" + appInfo['title'] + " Support' target='_blank'>Send Email</a>",
 					classes: "padding-left dark-link",
 					allowHtml: true
 				}

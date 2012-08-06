@@ -2,9 +2,9 @@
 
 enyo.kind({
 	name: "Checkbook.import",
-	kind: enyo.VFlexBox,
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
-	className: "light",
 	style: "height: 100%;",
 
 	allSheetsList: [],
@@ -18,51 +18,44 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.PageHeader,
-			layoutKind: enyo.HFlexLayout,
-			pack: "center",
-
-			className: "enyo-header-dark",
+			kind: "onyx.Toolbar",
+			classes: "text-center",
+			style: "position: relative;",
 
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
 					content: "Import System",
-					className: "bigger",
-					style: "margin-right: -32px;"
+					classes: "bigger"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
-					kind: enyo.ToolButton,
+					kind: "onyx.Button",
+					ontap: "closeImport",
 
-					icon: "assets/menu_icons/close.png",
-					className: "img-icon",
+					content: "x",
 
-					ontap: "closeImport"
+					classes: "onyx-negative",
+					style: "position: absolute; right: 15px;"
 				}
 			]
 		},
 
 		{
-			kind: enyo.Scroller,
-			flex: 1,
-
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			classes: "tardis-blue",
+			fit: true,
 			components: [
 				{
 					name: "instructions",
-					className: "light narrow-column",
-					flex: 1,
+					classes: "light narrow-column padding-half-top",
+					style: "height: 100%;",
 					components: [
 						{
-							kind: enyo.HtmlContent,
-							className: "group smaller",
-							style: "padding: 0 0.5em 0 0.5em;",
+							classes: "padding-std smaller",
+							allowHtml: true,
+
 							content: "<p>" +
 									"To import your finances into this program you must have a Google Documents account. " + "<br />" +
-									"<a href='http://docs.google.com/'>" + "Sign up here" + "</a>" +
+									"<a href='http://drive.google.com/' target='_blank'>" + "Sign up here" + "</a>" +
 								"</p><p>" +
 									"Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten. <span style='color:#cc0000;'>The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note.</span>" +
 								"</p>"
@@ -74,45 +67,49 @@ enyo.kind({
 					showing: false,
 
 					name: "credentials",
-					layoutKind: enyo.VFlexLayout,
-
-					className: "light narrow-column",
-					flex: 1,
+					classes: "light narrow-column padding-half-top",
+					style: "height: 100%;",
 
 					components: [
 						{
-							kind: enyo.RowGroup,
-							caption: "Google Credentials",
+							kind: "onyx.Groupbox",
 							components: [
 								{
-									name: "gUser",
-									kind: enyo.Input,
-									hint: "Google Username",
-
-									inputType: "email",
-
+									kind: "onyx.GroupboxHeader",
+									content: "Google Credentials"
+								},{
+									kind: "onyx.InputDecorator",
+									layoutKind: "enyo.FittableColumnsLayout",
+									noStretch: true,
 									components: [
 										{
+											name: "gUser",
+											kind: "onyx.Input",
+											type: "email",
+
+											fit: true,
+											placeholder: "Google Username"
+										},{
 											content: "Username",
-											className: "small",
-											style: "color: rgb( 32, 117, 191 );"
+											classes: "label"
 										}
 									]
 								}, {
 									name: "gPassWrapper",
+									kind: "onyx.InputDecorator",
+									layoutKind: "enyo.FittableColumnsLayout",
+									noStretch: true,
 									components: [
 										{
 											name: "gPass",
-											kind: enyo.PasswordInput,
-											hint: "Account Password",
+											kind: "onyx.Input",
+											type: "password",
 
-											components: [
-												{
-													content: "Password",
-													className: "small",
-													style: "color: rgb( 32, 117, 191 );"
-												}
-											]
+											fit: true,
+											placeholder: "Account Password"
+										},{
+											content: "Password",
+											classes: "label"
 										}
 									]
 								}
@@ -120,7 +117,7 @@ enyo.kind({
 						}, {
 							content: "Enter your Google Spreadsheets credentials to import your financial data from <a href='http://docs.google.com/'>Google Documents</a> to your device.",
 							allowHtml: true,
-							className: "smallest",
+							classes: "smallest",
 							style: "padding: 0.5em 0.5em 0 0.5em;"
 						}, {
 							layoutKind: enyo.HFlexLayout,
@@ -160,10 +157,8 @@ enyo.kind({
 					showing: false,
 
 					name: "sheetList",
-					layoutKind: enyo.VFlexLayout,
-
-					className: "light narrow-column",
-					flex: 1,
+					classes: "light narrow-column padding-half-top",
+					style: "height: 100%;",
 
 					components: [
 						{
@@ -202,12 +197,10 @@ enyo.kind({
 
 		{
 			name: "instructionsBar",
-			kind: enyo.Toolbar,
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
 					name: "instructionsButton",
 					kind: "onyx.Button",
 					content: "Continue",
@@ -215,9 +208,6 @@ enyo.kind({
 					ontap: "prepareCredentials",
 
 					style: "min-width: 150px;"
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
 				}
 			]
 		},
@@ -226,23 +216,18 @@ enyo.kind({
 			showing: false,
 
 			name: "credentialsBar",
-			kind: enyo.Toolbar,
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
 					name: "credentialsButton",
 					kind: "onyx.Button",
 					content: "Sign In",
 
 					ontap: "authenticateWithGoogle",
 
-					className: "onyx-affirmative deep-green",
+					classes: "onyx-affirmative deep-green",
 					style: "min-width: 150px;"
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
 				}
 			]
 		},
@@ -251,61 +236,59 @@ enyo.kind({
 			showing: false,
 
 			name: "sheetListBar",
-			kind: enyo.Toolbar,
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 8
-				}, {
 					name: "sheetListButton",
 					kind: "onyx.Button",
 					content: "Import Accounts",
 
 					ontap: "beginImportProcess",
 
-					className: "onyx-affirmative deep-green",
+					classes: "onyx-affirmative deep-green",
 					style: "min-width: 150px;"
 				}, {
 					kind: enyo.Spacer,
 					flex: 1
 				}, {
-					name: "sheetListSelectButton",
-					kind: "onyx.Button",
-					caption: "Select" + "...",
-
-					ontap: "sheetListSelectOptions",
-
-					flex: 1
-				}, {
-					kind: enyo.Spacer,
-					flex: 8
-				}
-			]
-		},
-
-		{
-			name: "selectMenu",
-			kind: enyo.Menu,
-			components: [
-				{
-					caption: "All",
-					value: 1
-				}, {
-					caption: "None",
-					value: 2
-				}, {
-					caption: "Invert",
-					value: 3
+					kind: "onyx.MenuDecorator",
+					components: [
+						{
+							kind: "onyx.Button",
+							components: [
+								{
+									content: "Select..."
+								}
+							]
+						}, {
+							kind: "onyx.Menu",
+							showOnTop: true,
+							floating: true,
+							components: [
+								{
+									content: "All",
+									value: 1
+								}, {
+									content: "None",
+									value: 2
+								}, {
+									content: "Invert",
+									value: 3
+								}
+							]
+						}
+					]
 				}
 			]
 		},
 
 		{
 			name: "progress",
-			kind: "GTS.progress"
+			kind: GTS.progress
 		}, {
 			name: "errorMessage",
-			kind: "GTS.system_error",
+			kind: GTS.system_error,
 
 			errTitle: "Import Error",
 			errMessage: "",
@@ -315,10 +298,10 @@ enyo.kind({
 
 		{
 			name: "gDataControls",
-			kind: "GTS.gdata"
+			kind: GTS.gdata
 		}, {
-			name: 'cryptoSystem',
-			kind: 'Checkbook.encryption'
+			name: "cryptoSystem",
+			kind: "Checkbook.encryption"
 		}
 	],
 
@@ -327,6 +310,8 @@ enyo.kind({
 		this.inherited( arguments );
 
 		this.log();
+
+		return;
 
 		this.$['instructionsButton'].setDisabled( false );
 		this.$['instructionsBar'].show();
@@ -337,7 +322,7 @@ enyo.kind({
 		this.$['credentials'].hide();
 		this.$['sheetList'].hide();
 
-		this.resized();
+		this.refreshLayout();
 
 		//check for pre-existing g-data log in
 		Checkbook.globals.gts_db.query(
@@ -346,6 +331,11 @@ enyo.kind({
 					"onSuccess": enyo.bind( this, this.fetchUserGData )
 				}
 			);
+	},
+
+	refreshLayout: function() {
+
+		this.waterfall( "onresize", "onresize", this );
 	},
 
 	fetchUserGData: function( results ) {
@@ -392,9 +382,9 @@ enyo.kind({
 		this.$['credentials'].show();
 		this.$['sheetList'].hide();
 
-		this.$['gUser'].forceFocus();
+		this.$['gUser'].focus();
 
-		this.resized();
+		this.refreshLayout();
 	},
 
 	togglePasswordVis: function( inSender, state ) {
@@ -412,7 +402,7 @@ enyo.kind({
 					components: [
 						{
 							content: "Password",
-							className: "small",
+							classes: "small",
 							style: "color: rgb( 32, 117, 191 );"
 						}
 					]
@@ -540,7 +530,7 @@ enyo.kind({
 			this.$['credentials'].hide();
 			this.$['sheetList'].show();
 
-			this.resized();
+			this.refreshLayout();
 
 			this.$['progress'].close();
 		}
@@ -566,11 +556,6 @@ enyo.kind({
 		this.allSheetsList[inEvent.rowIndex]['selectStatus'] = !this.allSheetsList[inEvent.rowIndex]['selectStatus'];
 
 		this.$['spreadsheetList'].render();
-	},
-
-	sheetListSelectOptions: function( inSender ) {
-
-		this.$['selectMenu'].openAtControl( inSender );
 	},
 
 	menuItemClick: function( inSender ) {

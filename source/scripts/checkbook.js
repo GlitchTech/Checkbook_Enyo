@@ -45,7 +45,7 @@ enyo.kind({
 											classes: "onyx-menu-divider"
 										}, {
 											content: "Import Data",
-											//ontap: "openImport"
+											ontap: "openImport"
 										}, {
 											content: "Export Data",
 											//ontap: "openExport"
