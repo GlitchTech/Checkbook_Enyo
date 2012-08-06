@@ -3,29 +3,103 @@
 enyo.kind({
 	name: "Checkbook.app",
 	kind: "enyo.Control",
-	fit: true,
 
 	components: [
 		{
 			name: "container",
-			kind: "Panels",
-
-			fit: true,
+			layoutKind: "enyo.FittableRowsLayout",
+			classes: "enyo-fit",
 			showing: false,
-			draggable: true,
-
-			classes: "app-panels enyo-fit",
-			arrangerKind: "CollapsingArranger",
-
 			components: [
 				{
-					name: "accounts",
-					kind: "Checkbook.accounts.view"
+					kind: "onyx.Toolbar",
+					name: "menubar",
+					classes: "padding-none",
+					components: [
+						{
+							kind: "onyx.MenuDecorator",
+							components: [
+								{
+									kind: "onyx.Button",
+									components: [
+										{
+											kind: "enyo.Image",
+											src: "assets/favicon.ico"
+										}, {
+											content: "Checkbook"
+										}
+									]
+								}, {
+									kind: "onyx.Menu",
+									showOnTop: true,
+									floating: true,
+									components: [
+										{
+											content: "Preferences & Accounts",
+											//ontap: "openPreferences"
+										}, {
+											showing: false,
+											content: "Auto-Complete Preferences",
+											//ontap: "openACPrefs"
+										}, {
+											classes: "onyx-menu-divider"
+										}, {
+											content: "Import Data",
+											//ontap: "openImport"
+										}, {
+											content: "Export Data",
+											//ontap: "openExport"
+										}, {
+											classes: "onyx-menu-divider"
+										}, {
+											content: "Search",
+											//ontap: "openSearch"
+										}, {
+											content: "Budget",
+											//ontap: "openBudget"
+										}, {
+											showing: false,
+											content: "Reports",
+											//ontap: "openReports"
+										}, {
+											classes: "onyx-menu-divider"
+										}, {
+											showing: false,
+											content: "Report Bug",
+											ontap: "errorReport"
+										}, {
+											showing: false,
+											classes: "onyx-menu-divider"
+										}, {
+											content: "About",
+											ontap: "showPopup",
+											popup: "about"
+										}
+									]
+								}
+							]
+						}
+					]
 				}, {
-					name: "transactions",
-					kind: "Checkbook.transactions.view",
+					kind: "Panels",
 
-					onChanged: "accountBalanceChanged"
+					fit: true,
+					draggable: true,
+
+					classes: "app-panels",
+					arrangerKind: "CollapsingArranger",
+
+					components: [
+						{
+							name: "accounts",
+							kind: "Checkbook.accounts.view"
+						}, {
+							name: "transactions",
+							kind: "Checkbook.transactions.view",
+
+							onChanged: "accountBalanceChanged"
+						}
+					]
 				}
 			]
 		},
@@ -34,6 +108,10 @@ enyo.kind({
 			name: "splash",
 			kind: "Checkbook.splash",
 			onFinish: "splashFinisher"
+		}, {
+			name: "about",
+			kind: "Checkbook.about",
+			onFinish: "closePopup"
 		},
 
 		{
@@ -60,60 +138,6 @@ enyo.kind({
 			showBudget: "openBudget",
 			showSearch: "openSearch"
 		}
-
-		/*{
-			name: "appMenu",
-			kind: enyo.AppMenu,
-			scrim: true,
-			components: [
-				{
-					caption: "Preferences & Data",
-					components: [
-						{
-							caption: "Preferences & Accounts",
-							ontap: "openPreferences"
-						}, {
-							showing: false,
-							caption: "Auto-Complete Preferences",
-							ontap: "openACPrefs"
-						}, {
-							caption: "Import Data",
-							ontap: "openImport"
-						}, {
-							caption: "Export Data",
-							ontap: "openExport"
-						}
-					]
-				}, {
-					caption: "Finance Information",
-					components: [
-						{
-							caption: "Search",
-							ontap: "openSearch"
-						}, {
-							caption: "Budget",
-							ontap: "openBudget"
-						}, {
-							showing: false,
-							caption: "Reports",
-							ontap: "openReports"
-						}
-					]
-				}, {
-					showing: false,
-					caption: "Report Bug",
-					ontap: "errorReport"
-				}, {
-					caption: "About",
-					ontap: "showPopup",
-					popup: "about"
-				}
-			]
-		}, {
-			name: "about",
-			kind: "Checkbook.about",
-			onClose: "closePopup"
-		}*/
 	],
 
 	paneStack: [],
@@ -231,7 +255,8 @@ enyo.kind({
 	loadCheckbook: function() {
 
 		this.$['container'].show();
-		this.$['container'].render();
+
+		this.waterfall( "onresize", "onresize", this );
 
 		//this.$['appMenu'].setAutomatic( true );
 
@@ -321,7 +346,8 @@ enyo.kind({
 
 	closePopup: function( inSender ) {
 
-		//this.$['appMenu'].setAutomatic( true );
+		this.log( arguments );
+
 		inSender.hide();
 	},
 

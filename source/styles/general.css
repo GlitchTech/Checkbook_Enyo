@@ -106,6 +106,10 @@ html, body {
 	padding-right: 0.5em;
 }
 
+.padding-none {
+	padding: 0;
+}
+
 .margin-top {
 	margin-top: 1em;
 }
@@ -146,6 +150,10 @@ html, body {
 .margin-left-right {
 	margin-left: 0.5em;
 	margin-right: 0.5em;
+}
+
+.margin-none {
+	margin: 0;
 }
 
 /* Float Alignment */
@@ -191,6 +199,19 @@ html, body {
 .img-icon {
 	height: 32px;
 	width: 32px;
+}
+
+.dark-link a,
+.dark-link a:link,
+.dark-link a:visited,
+.dark-link a:active,
+.dark-link a:hover {
+	color: #99ccff;
+}
+
+.dark-link a:active,
+.dark-link a:hover {
+	color: #ff0000;
 }
 
 .arrow,

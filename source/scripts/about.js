@@ -6,8 +6,8 @@
  * Dummy data since enyo.fetchAppInfo() doesn't exist in 2.0
  */
 var appInfo = {
-	"title": "Checkbook HD Beta",
-	"id": "com.glitchtechscience.enyo.checkbookbeta",
+	"title": "Checkbook HD",
+	"id": "com.glitchtechscience.enyo.checkbook",
 	"version": "1.1.0",
 
 	"vendor": "GlitchTech Science",
@@ -32,164 +32,133 @@ var appInfo = {
 enyo.kind({
 
 	name: "Checkbook.about",
-	kind: enyo.Popup,
+	kind: "onyx.Popup",
 
-	layoutKind: enyo.VFlexLayout,
+	centered: true,
+	floating: true,
 
-	modal: true,
 	scrim: true,
+	scrimclasses: "onyx-scrim-translucent",
 
 	events: {
-		onClose: ""
+		onFinish: ""
 	},
 
 	components: [
 		{
-			kind: enyo.HFlexBox,
+			kind: "enyo.FittableColumns",
+			noStretch: true,
 
-			align: "center",
-			pack: "left",
-			className: "big",
+			classes: "text-middle margin-half-bottom",
 
 			components: [
 				{
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: appInfo['icon']
 				}, {
-					kind: enyo.HtmlContent,
 					content: appInfo['title'] + " v" + appInfo['version'],
-					style: "padding-left: 10px",
-					flex: 1
+
+					allowHtml: true,
+					fit: true,
+
+					classes: "padding-left biggest"
 				}, {
-					kind: enyo.ToolButton,
-					icon: "assets/menu_icons/close.png",
-					style: "top: -25px; right: -10px; position: relative;",
-					ontap: "doClose"
+					kind: "onyx.Button",
+
+					content: "X",
+					ontap: "hide",
+
+					classes: "onyx-blue small-padding"
 				}
 			]
 		},
 
 		{
-			kind: enyo.HFlexBox,
+			kind: "enyo.FittableColumns",
+			noStretch: true,
 
-			align: "center",
-			pack: "left",
-			style: "margin-bottom: 10px;",
+			classes: "text-middle margin-half-top margin-half-bottom",
 
 			components: [
 				{
-					className: "small",
 					content: "Thank you for using " + appInfo['title'] + " powered by"
 				}, {
-					kind: enyo.Image,
-					src: "assets/enyo-logo.png",
-					style: "background-color: black; border-radius: 5px; margin: 5px 0px 0px 5px; padding: 1px;"
+					kind: "enyo.Image",
+					src: "assets/enyo-logo.png"
 				}
 			]
 		},
 
 		{
-			kind: enyo.HFlexBox,
+			kind: "enyo.FittableColumns",
+			noStretch: true,
 
-			align: "center",
-			pack: "left",
-			className: "small",
+			classes: "text-middle margin-half-top",
 
 			components: [
 				{
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: "assets/application-web.png",
 				}, {
-					kind: enyo.HtmlContent,
-					onLinkClick: "linkClicked",
-
 					content: "<a href='http://forums.precentral.net/glitchtech-science/'>Discussion Forums</a>",
-
-					style: "padding-left: 10px",
-					flex: 1
+					classes: "padding-left dark-link",
+					allowHtml: true
 				}
 			]
 		}, {
-			kind: enyo.HFlexBox,
+			kind: "enyo.FittableColumns",
+			noStretch: true,
 
-			align: "center",
-			pack: "left",
-			className: "small",
+			classes: "text-middle margin-half-top",
 
 			components: [
 				{
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: "assets/application-web.png",
 				}, {
-					kind: enyo.HtmlContent,
-					onLinkClick: "linkClicked",
-
 					content: "<a href='" + appInfo['vendorurl'] + "'>" + appInfo['vendor'] + " Website</a>",
-
-					style: "padding-left: 10px",
-					flex: 1
+					classes: "padding-left dark-link",
+					allowHtml: true
 				}
 			]
 		}, {
-			kind: enyo.HFlexBox,
+			kind: "enyo.FittableColumns",
+			noStretch: true,
 
-			align: "center",
-			pack: "left",
-			className: "small",
+			classes: "text-middle margin-half-top",
 
 			components: [
 				{
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: "assets/twitter-icon.png",
 				}, {
-					kind: enyo.HtmlContent,
-					onLinkClick: "linkClicked",
-
 					content: "<a href='http://twitter.com/#!/glitchtech'>" + appInfo['vendor'] + " Twitter</a>",
-
-					style: "padding-left: 10px",
-					flex: 1
+					classes: "padding-left dark-link",
+					allowHtml: true
 				}
 			]
 		}, {
-			kind: enyo.HFlexBox,
+			kind: "enyo.FittableColumns",
+			noStretch: true,
 
-			align: "center",
-			pack: "left",
-			className: "small",
+			classes: "text-middle margin-half-top",
 
 			components: [
 				{
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: "assets/application-email.png",
 				}, {
-					kind: enyo.HtmlContent,
-					onLinkClick: "linkClicked",
-
 					content: "<a href='mailto:" + appInfo['vendoremail'] + "?subject=" + appInfo['title'] + " Support'>Send Email</a>",
-
-					style: "padding-left: 10px",
-					flex: 1
+					classes: "padding-left dark-link",
+					allowHtml: true
 				}
 			]
 		},
 
 		{
 			content: appInfo['copyright'],
-			className: "smaller",
-			style: "margin-top: 10px;"
-		},
-
-		{
-			name: "linkService",
-			kind: "PalmService",
-			service: "palm://com.palm.applicationManager/",
-			method: "open"
+			allowHtml: true,
+			classes: "smaller margin-top"
 		}
-	],
-
-	linkClicked: function( inSender, inUrl, inEvent ) {
-
-		this.$['linkService'].call( { target: inUrl } );
-	}
+	]
 });

@@ -770,6 +770,8 @@ enyo.kind( {
 		this.$['loadingSpinner'].hide();
 
 		this.$['accountName'].focus();
+
+		this.waterfall( "onresize", "onresize", this );
 	},
 
 	/**

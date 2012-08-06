@@ -10,6 +10,8 @@ enyo.kind({
 	scrim: true,
 	scrimclasses: "onyx-scrim-translucent",
 
+	autoDismiss: false,
+
 	published: {
 		firstRun: false
 	},
