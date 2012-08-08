@@ -1,15 +1,41 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
+/**
+ * @name Checkbook.accounts.modify
+ * @author Matthew Schott <glitchtechscience@gmail.com>
+ *
+ * @class
+ * @version 2.0 (2012/08/08)
+ */
 enyo.kind( {
 	name: "Checkbook.accounts.modify",
 	kind: "FittableRows",
 	classes: "enyo-fit",
 
 	published: {
+		/** @lends Checkbook.accounts.modify# */
+
+		/**
+		 * account id; -1 to create new
+		 * @type integer
+		 * @default -1
+		 */
 		acctId: -1
 	},
 
+	/**
+	 * @public
+	 * Events sent by control
+	 */
 	events: {
+		/** @lends Checkbook.accounts.modify# */
+
+		/**
+		 * Modification complete
+		 * @event
+		 * @param {Object} inSender	Event's sender
+		 * @param {Object} inEvent	Event parameters
+		 */
 		onFinish: ""
 	},
 
@@ -17,6 +43,11 @@ enyo.kind( {
 	sorting: [],
 	pinChanged: false,
 
+	/**
+	 * @private
+	 * @type Array
+	 * Components of the control
+	 */
 	components: [
 		{
 			kind: "enyo.Scroller",
@@ -393,24 +424,17 @@ enyo.kind( {
 		},
 
 		{
-			name: "appMenu",
-			kind: enyo.AppMenu,
-			scrim: true,
-			components: [
-				{
-					//kind: "EditMenu"
-				}
-			]
-		},
-
-		{
 			name: "acctCategoryManager",
 			kind: "Checkbook.accountCategory.manager"
 		}
 	],
 
 	/**
-	 * TODO DEFINITION
+	 * @protected
+	 * @function
+	 * @name Checkbook.accounts.modify#rendered
+	 *
+	 * Called by Enyo when UI is rendered.
 	 */
 	rendered: function() {
 
@@ -424,7 +448,11 @@ enyo.kind( {
 	},
 
 	/**
-	 * TODO DEFINITION
+	 * @protected
+	 * @function
+	 * @name Checkbook.accounts.modify#buildAccountCategories
+	 *
+	 * @param {Object} results	SQL results of account categories
 	 */
 	buildAccountCategories: function( results ) {
 
@@ -812,7 +840,7 @@ enyo.kind( {
 			};
 
 		var options = {
-				"onSuccess": enyo.bind( this, this.tryFinish )
+				"onSuccess": enyo.bind( this, this.saveFinished )
 			};
 
 		if( this.acctId < 0 ) {
@@ -824,7 +852,7 @@ enyo.kind( {
 		}
 	},
 
-	tryFinish: function( status ) {
+	saveFinished: function( status ) {
 
 		this.doFinish( { "action": 1, "actionStatus": status } );
 	},
@@ -841,20 +869,21 @@ enyo.kind( {
 
 			this.createComponent( {
 					name: "deleteAccountConfirm",
-					kind: "GTS.deleteConfirm",
+					kind: "gts.ConfirmDialog",
 
-					owner: this,
+					title: "Delete Account",
+					message: "Are you sure you want to delete this account?",
 
-					confirmTitle: "Delete Account",
-					confirmMessage: "Are you sure you want to delete this account?",
-					confirmButtonYes: "Delete",
-					confirmButtonNo: "Cancel",
+					confirmText: "Delete",
+					confirmClass: "onyx-negative",
 
-					onYes: "deleteAccountHandler",
-					onNo: "deleteAccountConfirmClose"
+					cancelText: "Cancel",
+					cancelClass: "",
+
+					onConfirm: "deleteAccountHandler",
+					onCancel: "deleteAccountConfirmClose"
 				});
 
-			this.$['deleteAccountConfirm'].render();
 			this.$['deleteAccountConfirm'].show();
 		}
 	},
@@ -872,11 +901,21 @@ enyo.kind( {
 	 */
 	deleteAccountHandler: function() {
 
+		this.deleteAccountConfirmClose();
+
 		Checkbook.globals.accountManager.deleteAccount(
 				this.acctId,
 				{
-					"onSuccess": enyo.bind( this, this.doFinish, 2 )
+					"onSuccess": enyo.bind( this, this.deleteFinished )
 				}
 			);
+	},
+
+	/**
+	 * TODO DEFINITION
+	 */
+	deleteFinished: function( status ) {
+
+		this.doFinish( { "action": 2, "actionStatus": status } );
 	}
 });

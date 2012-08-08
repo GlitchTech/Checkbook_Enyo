@@ -115,38 +115,36 @@ enyo.kind({
 								}
 							]
 						}, {
-							content: "Enter your Google Spreadsheets credentials to import your financial data from <a href='http://docs.google.com/'>Google Documents</a> to your device.",
+							content: "Enter your Google Spreadsheets credentials to import your financial data from <a href='http://docs.google.com/' target='_blank'>Google Documents</a> to your device.",
 							allowHtml: true,
-							classes: "smallest",
-							style: "padding: 0.5em 0.5em 0 0.5em;"
+							classes: "smallest padding-std"
 						}, {
-							layoutKind: enyo.HFlexLayout,
+							layoutKind: "enyo.FittableColumnsLayout",
+							noStretch: true,
 
-							align: "center",
-							pack: "center",
-							style: "padding: 0.5em 0.5em 0.5em 0.5em;",
+							classes: "padding-std text-middle",
 
 							components: [
 								{
 									name: "saveCredentials",
-									kind: enyo.CheckBox,
+									kind: "onyx.Checkbox",
 									checked: true,
 
-									style: "margin-right: 10px;"
+									classes: "margin-right"
 								}, {
 									content: "Save credentials",
-									flex: 1
+									fit: true
 								}, {
 									name: "showPass",
-									kind: enyo.ToggleButton,
+									kind: "onyx.ToggleButton",
 
-									state: false,
-									onLabel: "Show password",
-									offLabel: "Mask password",
+									value: false,
+									onContent: "Show password",
+									offContent: "Mask password",
 
-									onChange: 'togglePasswordVis',
+									onChange: "togglePasswordVis",
 
-									style: "margin-left: 10px;"
+									classes: "margin-left"
 								}
 							]
 						}
@@ -297,9 +295,6 @@ enyo.kind({
 		},
 
 		{
-			name: "gDataControls",
-			kind: GTS.gdata
-		}, {
 			name: "cryptoSystem",
 			kind: "Checkbook.encryption"
 		}
@@ -308,10 +303,6 @@ enyo.kind({
 	rendered: function() {
 
 		this.inherited( arguments );
-
-		this.log();
-
-		return;
 
 		this.$['instructionsButton'].setDisabled( false );
 		this.$['instructionsBar'].show();
@@ -387,33 +378,9 @@ enyo.kind({
 		this.refreshLayout();
 	},
 
-	togglePasswordVis: function( inSender, state ) {
+	togglePasswordVis: function( inSender, inEvent ) {
 
-		var pass = this.$['gPass'].getValue();
-
-		this.$['gPass'].destroy();
-
-		this.$['gPassWrapper'].createComponent(
-				{
-					name: "gPass",
-					kind: ( state ? enyo.Input : enyo.PasswordInput ),
-					hint: "Account Password",
-
-					components: [
-						{
-							content: "Password",
-							classes: "small",
-							style: "color: rgb( 32, 117, 191 );"
-						}
-					]
-				}, {
-					owner: this
-				}
-			);
-
-		this.$['gPassWrapper'].render();
-
-		this.$['gPass'].setValue( pass );
+		this.$['gPass'].setType( inEvent.value ? "text" : "password" );
 	},
 
 	authenticateWithGoogle: function() {

@@ -12,8 +12,8 @@ enyo.kind({
 			showing: false,
 			components: [
 				{
-					kind: "onyx.Toolbar",
 					name: "menubar",
+					kind: "onyx.Toolbar",
 					classes: "padding-none",
 					components: [
 						{
@@ -155,21 +155,18 @@ enyo.kind({
 		if( enyo.platform.android ) {
 
 			touchEvent.preventDefault();
-		} else {
 
-			//show menu bar
+			//Use Android bindings
+			this.$['menubar'].hide();
+
+			//Android bindings (phonegap)
+			document.addEventListener( "backbutton", enyo.bind( this, this.backHandler ), false );
+			document.addEventListener( "menubutton", enyo.bind( this, this.menuHandler ), false );
+			//document.addEventListener("searchbutton", enyo.bind( this, this.searchHandler ), false);
 		}
 
-		try {
-			//Phonegap
-
-			BackButton.override();
-		} catch( err ) {}
-
-		//App-wide events to handle
+		//App-wide events to handle (for testing only)
 		document.addEventListener( "keydown", enyo.bind( this, this.keyboardHandler ) );
-		document.addEventListener( "menuKeyDown", enyo.bind( this, this.menuHandler ) );
-		document.addEventListener( "backKeyDown", enyo.bind( this, this.backHandler ) );
 	},
 
 	/** Application Events **/
@@ -189,7 +186,7 @@ enyo.kind({
 
 	menuHandler: function( inEvent ) {
 
-		this.log();
+		this.log( "NYI" );
 
 		inEvent.stopPropagation();
 		return true;
@@ -197,7 +194,15 @@ enyo.kind({
 
 	backHandler: function( inEvent ) {
 
-		this.log();
+		this.log( "NYI" );
+
+		inEvent.stopPropagation();
+		return true;
+	},
+
+	searchHandler: function( inEvent ) {
+
+		this.log( "NYI" );
 
 		inEvent.stopPropagation();
 		return true;
