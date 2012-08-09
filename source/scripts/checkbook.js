@@ -20,6 +20,7 @@ enyo.kind({
 							kind: "onyx.MenuDecorator",
 							components: [
 								{
+									name: "appMenuButton",
 									kind: "onyx.Button",
 									components: [
 										{
@@ -131,12 +132,13 @@ enyo.kind({
 
 		{
 			kind: "Signals",
-			onBack: "goBack",
 
 			modifyAccount: "showPanePopup",
 			modifyTransaction: "showPanePopup",
 			showBudget: "openBudget",
-			showSearch: "openSearch"
+			showSearch: "openSearch",
+
+			onkeydown: "keyboardHandler"//for testing only
 		}
 	],
 
@@ -156,22 +158,33 @@ enyo.kind({
 
 			touchEvent.preventDefault();
 
-			//Use Android bindings
-			this.$['menubar'].hide();
-
 			//Android bindings (phonegap)
 			document.addEventListener( "backbutton", enyo.bind( this, this.backHandler ), false );
 			document.addEventListener( "menubutton", enyo.bind( this, this.menuHandler ), false );
-			document.addEventListener("searchbutton", enyo.bind( this, this.searchHandler ), false);
+			document.addEventListener( "searchbutton", enyo.bind( this, this.searchHandler ), false);
 		}
+	},
 
-		//App-wide events to handle (for testing only)
-		document.addEventListener( "keydown", enyo.bind( this, this.keyboardHandler ) );
+	/**
+	 * @protected
+	 * Builds UI
+	 */
+	rendered: function() {
+
+		this.inherited( arguments );
+
+		this.$['splash'].show();
+
+		if( enyo.platform.android ) {
+
+			//Use Android bindings instead of UI buttons
+			this.$['menubar'].hide();
+		}
 	},
 
 	/** Application Events **/
 
-	keyboardHandler: function( inEvent ) {
+	keyboardHandler: function( inSender, inEvent ) {
 
 		if( inEvent.which === 18 ) {
 			//alt key
@@ -186,7 +199,11 @@ enyo.kind({
 
 	menuHandler: function( inEvent ) {
 
-		this.log( "NYI" );
+		if( this.paneStack.length === 0 ) {
+			//Menu is only available on Accounts or Transaction list screens.
+
+			this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+		}
 
 		inEvent.stopPropagation();
 		return true;
@@ -194,10 +211,46 @@ enyo.kind({
 
 	backHandler: function( inEvent ) {
 
-		this.log( "NYI" );
+		if( this.paneStack.length > 0 ) {
+
+			//this.hidePanePopup(  );
+			this.$[this.paneStack[this.paneStack.length - 1]].doFinish();
+		//} else if( showing only transaction window ) {
+
+			//reveal account window
+		} else {
+
+			this.createComponent( {
+					name: "exitConfirmation",
+					kind: "gts.ConfirmDialog",
+
+					title: "Exit Checkbook",
+					message: "Are you sure you want to close Checkbook?",
+
+					confirmText: "Yes",
+					cancelText: "No",
+
+					onConfirm: "exitConfirmationHandler",
+					onCancel: "exitConfirmationClose"
+				});
+
+			this.$['exitConfirmation'].show();
+		}
 
 		inEvent.stopPropagation();
 		return true;
+	},
+
+	exitConfirmationClose: function() {
+
+		this.$['exitConfirmation'].destroy();
+	},
+
+	exitConfirmationHandler: function() {
+
+		this.exitConfirmationClose();
+
+		this.log( "EXIT" );
 	},
 
 	searchHandler: function( inEvent ) {
@@ -209,16 +262,6 @@ enyo.kind({
 	},
 
 	/** Splash Controls **/
-
-	rendered: function() {
-
-		this.inherited( arguments );
-
-		this.$['splash'].show();
-
-		//Load splash popup. Verifies database.
-		//this.$['appMenu'].setAutomatic( false );
-	},
 
 	splashFinisher: function() {
 
@@ -262,8 +305,6 @@ enyo.kind({
 		this.$['container'].show();
 
 		this.waterfall( "onresize", "onresize", this );
-
-		//this.$['appMenu'].setAutomatic( true );
 
 		Checkbook.globals.criticalError = this.$['criticalError'];
 		Checkbook.globals.accountManager = new Checkbook.accounts.manager();
@@ -336,22 +377,15 @@ enyo.kind({
 
 	showPopup: function( inSender ) {
 
-		this.log( inSender.popup );
-
-		//LoD? Does Lazy cut it?
-
 		var popup = this.$[inSender.popup];
 
 		if( popup ) {
 
-			//this.$['appMenu'].setAutomatic( false );
 			popup.show();
 		}
 	},
 
 	closePopup: function( inSender ) {
-
-		this.log( arguments );
 
 		inSender.hide();
 	},
@@ -378,7 +412,6 @@ enyo.kind({
 		this.createComponent( paneArgs );
 
 		//Display new pane
-		//this.$['appMenu'].setAutomatic( false );
 		this.$[paneArgs['name']].render();
 		this.$['container'].hide();
 		this.$[paneArgs['name']].show();
@@ -413,7 +446,6 @@ enyo.kind({
 		} else {
 
 			//show base view
-			//this.$['appMenu'].setAutomatic( true );
 			this.$['container'].show();
 		}
 	},
@@ -444,8 +476,6 @@ enyo.kind({
 	},
 
 	importComplete: function( inSender, importStatus ) {
-
-		//this.$['appMenu'].setAutomatic( true );
 
 		if( importStatus === true ) {
 
