@@ -162,7 +162,7 @@ enyo.kind({
 			//Android bindings (phonegap)
 			document.addEventListener( "backbutton", enyo.bind( this, this.backHandler ), false );
 			document.addEventListener( "menubutton", enyo.bind( this, this.menuHandler ), false );
-			//document.addEventListener("searchbutton", enyo.bind( this, this.searchHandler ), false);
+			document.addEventListener("searchbutton", enyo.bind( this, this.searchHandler ), false);
 		}
 
 		//App-wide events to handle (for testing only)

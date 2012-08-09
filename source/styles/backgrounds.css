@@ -25,65 +25,59 @@
 }
 
 .deep-green {
-	background-color: #284907 !important;
-	color: #f1f1f1 !important;
+	background-color: #284907;
+	color: #f1f1f1;
 }
 
 .deep-green-gradient {
 	/* Horizontal, Center based */
 	/* .deep-green to .default to .deep-green */
-	background-image: -webkit-gradient(
-			linear,
-			left top,
-			right top,
-			from( #284907 ),
-			color-stop( 0.1, #284907 ),
-			color-stop( 0.4, #f1f1f1 ),
-			color-stop( 0.6, #f1f1f1 ),
-			color-stop( 0.9, #284907 ),
-			to( #284907 )
-		);
+
+	background: #284907; /* Old browsers */
+	background: -moz-linear-gradient( left, #284907 0%, #284907 10%, #f1f1f1 40%, #f1f1f1 60%, #284907 90%, #284907 100% ); /* FF3.6+ */
+	background: -webkit-gradient( linear, left top, right top, color-stop( 0%, #284907 ), color-stop( 10%, #284907 ), color-stop( 40%, #f1f1f1 ), color-stop( 60%, #f1f1f1 ), color-stop( 90%, #284907 ), color-stop( 100%, #284907 ) ); /* Chrome, Safari4+ */
+	background: -webkit-linear-gradient( left, #284907 0%, #284907 10%, #f1f1f1 40%, #f1f1f1 60%, #284907 90%, #284907 100% ); /* Chrome10+, Safari5.1+ */
+	background: -o-linear-gradient( left, #284907 0%, #284907 10%, #f1f1f1 40%, #f1f1f1 60%, #284907 90%, #284907 100% ); /* Opera 11.10+ */
+	background: -ms-linear-gradient( left, #284907 0%, #284907 10%, #f1f1f1 40%, #f1f1f1 60%, #284907 90%, #284907 100% ); /* IE10+ */
+	background: linear-gradient( to right, #284907 0%, #284907 10%, #f1f1f1 40%, #f1f1f1 60%, #284907 90%, #284907 100% ); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#284907', endColorstr='#284907', GradientType=1 ); /* IE6-9 */
 }
 
 .rich-brown {
-	background-color: #382513 !important;
+	background-color: #382513;
 }
 
 .rich-brown-gradient {
 	/* Horizontal, Center based */
-	/* .rich-brown to .default to .deep-green */
-	background-image: -webkit-gradient(
-			linear,
-			left top,
-			right top,
-			from( #382513 ),
-			color-stop( 0.1, #382513 ),
-			color-stop( 0.4, #f1f1f1 ),
-			color-stop( 0.6, #f1f1f1 ),
-			color-stop( 0.9, #382513 ),
-			to( #382513 )
-		);
+	/* .rich-brown to .default to .rich-brown */
+
+	background: #382513; /* Old browsers */
+	background: -moz-linear-gradient( left, #382513 0%, #382513 10%, #f1f1f1 40%, #f1f1f1 60%, #382513 90%, #382513 100% ); /* FF3.6+ */
+	background: -webkit-gradient( linear, left top, right top, color-stop( 0%, #382513 ), color-stop( 10%, #382513 ), color-stop( 40%, #f1f1f1 ), color-stop( 60%, #f1f1f1 ), color-stop( 90%, #382513 ), color-stop( 100%, #382513 ) ); /* Chrome, Safari4+ */
+	background: -webkit-linear-gradient( left, #382513 0%, #382513 10%, #f1f1f1 40%, #f1f1f1 60%, #382513 90%, #382513 100% ); /* Chrome10+, Safari5.1+ */
+	background: -o-linear-gradient( left, #382513 0%, #382513 10%, #f1f1f1 40%, #f1f1f1 60%, #382513 90%, #382513 100% ); /* Opera 11.10+ */
+	background: -ms-linear-gradient( left, #382513 0%, #382513 10%, #f1f1f1 40%, #f1f1f1 60%, #382513 90%, #382513 100% ); /* IE10+ */
+	background: linear-gradient( to right, #382513 0%, #382513 10%, #f1f1f1 40%, #f1f1f1 60%, #382513 90%, #382513 100% ); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#382513', endColorstr='#382513', GradientType=1 ); /* IE6-9 */
 }
 
 .tardis-blue {
-	background-color: #272d70 !important;
-	color: #f1f1f1 !important;
+	background-color: #272d70;
+	color: #f1f1f1;
 }
 
 .tardis-blue-gradient {
 	/* Horizontal, Center based */
-	/* .rich-brown to .default to .deep-green */
-	background-image: -webkit-gradient(
-			linear,
-			left top,
-			right top,
-			from( #272D70 ),
-			color-stop( 0.1, #272D70 ),
-			color-stop( 0.4, #f1f1f1 ),
-			color-stop( 0.6, #f1f1f1 ),
-			color-stop( 0.9, #272D70 ),
-			to( #272D70 )
-		);
+	/* .tardis-blue to .default to .tardis-blue */
+
+	background: #272d70; /* Old browsers */
+	background: -moz-linear-gradient( left, #272d70 0%, #272d70 10%, #f1f1f1 40%, #f1f1f1 60%, #272d70 90%, #272d70 100% ); /* FF3.6+ */
+	background: -webkit-gradient( linear, left top, right top, color-stop( 0%, #272d70 ), color-stop( 10%, #272d70 ), color-stop( 40%, #f1f1f1 ), color-stop( 60%, #f1f1f1 ), color-stop( 90%, #272d70 ), color-stop( 100%, #272d70 ) ); /* Chrome, Safari4+ */
+	background: -webkit-linear-gradient( left, #272d70 0%, #272d70 10%, #f1f1f1 40%, #f1f1f1 60%, #272d70 90%, #272d70 100% ); /* Chrome10+, Safari5.1+ */
+	background: -o-linear-gradient( left, #272d70 0%, #272d70 10%, #f1f1f1 40%, #f1f1f1 60%, #272d70 90%, #272d70 100% ); /* Opera 11.10+ */
+	background: -ms-linear-gradient( left, #272d70 0%, #272d70 10%, #f1f1f1 40%, #f1f1f1 60%, #272d70 90%, #272d70 100% ); /* IE10+ */
+	background: linear-gradient( to right, #272d70 0%, #272d70 10%, #f1f1f1 40%, #f1f1f1 60%, #272d70 90%, #272d70 100% ); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#272d70', endColorstr='#272d70', GradientType=1 ); /* IE6-9 */
 }
 
 /* Checkbook Stamp Background */
