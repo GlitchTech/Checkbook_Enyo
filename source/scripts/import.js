@@ -1,4 +1,4 @@
-/* Copyright © 2011-2012, GlitchTech Science */
+/* Copyright Â© 2011-2012, GlitchTech Science */
 
 enyo.kind({
 	name: "Checkbook.import",
@@ -295,6 +295,13 @@ enyo.kind({
 		},
 
 		{
+			name: "gapi",
+			kind: "GTS.Gapi",
+			apiKey: "AIzaSyABIXMbumcYij_9qb92qjbLVRAzieLR650",
+			onReady: "testError"
+		},
+
+		{
 			name: "cryptoSystem",
 			kind: "Checkbook.encryption"
 		}
@@ -345,6 +352,24 @@ enyo.kind({
 							( results[0]['saveGSheetsData'] === 1 )
 						)
 				);
+		}
+	},
+
+	test: function() {
+
+		this.log( arguments );
+	},
+
+	testError: function() {
+
+		if( !this.$['gapi'].isGapiReady() ) {
+
+			var async = new enyo.Async()
+				.go()
+				.response( this, this.testError );
+		} else {
+
+			this.$['gapi'].loadModule( "plus", 1, { "onSuccess": enyo.bind( this, this.test ), "onError": enyo.bind( this, this.testError ) } );
 		}
 	},
 
