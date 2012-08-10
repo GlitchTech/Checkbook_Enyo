@@ -6,7 +6,7 @@
  * Dummy data since enyo.fetchAppInfo() doesn't exist in 2.0
  */
 var appInfo = {
-	"title": "Checkbook HD",
+	"title": "Checkbook",
 	"id": "com.glitchtechscience.enyo.checkbook",
 	"version": "1.1.0",
 
@@ -18,7 +18,6 @@ var appInfo = {
 
 	"keywords": [
 		"Checkbook",
-		"Checkbook HD",
 		"finance",
 		"budget",
 		"money",

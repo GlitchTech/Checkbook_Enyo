@@ -2,10 +2,10 @@
 
 enyo.kind({
 	name: "Checkbook.preferences",
-	kind: enyo.VFlexBox,
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
 	style: "height: 100%;",
-	flex: 1,
 
 	events: {
 		onFinish: "",
@@ -16,82 +16,72 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.PageHeader,
+			kind: "onyx.Toolbar",
+			classes: "text-center text-middle",
 			components: [
 				{
-					kind: enyo.Spacer
-				}, {
-					kind: enyo.Image,
+					kind: "enyo.Image",
 					src: "assets/dollar_sign_1.png",
-					className: "img-icon",
-					style: "margin-right: 0.25em;"
+					classes: "img-icon margin-half-right"
 				}, {
 					content: "Preferences & Accounts",
-					className: "bigger",
-					style: "margin-top: -6px;"
-				}, {
-					kind: enyo.Spacer
+					classes: "bigger"
 				}
 			]
 		},
 
 		{
-			kind: enyo.Scroller,
-
-			autoHorizontal: false,
-			horizontal: false,
-
-			flex: 1,
-
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			//classes: "tardis-blue-gradient",
+			fit: true,
 			components: [
 				{
-					layoutKind: enyo.VFlexLayout,
-					className: "light narrow-column",
-					flex: 1,
-
+					classes: "light narrow-column",
+					style: "min-height: 100%;",
 					components: [
 						{
-							kind: enyo.Group,
-							caption: "Program Security",
+							kind: "onyx.Groupbox",
 							components: [
 								{
+									kind: "onyx.GroupboxHeader",
+									content: "Program Security"
+								}, {
 									name: "pinLock",
 									kind: "GTS.ToggleBar",
 
-									mainText: "PIN Lock",
+									label: "PIN Lock",
 
-									onText: "Yes",
-									offText: "No",
+									onContent: "Yes",
+									offContent: "No",
 
 									onChange: "togglePINStatus"
 								}, {
 									name: "pinLockDrawer",
-									kind: enyo.BasicDrawer,
+									kind: "onyx.Drawer",
 									open: false,
-
 									components: [
 										{
-											kind: enyo.Item,
-											layoutKind: enyo.HFlexLayout,
-
-											align: "center",
-											tapHightlight: true,
+											kind: "onyx.Groupbox",
+											classes: "padding-half-top",
+											ontap: "changeAppPin",
 											components: [
 												{
-													name: "pinCode",
-													kind: enyo.PasswordInput,
-
-													flex: 1,
-
-													hint: "Tap to set...",
-
-													onmousedown: "changeAppPin",
-													onmouseup: "changeAppPin",
-
+													kind: "onyx.InputDecorator",
+													layoutKind: "FittableColumnsLayout",
 													components: [
 														{
+															name: "pinCode",
+															kind: "onyx.Input",
+															type: "password",
+
+															placeholder: "Tap to set...",
+
+															disabled: true,
+															fit: true
+														}, {
 															content: "Code",
-															className: "enyo-label"
+															classes: "label"
 														}
 													]
 												}
@@ -101,51 +91,54 @@ enyo.kind({
 								}
 							]
 						}, {
-							kind: enyo.RowGroup,
-							caption: "General Options",
+							kind: "onyx.Groupbox",
+							classes: "margin-top",
 							components: [
 								{
+									kind: "onyx.GroupboxHeader",
+									content: "General Options"
+								}, {
 									name: "transPreview",
 									kind: "GTS.ToggleBar",
 
-									mainText: "Transaction Preview",
-									subText: "Show preview of a tapped transaction.",
+									label: "Transaction Preview",
+									sublabel: "Show preview of a tapped transaction.",
 
-									onText: "Yes",
-									offText: "No",
+									onContent: "Yes",
+									offContent: "No",
 
 									onChange: "updateTransPreview"
 								}, {
 									name: "updateNotice",
 									kind: "GTS.ToggleBar",
 
-									mainText: "System Notifications",
-									subText: "Recieve in-app notices of updates and other important news.",
+									label: "System Notifications",
+									sublabel: "Recieve in-app notices of updates and other important news.",
 
-									onText: "Yes",
-									offText: "No",
+									onContent: "Yes",
+									offContent: "No",
 
 									onChange: "updateUpdateNotice"
 								}, {
 									name: "errorReporting",
 									kind: "GTS.ToggleBar",
 
-									mainText: "Error Reporting",
-									subText: "Report errors to GlitchTech Science",
+									label: "Error Reporting",
+									sublabel: "Report errors to GlitchTech Science",
 
-									onText: "Yes",
-									offText: "No",
+									onContent: "Yes",
+									offContent: "No",
 
 									onChange: "updateErrorReporting"
 								}, {
 									name: "dispColor",
 									kind: "GTS.ToggleBar",
 
-									mainText: "Account Colors",
-									subText: "Add color in some areas based on account categories.",
+									label: "Account Colors",
+									sublabel: "Add color in some areas based on account categories.",
 
-									onText: "Yes",
-									offText: "No",
+									onContent: "Yes",
+									offContent: "No",
 
 									onChange: "updateDispColor"
 								}, {
@@ -154,71 +147,121 @@ enyo.kind({
 								}
 							]
 						}, {
-							kind: enyo.RowGroup,
-							caption: "Accounts",
+							kind: "onyx.Groupbox",
+							classes: "margin-top",
 							components: [
 								{
-									name: "entries",
-									kind: "Checkbook.accounts.list",
-
-									style: "height: 300px;",
-									className: "checkbook-stamp",
-
-									balanceView: 4,
-
-									editMode: true,
-
-									onSetupRow: "setupRow",
-
-									onModify: "doModify",
-									onChanged: "doChanged",
-									onDelete: "doDelete"
+									kind: "onyx.GroupboxHeader",
+									content: "Accounts"
 								}, {
-									name: "defaultAccount",
-									kind: "GTS.ListSelectorBar",
-									className: "force-left-padding",
+									kind: "onyx.Item",
+									classes: "padding-none",
+									components: [
+										{
+											name: "entries",
+											kind: "Checkbook.accounts.list",
+											fit: true,
 
-									disabled: true,
+											balanceView: 4,
 
-									labelText: "Default Account",
-									onChange: "updateDefaultAccount",
+											editMode: true,
 
-									value: 0,
-									choices: []
+											style: "height: 300px;",
+											classes: "checkbook-stamp",
+											onSetupRow: "setupRow",
+
+											onModify: "doModify",
+											onChanged: "doChanged",
+											onDelete: "doDelete"
+										}
+									]
 								}, {
-									name: "addAccountButton",
-									kind: "onyx.Button",
-									toggling: true,
+									kind: "onyx.Item",
+									components: [
+										{
+											name: "defaultAccount",
+											kind: GTS.ListSelectorBar,
 
-									content: "Add Account",
-									ontap: "addAccount"
+											disabled: true,
+
+											labelText: "Default Account",
+											onChange: "updateDefaultAccount",
+
+											value: 0,
+											choices: []
+										}
+									]
+								}, {
+									kind: "onyx.Item",
+									components: [
+										{
+											name: "addAccountButton",
+											kind: "onyx.Button",
+											toggling: true,
+
+											content: "Add Account",
+											classes: "full-width",
+
+											ontap: "addAccount"
+										}
+									]
 								}
 							]
 						}, {
-							kind: enyo.RowGroup,
-							caption: "Add/Edit Categories",
+							kind: "onyx.Groupbox",
+							classes: "margin-top",
 							components: [
 								{
-									name: "editAccountCategories",
-									kind: "onyx.Button",
-									toggling: true,
-
-									content: "Edit Account Categories",
-									ontap: "modifyAccountCategories"
+									kind: "onyx.GroupboxHeader",
+									content: "Categories & Suggestions"
 								}, {
-									name: "editTransactionCategories",
-									kind: "onyx.Button",
-									toggling: true,
+									kind: "onyx.Item",
+									components: [
+										{
+											name: "editAccountCategories",
+											kind: "onyx.Button",
+											toggling: true,
 
-									content: "Edit Transaction Categories",
-									ontap: "modifyTransactionCategories"
+											content: "Edit Account Categories",
+											classes: "full-width",
+
+											ontap: "modifyAccountCategories"
+										}
+									]
+								}, {
+									kind: "onyx.Item",
+									components: [
+										{
+											name: "editTransactionCategories",
+											kind: "onyx.Button",
+											toggling: true,
+
+											content: "Edit Transaction Categories",
+											classes: "full-width",
+
+											ontap: "modifyTransactionCategories"
+										}
+									]
+								}, {
+									kind: "onyx.Item",
+									components: [
+										{
+											name: "",
+											kind: "onyx.Button",
+											toggling: true,
+
+											content: "Auto-Complete Settings",
+											classes: "full-width",
+
+											ontap: ""
+										}
+									]
 								}
 							]
 						}, {
 							kind: "onyx.Button",
 							content: "Full Wipe",
-							className: "onyx-negative",
-							style: "margin-top: 1.5em;",
+							classes: "onyx-negative margin-top full-width",
 							ontap: "fullwipe"
 						}
 					]
@@ -226,24 +269,18 @@ enyo.kind({
 			]
 		},
 
+
 		{
-			kind: enyo.Toolbar,
-			className: "enyo-toolbar-light",
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 4
-				}, {
 					kind: "onyx.Button",
 
-					flex: 2,
-					className: "onyx-affirmative deep-green",
+					classes: "onyx-affirmative deep-green",
 
-					caption: "Done",
+					content: "Done",
 					ontap: "doFinish"
-				}, {
-					kind: enyo.Spacer,
-					flex: 4
 				}
 			]
 		},
@@ -257,6 +294,8 @@ enyo.kind({
 	rendered: function() {
 
 		this.inherited( arguments );
+
+		return;
 
 		this.$['pinLock'].setValue( Checkbook.globals.prefs['useCode'] === 1 );
 		this.$['pinCode'].setValue( Checkbook.globals.prefs['code'] );
@@ -386,7 +425,7 @@ enyo.kind({
 	buildDefaultAccountList: function( accounts ) {
 
 		accounts.unshift( {
-				caption: "No Default Account",
+				content: "No Default Account",
 				color: null,
 				icon: null,
 				value: -1

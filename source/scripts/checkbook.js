@@ -37,39 +37,32 @@ enyo.kind({
 									components: [
 										{
 											content: "Preferences & Accounts",
-											//ontap: "openPreferences"
-										}, {
-											showing: false,
-											content: "Auto-Complete Preferences",
-											//ontap: "openACPrefs"
+											ontap: "openPreferences"
 										}, {
 											classes: "onyx-menu-divider"
 										}, {
-											content: "Import Data",
-											ontap: "openImport"
+											content: "Import Data (NYI)",
+											//ontap: "openImport"
 										}, {
-											content: "Export Data",
+											content: "Export Data (NYI)",
 											//ontap: "openExport"
 										}, {
 											classes: "onyx-menu-divider"
 										}, {
-											content: "Search",
+											content: "Search (NYI)",
 											//ontap: "openSearch"
 										}, {
-											content: "Budget",
+											content: "Budget (NYI)",
 											//ontap: "openBudget"
 										}, {
-											showing: false,
-											content: "Reports",
+											content: "Reports (NYI)",
 											//ontap: "openReports"
 										}, {
 											classes: "onyx-menu-divider"
 										}, {
-											showing: false,
-											content: "Report Bug",
-											ontap: "errorReport"
+											content: "Report Bug (NYI)",
+											//ontap: "errorReport"
 										}, {
-											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
 											content: "About",
@@ -488,19 +481,6 @@ enyo.kind({
 					this.loadCheckbookStage2
 				);
 		}
-	},
-
-	/** Checkbook.autocompleteprefs.* **/
-
-	openACPrefs: function( inSender, inEvent ) {
-
-		this.showPanePopup(
-				null,
-				{
-					name: "autocompleteprefs",
-					kind: "Checkbook.autocompleteprefs.view"
-				}
-			);
 	},
 
 	/** Checkbook.budget.* **/

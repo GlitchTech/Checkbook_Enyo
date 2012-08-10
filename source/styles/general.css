@@ -192,6 +192,10 @@ html, body {
 	padding: 5px 5px 5px 10px;
 }
 
+.full-width {
+	min-width: 100%;
+}
+
 .invert {
 	/* http://css3please.com/ */
 
