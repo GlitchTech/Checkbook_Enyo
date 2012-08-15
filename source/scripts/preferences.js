@@ -180,11 +180,11 @@ enyo.kind({
 									components: [
 										{
 											name: "defaultAccount",
-											kind: GTS.ListSelectorBar,
+											kind: "GTS.SelectorBar",
 
 											disabled: true,
 
-											labelText: "Default Account",
+											label: "Default Account",
 											onChange: "updateDefaultAccount",
 
 											value: 0,
@@ -295,10 +295,9 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		return;
-
 		this.$['pinLock'].setValue( Checkbook.globals.prefs['useCode'] === 1 );
 		this.$['pinCode'].setValue( Checkbook.globals.prefs['code'] );
+		this.$['pinLockDrawer'].setOpen( this.$['pinLock'].getValue() );
 
 		this.$['transPreview'].setValue( Checkbook.globals.prefs['transPreview'] === 1 );
 		this.$['updateNotice'].setValue( Checkbook.globals.prefs['updateCheckNotification'] === 1 );
@@ -331,17 +330,17 @@ enyo.kind({
 				}
 			);
 
-		this.$['pinPopup'].openAtCenter();
+		this.$['pinPopup'].show();
 	},
 
-	changeAppPinHandler: function( inSender, newPin ) {
+	changeAppPinHandler: function( inSender, inEvent ) {
 
 		this.$['cryptoSystem'].encryptString(
-				newPin,
+				inEvent.value,
 				enyo.bind( this, this.cryptoPinHandler )
 			);
 
-		this.$['pinPopup'].close();
+		this.$['pinPopup'].hide();
 		this.$['pinPopup'].destroy();
 	},
 
@@ -372,27 +371,27 @@ enyo.kind({
 
 	/** General Controls **/
 
-	updateTransPreview: function( inSender, inValue ) {
+	updateTransPreview: function( inSender, inEvent ) {
 
-		Checkbook.globals.prefs['transPreview'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.prefs['transPreview'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "previewTransaction": Checkbook.globals.prefs['transPreview'] }, {} ) );
 	},
 
-	updateUpdateNotice: function( inSender, inValue ) {
+	updateUpdateNotice: function( inSender, inEvent ) {
 
-		Checkbook.globals.prefs['updateCheckNotification'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.prefs['updateCheckNotification'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "updateCheckNotification": Checkbook.globals.prefs['updateCheckNotification'] }, {} ) );
 	},
 
-	updateErrorReporting: function( inSender, inValue ) {
+	updateErrorReporting: function( inSender, inEvent ) {
 
-		Checkbook.globals.prefs['errorReporting'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.prefs['errorReporting'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "errorReporting": Checkbook.globals.prefs['errorReporting'] }, {} ) );
 	},
 
-	updateDispColor: function( inSender, inValue ) {
+	updateDispColor: function( inSender, inEvent ) {
 
-		Checkbook.globals.prefs['dispColor'] = ( inValue ? 1 : 0 );
+		Checkbook.globals.prefs['dispColor'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "dispColor": Checkbook.globals.prefs['dispColor'] }, {} ) );
 	},
 
@@ -432,10 +431,7 @@ enyo.kind({
 			});
 
 		this.$['defaultAccount'].setChoices( accounts );
-
 		this.$['defaultAccount'].setDisabled( false );
-		this.$['defaultAccount'].$['listName'].setDisabled( false );
-
 		this.$['defaultAccount'].render();
 
 		Checkbook.globals.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.setDefaultAccount ) } );
@@ -452,9 +448,9 @@ enyo.kind({
 		}
 	},
 
-	updateDefaultAccount: function( inSender, newVal, oldVal ) {
+	updateDefaultAccount: function( inSender, inEvent ) {
 
-		Checkbook.globals.accountManager.updateDefaultAccount( newVal );
+		Checkbook.globals.accountManager.updateDefaultAccount( this.$['defaultAccount'].getValue() );
 	},
 
 	addAccount: function() {
