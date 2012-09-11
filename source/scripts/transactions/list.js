@@ -602,7 +602,10 @@ results = {
 
 		var index = inEvent.rowIndex;
 
-		if( this.account['frozen'] === 1 ) {
+		if( !this.transactions[index] ) {
+
+			return;
+		} else if( this.account['frozen'] === 1 ) {
 
 			this.$['list'].refresh();
 			return;

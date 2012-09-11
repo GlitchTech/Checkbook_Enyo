@@ -3,7 +3,7 @@
 enyo.kind({
 
 	name: "Checkbook.search.pane",
-	kind: enyo.VFlexBox,
+//	kind: enyo.VFlexBox,
 
 	style: "height: 100%;",
 

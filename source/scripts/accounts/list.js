@@ -52,7 +52,7 @@ enyo.kind({
 					components: [
 						{
 							name: "catDivider",
-							kind: enyo.Divider,
+							//kind: enyo.Divider,
 							showing: false,
 							ontap: "dividerTapped"
 						}, {

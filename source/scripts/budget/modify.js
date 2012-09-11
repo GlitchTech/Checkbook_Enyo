@@ -3,9 +3,8 @@
 enyo.kind({
 
 	name: "Checkbook.budget.modify",
-	kind: enyo.ModalDialog,
-
-	layoutKind: enyo.VFlexLayout,
+//	kind: enyo.ModalDialog,
+//	layoutKind: enyo.VFlexLayout,
 
 	modal: true,
 	scrim: true,

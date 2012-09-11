@@ -5,7 +5,7 @@
  */
 enyo.kind( {
 	name: "Checkbook.autocompleteprefs.view",
-	kind: enyo.VFlexBox,
+//	kind: enyo.VFlexBox,
 
 	style: "height: 100%;",
 	flex: 1,

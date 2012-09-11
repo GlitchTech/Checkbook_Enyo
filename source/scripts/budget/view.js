@@ -3,7 +3,7 @@
 enyo.kind({
 
 	name: "Checkbook.budget.view",
-	kind: enyo.VFlexBox,
+//	kind: enyo.VFlexBox,
 
 	flex: 1,
 	style: "height: 100%;",

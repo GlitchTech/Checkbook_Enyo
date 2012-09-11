@@ -41,11 +41,11 @@ enyo.kind({
 										}, {
 											classes: "onyx-menu-divider"
 										}, {
-											content: "Import Data (NYI)",
-											//ontap: "openImport"
+											content: "Import Data",
+											ontap: "openImport"
 										}, {
 											content: "Export Data (NYI)",
-											//ontap: "openExport"
+											ontap: "openExport"
 										}, {
 											classes: "onyx-menu-divider"
 										}, {

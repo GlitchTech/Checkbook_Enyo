@@ -161,15 +161,15 @@ enyo.kind({
 					components: [
 						{
 							name: "spreadsheetList",
-							kind: enyo.VirtualRepeater,
+							//kind: enyo.VirtualRepeater,
 
 							flex: 1,
 							onSetupRow: "setupRow",
 
 							components: [
 								{
-									kind: enyo.Item,
-									layoutKind: enyo.HFlexLayout,
+									//kind: enyo.Item,
+									//layoutKind: enyo.HFlexLayout,
 
 									tapHighlight: true,
 									ontap: "sheetSelectedChanged",
@@ -180,7 +180,7 @@ enyo.kind({
 											flex: 1
 										}, {
 											name: "sheetSelected",
-											kind: enyo.CheckBox,
+											//kind: enyo.CheckBox,
 
 											style: "margin-right: 10px;"
 										}
@@ -247,9 +247,6 @@ enyo.kind({
 					classes: "onyx-affirmative deep-green",
 					style: "min-width: 150px;"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
@@ -283,10 +280,10 @@ enyo.kind({
 
 		{
 			name: "progress",
-			kind: GTS.progress
+			//kind: GTS.progress
 		}, {
 			name: "errorMessage",
-			kind: GTS.system_error,
+			//kind: GTS.system_error,
 
 			errTitle: "Import Error",
 			errMessage: "",
@@ -297,8 +294,13 @@ enyo.kind({
 		{
 			name: "gapi",
 			kind: "GTS.Gapi",
-			apiKey: "AIzaSyABIXMbumcYij_9qb92qjbLVRAzieLR650",
-			onReady: "testError"
+			apiKey: "",
+			onReady: "gapiReady"
+		},
+
+		{
+			name: "gapiAccess",
+			kind: "private.gapi"
 		},
 
 		{
@@ -355,12 +357,26 @@ enyo.kind({
 		}
 	},
 
+	gapiReady: function() {
+
+		this.$['gapi'].setApiKey( this.$['gapiAccess'].getApiKey() );
+		this.$['gapi'].setClientId( this.$['gapiAccess'].getClientId() );
+
+		this.$["gapi"].setScope( [ "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile" ] );
+
+		new enyo.Async()
+			.go()
+			.response( this.$['gapi'], this.$['gapi'].auth );
+	},
+
 	test: function() {
 
 		this.log( arguments );
 	},
 
 	testError: function() {
+
+		this.log();
 
 		if( !this.$['gapi'].isGapiReady() ) {
 

@@ -3,8 +3,8 @@
 enyo.kind({
 
 	name: "Checkbook.search.results",
-	kind: enyo.SlidingView,
-	layoutKind: enyo.VFlexLayout,
+//	kind: enyo.SlidingView,
+//	layoutKind: enyo.VFlexLayout,
 
 	flex: 1,
 

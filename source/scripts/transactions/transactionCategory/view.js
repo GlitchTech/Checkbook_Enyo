@@ -4,7 +4,7 @@ enyo.kind({
 
 	name: "Checkbook.transactionCategory.view",
 	kind: enyo.Popup,
-	layoutKind: enyo.VFlexLayout,
+//	layoutKind: enyo.VFlexLayout,
 
 	modal: true,
 	scrim: true,
@@ -60,7 +60,7 @@ enyo.kind({
 					name: "item",
 
 					kind: enyo.SwipeableItem,
-					layoutKind: enyo.VFlexLayout,
+				//	layoutKind: enyo.VFlexLayout,
 
 					tapHighlight: true,
 					ontap: "editItem",

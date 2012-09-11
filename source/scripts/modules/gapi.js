@@ -32,7 +32,20 @@ enyo.kind({
 		 * @type string
 		 * @default ""
 		 */
-		apiKey: ""
+		apiKey: "",
+
+		/**
+		 * API Client ID
+		 * @type string
+		 * @default ""
+		 */
+		clientId: "",
+		/**
+		 * Scope for current authentication
+		 * @type [string]
+		 * @default []
+		 */
+		scope: []
 	},
 
 	/**
@@ -59,6 +72,10 @@ enyo.kind({
 
 		// Run our default construction
 		this.inherited( arguments );
+
+		this._binds = {
+				"_handleAuthResult": enyo.bind( this, this.handleAuthResult )
+			};
 	},
 
 	/**
@@ -122,8 +139,12 @@ enyo.kind({
 	 */
 	gapiLoaded: function() {
 
+		if( this.apiKey != "" ) {
+
+			this.apiKeyChanged();
+		}
+
 		this.doReady();
-		this.apiKeyChanged();
 	},
 
 	/**
@@ -161,7 +182,7 @@ enyo.kind({
 			return;
 		}
 
-		if( typeof( gapi.client[name] ) === 'undefined' ) {
+		if( typeof( gapi.client[name] ) === "undefined" ) {
 
 			gapi.client.load( name, ( "v" + version ), options.onSuccess );
 		} else {
@@ -172,4 +193,33 @@ enyo.kind({
 			}
 		}
 	},
+
+	auth: function() {
+
+		gapi.auth.authorize( { "client_id": this.clientId, "scope": this.scope.join( " " ), "immediate": true }, this._binds['_handleAuthResult'] );
+	},
+
+	handleAuthResult: function( authResult ) {
+
+		this.log( arguments );
+
+		var authorizeButton = document.getElementById( "authorize-button" );
+
+		if( authResult && !authResult.error ) {
+
+			authorizeButton.style.visibility = "hidden";
+
+			this.log( "AUTHED" );
+		} else {
+
+			authorizeButton.style.visibility = "";
+			authorizeButton.onclick = handleAuthClick;
+		}
+	},
+
+	handleAuthClick: function() {
+
+		gapi.auth.authorize( { "client_id": this.clientId, "scope": this.scope.join( " " ), "immediate": false }, this._binds['_handleAuthResult'] );
+		return false;
+	}
 });

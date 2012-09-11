@@ -1,7 +1,5 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
-//Convert to popup
-	//See how email does it & retains connection to main app
 enyo.kind( {
 	name: "Checkbook.transactions.modify",
 	kind: "FittableRows",
@@ -68,6 +66,7 @@ enyo.kind( {
 										},{
 											name: "autosuggestIcon",
 											kind: "enyo.Image",
+											classes: "img-icon",
 											src: "assets/search.png"
 										}
 									]
@@ -392,7 +391,6 @@ enyo.kind( {
 							classes: "onyx-negative margin-top",
 							style: "width: 100%;"
 						}, {
-							kind: enyo.Spacer,
 							style: "height: 1.5em;"
 						}
 					]

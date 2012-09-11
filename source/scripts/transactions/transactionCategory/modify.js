@@ -4,7 +4,7 @@ enyo.kind({
 
 	name: "Checkbook.transactionCategory.modify",
 	kind: enyo.Popup,
-	layoutKind: enyo.VFlexLayout,
+//	layoutKind: enyo.VFlexLayout,
 
 	modal: true,
 	scrim: true,

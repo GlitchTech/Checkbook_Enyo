@@ -2,7 +2,7 @@
 
 enyo.kind({
 	name: "Checkbook.export",
-	kind: enyo.VFlexBox,
+////	kind: enyo.VFlexBox,
 
 	className: "light",
 	style: "height: 100%;",
@@ -50,7 +50,7 @@ enyo.kind({
 			components: [
 				{
 					name: "credentials",
-					layoutKind: enyo.VFlexLayout,
+				//	layoutKind: enyo.VFlexLayout,
 
 					className: "light narrow-column",
 					flex: 1,
@@ -133,7 +133,7 @@ enyo.kind({
 					showing: false,
 
 					name: "accountList",
-					layoutKind: enyo.VFlexLayout,
+				//	layoutKind: enyo.VFlexLayout,
 
 					className: "light narrow-column",
 					flex: 1,

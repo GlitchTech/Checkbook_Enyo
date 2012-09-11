@@ -22,6 +22,8 @@ enyo.depends(
 	"$lib/gts-plugins/DecimalInput",
 	"$lib/gts-plugins/ConfirmDialog",
 
+	"$lib/private",
+
 	"scripts/",
 	"styles/"
 );

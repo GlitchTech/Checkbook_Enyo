@@ -13,3 +13,6 @@
 [submodule "lib/canvas-spinner"]
 	path = lib/canvas-spinner
 	url = https://github.com/JMTK/canvas-spinner.git
+[submodule "lib/private"]
+	path = lib/private
+	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/checkbook_private.git
