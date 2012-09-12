@@ -54,70 +54,11 @@ enyo.kind({
 							allowHtml: true,
 
 							content: "<p>" +
-									"To import your finances into this program you must have a Google Documents account. " + "<br />" +
+									"To import your finances into this program you must have a Google Drive account. " + "<br />" +
 									"<a href='http://drive.google.com/' target='_blank'>" + "Sign up here" + "</a>" +
 								"</p><p>" +
 									"Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten. <span style='color:#cc0000;'>The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note.</span>" +
 								"</p>"
-						}
-					]
-				},
-
-				{
-					showing: false,
-
-					name: "credentials",
-					classes: "light narrow-column padding-half-top",
-					style: "height: 100%;",
-
-					components: [
-						{
-							kind: "onyx.Groupbox",
-							components: [
-								{
-									kind: "onyx.GroupboxHeader",
-									content: "Google Credentials"
-								},{
-									kind: "onyx.InputDecorator",
-									layoutKind: "enyo.FittableColumnsLayout",
-									noStretch: true,
-									components: [
-										{
-											name: "gUser",
-											kind: "onyx.Input",
-											type: "email",
-
-											fit: true,
-											placeholder: "Google Username"
-										},{
-											content: "Username",
-											classes: "label"
-										}
-									]
-								}, {
-									name: "gPassWrapper",
-									kind: "onyx.InputDecorator",
-									layoutKind: "enyo.FittableColumnsLayout",
-									noStretch: true,
-									components: [
-										{
-											name: "gPass",
-											kind: "onyx.Input",
-											type: "password",
-
-											fit: true,
-											placeholder: "Account Password"
-										},{
-											content: "Password",
-											classes: "label"
-										}
-									]
-								}
-							]
-						}, {
-							content: "Enter your Google Spreadsheets credentials to import your financial data from <a href='http://docs.google.com/' target='_blank'>Google Documents</a> to your device.",
-							allowHtml: true,
-							classes: "smallest padding-std"
 						}, {
 							layoutKind: "enyo.FittableColumnsLayout",
 							noStretch: true,
@@ -128,23 +69,12 @@ enyo.kind({
 								{
 									name: "saveCredentials",
 									kind: "onyx.Checkbox",
-									checked: true,
+									value: true,
 
 									classes: "margin-right"
 								}, {
 									content: "Save credentials",
 									fit: true
-								}, {
-									name: "showPass",
-									kind: "onyx.ToggleButton",
-
-									value: false,
-									onContent: "Show password",
-									offContent: "Mask password",
-
-									onChange: "togglePasswordVis",
-
-									classes: "margin-left"
 								}
 							]
 						}
@@ -201,30 +131,11 @@ enyo.kind({
 				{
 					name: "instructionsButton",
 					kind: "onyx.Button",
-					content: "Continue",
-
-					ontap: "prepareCredentials",
-
-					style: "min-width: 150px;"
-				}
-			]
-		},
-
-		{
-			showing: false,
-
-			name: "credentialsBar",
-			kind: "onyx.Toolbar",
-			classes: "text-center",
-			components: [
-				{
-					name: "credentialsButton",
-					kind: "onyx.Button",
-					content: "Sign In",
+					content: "Authenticate",
 
 					ontap: "authenticateWithGoogle",
 
-					classes: "onyx-affirmative deep-green",
+					classes: "onyx-affirmative",
 					style: "min-width: 150px;"
 				}
 			]
@@ -281,6 +192,8 @@ enyo.kind({
 		{
 			name: "progress",
 			//kind: GTS.progress
+
+			load: function() { this.log( arguments ); }
 		}, {
 			name: "errorMessage",
 			//kind: GTS.system_error,
@@ -294,7 +207,6 @@ enyo.kind({
 		{
 			name: "gapi",
 			kind: "GTS.Gapi",
-			apiKey: "",
 			onReady: "gapiReady"
 		},
 
@@ -313,24 +225,16 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.$['instructionsButton'].setDisabled( false );
+		this.$['instructionsButton'].setDisabled( true );
 		this.$['instructionsBar'].show();
-		this.$['credentialsBar'].hide();
 		this.$['sheetListBar'].hide();
 
 		this.$['instructions'].show();
-		this.$['credentials'].hide();
 		this.$['sheetList'].hide();
 
-		this.refreshLayout();
+		//Show message of loading
 
-		//check for pre-existing g-data log in
-		Checkbook.globals.gts_db.query(
-				"SELECT saveGSheetsData, gSheetUser, gSheetPass FROM prefs LIMIT 1;",
-				{
-					"onSuccess": enyo.bind( this, this.fetchUserGData )
-				}
-			);
+		this.refreshLayout();
 	},
 
 	refreshLayout: function() {
@@ -338,116 +242,103 @@ enyo.kind({
 		this.waterfall( "onresize", "onresize", this );
 	},
 
-	fetchUserGData: function( results ) {
+	gapiReady: function() {
 
-		this.log();
+		//check for pre-existing g-data log in
+		Checkbook.globals.gts_db.query(
+				"SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;",
+				{
+					"onSuccess": enyo.bind( this, this.decryptGapiData )
+				}
+			);
+	},
+
+	decryptGapiData: function( results ) {
 
 		if( results.length > 0 ) {
+
+			this.$['saveCredentials'].setValue( results[0]['saveGSheetsData'] );
 
 			//Decrypt if exists
 			this.$['cryptoSystem'].decryptString(
 					results[0]['gSheetPass'],
 					enyo.bind(
 							this,
-							this.setUserGData,
-							results[0]['gSheetUser'],
-							( results[0]['saveGSheetsData'] === 1 )
+							this.loadGapiData
 						)
 				);
 		}
 	},
 
-	gapiReady: function() {
+	loadGapiData: function( obj ) {
 
 		this.$['gapi'].setApiKey( this.$['gapiAccess'].getApiKey() );
 		this.$['gapi'].setClientId( this.$['gapiAccess'].getClientId() );
 
-		this.$["gapi"].setScope( [ "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile" ] );
+		this.$['gapi'].setAuthToken( enyo.json.parse( obj ) );
 
-		new enyo.Async()
-			.go()
-			.response( this.$['gapi'], this.$['gapi'].auth );
-	},
+		this.$['instructionsButton'].setDisabled( false );
 
-	test: function() {
-
-		this.log( arguments );
-	},
-
-	testError: function() {
-
-		this.log();
-
-		if( !this.$['gapi'].isGapiReady() ) {
-
-			var async = new enyo.Async()
-				.go()
-				.response( this, this.testError );
-		} else {
-
-			this.$['gapi'].loadModule( "plus", 1, { "onSuccess": enyo.bind( this, this.test ), "onError": enyo.bind( this, this.testError ) } );
-		}
-	},
-
-	setUserGData: function( user, save, pass ) {
-
-		this.log();
-
-		this.$['gUser'].setValue( user );
-		this.$['gPass'].setValue( pass );
-		this.$['saveCredentials'].setChecked( save );
-
-		this.$['showPass'].setDisabled( save );//Disable show cred if loaded from DB
-	},
-
-	prepareCredentials: function() {
-
-		this.log();
-
-		this.$['instructionsButton'].setDisabled( true );
-		this.$['credentialsButton'].setDisabled( false );
-		this.$['instructionsBar'].hide();
-		this.$['credentialsBar'].show();
-		this.$['sheetListBar'].hide();
-
-		this.$['instructions'].hide();
-		this.$['credentials'].show();
-		this.$['sheetList'].hide();
-
-		this.$['gUser'].focus();
-
-		this.refreshLayout();
-	},
-
-	togglePasswordVis: function( inSender, inEvent ) {
-
-		this.$['gPass'].setType( inEvent.value ? "text" : "password" );
+		//hide message of loading
 	},
 
 	authenticateWithGoogle: function() {
 
-		this.log();
+		this.$["gapi"].setScope( [ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive.metadata.readonly", "https://www.googleapis.com/auth/drive.readonly" ] );
 
-		this.$['credentialsButton'].setDisabled( true );
+		this.$['gapi'].auth( { "onSuccess": enyo.bind( this, this.userAuthenticated ), "onError": enyo.bind( this, this.userNotAuthenticated ) } );
+	},
 
-		//Check username & password exist
-		this.$['progress'].load( "Authenticating", "Trying to authenticate credentials", 25 );
+	userNotAuthenticated: function() {
 
-		this.$['gDataControls'].gdata_authenticate(
-				this.$['gUser'].getValue(),
-				this.$['gPass'].getValue(),
-				"wise",
-				{
-					'onSuccess': enyo.bind( this, this.fetchSpreadsheetList ),
-					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.prepareCredentials ) ),
-					'timeout': 15
-				}
-			);
+		this.closeImport();
+	},
+
+	userAuthenticated: function() {
+
+		//save credentials
+		if( this.$['saveCredentials'].getValue() ) {
+
+			this.$['cryptoSystem'].encryptString(
+					enyo.json.stringify( this.$['gapi'].getAuthToken() ),
+					enyo.bind(
+							this,
+							this.saveUserGData
+						)
+				);
+		} else {
+
+			this.saveUserGData( "" );
+		}
+
+		this.$['gapi'].loadModule( "drive", 2, { "onSuccess": enyo.bind( this, this.fetchSpreadsheetList ), "onError": enyo.bind( this, this.fatalError, "Checkbook importer has encountered a fatal error. Please try again later." ) } );
+	},
+
+	saveUserGData: function( token ) {
+
+		var updateObj = {
+					"saveGSheetsData": 0,
+					"gSheetPass": ""
+				};
+
+		if( this.$['saveCredentials'].getValue() && token.length > 0 ) {
+
+			updateObj = {
+						"saveGSheetsData": this.$['saveCredentials'].getValue() ? 1 : 0,
+						"gSheetPass": token
+					};
+		}
+
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", updateObj, {} ) );
 	},
 
 	fetchSpreadsheetList: function() {
 
-		this.log();
+		this.log( gapi );
+		//https://developers.google.com/apis-explorer/#p/drive/v2/
+		//https://developers.google.com/drive/v2/reference/
+
+		return;
 
 		this.$['progress'].setMessage( "Retrieving spreadsheets..." );
 		this.$['progress'].setProgress( 50 );
@@ -476,36 +367,17 @@ enyo.kind({
 			);
 	},
 
-	saveUserGData: function( pass ) {
 
-		this.log();
 
-		var updateObj = null;
 
-		if( !this.$['saveCredentials'].getChecked() || pass.length <= 0 ) {
 
-			updateObj = {
-						"saveGSheetsData": 0,
-						"gSheetUser": "",
-						"gSheetPass": ""
-					};
-		} else {
 
-			updateObj = {
-						"saveGSheetsData": this.$['saveCredentials'].getChecked() ? 1 : 0,
-						"gSheetUser": this.$['gUser'].getValue(),
-						"gSheetPass": pass
-					};
-		}
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
 
-		Checkbook.globals.gts_db.query(
-				Checkbook.globals.gts_db.getUpdate(
-					"prefs",
-					updateObj,
-					{}
-				)
-			);
-	},
 
 	renderSpreadsheetList: function( sheetListObj ) {
 
@@ -531,11 +403,9 @@ enyo.kind({
 
 			this.$['sheetListButton'].setDisabled( false );
 			this.$['instructionsBar'].hide();
-			this.$['credentialsBar'].hide();
 			this.$['sheetListBar'].show();
 
 			this.$['instructions'].hide();
-			this.$['credentials'].hide();
 			this.$['sheetList'].show();
 
 			this.refreshLayout();
@@ -1251,6 +1121,11 @@ enyo.kind({
 		}
 	},
 
+	fatalError: function( message ) {
+
+		this.showErrorMessage( enyo.bind( this, this.closeImport, true ), message );
+	},
+
 	showErrorMessage: function( callbackFn, error ) {
 
 		this.onErrorClose = callbackFn;
@@ -1284,7 +1159,6 @@ enyo.kind({
 		this.$['instructionsButton'].setDisabled( false );
 
 		this.$['instructions'].show();
-		this.$['credentials'].hide();
 		this.$['sheetList'].hide();
 
 		//Close & continue

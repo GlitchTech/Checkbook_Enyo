@@ -784,16 +784,11 @@ enyo.kind({
 									"code": "",
 									"saveGSheetsData": 0,
 									"gSheetUser": "depreciated",
-									"gSheetPass": "depreciated",
+									"gSheetPass": "",
 								},
 								{}
 							)
 					);
-
-				//querySet.push( "ALTER TABLE prefs ADD COLUMN access_token TEXT NULL;" );//The token that can be sent to a Google API
-				//querySet.push( "ALTER TABLE prefs ADD COLUMN refresh_token TEXT NULL;" );//A token that may be used to obtain a new access token, valid until the user revokes access.
-				//querySet.push( "ALTER TABLE prefs ADD COLUMN expires_in TEXT NULL;" );//The remaining lifetime on the access token
-				//querySet.push( "ALTER TABLE prefs ADD COLUMN token_type TEXT NULL;" );//Indicates the type of token returned. At this time, this field will always have the value Bearer
 
 				this.versionCheck = 24;
 			case 24:

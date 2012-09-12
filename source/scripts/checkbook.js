@@ -192,7 +192,7 @@ enyo.kind({
 
 	menuHandler: function( inEvent ) {
 
-		if( this.paneStack.length === 0 ) {
+		if( this.paneStack.length <= 0 ) {
 			//Menu is only available on Accounts or Transaction list screens.
 
 			this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
