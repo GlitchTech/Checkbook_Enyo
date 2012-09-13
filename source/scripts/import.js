@@ -10,7 +10,7 @@ enyo.kind({
 	allSheetsList: [],
 	importItems: [],
 
-	standardLimit: 100,
+	standardLimit: 500,
 
 	events: {
 		onFinish: ""
@@ -220,7 +220,8 @@ enyo.kind({
 
 		{
 			name: "gssc",
-			kind: "Checkbook.gdata"
+			kind: "GTS.gdata",
+			appName: "com.glitchtechscience.checkbook"
 		},
 
 		{
@@ -305,7 +306,7 @@ enyo.kind({
 
 	authenticateWithGoogle: function() {
 
-		this.$["gapi"].setScope( [ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive.metadata.readonly", "https://www.googleapis.com/auth/drive.readonly" ] );
+		this.$["gapi"].setScope( [ "https://www.googleapis.com/auth/drive", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ] );
 
 		this.$['gapi'].auth( { "onSuccess": enyo.bind( this, this.userAuthenticated ), "onError": enyo.bind( this, this.userNotAuthenticated ) } );
 	},
@@ -397,8 +398,6 @@ enyo.kind({
 
 	rendersheetList: function( gapiSheetList ) {
 
-		this.log( typeof( gapiSheetList ), !gapiSheetList , typeof( gapiSheetList ) === "undefined" , gapiSheetList.length <= 0 );
-
 		if( !gapiSheetList || typeof( gapiSheetList ) === "undefined" || gapiSheetList.length <= 0 ) {
 
 			this.$['progress'].hide();
@@ -488,11 +487,9 @@ enyo.kind({
 
 		this.importItems = [];
 
-		for (var i = 0; i < this.allSheetsList.length; i++) {
+		for( var i = 0; i < this.allSheetsList.length; i++ ) {
 
 			if( this.allSheetsList[i]['selectStatus'] ) {
-
-				this.log( this.allSheetsList[i] );
 
 				this.importItems.push( {
 						"sheetIndex": i,
@@ -518,6 +515,7 @@ enyo.kind({
 		this.errorCount = 0;
 
 		try {
+			//Convert to Phonegap API
 
 			enyo.windows.setWindowProperties( window, { blockScreenTimeout: true } );
 			this.log( "Window: blockScreenTimeout: true" );
@@ -532,7 +530,7 @@ enyo.kind({
 				"progress": 0
 			});
 
-		this.$['gssc'].setAuthKey( this.$['gapi'].getAuthToken() );
+		this.$['gssc'].setAuthKey( this.$['gapi'].getAuthToken().AccessToken );
 
 		enyo.asyncMethod(
 				this,
@@ -542,28 +540,22 @@ enyo.kind({
 
 	fetchDocSummary: function() {
 
-		this.log();
+		this.$['progress'].setProgress( this.documentIndex / this.importItems.length * 100 );
 
-		this.$['gssc'].fetch_spreadsheet_summary(
+		this.$['gssc'].getSheetSummary(
 				this.importItems[this.documentIndex]['sheetId'],
 				{
-					'onSuccess': enyo.bind( this, this.parseDocSummary ),
-					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.rendersheetList ) ),
-					'timeout': 20
+					"onSuccess": enyo.bind( this, this.parseDocSummary ),
+					"onError": enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.fetchsheetList ) )
 				}
 			);
 	},
 
-	parseDocSummary: function( response ) {
+	parseDocSummary: function( inSender, data ) {
 
-		if( !this.checkErrorCount() ) {
+		if( this.checkErrorCount() ) { return; }
 
-			return;
-		}
-
-		this.log( arguments );return;
-
-		if( typeof( response.responseJSON.feed.entry ) === "undefined" ) {
+		if( typeof( data.feed.entry ) === "undefined" ) {
 			//Bad data returned
 
 			this.error( "Bad data from Google." );
@@ -577,22 +569,23 @@ enyo.kind({
 			return;
 		}
 
-		this.$['progress'].setMessage( "Fetching document specifications" );
+		var data = data.feed.entry;
 
-		var data = response.responseJSON.feed.entry;
+		if( !enyo.isArray( data ) ) {
+
+			data = [ data ];
+		}
 
 		for( var i = 0; i < data.length; i++ ) {
 
 			//Add page to array with all sheet Ids
 			this.importItems[this.documentIndex]['pages'].push( {
-					"pageKey": data[i]['id']['$t'].slice( data[i]['id']['$t'].lastIndexOf( "/" ) + 1 ),
-					"title":data[i]['title']['$t']
+					"pageKey": data[i]['id']['#text'].slice( data[i]['id']['#text'].lastIndexOf( "/" ) + 1 ),
+					"title": data[i]['title']['#text']
 				});
 		}
 
 		this.documentIndex++;
-
-		this.$['progress'].setProgress( this.documentIndex / this.importItems.length * 100 );
 
 		if( this.documentIndex < this.importItems.length ) {
 			//Continue get sheet summary information
@@ -608,22 +601,7 @@ enyo.kind({
 		}
 	},
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
 	fetchAccountData: function( callbackFn ) {
-
-		this.log();
 
 		Checkbook.globals.gts_db.query(
 				Checkbook.globals.gts_db.getSelect( "accounts", [ "acctId", "acctCategory", "acctName" ] ),
@@ -634,8 +612,6 @@ enyo.kind({
 	},
 
 	processAccountData: function( callbackFn, results ) {
-
-		this.log();
 
 		this.accountList = {};
 		this.newAccounts = [];
@@ -656,8 +632,6 @@ enyo.kind({
 
 	addAccountListObject: function( id, name, category ) {
 
-		this.log( "( " + id + ", " + name + ", " + category + ")" );
-
 		if( typeof( this.accountList[category] ) === "undefined" ) {
 
 			this.accountList[category] = {};
@@ -667,11 +641,6 @@ enyo.kind({
 	},
 
 	startDataPull: function() {
-
-		this.log();
-
-		//Start pulling down full sheets
-		this.$['progress'].setProgress( 5 );
 
 		this.documentIndex = 0;
 		this.pageIndex = 0;
@@ -683,8 +652,6 @@ enyo.kind({
 
 	downloadDocData: function( offset, limit ) {
 
-		this.log( "( " + offset + ", " + limit + " )" );
-
 		if( this.pageIndex >= this.importItems[this.documentIndex]['pages'].length ) {
 
 			//invalid page index
@@ -693,39 +660,28 @@ enyo.kind({
 			return;
 		}
 
-		this.$['gssc'].fetch_spreadsheet_data(
+		this.$['gssc'].getSheetData(
 				this.importItems[this.documentIndex]['sheetId'],
 				this.importItems[this.documentIndex]['pages'][this.pageIndex]['pageKey'],
 				offset,
 				limit,
 				{
 					"onSuccess": enyo.bind( this, this.processDocData ),
-					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.fetchsheetList ) ),
-					"timeout": 30
+					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.fetchsheetList ) )
 				}
 			);
 	},
 
-	processDocData: function( response ) {
+	processDocData: function( inSender, data ) {
 
-		this.log();
+		if( this.checkErrorCount( 5 ) ) { return; }
 
-		if( this.errorCount >= 5 ) {
-			//Too many errors
-
-			this.error( "Multiple sets of bad data from Google." );
-
-			this.errorCount = 0;
-
-			this.showErrorMessage( enyo.bind( this, this.fetchsheetList ), "There has been an error: Multiple sets of bad data from Google. Please try again later." );
-
-			return;
-		}
-
-		if( typeof( response.responseJSON ) === "undefined" ||
-			typeof( response.responseJSON.feed ) === "undefined" ||
-			typeof( response.responseJSON.feed.entry ) === "undefined" ) {
+		if( typeof( data ) === "undefined" ||
+			typeof( data.feed ) === "undefined" ||
+			typeof( data.feed.entry ) === "undefined" ) {
 			//Bad data returned
+
+			this.log( data );
 
 			this.error( "Bad data from Google." );
 			this.$['progress'].setMessage( "Attempting to fix bad import data" );
@@ -739,52 +695,59 @@ enyo.kind({
 			return;
 		}
 
-		this.importItems[this.documentIndex]['limit'] = parseInt( response.responseJSON.feed['openSearch$itemsPerPage']['$t'] );
-		this.importItems[this.documentIndex]['offset'] = parseInt( response.responseJSON.feed['openSearch$startIndex']['$t'] );
-		this.importItems[this.documentIndex]['totalResults'] = parseInt( response.responseJSON.feed['openSearch$totalResults']['$t'] );
+		this.importItems[this.documentIndex]['limit'] = parseInt( data.feed['openSearch:itemsPerPage']['#text'] );
+		this.importItems[this.documentIndex]['offset'] = parseInt( data.feed['openSearch:startIndex']['#text'] );
+		this.importItems[this.documentIndex]['totalResults'] = parseInt( data.feed['openSearch:totalResults']['#text'] );
+
+		var data = data.feed.entry;
+
+		if( !enyo.isArray( data ) ) {
+
+			data = [ data ];
+		}
 
 		if( this.importItems[this.documentIndex]['offset'] === 1 &&
 			(
-				typeof( response.responseJSON.feed.entry[0]['gsx$amount'] ) === "undefined" ||
-				typeof( response.responseJSON.feed.entry[0]['gsx$amount']['$t'] ) === "undefined" ||
-				typeof( response.responseJSON.feed.entry[0]['gsx$description'] ) === "undefined" ||
-				typeof( response.responseJSON.feed.entry[0]['gsx$description']['$t'] ) === "undefined" ||
-				typeof( response.responseJSON.feed.entry[0]['gsx$date'] ) === "undefined" ||
-				typeof( response.responseJSON.feed.entry[0]['gsx$date']['$t'] ) === "undefined"
+				typeof( data[0]['gsx:amount'] ) === "undefined" ||
+				typeof( data[0]['gsx:amount']['#text'] ) === "undefined" ||
+				typeof( data[0]['gsx:description'] ) === "undefined" ||
+				typeof( data[0]['gsx:description']['#text'] ) === "undefined" ||
+				typeof( data[0]['gsx:date'] ) === "undefined" ||
+				typeof( data[0]['gsx:date']['#text'] ) === "undefined"
 			) ) {
 
 			this.createComponent( {
 					name: "alertShow",
-					kind: "GTS.confirm",
+					kind: "gts.ConfirmDialog",
 
-					confirmTitle: "Warning! Missing Fields",
-					confirmMessage: "Current page is missing essential fields for importing the data. These fields can be blank, but doing so may result in an improper import. The first row should have the following items: account, accountCat, date, amount, description, cleared, note.",
-					confirmMessage2: this.importItems[this.documentIndex]['name'] + " page " + ( this.pageIndex + 1 ),
+					title: "Warning! Missing Fields",
+					message: "Current page is missing essential fields for importing the data. These fields can be blank, but doing so may result in an improper import. The first row should have the following items: account, accountCat, date, amount, description, cleared, note. (" + this.importItems[this.documentIndex]['name'] + " page " + ( this.pageIndex + 1 ) + ")",
 
-					confirmButtonYes: "Skip Current Item",
-					confirmButtonNo: "Ignore and Continue",
+					confirmText: "Skip Current Item",
+					cancelText: "Ignore and Continue",
 
-					onYes: "nextDocumentPage",
-					onNo: "processDocDataIgnoreContinue"
+					onConfirm: "nextDocumentPage",
+					onCancel: "processDocDataIgnoreContinue"
 				});
 
-			this.responseHolder = response.responseJSON.feed.entry;
+			this.responseHolder = data;
 
-			this.$['alertShow'].openAtCenter();
+			this.$['alertShow'].show();
 		} else {
 
-			this.processDocDataFollower( response.responseJSON.feed.entry );
+			this.processDocDataFollower( data );
 		}
 	},
 
 	processDocDataIgnoreContinue: function() {
 
+		this.$['alertShow'].hide();
 		this.$['alertShow'].destroy();
 
-		var entry = this.responseHolder;
+		var data = this.responseHolder;
 		this.responseHolder = null;
 
-		this.processDocDataFollower( entry );
+		this.processDocDataFollower( data );
 	},
 
 	processDocDataFollower: function( entry ) {
@@ -798,7 +761,7 @@ enyo.kind({
 
 			trsn = {};
 
-			trsn['amount'] = deformatAmount( this.getNode( data[i], 'gsx$amount' ) );
+			trsn['amount'] = deformatAmount( this.getNode( data[i], 'gsx:amount' ) );
 
 			if( Object.validNumber( trsn['amount'] ) ) {
 				//Only continue if amount field is not empty && is a number
@@ -806,7 +769,7 @@ enyo.kind({
 				trsn['amount'] = parseFloat( trsn['amount'] );
 
 				//Transaction Id
-				trsn['itemId'] = parseInt( this.getNode( data[i], 'gsx$gtid' ) );
+				trsn['itemId'] = parseInt( this.getNode( data[i], 'gsx:gtid' ) );
 
 				if( !Object.validNumber( trsn['itemId'] ) ) {
 
@@ -814,8 +777,8 @@ enyo.kind({
 				}
 
 				//Account
-				trsn['accountName'] = this.getNode( data[i], 'gsx$account' );
-				trsn['accountCat'] = this.getNode( data[i], 'gsx$accountcat' );
+				trsn['accountName'] = this.getNode( data[i], 'gsx:account' );
+				trsn['accountCat'] = this.getNode( data[i], 'gsx:accountcat' );
 
 				if( trsn['accountName'] === "" ) {
 
@@ -839,9 +802,9 @@ enyo.kind({
 				}
 
 				//Linked Account & Record
-				trsn['linkedAccountName'] = this.getNode( data[i], 'gsx$gtlinkedaccount' );//Line 776 of mojo for basic idea
-				trsn['linkedAccountCat'] = this.getNode( data[i], 'gsx$gtlinkedaccountcat' );
-				trsn['linkedRecord'] = parseInt( this.getNode( data[i], 'gsx$gtlinkid' ) );
+				trsn['linkedAccountName'] = this.getNode( data[i], 'gsx:gtlinkedaccount' );//Line 776 of mojo for basic idea
+				trsn['linkedAccountCat'] = this.getNode( data[i], 'gsx:gtlinkedaccountcat' );
+				trsn['linkedRecord'] = parseInt( this.getNode( data[i], 'gsx:gtlinkid' ) );
 
 				if( Object.validNumber( trsn['linkedRecord'] ) ) {
 
@@ -873,7 +836,7 @@ enyo.kind({
 				}
 
 				//Cleared
-				trsn['cleared'] = this.getNode( data[i], 'gsx$cleared' ).toLowerCase();
+				trsn['cleared'] = this.getNode( data[i], 'gsx:cleared' ).toLowerCase();
 
 				if( trsn['cleared'] == 0 ||
 							trsn['cleared'] == "no" ||
@@ -888,7 +851,7 @@ enyo.kind({
 				}
 
 				//Date
-				trsn['date'] = Date.deformat( this.getNode( data[i], 'gsx$date' ) );
+				trsn['date'] = Date.deformat( this.getNode( data[i], 'gsx:date' ) );
 
 				if( !Object.validNumber( trsn['date'] ) ) {
 
@@ -896,7 +859,7 @@ enyo.kind({
 				}
 
 				//Category
-				trsn['category'] = this.getNode( data[i], 'gsx$gtcat' );
+				trsn['category'] = this.getNode( data[i], 'gsx:gtcat' );
 
 				if( trsn['category'] === "" || trsn['category'].toLowerCase() === "none" ) {
 					//No or bad category data
@@ -928,12 +891,12 @@ enyo.kind({
 				}
 
 				//Description
-				trsn['desc'] = this.getNode( data[i], 'gsx$description' );
+				trsn['desc'] = this.getNode( data[i], 'gsx:description' );
 				trsn['desc'] = trsn['desc'].length > 0 ? trsn['desc'] : "Transaction Description";
 
 				//Special checks not needed
-				trsn['checkNum'] = this.getNode( data[i], 'gsx$checknum' );
-				trsn['note'] = this.getNode( data[i], 'gsx$note' );
+				trsn['checkNum'] = this.getNode( data[i], 'gsx:checknum' );
+				trsn['note'] = this.getNode( data[i], 'gsx:note' );
 
 				this.importItems[this.documentIndex]['transactions'].push( trsn );
 			}
@@ -941,10 +904,10 @@ enyo.kind({
 
 		var pageProgress = ( data.length + this.importItems[this.documentIndex]['offset'] ) / this.importItems[this.documentIndex]['totalResults'];
 		var docProgress = ( ( pageProgress > 1 ? 1 : pageProgress ) + this.pageIndex ) / this.importItems[this.documentIndex]['pages'].length;
-		var totalProgress = ( ( docProgress / 2 ) + this.documentIndex ) / this.importItems.length;
+		var totalProgress = ( ( docProgress / 2 ) + this.documentIndex ) / this.importItems.length * 100;
 
-		this.$['progress'].setMessage( this.importItems[this.documentIndex]['name'] + "<br />Downloading: " + ( new Number( docProgress * 100 ) ).toFixed( 1 ) + "%" );
-		this.$['progress'].setProgress( totalProgress * 100 );
+		this.$['progress'].setMessage( this.importItems[this.documentIndex]['name'] + "<br />Downloading: " + ( new Number( docProgress ) ).toFixed( 1 ) + "%" );
+		this.$['progress'].setProgress( totalProgress );
 
 		if( ( this.importItems[this.documentIndex]['limit'] + this.importItems[this.documentIndex]['offset'] ) < this.importItems[this.documentIndex]['totalResults'] ) {
 
@@ -957,15 +920,28 @@ enyo.kind({
 		}
 	},
 
+
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 	getNode: function( container, id ) {
 
-		if( typeof( container ) === "undefined" || typeof( container[id] ) === "undefined" || typeof( container[id]['$t'] ) === "undefined" ) {
+		if( typeof( container ) === "undefined" || typeof( container[id] ) === "undefined" || typeof( container[id]['#text'] ) === "undefined" ) {
 
 			return "";
 		} else {
 
 			//Trim extra space from start and end of node content
-			return container[id]['$t'].trim();
+			return container[id]['#text'].trim();
 		}
 	},
 
@@ -1150,7 +1126,9 @@ enyo.kind({
 		}
 	},
 
-	checkErrorCount: function() {
+	checkErrorCount: function( testLimit ) {
+
+		if( !testLimit ) { testLimit = 3; }
 
 		if( this.errorCount >= 3 ) {
 			//Too many errors
