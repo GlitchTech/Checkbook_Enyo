@@ -85,36 +85,36 @@ enyo.kind({
 					showing: false,
 
 					name: "sheetList",
+					kind: "Repeater",
+
 					classes: "light narrow-column padding-half-top",
-					style: "height: 100%;",
+
+					onSetupItem: "setupRow",
 
 					components: [
 						{
-							name: "spreadsheetList",
-							//kind: enyo.VirtualRepeater,
+							kind: "onyx.Item",
 
-							flex: 1,
-							onSetupRow: "setupRow",
+							tapHighlight: true,
+							ontap: "sheetSelectedChanged",
+
+							classes: "bordered",
 
 							components: [
 								{
-									//kind: enyo.Item,
-									//layoutKind: enyo.HFlexLayout,
+									name: "sheetSelected",
+									kind: "onyx.Checkbox",
 
-									tapHighlight: true,
-									ontap: "sheetSelectedChanged",
+									value: false,
+									disabled: true,
 
-									components: [
-										{
-											name: "sheetName",
-											flex: 1
-										}, {
-											name: "sheetSelected",
-											//kind: enyo.CheckBox,
-
-											style: "margin-right: 10px;"
-										}
-									]
+									style: "margin-right: 10px;"
+								}, {
+									name: "sheetName",
+									tag: "span"
+								}, {
+									name: "sheetUpdated",
+									classes: "smaller"
 								}
 							]
 						}
@@ -159,6 +159,7 @@ enyo.kind({
 					style: "min-width: 150px;"
 				}, {
 					kind: "onyx.MenuDecorator",
+					onSelect: "menuItemClick",
 					components: [
 						{
 							kind: "onyx.Button",
@@ -197,11 +198,12 @@ enyo.kind({
 			cancelText: "Cancel"
 		}, {
 			name: "errorMessage",
-			//kind: GTS.system_error,
+			kind: "Checkbook.systemError",
 
 			errTitle: "Import Error",
-			errMessage: "",
-			errMessage2: "" ,
+			mainMessage: "",
+			secondaryMessage: "",
+
 			onFinish: "closeErrorMessage"
 		},
 
@@ -214,6 +216,11 @@ enyo.kind({
 		{
 			name: "gapiAccess",
 			kind: "private.gapi"
+		},
+
+		{
+			name: "gssc",
+			kind: "Checkbook.gdata"
 		},
 
 		{
@@ -331,7 +338,7 @@ enyo.kind({
 			this.saveUserGData( "" );
 		}
 
-		this.$['gapi'].loadModule( "drive", 2, { "onSuccess": enyo.bind( this, this.fetchSpreadsheetList ), "onError": enyo.bind( this, this.fatalError, "Checkbook importer has encountered a fatal error. Please try again later." ) } );
+		this.$['gapi'].loadModule( "drive", 2, { "onSuccess": enyo.bind( this, this.fetchsheetList ), "onError": enyo.bind( this, this.fatalError, "Checkbook importer has encountered a fatal error. Please try again later." ) } );
 	},
 
 	saveUserGData: function( token ) {
@@ -352,10 +359,7 @@ enyo.kind({
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", updateObj, {} ) );
 	},
 
-	fetchSpreadsheetList: function() {
-
-		//https://developers.google.com/apis-explorer/#p/drive/v2/
-		//https://developers.google.com/drive/v2/reference/
+	fetchsheetList: function() {
 
 		this.$['progress'].show( {
 				"title": "Import Progress",
@@ -363,118 +367,110 @@ enyo.kind({
 				"progress": 25
 			});
 
-		return;
-
-		//save credentials
-		if( this.$['saveCredentials'].getChecked() ) {
-
-			this.$['cryptoSystem'].encryptString(
-					this.$['gPass'].getValue(),
-					enyo.bind(
-							this,
-							this.saveUserGData
-						)
-				);
-		} else {
-
-			this.saveUserGData( '' );
-		}
-
-		this.$['gDataControls'].gdata_fetch_spreadsheet_list(
-				{
-					'onSuccess': enyo.bind( this, this.renderSpreadsheetList ),
-					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.prepareCredentials ) ),
-					'timeout': 30
-				}
-			);
+		var initialRequest = gapi.client.drive.files.list();
+		this.retrievePageOfFiles( initialRequest, [] );
 	},
 
+	retrievePageOfFiles: function( request, result ) {
 
+		var self = this;
 
+		request.execute( function( resp ) {
 
+				result = result.concat( resp.items );
 
+				var nextPageToken = resp.nextPageToken;
 
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
+				if( nextPageToken ) {
 
+					request = gapi.client.drive.files.list( {
+							'pageToken': nextPageToken
+						});
 
-	renderSpreadsheetList: function( sheetListObj ) {
+					this.retrievePageOfFiles( request, result );
+				} else {
 
-		this.log();
+					self.rendersheetList( result );
+				}
+			});
+	},
 
-		if( sheetListObj ) {
+	rendersheetList: function( gapiSheetList ) {
 
-			this.allSheetsList = sheetListObj;
-		}
+		this.log( typeof( gapiSheetList ), !gapiSheetList , typeof( gapiSheetList ) === "undefined" , gapiSheetList.length <= 0 );
 
-		//Did the request get the right data
-		if( this.allSheetsList.length <= 0 ) {
+		if( !gapiSheetList || typeof( gapiSheetList ) === "undefined" || gapiSheetList.length <= 0 ) {
 
-			this.$['progress'].close();
+			this.$['progress'].hide();
 
 			this.showErrorMessage( enyo.bind( this, this.closeImport ), "No data available to be imported." );
-		} else {
 
-			this.$['progress'].setMessage( "Processing spreadsheets..." );
-			this.$['progress'].setProgress( 75 );
-
-			this.$['spreadsheetList'].render();
-
-			this.$['sheetListButton'].setDisabled( false );
-			this.$['instructionsBar'].hide();
-			this.$['sheetListBar'].show();
-
-			this.$['instructions'].hide();
-			this.$['sheetList'].show();
-
-			this.refreshLayout();
-
-			this.$['progress'].close();
+			return;
 		}
+
+		this.$['progress'].setMessage( "Processing spreadsheets..." );
+		this.$['progress'].setProgress( 75 );
+
+		this.$['sheetListButton'].setDisabled( false );
+		this.$['instructionsBar'].hide();
+		this.$['sheetListBar'].show();
+
+		this.$['instructions'].hide();
+		this.$['sheetList'].show();
+
+		this.allSheetsList = gapiSheetList;
+
+		this.$['sheetList'].setCount( this.allSheetsList.length );
+
+		this.refreshLayout();
+
+		this.$['progress'].hide();
 	},
 
-	setupRow: function( inSender, inIndex ) {
-		//VirtualList render control
+	setupRow: function( inSender, inEvent ) {
 
-		var row = this.allSheetsList[inIndex];
+		var index = inEvent.index;
+		var item = inEvent.item;
+
+		var row = this.allSheetsList[index];
 
 		if( row ) {
 
-			this.$['sheetName'].setContent( row['name'] );
-			this.$['sheetSelected'].setChecked( row['selectStatus'] );
+			item.$['sheetName'].setContent( row['title'] );
+
+			var dateObj = new Date( row['modifiedDate'] );
+			item.$['sheetUpdated'].setContent( dateObj.format( { date: "longDate", time: "shortTime" } ) );
+
+			item.$['sheetSelected'].setValue( row['selectStatus'] );
 
 			return true;
 		}
 	},
 
 	sheetSelectedChanged: function( inSender, inEvent ) {
-		//VirtualList checkbox control, keep data synced
 
-		this.allSheetsList[inEvent.rowIndex]['selectStatus'] = !this.allSheetsList[inEvent.rowIndex]['selectStatus'];
+		this.allSheetsList[inEvent.index]['selectStatus'] = !this.allSheetsList[inEvent.index]['selectStatus'];
 
-		this.$['spreadsheetList'].render();
+		this.$['sheetList'].renderRow( inEvent.index );
 	},
 
-	menuItemClick: function( inSender ) {
+	menuItemClick: function( inSender, inEvent ) {
 
-		if( inSender.value === 1 ) {
+		if( inEvent.selected.value === 1 ) {
 			//All
 
 			for( var i = 0; i < this.allSheetsList.length; i++ ) {
 
 				this.allSheetsList[i]['selectStatus'] = true;
 			}
-		} else if( inSender.value === 2 ) {
+		} else if( inEvent.selected.value === 2 ) {
 			//None
 
 			for( var i = 0; i < this.allSheetsList.length; i++ ) {
 
 				this.allSheetsList[i]['selectStatus'] = false;
 			}
-		} else if( inSender.value === 3 ) {
+		} else if( inEvent.selected.value === 3 ) {
 			//Invert
 
 			for( var i = 0; i < this.allSheetsList.length; i++ ) {
@@ -483,12 +479,10 @@ enyo.kind({
 			}
 		}
 
-		this.$['spreadsheetList'].render();
+		this.$['sheetList'].setCount( this.allSheetsList.length );
 	},
 
 	beginImportProcess: function() {
-
-		this.log();
 
 		this.$['sheetListButton'].setDisabled( true );
 
@@ -498,10 +492,12 @@ enyo.kind({
 
 			if( this.allSheetsList[i]['selectStatus'] ) {
 
+				this.log( this.allSheetsList[i] );
+
 				this.importItems.push( {
 						"sheetIndex": i,
-						"name": this.allSheetsList[i]['name'],
-						"sheetKey": this.allSheetsList[i]['sheetKey'],
+						"name": this.allSheetsList[i]['title'],
+						"sheetId": this.allSheetsList[i]['id'],
 						"finished": false,
 
 						"pages": [],
@@ -514,7 +510,6 @@ enyo.kind({
 		if( this.importItems.length <= 0 ) {
 
 			this.showErrorMessage( enyo.bind( this, this.closeImport ), "No accounts selected to import" );
-
 			return;
 		}
 
@@ -531,7 +526,13 @@ enyo.kind({
 			this.log( "Window Error (Start)", err );
 		}
 
-		this.$['progress'].load( "Importing Data", "Fetching document specifications", 0 );
+		this.$['progress'].show( {
+				"title": "Importing Data",
+				"message": "Fetching document specifications...",
+				"progress": 0
+			});
+
+		this.$['gssc'].setAuthKey( this.$['gapi'].getAuthToken() );
 
 		enyo.asyncMethod(
 				this,
@@ -543,11 +544,11 @@ enyo.kind({
 
 		this.log();
 
-		this.$['gDataControls'].gdata_fetch_spreadsheet_summary(
-				this.importItems[this.documentIndex]['sheetKey'],
+		this.$['gssc'].fetch_spreadsheet_summary(
+				this.importItems[this.documentIndex]['sheetId'],
 				{
 					'onSuccess': enyo.bind( this, this.parseDocSummary ),
-					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.renderSpreadsheetList ) ),
+					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.rendersheetList ) ),
 					'timeout': 20
 				}
 			);
@@ -555,19 +556,12 @@ enyo.kind({
 
 	parseDocSummary: function( response ) {
 
-		this.log();
-
-		if( this.errorCount >= 3 ) {
-			//Too many errors
-
-			this.error( "Multiple sets of bad data from Google." );
-
-			this.errorCount = 0;
-
-			this.showErrorMessage( enyo.bind( this, this.renderSpreadsheetList ), "There has been an error: Multiple sets of bad data from Google. Please try again later." );
+		if( !this.checkErrorCount() ) {
 
 			return;
 		}
+
+		this.log( arguments );return;
 
 		if( typeof( response.responseJSON.feed.entry ) === "undefined" ) {
 			//Bad data returned
@@ -613,6 +607,19 @@ enyo.kind({
 			this.fetchAccountData( enyo.bind( this, this.startDataPull ) );
 		}
 	},
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 
 	fetchAccountData: function( callbackFn ) {
 
@@ -686,14 +693,14 @@ enyo.kind({
 			return;
 		}
 
-		this.$['gDataControls'].gdata_fetch_spreadsheet_data(
-				this.importItems[this.documentIndex]['sheetKey'],
+		this.$['gssc'].fetch_spreadsheet_data(
+				this.importItems[this.documentIndex]['sheetId'],
 				this.importItems[this.documentIndex]['pages'][this.pageIndex]['pageKey'],
 				offset,
 				limit,
 				{
 					"onSuccess": enyo.bind( this, this.processDocData ),
-					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.renderSpreadsheetList ) ),
+					'onError': enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.fetchsheetList ) ),
 					"timeout": 30
 				}
 			);
@@ -710,7 +717,7 @@ enyo.kind({
 
 			this.errorCount = 0;
 
-			this.showErrorMessage( enyo.bind( this, this.renderSpreadsheetList ), "There has been an error: Multiple sets of bad data from Google. Please try again later." );
+			this.showErrorMessage( enyo.bind( this, this.fetchsheetList ), "There has been an error: Multiple sets of bad data from Google. Please try again later." );
 
 			return;
 		}
@@ -1096,7 +1103,7 @@ enyo.kind({
 
 		var options = {
 				"onSuccess": enyo.bind( this, this.saveDocDataHandler, offset, limit ),
-				"onError": enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.renderSpreadsheetList ), "Error while saving data, please try again. Contact <a href='mailto:GlitchTechScience@gmail.com'>GlitchTechScience@gmail.com</a> if this continues to occur." )
+				"onError": enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.fetchsheetList ), "Error while saving data, please try again. Contact <a href='mailto:GlitchTechScience@gmail.com'>GlitchTechScience@gmail.com</a> if this continues to occur." )
 			};
 
 		//Insert
@@ -1125,7 +1132,7 @@ enyo.kind({
 
 			this.allSheetsList[this.importItems[this.documentIndex]['sheetIndex']]['selectStatus'] = false;
 
-			this.$['spreadsheetList'].render();
+			this.$['sheetList'].render();
 
 			this.documentIndex++;
 			this.pageIndex = 0;
@@ -1143,6 +1150,23 @@ enyo.kind({
 		}
 	},
 
+	checkErrorCount: function() {
+
+		if( this.errorCount >= 3 ) {
+			//Too many errors
+
+			this.error( "Multiple sets of bad data from Google." );
+
+			this.errorCount = 0;
+
+			this.showErrorMessage( enyo.bind( this, this.fetchsheetList ), "There has been an error: Multiple sets of bad data from Google. Please try again later." );
+
+			return true;
+		}
+
+		return false;
+	},
+
 	fatalError: function( message ) {
 
 		this.showErrorMessage( enyo.bind( this, this.closeImport, true ), message );
@@ -1152,16 +1176,16 @@ enyo.kind({
 
 		this.onErrorClose = callbackFn;
 
-		this.$['progress'].close();
+		this.$['progress'].hide();
 
 		//set error message
-		this.$['errorMessage'].setErrMessage( error );
-		this.$['errorMessage'].openAtCenter();
+		this.$['errorMessage'].show();
+		this.$['errorMessage'].setMainMessage( error );
 	},
 
 	closeErrorMessage: function() {
 
-		this.$['errorMessage'].close();
+		this.$['errorMessage'].hide();
 
 		this.onErrorClose();
 	},

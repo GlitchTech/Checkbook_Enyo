@@ -29,7 +29,7 @@ enyo.kind({
 		errTitle: "System Error",
 		mainMessage: "Something happend that should not have. Sorry about that.",
 		secondaryMessage: "",
-		errorIcon: "assets/warning-icon.png"
+		errorIcon: "assets/status_icons/warning.png"
 	},
 
 	events: {
