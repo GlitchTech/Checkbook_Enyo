@@ -191,9 +191,10 @@ enyo.kind({
 
 		{
 			name: "progress",
-			//kind: GTS.progress
-
-			load: function() { this.log( arguments ); }
+			kind: "GTS.ProgressDialog",
+			animateProgress: true,
+			onCancel: "closeImport",
+			cancelText: "Cancel"
 		}, {
 			name: "errorMessage",
 			//kind: GTS.system_error,
@@ -233,6 +234,11 @@ enyo.kind({
 		this.$['sheetList'].hide();
 
 		//Show message of loading
+		this.$['progress'].show( {
+				"title": "Import Progress",
+				"message": "Linking to Google...",
+				"progress": 25
+			});
 
 		this.refreshLayout();
 	},
@@ -244,6 +250,8 @@ enyo.kind({
 
 	gapiReady: function() {
 
+		this.$['progress'].setProgress( 60 );
+
 		//check for pre-existing g-data log in
 		Checkbook.globals.gts_db.query(
 				"SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;",
@@ -254,6 +262,8 @@ enyo.kind({
 	},
 
 	decryptGapiData: function( results ) {
+
+		this.$['progress'].setProgress( 90 );
 
 		if( results.length > 0 ) {
 
@@ -267,6 +277,9 @@ enyo.kind({
 							this.loadGapiData
 						)
 				);
+		} else {
+
+			this.loadGapiData( "" );
 		}
 	},
 
@@ -280,6 +293,7 @@ enyo.kind({
 		this.$['instructionsButton'].setDisabled( false );
 
 		//hide message of loading
+		this.$['progress'].hide();
 	},
 
 	authenticateWithGoogle: function() {
@@ -295,6 +309,12 @@ enyo.kind({
 	},
 
 	userAuthenticated: function() {
+
+		this.$['progress'].show( {
+				"title": "Import Progress",
+				"message": "Authenticated...",
+				"progress": 15
+			});
 
 		//save credentials
 		if( this.$['saveCredentials'].getValue() ) {
@@ -334,14 +354,16 @@ enyo.kind({
 
 	fetchSpreadsheetList: function() {
 
-		this.log( gapi );
 		//https://developers.google.com/apis-explorer/#p/drive/v2/
 		//https://developers.google.com/drive/v2/reference/
 
-		return;
+		this.$['progress'].show( {
+				"title": "Import Progress",
+				"message": "Retrieving spreadsheets...",
+				"progress": 25
+			});
 
-		this.$['progress'].setMessage( "Retrieving spreadsheets..." );
-		this.$['progress'].setProgress( 50 );
+		return;
 
 		//save credentials
 		if( this.$['saveCredentials'].getChecked() ) {

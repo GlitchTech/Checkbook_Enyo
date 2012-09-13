@@ -22,6 +22,7 @@ enyo.depends(
 	"$lib/gts-plugins/TimePicker",
 	"$lib/gts-plugins/DecimalInput",
 	"$lib/gts-plugins/ConfirmDialog",
+	"$lib/gts-plugins/ProgressDialog",
 
 	"$lib/private",
 
