@@ -120,14 +120,14 @@ enyo.kind({
 
 	/** Event Handlers **/
 
-	handleSetupRow: function() {
+	handleSetupRow: function( inSender, inEvent ) {
 
 		if( enyo.isFunction( this.doSetupRow ) && this.onSetupRow !== "" ) {
 
-			return( this.doSetupRow.apply( this, arguments ) );
+			return( this.doSetupRow( inEvent ) );
 		} else {
 
-			return( this.setupRow.apply( this, arguments ) );
+			return( this.setupRow( inSender, inEvent ) );
 		}
 	},
 

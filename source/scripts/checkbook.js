@@ -47,19 +47,25 @@ enyo.kind({
 											content: "Export Data (NYI)",
 											ontap: "openExport"
 										}, {
+											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
+											showing: false,
 											content: "Search (NYI)",
 											//ontap: "openSearch"
 										}, {
+											showing: false,
 											content: "Budget (NYI)",
 											//ontap: "openBudget"
 										}, {
+											showing: false,
 											content: "Reports (NYI)",
 											//ontap: "openReports"
 										}, {
+											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
+											showing: false,
 											content: "Report Bug (NYI)",
 											//ontap: "errorReport"
 										}, {
@@ -206,7 +212,6 @@ enyo.kind({
 
 		if( this.paneStack.length > 0 ) {
 
-			//this.hidePanePopup(  );
 			this.$[this.paneStack[this.paneStack.length - 1]].doFinish();
 		//} else if( showing only transaction window ) {
 
@@ -361,7 +366,7 @@ enyo.kind({
 					"~|p2t|~",
 					"",
 					"~|mt|~",
-					"assets/warning-icon.png"
+					"assets/status_icons/warning.png"
 				);
 		}
 	},
@@ -441,6 +446,19 @@ enyo.kind({
 			//show base view
 			this.$['container'].show();
 		}
+	},
+
+	/** Checkbook.preferences **/
+
+	openPreferences: function() {
+
+		this.showPanePopup(
+				null,
+				{
+					name: "preferences",
+					kind: "Checkbook.preferences"
+				}
+			);
 	},
 
 	/** Checkbook.Import && Checkbook.Export **/
@@ -540,45 +558,6 @@ enyo.kind({
 
 			inSender.doNext( changesMade );
 		}
-	},
-
-	/** Checkbook.preferences && ( Checkbook.preferences --> Checkbook.accounts.view ) Communication Channels **/
-
-	openPreferences: function() {
-
-		this.showPanePopup(
-				null,
-				{
-					name: "preferences",
-					kind: "Checkbook.preferences",
-					//onFinish: "closePopup",
-
-					//Account Controls
-					onModify: "showPanePopup",
-					onChanged: "prefAccoutChanged",
-					onDelete: "prefAccoutDeleted"
-				}
-			);
-	},
-
-	prefAccoutChanged: function( inSender, inAccount ) {
-
-		enyo.Signals.send( "accountChanged" );
-
-		if( inAccount ) {
-			//Needs to have more than inSender
-
-			enyo.Signals.send( "viewAccount", { account: inAccount, force: true } )
-		}
-	},
-
-	prefAccoutDeleted: function() {
-
-		this.log( "Update account list", arguments );
-
-		enyo.Signals.send( "accountChanged" );
-
-		this.accoutDeleted.apply( this, arguments );
 	},
 
 	/** ( Checkbook.transactions.view --> Checkbook.accounts.view ) Communication Channels **/

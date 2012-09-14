@@ -8,10 +8,7 @@ enyo.kind({
 	style: "height: 100%;",
 
 	events: {
-		onFinish: "",
-		onModify: "",
-		onChanged: "",
-		onDelete: ""
+		onFinish: ""
 	},
 
 	components: [
@@ -33,11 +30,11 @@ enyo.kind({
 		{
 			kind: "enyo.Scroller",
 			horizontal: "hidden",
-			//classes: "tardis-blue-gradient",
+			classes: "tardis-blue-gradient",
 			fit: true,
 			components: [
 				{
-					classes: "light narrow-column",
+					classes: "light narrow-column padding-half-top padding-half-bottom",
 					style: "min-height: 100%;",
 					components: [
 						{
@@ -168,11 +165,7 @@ enyo.kind({
 
 											style: "height: 300px;",
 											classes: "checkbook-stamp",
-											onSetupRow: "setupRow",
-
-											onModify: "doModify",
-											onChanged: "doChanged",
-											onDelete: "doDelete"
+											onSetupRow: "setupRow"
 										}
 									]
 								}, {
@@ -293,8 +286,6 @@ enyo.kind({
 
 	rendered: function() {
 
-		this.inherited( arguments );
-
 		this.$['pinLock'].setValue( Checkbook.globals.prefs['useCode'] === 1 );
 		this.$['pinCode'].setValue( Checkbook.globals.prefs['code'] );
 		this.$['pinLockDrawer'].setOpen( this.$['pinLock'].getValue() );
@@ -307,6 +298,8 @@ enyo.kind({
 		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
 
 		this.$['entries'].renderAccountList();
+
+		this.inherited( arguments );
 	},
 
 	/** PIN Controls **/
@@ -397,25 +390,29 @@ enyo.kind({
 
 	/** Account Controls **/
 
-	setupRow: function( inControl, inSender, inIndex ) {
+	setupRow: function( inSender, inEvent ) {
 
-		var row = inControl.accounts[inIndex];
+		var index = inEvent.index;
+
+		var row = inSender.accounts[index];
 
 		if( row ) {
 
-			inControl.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
+			row['index'] = index;
+
+			inSender.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
 
 			if( row['hidden'] === 2 ) {
 
-				inControl.$['icon'].setSrc( imgToGrey( "assets/" + row['acctCategoryIcon'] ) );
+				inSender.$['icon'].setSrc( imgToGrey( "assets/" + row['acctCategoryIcon'] ) );
 			} else {
 
-				inControl.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
+				inSender.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 			}
 
-			inControl.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
+			inSender.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
 
-			inControl.$['name'].setContent( row['acctName'] );
+			inSender.$['name'].setContent( row['acctName'] );
 
 			return true;
 		}
@@ -456,13 +453,12 @@ enyo.kind({
 	addAccount: function() {
 
 		//Prevent user from launching multiple New Account windows
-		if( this.$['addAccountButton'].getDepressed() && !this.$['addAccountButton'].getDisabled() ) {
+		if( !this.$['addAccountButton'].getDisabled() ) {
 
 			this.$['addAccountButton'].setDisabled( true );
 
-			enyo.asyncMethod(
-					this,
-					this.doModify,
+			enyo.Signals.send(
+					"modifyAccount",
 					{
 						name: "addAccount",
 						kind: "Checkbook.accounts.modify",
@@ -473,24 +469,20 @@ enyo.kind({
 		}
 	},
 
-	addAccountComplete: function( inSender, action, actionStatus ) {
+	addAccountComplete: function( inSender, inEvent ) {
 
-		this.$['addAccountButton'].setDepressed( false );
 		this.$['addAccountButton'].setDisabled( false );
 
-		if( action === 1 && actionStatus === true ) {
+		if( inEvent['action'] === 1 && inEvent['actionStatus'] === true ) {
 
-			this.log( "New account created" );
-
-			this.$['entries'].renderAccountList();
-			this.doChanged();
+			enyo.Signals.send( "accountChanged" );
 		}
 	},
 
 	/** Category Controls **/
 	modifyAccountCategories: function() {
 
-		if( this.$['editAccountCategories'].getDepressed() && !this.$['editAccountCategories'].getDisabled() ) {
+		if( !this.$['editAccountCategories'].getDisabled() ) {
 
 			this.$['editAccountCategories'].setDisabled( true );
 
@@ -503,25 +495,23 @@ enyo.kind({
 					owner: this
 				});
 
-			this.$['accountCategoryView'].render();
-			this.$['accountCategoryView'].openAtCenter();
+			this.$['accountCategoryView'].show();
 		}
 	},
 
 	modifyAccountCategoriesComplete: function() {
 
-		this.$['entries'].renderAccountList();
-		this.doChanged();
+		enyo.Signals.send( "accountChanged" );
 
+		this.$['accountCategoryView'].hide();
 		this.$['accountCategoryView'].destroy();
 
-		this.$['editAccountCategories'].setDepressed( false );
 		this.$['editAccountCategories'].setDisabled( false );
 	},
 
 	modifyTransactionCategories: function() {
 
-		if( this.$['editTransactionCategories'].getDepressed() && !this.$['editTransactionCategories'].getDisabled() ) {
+		if( !this.$['editTransactionCategories'].getDisabled() ) {
 
 			this.$['editTransactionCategories'].setDisabled( true );
 
@@ -534,16 +524,15 @@ enyo.kind({
 					owner: this
 				});
 
-			this.$['transactionCategoryView'].render();
-			this.$['transactionCategoryView'].openAtCenter();
+			this.$['transactionCategoryView'].show();
 		}
 	},
 
 	modifyTransactionCategoriesComplete: function() {
 
+		this.$['transactionCategoryView'].hide();
 		this.$['transactionCategoryView'].destroy();
 
-		this.$['editTransactionCategories'].setDepressed( false );
 		this.$['editTransactionCategories'].setDisabled( false );
 	},
 
@@ -552,39 +541,45 @@ enyo.kind({
 
 		this.createComponent( {
 				name: "fullwipeConfirm",
-				kind: "GTS.deleteConfirm",
+				kind: "gts.ConfirmDialog",
 
-				owner: this,
+				title: "Purge All Data",
+				message: "Are you sure? Remember this cannot be undone. This app will try to exit when process is complete.",
 
-				confirmTitle: "Purge All Data",
-				confirmMessage: "Are you sure? Remember this cannot be undone. This app will exit when process is complete.",
-				confirmButtonYes: "Delete Everything",
-				confirmButtonNo: "Cancel",
+				confirmText: "Delete Everything",
+				confirmClass: "onyx-negative",
 
-				onYes: "fullwipeRun",
-				onNo: "fullwipeConfirmClose"
+				cancelText: "Cancel",
+				cancelClass: "",
+
+				onConfirm: "fullwipeRun",
+				onCancel: "fullwipeConfirmClose"
 			});
 
-		this.$['fullwipeConfirm'].render();
-		this.$['fullwipeConfirm'].openAtCenter();
+		this.$['fullwipeConfirm'].show();
 	},
 
 	fullwipeConfirmClose: function() {
 
+		this.$['fullwipeConfirm'].hide();
 		this.$['fullwipeConfirm'].destroy();
 	},
 
 	fullwipeRun: function() {
 
-		this.$['fullwipeConfirm'].destroy();
+		this.fullwipeConfirmClose();
 
 		this.createComponent( {
 				name: "wipeProgress",
-				kind: "GTS.progress"
+				kind: "GTS.ProgressDialog",
+				animateProgress: true,
 			});
 
-		this.$['wipeProgress'].render();
-		this.$['wipeProgress'].load( "Purging All Data", "Please wait...", 50 );
+		this.$['progress'].show( {
+				"title": "Purging All Data",
+				"message": "Please wait...",
+				"progress": 50
+			});
 
 		Checkbook.globals.gts_db.queries(
 				[
@@ -611,12 +606,5 @@ enyo.kind({
 	deleteEverythingDone: function() {
 
 		window.close();
-		/*
-		//Multi-window version?
-		for( var win in enyo.windows.getWindows() ) {
-
-			win.close();
-		}
-		*/
 	}
 });

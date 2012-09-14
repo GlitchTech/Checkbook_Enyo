@@ -47,6 +47,7 @@ enyo.kind( {
 					kind: "onyx.InputDecorator",
 					layoutKind: "FittableColumnsLayout",
 					classes: "onyx-focused margin-bottom",
+					alwaysLooksFocused: true,
 					components: [
 						{
 							name: "pin",

@@ -111,7 +111,7 @@ enyo.kind({
 					components: [
 						{
 							kind: "enyo.Image",
-							src: "assets/warning-icon.png",
+							src: "assets/status_icons/warning.png",
 							style: "margin-right: 5px;"
 						}, {
 							name: "errorMessage",
