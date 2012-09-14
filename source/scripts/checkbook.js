@@ -470,7 +470,7 @@ enyo.kind({
 
 	importComplete: function( inSender, importStatus ) {
 
-		if( importStatus === true ) {
+		if( importStatus['success'] === true ) {
 
 			this.$['transactions'].reloadSystem();
 

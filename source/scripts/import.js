@@ -10,7 +10,7 @@ enyo.kind({
 	allSheetsList: [],
 	importItems: [],
 
-	standardLimit: 500,
+	standardLimit: 100,
 
 	events: {
 		onFinish: ""
@@ -581,7 +581,8 @@ enyo.kind({
 			//Add page to array with all sheet Ids
 			this.importItems[this.documentIndex]['pages'].push( {
 					"pageKey": data[i]['id']['#text'].slice( data[i]['id']['#text'].lastIndexOf( "/" ) + 1 ),
-					"title": data[i]['title']['#text']
+					"title": data[i]['title']['#text'],
+					"totalResults": 0
 				});
 		}
 
@@ -677,11 +678,8 @@ enyo.kind({
 		if( this.checkErrorCount( 5 ) ) { return; }
 
 		if( typeof( data ) === "undefined" ||
-			typeof( data.feed ) === "undefined" ||
-			typeof( data.feed.entry ) === "undefined" ) {
+			typeof( data.feed ) === "undefined" ) {
 			//Bad data returned
-
-			this.log( data );
 
 			this.error( "Bad data from Google." );
 			this.$['progress'].setMessage( "Attempting to fix bad import data" );
@@ -698,6 +696,12 @@ enyo.kind({
 		this.importItems[this.documentIndex]['limit'] = parseInt( data.feed['openSearch:itemsPerPage']['#text'] );
 		this.importItems[this.documentIndex]['offset'] = parseInt( data.feed['openSearch:startIndex']['#text'] );
 		this.importItems[this.documentIndex]['totalResults'] = parseInt( data.feed['openSearch:totalResults']['#text'] );
+
+		if( this.importItems[this.documentIndex]['totalResults'] <= 0 || typeof( data.feed.entry ) === "undefined" ) {
+
+			this.nextDocumentPage();
+			return;
+		}
 
 		var data = data.feed.entry;
 
@@ -751,8 +755,6 @@ enyo.kind({
 	},
 
 	processDocDataFollower: function( entry ) {
-
-		this.log();
 
 		var data = enyo.isArray( entry ) ? entry : [];
 		var trsn;
@@ -902,12 +904,7 @@ enyo.kind({
 			}
 		}
 
-		var pageProgress = ( data.length + this.importItems[this.documentIndex]['offset'] ) / this.importItems[this.documentIndex]['totalResults'];
-		var docProgress = ( ( pageProgress > 1 ? 1 : pageProgress ) + this.pageIndex ) / this.importItems[this.documentIndex]['pages'].length;
-		var totalProgress = ( ( docProgress / 2 ) + this.documentIndex ) / this.importItems.length * 100;
-
-		this.$['progress'].setMessage( this.importItems[this.documentIndex]['name'] + "<br />Downloading: " + ( new Number( docProgress ) ).toFixed( 1 ) + "%" );
-		this.$['progress'].setProgress( totalProgress );
+		this.updateDocDownloadProgress( data.length );
 
 		if( ( this.importItems[this.documentIndex]['limit'] + this.importItems[this.documentIndex]['offset'] ) < this.importItems[this.documentIndex]['totalResults'] ) {
 
@@ -920,18 +917,19 @@ enyo.kind({
 		}
 	},
 
+	updateDocDownloadProgress: function( dataLength ) {
 
+		var pageProgress = ( dataLength + this.importItems[this.documentIndex]['offset'] ) / this.importItems[this.documentIndex]['totalResults'];
+		var docProgress = ( ( pageProgress > 1 ? 1 : pageProgress ) + this.pageIndex ) / this.importItems[this.documentIndex]['pages'].length;
+		var totalProgress = ( ( ( docProgress / 2 ) + this.documentIndex ) / this.importItems.length ) * 100;
 
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
+		this.$['progress'].setMessage( this.importItems[this.documentIndex]['name'] + "<br />Downloading: " + ( new Number( isNaN( docProgress ) ? 0 : docProgress ) ).toFixed( 1 ) + "%" );
 
+		if( !isNaN( totalProgress ) ) {
 
-
-
-
+			this.$['progress'].setProgress( totalProgress );
+		}
+	},
 
 	getNode: function( container, id ) {
 
@@ -946,8 +944,6 @@ enyo.kind({
 	},
 
 	nextDocumentPage: function() {
-
-		this.log();
 
 		this.pageIndex++;
 
@@ -969,8 +965,6 @@ enyo.kind({
 	},
 
 	insertNewAccounts: function() {
-
-		this.log();
 
 		var data = {
 				"table": "accounts",
@@ -994,8 +988,6 @@ enyo.kind({
 	},
 
 	saveDocData: function( offset, limit ) {
-
-		this.log( "( " + offset + ", " + limit + " )" );
 
 		var queries = [];
 
@@ -1087,8 +1079,6 @@ enyo.kind({
 	},
 
 	saveDocDataHandler: function( offset, limit ) {
-
-		this.log( "( " + offset + ", " + limit + " )" );
 
 		Checkbook.globals.accountManager.updateAccountModTime();
 
@@ -1186,6 +1176,6 @@ enyo.kind({
 		this.$['sheetList'].hide();
 
 		//Close & continue
-		this.doFinish( success );
+		this.doFinish( { "success": success } );
 	}
 });
