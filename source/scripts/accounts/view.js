@@ -125,7 +125,8 @@ enyo.kind( {
 
 			accountChanged: "renderAccountList",
 			balanceChanged: "refresh",
-			balanceViewChanged: "accountBalanceViewChanged"
+			balanceViewChanged: "accountBalanceViewChanged",
+			accountBalanceChanged: "accountBalanceChanged"
 		}
 	],
 
@@ -193,7 +194,10 @@ enyo.kind( {
 	/**
 	 * TODO DEFINITION
 	 */
-	accountBalanceChanged: function( index, deltaBalanceArr ) {
+	accountBalanceChanged: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		return;
 
 		if( !Object.isNumber( index ) || index < 0 || index >= this.$['entries'].accounts.length ) {
 
@@ -204,6 +208,55 @@ enyo.kind( {
 		this.$['entries'].accounts[index]['balance1'] = deltaBalanceArr[1];
 		this.$['entries'].accounts[index]['balance2'] = deltaBalanceArr[2];
 		this.$['entries'].accounts[index]['balance3'] = deltaBalanceArr[3];
+
+		this.$['entries'].refresh();
+		this.accountBalanceForceUpdate();
+	//},
+
+	//accountBalanceChanged: function( inSender, accts, deltaBalanceArr ) {
+
+		var acctIndex = accts['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['account'] ) : - 1;
+
+		if( acctIndex >= 0 ) {
+
+			if( accts['accountBal'].length > 0 ) {
+
+				this.$['accounts'].accountBalanceChanged(
+						acctIndex,
+						accts['accountBal']
+					);
+			} else {
+
+				Checkbook.globals.accountManager.fetchAccountBalance( accts['account'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['account'], acctIndex ) } );
+			}
+		}
+
+		var linkedIndex = accts['linkedAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['linkedAccount'] ) : - 1;
+
+		if( linkedIndex >= 0 ) {
+
+			Checkbook.globals.accountManager.fetchAccountBalance( accts['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['linkedAccount'], linkedIndex ) } );
+		}
+
+		var atIndex = accts['atAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['atAccount'] ) : - 1;
+
+		if( atIndex >= 0 ) {
+
+			Checkbook.globals.accountManager.fetchAccountBalance( accts['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['atAccount'], atIndex ) } );
+		}
+	},
+
+	accountBalanceChangedHandler: function( index, results ) {
+
+		if( !Object.isNumber( index ) || index < 0 || index >= this.$['entries'].accounts.length ) {
+
+			return;
+		}
+
+		this.$['entries'].accounts[index]['balance0'] = newBal[0];
+		this.$['entries'].accounts[index]['balance1'] = newBal[1];
+		this.$['entries'].accounts[index]['balance2'] = newBal[2];
+		this.$['entries'].accounts[index]['balance3'] = newBal[3];
 
 		this.$['entries'].refresh();
 		this.accountBalanceForceUpdate();

@@ -9,7 +9,7 @@ enyo.kind({
 	name: "Checkbook.transactionCategory.select",
 	kind: "onyx.Popup",
 
-	classes: "small-input-popup",
+	classes: "small-popup",
 
 	centered: true,
 	floating: true,

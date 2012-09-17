@@ -1,15 +1,19 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.accountCategory.view",
-	kind: enyo.Popup,
-//	layoutKind: enyo.VFlexLayout,
+	kind: "onyx.Popup",
+	//Should not be a popup. Maybe fullscreen or view to the side.
 
-	modal: true,
+	classes: "small-popup",
+
+	centered: true,
+	floating: true,
+
 	scrim: true,
+	scrimclasses: "onyx-scrim-translucent",
 
-	style: "width: 400px;",
+	autoDismiss: false,
 
 	categories: [],
 
@@ -19,17 +23,12 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Header,
-			layoutKind: enyo.HFlexLayout,
-			align: "center",
-
-			className: "enyo-header-dark popup-header",
-			style: "border-radius: 10px; margin-bottom: 10px;",
+			kind: "onyx.Toolbar",
+			classes: "text-center",
+			style: "position: relative; background: none; border: 0;",
 
 			components: [
 				{
-					style: "text-align: center; margin-right: -32px;",
-					flex: 1,
 					components: [
 						{
 							content: "Account Categories",
@@ -40,17 +39,19 @@ enyo.kind({
 						}
 					]
 				}, {
-					kind: enyo.ToolButton,
-					icon: "assets/menu_icons/close.png",
-					className: "img-icon",
-					style: "text-align: center;",
-					ontap: "close"
+					kind: "onyx.Button",
+					ontap: "closeView",
+
+					content: "x",
+
+					classes: "onyx-negative",
+					style: "position: absolute; right: 5px; padding: 3px 12px;"
 				}
 			]
 		}, {
 
 			name: "entries",
-			kind: "ReorderableVirtualList",
+			//kind: "ReorderableVirtualList",
 
 			style: "height: 325px;",
 			reorderable: true,
@@ -63,7 +64,7 @@ enyo.kind({
 				{
 					name: "item",
 
-					kind: enyo.SwipeableItem,
+				//	kind: enyo.SwipeableItem,
 				//	layoutKind: enyo.VFlexLayout,
 
 					tapHighlight: true,
@@ -72,13 +73,13 @@ enyo.kind({
 
 					components: [
 						{
-							kind: enyo.HFlexBox,
+						//	kind: enyo.HFlexBox,
 							className: "account",
 							align: "center",
 							components: [
 								{
 									name: "icon",
-									kind: enyo.Image,
+									//kind: enyo.Image,
 									className: "accountIcon"
 								}, {
 									name: "name",
@@ -90,18 +91,13 @@ enyo.kind({
 					]
 				}
 			]
-		},
-
-		{
-			kind: enyo.Toolbar,
-			components: [
+		}, {
+			classes: "padding-std text-center",
+			components:[
 				{
 					kind: "onyx.Button",
+					content: "Create New",
 
-					flex: 2,
-					className: "enyo-button-primary",
-
-					caption: "Create New",
 					ontap: "createNew"
 				}
 			]
@@ -109,14 +105,14 @@ enyo.kind({
 
 		{
 			name: "modifyCat",
-			kind: "Checkbook.accountCategory.modify",
+			//kind: "Checkbook.accountCategory.modify",
 
 			onChange: "modificationComplete",
 		},
 
 		{
 			name: "manager",
-			kind: "Checkbook.accountCategory.manager"
+			//kind: "Checkbook.accountCategory.manager"
 		}
 	],
 

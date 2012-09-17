@@ -213,7 +213,6 @@ enyo.kind({
 										{
 											name: "editAccountCategories",
 											kind: "onyx.Button",
-											toggling: true,
 
 											content: "Edit Account Categories",
 											classes: "full-width",
@@ -227,7 +226,6 @@ enyo.kind({
 										{
 											name: "editTransactionCategories",
 											kind: "onyx.Button",
-											toggling: true,
 
 											content: "Edit Transaction Categories",
 											classes: "full-width",
@@ -236,17 +234,17 @@ enyo.kind({
 										}
 									]
 								}, {
+									showing: false,
 									kind: "onyx.Item",
 									components: [
 										{
-											name: "",
+											name: "editAutoCompleteSettings",
 											kind: "onyx.Button",
-											toggling: true,
 
 											content: "Auto-Complete Settings",
 											classes: "full-width",
 
-											ontap: ""
+											ontap: "modifyAutoCompleteSettings"
 										}
 									]
 								}
@@ -393,26 +391,26 @@ enyo.kind({
 	setupRow: function( inSender, inEvent ) {
 
 		var index = inEvent.index;
-
+		var item = inEvent.item;
 		var row = inSender.accounts[index];
 
 		if( row ) {
 
 			row['index'] = index;
 
-			inSender.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
+			item.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
 
 			if( row['hidden'] === 2 ) {
 
-				inSender.$['icon'].setSrc( imgToGrey( "assets/" + row['acctCategoryIcon'] ) );
+				item.$['icon'].setSrc( imgToGrey( "assets/" + row['acctCategoryIcon'] ) );
 			} else {
 
-				inSender.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
+				item.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 			}
 
-			inSender.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
+			item.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
 
-			inSender.$['name'].setContent( row['acctName'] );
+			item.$['name'].setContent( row['acctName'] );
 
 			return true;
 		}
@@ -480,6 +478,7 @@ enyo.kind({
 	},
 
 	/** Category Controls **/
+
 	modifyAccountCategories: function() {
 
 		if( !this.$['editAccountCategories'].getDisabled() ) {
@@ -536,7 +535,37 @@ enyo.kind({
 		this.$['editTransactionCategories'].setDisabled( false );
 	},
 
+	modifyAutoCompleteSettings: function() {
+
+		return;
+
+		if( !this.$['editAutoCompleteSettings'].getDisabled() ) {
+
+			this.$['editAutoCompleteSettings'].setDisabled( true );
+
+			this.createComponent( {
+					name: "autoCompleteSettingsView",
+					//kind: "Checkbook.transactionCategory.view",
+
+					onClose: "modifyTransactionCategoriesComplete",
+
+					owner: this
+				});
+
+			this.$['autoCompleteSettingsView'].show();
+		}
+	},
+
+	modifyTransactionCategoriesComplete: function() {
+
+		this.$['autoCompleteSettingsView'].hide();
+		this.$['autoCompleteSettingsView'].destroy();
+
+		this.$['editAutoCompleteSettings'].setDisabled( false );
+	},
+
 	/** Full Wipe Control **/
+
 	fullwipe: function() {
 
 		this.createComponent( {

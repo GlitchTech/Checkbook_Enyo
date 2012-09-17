@@ -558,55 +558,5 @@ enyo.kind({
 
 			inSender.doNext( changesMade );
 		}
-	},
-
-	/** ( Checkbook.transactions.view --> Checkbook.accounts.view ) Communication Channels **/
-
-	accountBalanceChanged: function( inSender, accts, deltaBalanceArr ) {
-
-		var acctIndex = accts['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['account'] ) : - 1;
-
-		if( acctIndex >= 0 ) {
-
-			if( accts['accountBal'].length > 0 ) {
-
-				this.$['accounts'].accountBalanceChanged(
-						acctIndex,
-						accts['accountBal']
-					);
-			} else {
-
-				Checkbook.globals.accountManager.fetchAccountBalance( accts['account'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['account'], acctIndex ) } );
-			}
-		}
-
-		var linkedIndex = accts['linkedAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['linkedAccount'] ) : - 1;
-
-		if( linkedIndex >= 0 ) {
-
-			Checkbook.globals.accountManager.fetchAccountBalance( accts['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['linkedAccount'], linkedIndex ) } );
-		}
-
-		var atIndex = accts['atAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( accts['atAccount'] ) : - 1;
-
-		if( atIndex >= 0 ) {
-
-			Checkbook.globals.accountManager.fetchAccountBalance( accts['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, accts['atAccount'], atIndex ) } );
-		}
-	},
-
-	accountBalanceChangedHandler: function( id, index, results ) {
-
-		var newBal = [
-				prepAmount( results['balance0'] ),
-				prepAmount( results['balance1'] ),
-				prepAmount( results['balance2'] ),
-				prepAmount( results['balance3'] )
-			];
-
-		this.$['accounts'].accountBalanceChanged(
-				index,
-				newBal
-			);
 	}
 });

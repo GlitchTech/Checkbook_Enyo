@@ -15,7 +15,7 @@ enyo.kind({
 	name: "Checkbook.pinChangePopup",
 	kind: "onyx.Popup",
 
-	classes: "small-input-popup",
+	classes: "small-popup",
 
 	centered: true,
 	floating: true,

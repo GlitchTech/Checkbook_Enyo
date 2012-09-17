@@ -4,7 +4,7 @@ enyo.kind( {
 	name: "Checkbook.transactions.viewSingle",
 	kind: "onyx.Popup",
 
-	classes: "large-input-popup",
+	classes: "large-popup",
 
 	centered: true,
 	floating: true,
@@ -233,6 +233,8 @@ enyo.kind( {
 	 */
 	constructor: function() {
 
+		this.log();
+
 		this.inherited( arguments );
 
 		this._binds = {
@@ -243,20 +245,13 @@ enyo.kind( {
 
 	/**
 	 * @protected
-	 * @extends onyx.Popup#rendered
-	 */
-	rendered: function() {
-
-		this.inherited( arguments );
-	},
-
-	/**
-	 * @protected
 	 * @extends onyx.Popup#show
 	 *
 	 * @param boolean shortTerm Hide popup without closing procedure
 	 */
 	show: function( shortTerm ) {
+
+		this.log();
 
 		if( !shortTerm ) {
 
@@ -299,6 +294,8 @@ enyo.kind( {
 	 */
 	reflow: function() {
 
+		this.log();
+
 		this.$['scroller'].applyStyle( "height", null );
 
 		this.inherited( arguments );
@@ -313,6 +310,8 @@ enyo.kind( {
 	 * @param boolean shortTerm Hide popup without closing procedure
 	 */
 	hide: function( shortTerm ) {
+
+		this.log();
 
 		if( !shortTerm ) {
 
@@ -331,11 +330,15 @@ enyo.kind( {
 
 	loadAccount: function( finishRender, result ) {
 
+		this.log();
+
 		this.account = result;
 		this.renderDisplay( finishRender );
 	},
 
 	renderDisplay: function( finishRender ) {
+
+		this.log();
 
 		if( this.account['frozen'] === 1 ) {
 
@@ -432,6 +435,8 @@ enyo.kind( {
 
 	renderFromAccount: function( acct ) {
 
+		this.log();
+
 		this.$['fromAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['fromAccount'].setContent( acct['acctName'] );
 
@@ -445,6 +450,8 @@ enyo.kind( {
 	},
 
 	renderToAccount: function( acct ) {
+
+		this.log();
 
 		this.$['toAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['toAccount'].setContent( acct['acctName'] );
@@ -462,7 +469,16 @@ enyo.kind( {
 
 	clearToggled: function() {
 
-		var cleared = this.doClear( { "rowIndex": this.index } );
+		this.log();
+
+		var cleared = this.doClear( { "rowIndex": this.index, "callback": enyo.bind( this, this.clearToggledHandler ) } );
+
+		return true;
+	},
+
+	clearToggledHandler: function( cleared ) {
+
+		this.log();
 
 		this.$['cleared'].setValue( cleared );
 
@@ -471,11 +487,15 @@ enyo.kind( {
 
 	editClicked: function() {
 
+		this.log();
+
 		this.doEdit( { "rowIndex": this.index } );
 		enyo.asyncMethod( this, this.hide );
 	},
 
 	deleteClicked: function() {
+
+		this.log();
 
 		this.createComponent( {
 				name: "deleteTransactionConfirm",
@@ -500,11 +520,15 @@ enyo.kind( {
 
 	deleteTransactionConfirmClose: function() {
 
+		this.log();
+
 		this.$['deleteTransactionConfirm'].destroy();
 		this.show( true );
 	},
 
 	deleteTransactionHandler: function() {
+
+		this.log();
 
 		this.deleteTransactionConfirmClose();
 		this.doDelete( { "rowIndex": this.index } );

@@ -6,10 +6,6 @@ enyo.kind( {
 	transactions: [],
 	account: {},
 
-	events: {
-		onBalanceChanged: ""
-	},
-
 	components: [
 		{
 			name: "list",
@@ -140,6 +136,8 @@ enyo.kind( {
 
 	accountChanged: function( inSender, inEvent ) {
 
+		this.log();
+
 		if( inEvent && inEvent.deleted && this.getAccountId() === inEvent.accountId ) {
 
 			this.unloadSystem();
@@ -151,11 +149,15 @@ enyo.kind( {
 
 	unloadSystem: function() {
 
+		this.log();
+
 		this.account = {};
 		this.$['list'].empty();
 	},
 
 	reloadSystem: function() {
+
+		this.log();
 
 		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
 
@@ -166,10 +168,12 @@ enyo.kind( {
 
 		this.reloadTransactionList();
 		this.initialScroll();
-		this.doBalanceChanged();
+		enyo.Signals.send( "accountBalanceChanged", {} );
 	},
 
 	reloadTransactionList: function() {
+
+		this.log();
 
 		this.transactions = [];
 		this.$['list'].setCount( 0 );
@@ -178,6 +182,8 @@ enyo.kind( {
 	},
 
 	initialScroll: function() {
+
+		this.log();
 
 		if( !( this.account['sort'] === 0 || this.account['sort'] === 1 || this.account['sort'] === 6 || this.account['sort'] === 7 ) ) {
 
@@ -233,6 +239,8 @@ enyo.kind( {
 	},
 
 	initialScrollHandler: function( results ) {
+
+		this.log();
 
 		var scrollToIndex = 0;
 
@@ -330,6 +338,8 @@ enyo.kind( {
 	},
 
 	transactionFetchGroup: function( inSender, inEvent ) {
+
+		this.log();
 
 		var index = inEvent['page'] * 50;//inEvent['pageSize'];
 
@@ -436,6 +446,8 @@ results = {
 
 	duplicateTransaction: function( rowIndex ) {
 
+		this.log();
+
 		this.toggleCreateButtons();
 
 		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
@@ -472,6 +484,7 @@ results = {
 
 	transactiontapped: function( inSender, inEvent ) {
 
+		this.log();
 
 		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode
@@ -484,9 +497,13 @@ results = {
 
 			this.vsEdit( null, inEvent );
 		}
+
+		return true;
 	},
 
 	vsEdit: function( inSender, inEvent ) {
+
+		this.log();
 
 		if( this.account['frozen'] !== 1 ) {
 			//account not frozen
@@ -507,6 +524,8 @@ results = {
 
 	modifyTransactionComplete: function( rowIndex, inSender, accounts ) {
 
+		this.log();
+
 		this.log( arguments );
 
 		var action = accounts['modifyStatus'];
@@ -515,7 +534,7 @@ results = {
 		if( action === 1 ) {
 			//edited
 
-			this.doBalanceChanged( accounts );
+			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
 
 			this.reloadTransactionList();
 
@@ -527,7 +546,7 @@ results = {
 		} else if( action === 2 ) {
 			//deleted
 
-			this.doBalanceChanged( accounts );
+			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
 
 			this.account['itemCount']--;
 
@@ -542,6 +561,8 @@ results = {
 	},
 
 	transactionHeld: function( inSender, inEvent ) {
+
+		this.log();
 
 		this.log( "I DO NOT WORK YET", arguments );
 		return;
@@ -560,6 +581,8 @@ results = {
 	},
 
 	transactionHeldHandler: function( inSender, inEvent ) {
+
+		this.log();
 
 		this.log( arguments );
 		return true;
@@ -591,6 +614,8 @@ results = {
 
 	transactionCleared: function( inSender, inEvent ) {
 
+		this.log();
+
 		this.vsCleared( null, inEvent );
 
 		//Don't 'click' the row
@@ -599,6 +624,8 @@ results = {
 	},
 
 	vsCleared: function( inSender, inEvent ) {
+
+		this.log();
 
 		var index = inEvent.rowIndex;
 
@@ -619,13 +646,19 @@ results = {
 		//Update row UI
 		this.$['list'].renderRow( index );
 
-		this.doBalanceChanged();
+		enyo.Signals.send( "accountBalanceChanged", {} );
 
-		//Return status
-		return cleared;
+		if( enyo.isFunction( inEvent.callback ) ) {
+
+			inEvent.callback( cleared );
+		}
+
+		return true;
 	},
 
 	deleteTransactionConfirmHandler: function() {
+
+		this.log();
 
 		this.transactionDeleted( null, this.$['deleteTransactionConfirm'].rowIndex );
 		this.deleteTransactionConfirmClose();
@@ -633,10 +666,14 @@ results = {
 
 	deleteTransactionConfirmClose: function() {
 
+		this.log();
+
 		this.$['deleteTransactionConfirm'].close();
 	},
 
 	transactionDeleted: function( inSender, inEvent ) {
+
+		this.log();
 
 		var rowIndex = inEvent.rowIndex;
 
@@ -715,6 +752,6 @@ results = {
 				this.transactions.length//Offset
 			);
 
-		this.doBalanceChanged( accounts );
+		enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
 	}
 });

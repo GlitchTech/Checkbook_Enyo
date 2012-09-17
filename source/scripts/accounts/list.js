@@ -31,11 +31,11 @@ enyo.kind({
 	components: [
 		{
 			name: "entries",
-			kind: "enyo.List",
+			kind: "enyo.Repeater",
 
 			classes: "enyo-fit",
 
-			onReorder: "reorder",
+			//onReorder: "reorder",
 			onSetupItem: "handleSetupRow",
 
 			components: [
@@ -135,6 +135,8 @@ enyo.kind({
 
 	renderAccountList: function() {
 
+		this.log();
+
 		this.accounts = [];
 
 		Checkbook.globals.accountManager.fetchAccounts(
@@ -145,6 +147,8 @@ enyo.kind({
 	},
 
 	dataResponse: function( results ) {
+
+		this.log();
 
 		this.accounts = enyo.clone( results );
 
@@ -164,13 +168,16 @@ enyo.kind({
 
 	punt: function() {
 
-		this.$['entries'].setCount( this.accounts.length );
+		this.log();
+
 		this.refresh();
 	},
 
 	refresh: function() {
 
-		this.$['entries'].refresh();
+		this.log();
+
+		this.$['entries'].setCount( this.accounts.length );
 	},
 
 	dividerTapped: function( inSender, inEvent ) {
@@ -217,6 +224,8 @@ enyo.kind({
 						{
 							"onSuccess": function() {
 
+		this.log();
+
 								enyo.Signals.send( nextAction, nextActionEvent );
 							}
 						}
@@ -232,6 +241,8 @@ enyo.kind({
 
 	editAccountComplete: function( rowIndex, inSender, inEvent ) {
 
+		this.log();
+
 		if( inEvent.action === 1 && inEvent.actionStatus === true ) {
 
 			var self = this;
@@ -241,6 +252,8 @@ enyo.kind({
 					this.accounts[rowIndex]['acctId'],
 					{
 						"onSuccess": function() {
+
+		this.log();
 
 							enyo.Signals.send( "accountChanged", { "accountId": self.accounts[rowIndex]['acctId'] } );
 						}
@@ -302,6 +315,8 @@ enyo.kind({
 				{
 					"onSuccess": function() {
 
+		this.log();
+
 						enyo.Signals.send( "accountChanged", { "accountId": self.accounts[inEvent.index]['acctId'], "deleted": true } );
 					}
 				}
@@ -315,23 +330,23 @@ enyo.kind({
 	setupRow: function( inSender, inEvent ) {
 
 		var index = inEvent.index;
-
+		var item = inEvent.item;
 		var row = this.accounts[index];
 
 		if( row ) {
 
 			row['index'] = index;
 
-			this.$['accountItem'].addRemoveClass( "alt-row", ( row['index'] % 2 === 0 ) );
-			this.$['accountItem'].addRemoveClass( "norm-row", ( row['index'] % 2 !== 0 ) );
+			item.$['accountItem'].addRemoveClass( "alt-row", ( row['index'] % 2 === 0 ) );
+			item.$['accountItem'].addRemoveClass( "norm-row", ( row['index'] % 2 !== 0 ) );
 
-			this.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
-			this.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
+			item.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
+			item.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
 
-			this.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
-			this.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
+			item.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
+			item.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
 
-			this.$['name'].setContent( row['acctName'] );
+			item.$['name'].setContent( row['acctName'] );
 
 			//Header balance view - override account default setting
 
@@ -356,12 +371,12 @@ enyo.kind({
 
 			row['balance'] = prepAmount( row['balance'] );
 
-			this.$['balance'].setContent( formatAmount( row['balance'] ) );
-			this.$['balance'].addRemoveClass( "positiveBalance", ( row['balance'] > 0 ) );
-			this.$['balance'].addRemoveClass( "negativeBalance", ( row['balance'] < 0 ) );
-			this.$['balance'].addRemoveClass( "neutralBalance", ( row['balance'] == 0 ) );
+			item.$['balance'].setContent( formatAmount( row['balance'] ) );
+			item.$['balance'].addRemoveClass( "positiveBalance", ( row['balance'] > 0 ) );
+			item.$['balance'].addRemoveClass( "negativeBalance", ( row['balance'] < 0 ) );
+			item.$['balance'].addRemoveClass( "neutralBalance", ( row['balance'] == 0 ) );
 
-			this.$['note'].setContent( row['acctNotes'] );
+			item.$['note'].setContent( row['acctNotes'] );
 
 			//proper sort mode && difference between categories
 			if( (
@@ -372,11 +387,11 @@ enyo.kind({
 					row['acctCategory'] !== this.accounts[row['index'] - 1]['acctCategory']
 				) ) {
 
-				this.$['catDivider'].show();
-				this.$['catDivider'].setContent( row['acctCategory'] );
+				item.$['catDivider'].show();
+				item.$['catDivider'].setContent( row['acctCategory'] );
 			} else {
 
-				this.$['catDivider'].hide();
+				item.$['catDivider'].hide();
 			}
 
 /*

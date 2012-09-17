@@ -4,7 +4,7 @@ enyo.kind( {
 	name: "Checkbook.login",
 	kind: "onyx.Popup",
 
-	classes: "login-system small-input-popup",
+	classes: "login-system small-popup",
 
 	centered: true,
 	floating: true,
