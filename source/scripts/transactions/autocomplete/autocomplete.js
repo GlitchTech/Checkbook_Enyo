@@ -1,55 +1,80 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 /**
- * Checkbook.transactions.autocomplete ( Popup )
+ * Checkbook.transactions.autocomplete ( options )
  */
 enyo.kind( {
 	name: "Checkbook.transactions.autocomplete",
-	kind: "onyx.Popup",
+	kind: "onyx.InputDecorator",
+
+	style: "position: relative;",
+
+	handlers: {
+		oninput: "input",
+		onSelect: "itemSelected",
+	},
 
 	published: {
-		searchValue: "",
-		limit: 50
+		enabled: true,
+		limit: 50,
+
+		values: "",
+		delay: 200,
+		//* private ... needed to support Menu ...
+		active: false
 	},
 
 	events: {
-		onSelect: ""
+		onInputChanged: "",
+		onValueSelected: ""
 	},
 
-	suggestResults: [],
-
-	components: [
-		{//repeater
-			name: "suggestionList",
-			kind: "enyo.Repeater",
-
-			onSetupItem: "setupRow",
-
-			components: [
-				{
-					kind: "onyx.Item",
-					ontap: "rowClicked",
-					style: "width: 100%;",
-
-					components: [
-						{
-							name: "desc",
-							allowHtml: true,
-							flex: 1
-						}
-					]
-				}
-			]
-		}
+	components:[
+		{
+			name: "options",
+			kind: "onyx.Menu",
+			floating: true
+		}, {
+			name: "icon",
+			kind: "enyo.Image",
+			classes: "img-icon",
+			style: "position: absolute; right: 5px;",
+			src: "assets/search.png"
+		},
 	],
 
-	searchValueChanged: function() {
+	rendered: function() {
 
-		this.searchValue = this.searchValue.trim();
+		this.enabledChanged();
+	},
+
+	enabledChanged: function() {
+
+		this.log();
+
+		this.$['icon'].setShowing( this.enabled );
+	},
+
+	input: function( source, event ) {
+
+		if( !this.enabled ) {
+
+			return;
+		}
+
+		// cache input instance. means we only support a single input but that's probably okay.
+		// works around a bug where originator is Menu rather than Input
+		this.inputField = this.inputField || event.originator;
+
+		enyo.job( null, enyo.bind( this, "fireInputChanged" ), this.delay );
+	},
+
+	fireInputChanged: function() {
+
+		this.searchValue = this.inputField.getValue();
 
 		if( this.searchValue.length <= 0 ) {
 
-			this.hide();
 			return;
 		}
 
@@ -71,29 +96,101 @@ enyo.kind( {
 					"onSuccess": enyo.bind( this, this.buildSuggestionList, this.searchValue )
 				}
 			);
+
+		this.doInputChanged( { value: this.inputField.getValue() } );
 	},
 
-	buildSuggestionList: function( qrySearch, results ) {
+	buildSuggestionList: function( oldSearchValue, results ) {
 
-		if( this.searchValue !== qrySearch ) {
+		if( this.searchValue !== oldSearchValue ) {
+			//prevent old data queries
 
 			return;
 		}
 
-		if( results.length <= 0 ) {
+		this.values = results;
+		this.valuesChanged();
+	},
 
-			this.hide();
+	valuesChanged: function() {
+
+		if( !this.values || this.values.length === 0 ) {
+
+			this.waterfall( "onRequestHideMenu", { activator: this } );
 			return;
 		}
 
-		if( this.getOwner().$['descWrapper'] ) {
+		this.$['options'].destroyClientControls();
+		var c = [];
 
-			this.suggestResults = results;
-			this.$['suggestionList'].setCount( this.suggestResults.length );
+		for( var i = 0; i < this.values.length; i++ ) {
 
-			this.show();
-			this.updatePosition();
+			c.push( {
+					"content": this.values[i]['desc'],
+					index: i,
+					allowHtml: true
+				});
 		}
+
+		this.$['options'].createComponents( c );
+		this.$['options'].render();
+
+		this.waterfall( "onRequestShowMenu", { activator: this } );
+	},
+
+	itemSelected: function( inSender, inEvent ) {
+
+		if( inEvent.content && inEvent.content.length > 0 ) {
+
+			inEvent.content = inEvent.content.dirtyString();
+
+			this.inputField.setValue( inEvent.content );
+		}
+
+		Checkbook.globals.gts_db.query(
+				new GTS.databaseQuery(
+						{
+							"sql": "SELECT " +
+									"( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct, " +
+									" ( CASE WHEN a.category = '||~SPLIT~||' THEN" +
+										" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = a.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
+									" ELSE a.category END ) AS category," +
+									" ( CASE WHEN a.category = '||~SPLIT~||' THEN" +
+										" 'PARSE_CATEGORY'" +
+									" ELSE a.category2 END ) AS category2, " +
+									"COUNT( desc ) AS count " +
+								"FROM transactions a " +
+								"WHERE desc = ? " +
+									"AND category != '' " +
+									"GROUP BY category " +
+								"ORDER BY count DESC " +
+								"LIMIT 1;",
+							"values": [ this.getOwner().$['account'].getValue(), this.values[inEvent.selected.index]['desc'] ]
+						}
+					),
+				{
+					"onSuccess": enyo.bind( this, this.dataHandler, inEvent.content )
+				}
+			);
+	},
+
+	dataHandler: function( desc, results ) {
+
+		var data = { "data": false };
+
+		if( results.length > 0 ) {
+
+			var data = {
+					"data": true,
+					"desc": desc,
+					"linkedAccount": results[0]['linkedAccount'],
+					"category": Checkbook.globals.transactionManager.parseCategoryDB( results[0]['category'].dirtyString(), results[0]['category2'].dirtyString() )
+				};
+		}
+
+		this.doValueSelected( data );
+
+		this.searchValue = "";
 	},
 
 	updatePosition: function() {
@@ -125,62 +222,5 @@ enyo.kind( {
 
 			this.applyStyle( "top", ( t + b.height ) + "px" );
 		}
-	},
-
-	setupRow: function( inSender, inEvent ) {
-
-		var item = inEvent.item;
-
-		var row = this.suggestResults[inEvent.index];
-
-		if( row && item ) {
-
-			item.$['desc'].setContent( row['desc'] );
-
-			return true;
-		}
-	},
-
-	rowClicked: function( inSender, inEvent ) {
-
-		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
-						{
-							"sql": "SELECT " +
-									"( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct, " +
-									" ( CASE WHEN a.category = '||~SPLIT~||' THEN" +
-										" ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = a.itemId ORDER BY ts.amount DESC ) ) || ']' )" +
-									" ELSE a.category END ) AS category," +
-									" ( CASE WHEN a.category = '||~SPLIT~||' THEN" +
-										" 'PARSE_CATEGORY'" +
-									" ELSE a.category2 END ) AS category2, " +
-									"COUNT( desc ) AS count " +
-								"FROM transactions a " +
-								"WHERE desc = ? " +
-									"AND category != '' " +
-									"GROUP BY category " +
-								"ORDER BY count DESC " +
-								"LIMIT 1;",
-							"values": [ this.getOwner().$['account'].getValue(), this.suggestResults[inEvent.index]['desc'] ]
-						}
-					),
-				{
-					"onSuccess": enyo.bind( this, this.dataHandler, this.suggestResults[inEvent.index]['desc'] )
-				}
-			);
-	},
-
-	dataHandler: function( desc, results ) {
-
-		var data = {
-				"desc": desc,
-				"linkedAccount": results[0]['linkedAccount'],
-				"category": Checkbook.globals.transactionManager.parseCategoryDB( results[0]['category'].dirtyString(), results[0]['category2'].dirtyString() )
-			};
-
-		this.doSelect( data );
-
-		this.searchValue = "";
-		this.hide();
 	}
 });

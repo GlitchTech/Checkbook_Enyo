@@ -10,6 +10,7 @@
 
 enyo.kind({
 	name: "Checkbook.accounts.list",
+	kind: "enyo.Scroller",
 	fit: true,
 
 	style: "position: relative;",
@@ -25,7 +26,9 @@ enyo.kind({
 		balanceView: 4,
 
 		editMode: false,
-		reorderable: true
+		reorderable: true,
+
+		horizontal: "hidden"
 	},
 
 	components: [

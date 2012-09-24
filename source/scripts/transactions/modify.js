@@ -48,26 +48,20 @@ enyo.kind( {
 							classes: "padding-half-top padding-half-bottom",
 							components: [
 								{
-									name: "descWrapper",
-									kind: "onyx.InputDecorator",
-									layoutKind: "enyo.FittableColumnsLayout",
-									noStretch: true,
+									name: "autocomplete",
+									kind: "Checkbook.transactions.autocomplete",
+
+									onValueSelected: "descAutoSuggestMade",
+
 									components: [
 										{
 											name: "desc",
 											kind: "onyx.Input",
 
-											fit: true,
 											placeholder: "Enter Description",
 
 											onkeypress: "descKeyPress",
-											oninput: "descContentChanged",
 											autoKeyModifier: "shift-single",
-										},{
-											name: "autosuggestIcon",
-											kind: "enyo.Image",
-											classes: "img-icon",
-											src: "assets/search.png"
 										}
 									]
 								}, {
@@ -437,10 +431,6 @@ enyo.kind( {
 		},
 
 		{
-			name: "autocomplete",
-			kind: "Checkbook.transactions.autocomplete",
-			onSelect: "descAutoSuggestMade"
-		}, {
 			name: "categorySystem",
 			kind: "Checkbook.transactionCategory.select"
 		},
@@ -623,7 +613,7 @@ enyo.kind( {
 
 		//this.$['date'].setShowTime( this.accountObj['showTransTime'] == 1 );
 
-		this.$['autosuggestIcon'].setShowing( this.accountObj['useAutoComplete'] === 1 );
+		this.$['autocomplete'].setEnabled( this.accountObj['useAutoComplete'] === 1 );
 
 		this.$['autoTrans'].setShowing(
 				this.trsnObj['itemId'] < 0 &&
@@ -696,25 +686,18 @@ enyo.kind( {
 
 	/** Autocomplete Controls **/
 
-	descContentChanged: function() {
-		//Autocomplete
-
-		if( this.accountObj['useAutoComplete'] === 1 ) {
-
-			this.$['autocomplete'].setSearchValue( this.$['desc'].getValue() );
-		}
-	},
-
 	descAutoSuggestMade: function( inSender, suggestTrsnObj ) {
 
-		this.trsnObj['desc'] = suggestTrsnObj['desc'];
-		this.$['desc'].setValue( this.trsnObj['desc'] );
+		this.trsnObj['desc'] = this.$['desc'].getValue();
 
-		this.trsnObj['linkedAccount'] = ( this.transactionType === "transfer" ? suggestTrsnObj['linkedAccount'] : -1 );
-		this.$['linkedAccount'].setValue( this.trsnObj['linkedAccount'] );
+		if( suggestTrsnObj['data'] ) {
 
-		this.trsnObj['category'] = suggestTrsnObj['category'];
-		this.categoryChanged();
+			this.trsnObj['linkedAccount'] = ( this.transactionType === "transfer" ? suggestTrsnObj['linkedAccount'] : -1 );
+			this.$['linkedAccount'].setValue( this.trsnObj['linkedAccount'] );
+
+			this.trsnObj['category'] = suggestTrsnObj['category'];
+			this.categoryChanged();
+		}
 
 		this.$['amount'].focus();
 	},
