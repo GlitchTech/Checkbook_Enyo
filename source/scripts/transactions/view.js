@@ -57,12 +57,12 @@ enyo.kind( {
 			ondragfinish: "listDrag"
 		}, {
 			name: "footer",
-			kind: "onyx.MoreToolbar",//Doesn't work with fittable.
+			kind: "onyx.MoreToolbar",
 			classes: "deep-green",
 			components: [
 				{
 					kind: "onyx.Grabber",
-					classes: "margin-right",
+					style: "height: 27px;"//override MoreToolbar fitting
 				},{
 					kind: "onyx.MenuDecorator",
 					components: [
@@ -80,6 +80,8 @@ enyo.kind( {
 						}
 					]
 				}, {
+					classes: "text-center",
+					fit: true,
 					components: [
 						{
 							name: "addIncomeButton",

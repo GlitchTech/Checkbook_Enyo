@@ -55,8 +55,7 @@ enyo.kind( {
 
 			editMode: false
 		}, {
-			kind: "onyx.Toolbar",
-			layoutKind: "enyo.FittableColumnsLayout",
+			kind: "onyx.MoreToolbar",
 			classes: "rich-brown",
 			components: [
 				{

@@ -175,6 +175,11 @@ enyo.kind( {
 
 		this.log();
 
+		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
+
+			return false;
+		}
+
 		this.transactions = [];
 		this.$['list'].setCount( 0 );
 		this.$['list'].reset();
@@ -184,6 +189,11 @@ enyo.kind( {
 	initialScroll: function() {
 
 		this.log();
+
+		if( this.$['list'].getCount() <= 0 ) {
+
+			return;
+		}
 
 		if( !( this.account['sort'] === 0 || this.account['sort'] === 1 || this.account['sort'] === 6 || this.account['sort'] === 7 ) ) {
 

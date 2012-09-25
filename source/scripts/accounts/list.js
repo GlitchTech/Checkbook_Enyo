@@ -193,7 +193,7 @@ enyo.kind({
 	accountTapped: function( inSender, inEvent ) {
 		//Row Tapped
 
-		var row = this.accounts[inEvent.rowIndex];
+		var row = this.accounts[inEvent.index];
 
 		if( row ) {
 
@@ -207,8 +207,8 @@ enyo.kind({
 				nextActionEvent = {
 						name: "editAccount",
 						kind: "Checkbook.accounts.modify",
-						acctId: this.accounts[inEvent.rowIndex]['acctId'],
-						onFinish: enyo.bind( this, this.editAccountComplete, inEvent.rowIndex )
+						acctId: this.accounts[inEvent.index]['acctId'],
+						onFinish: enyo.bind( this, this.editAccountComplete, inEvent.index )
 					};
 			} else {
 				//View Account
@@ -226,8 +226,6 @@ enyo.kind({
 						row['lockedCode'],
 						{
 							"onSuccess": function() {
-
-		this.log();
 
 								enyo.Signals.send( nextAction, nextActionEvent );
 							}

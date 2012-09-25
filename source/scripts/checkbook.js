@@ -81,6 +81,7 @@ enyo.kind({
 						}
 					]
 				}, {
+					name: "mainViews",
 					kind: "Panels",
 
 					fit: true,
@@ -132,37 +133,20 @@ enyo.kind({
 		{
 			kind: "Signals",
 
+			viewAccount: "viewAccount",
 			modifyAccount: "showPanePopup",
 			modifyTransaction: "showPanePopup",
 			showBudget: "openBudget",
 			showSearch: "openSearch",
 
+			backbutton: "backHandler",
+			menubutton: "menuHandler",
+			searchbutton: "searchHandler",
 			onkeydown: "keyboardHandler"//for testing only
 		}
 	],
 
 	paneStack: [],
-
-	/**
-	 * @protected
-	 * @constructs
-	 */
-	constructor: function() {
-
-		this.inherited( arguments );
-
-		enyo.Scroller.touchScrolling = true;
-
-		if( enyo.platform.android ) {
-
-			touchEvent.preventDefault();
-
-			//Android bindings (phonegap)
-			document.addEventListener( "backbutton", enyo.bind( this, this.backHandler ), false );
-			document.addEventListener( "menubutton", enyo.bind( this, this.menuHandler ), false );
-			document.addEventListener( "searchbutton", enyo.bind( this, this.searchHandler ), false);
-		}
-	},
 
 	/**
 	 * @protected
@@ -211,12 +195,15 @@ enyo.kind({
 	backHandler: function( inEvent ) {
 
 		if( this.paneStack.length > 0 ) {
+			//Exit top most layer
 
 			this.$[this.paneStack[this.paneStack.length - 1]].doFinish();
-		//} else if( showing only transaction window ) {
+		} else if( this.$['mainViews'].getIndex() > 0 ) {
+			//Slide back towards home (account list)
 
-			//reveal account window
+			this.$['mainViews'].previous();
 		} else {
+			//Confirm exit
 
 			this.createComponent( {
 					name: "exitConfirmation",
@@ -445,6 +432,18 @@ enyo.kind({
 
 			//show base view
 			this.$['container'].show();
+		}
+
+		this.waterfall( "onresize", "onresize", this );
+	},
+
+	/** Checkbook.accounts.* **/
+
+	viewAccount: function() {
+
+		if( enyo.Panels.isScreenNarrow() ) {
+
+			this.$['mainViews'].setIndex( 1 );
 		}
 	},
 

@@ -67,14 +67,15 @@ enyo.kind({
 
 				options.push( {
 						value: this.choices[i]['value'],
+						classes: "h-box",
 
 						components: [
 							{
 								content: this.choices[i]['content'],
-								classes: "margin-right"
+								classes: "margin-right box-flex-1"
 							}, {
 								content: formatAmount( this.choices[i]['balance'] ),
-								classes: balanceColor + " right"
+								classes: balanceColor
 							}
 						]
 					});
