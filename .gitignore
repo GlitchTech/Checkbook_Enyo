@@ -1,4 +1,8 @@
-.settings/*
-assets/*
-bin/*
-gen/*
+#ignore thumbs.db
+thumbs.db
+
+#ignore workspace
+*.sublime-workspace
+/gen/*
+/bin/*
+/.settings/*
