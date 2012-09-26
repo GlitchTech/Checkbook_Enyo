@@ -91,7 +91,7 @@ enyo.kind({
 
 		// Open our database connection
 		// parameters: name, version, displayName [unused in WebOS], target size
-		this.db = openDatabase( this.database, this.version, '', this.estimatedSize );
+		this.db = window.openDatabase( this.database, this.version, '', this.estimatedSize );
 
 		// Make sure everything is peachy
 		if( !this.db ) {

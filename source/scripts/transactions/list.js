@@ -351,7 +351,9 @@ enyo.kind( {
 
 		this.log();
 
-		var index = inEvent['page'] * 50;//inEvent['pageSize'];
+		inEvent['pageSize'] = 50;//Event doesn't carry this detail by default. Change this.
+
+		var index = inEvent['page'] * inEvent['pageSize'];
 
 		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
 
@@ -373,7 +375,7 @@ enyo.kind( {
 					{
 						"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
 					},
-					50,//inEvent['pageSize'],//Limit
+					inEvent['pageSize'],//Limit
 					index//Offset
 				);
 

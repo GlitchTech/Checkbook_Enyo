@@ -158,7 +158,7 @@ enyo.kind({
 
 		this.$['splash'].show();
 
-		if( enyo.platform.android ) {
+		if( enyo.platform.android || enyo.platform.androidChrome ) {
 
 			//Use Android bindings instead of UI buttons
 			this.$['menubar'].hide();
@@ -202,8 +202,8 @@ enyo.kind({
 			//Slide back towards home (account list)
 
 			this.$['mainViews'].previous();
-		} else {
-			//Confirm exit
+		} else if( enyo.platform.android || enyo.platform.androidChrome ) {
+			//Confirm exit (android only)
 
 			this.createComponent( {
 					name: "exitConfirmation",
@@ -235,7 +235,8 @@ enyo.kind({
 
 		this.exitConfirmationClose();
 
-		this.log( "EXIT" );
+		this.log( "exit app" );
+		navigator.app.exitApp();
 	},
 
 	searchHandler: function( inEvent ) {

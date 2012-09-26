@@ -12,6 +12,7 @@
 		<link href="build/app.css" rel="stylesheet">
 		<!-- js -->
 		<script src="lib/cordova-2.1.0.js"></script>
+		<script src="lib/backbone.js"></script>
 		<script src="build/enyo.js"></script>
 		<script src="build/app.js" onerror="alert('No application build found, redirecting to debug.html.'), location='debug.html';"></script>
 	</head>
@@ -23,7 +24,9 @@
 			// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
 			function onDeviceReady() {
 
-				new Checkbook.app().write();
+				enyo.Scroller.touchScrolling = true;
+
+				new Checkbook.app().renderInto( document.body );
 			}
 		</script>
 	</body>
