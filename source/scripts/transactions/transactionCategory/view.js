@@ -79,10 +79,15 @@ enyo.kind({
 							components: [
 								{
 									name: "general",
-									style: "display: inline-block"
+									style: "display: inline-block;"
+								}, {
+									content: "&gt;&gt;",
+									style: "display: inline-block;",
+									classes: "margin-left bold",
+									allowHtml: true
 								}, {
 									name: "specific",
-									style: "display: inline-block",
+									style: "display: inline-block;",
 									classes: "margin-left"
 								}
 							]
