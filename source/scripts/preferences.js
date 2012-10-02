@@ -556,14 +556,6 @@ enyo.kind({
 		}
 	},
 
-	modifyTransactionCategoriesComplete: function() {
-
-		this.$['autoCompleteSettingsView'].hide();
-		this.$['autoCompleteSettingsView'].destroy();
-
-		this.$['editAutoCompleteSettings'].setDisabled( false );
-	},
-
 	/** Full Wipe Control **/
 
 	fullwipe: function() {
