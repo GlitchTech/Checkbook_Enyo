@@ -159,10 +159,12 @@ enyo.kind({
 			currVersion = results[0]['dbVer'];
 		}
 
-		//DB Version
-		this.versionCheck = 23;
+		this.log( currVersion );
 
-		if( currVersion === this.versionCheck ) {
+		//DB Version
+		this.versionCheck = 24;
+
+		if( currVersion == this.versionCheck ) {
 
 			this.$['splashProgress'].animateProgressTo( 75 );
 
@@ -192,7 +194,7 @@ enyo.kind({
 			this.splashFinished();//Temp until repeat system is in place
 		} else if( currVersion >= 1 ) {
 
-			this.log( "DB out of date, preparing to update" );
+			this.log( "DB out of date, preparing to update: " + currVersion + " to " + this.versionCheck );
 
 			this.updateDBStructure( currVersion );
 		} else {

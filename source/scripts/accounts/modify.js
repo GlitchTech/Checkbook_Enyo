@@ -390,20 +390,18 @@ enyo.kind( {
 
 		{
 			kind: "onyx.Toolbar",
-			classes: "text-center",
+			classes: "text-center two-button-toolbar",
 			components: [
 				{
 					kind: "onyx.Button",
 					content: "Cancel",
-					style: "width: 150px",
 					ontap: "doFinish"
 				}, {
-					style: "width: 50px;"
+					content: ""
 				}, {
 					kind: "onyx.Button",
 					content: "Save",
 					classes: "onyx-affirmative",
-					style: "width: 150px;",
 					ontap: "saveAccount"
 				}
 			]

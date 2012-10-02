@@ -36,7 +36,7 @@ enyo.kind({
 									floating: true,
 									components: [
 										{
-											content: "Preferences & Accounts",
+											content: "Preferences",
 											ontap: "openPreferences"
 										}, {
 											classes: "onyx-menu-divider"
@@ -139,9 +139,11 @@ enyo.kind({
 			showBudget: "openBudget",
 			showSearch: "openSearch",
 
-			backbutton: "backHandler",
-			menubutton: "menuHandler",
-			searchbutton: "searchHandler",
+			showPanePopup: "showPanePopup",
+
+			onbackbutton: "backHandler",
+			onmenubutton: "menuHandler",
+			onsearchbutton: "searchHandler",
 			onkeydown: "keyboardHandler"//for testing only
 		}
 	],
@@ -188,7 +190,6 @@ enyo.kind({
 			this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
 		}
 
-		inEvent.stopPropagation();
 		return true;
 	},
 
@@ -222,7 +223,6 @@ enyo.kind({
 			this.$['exitConfirmation'].show();
 		}
 
-		inEvent.stopPropagation();
 		return true;
 	},
 
@@ -243,7 +243,6 @@ enyo.kind({
 
 		this.log( "NYI" );
 
-		inEvent.stopPropagation();
 		return true;
 	},
 
@@ -396,10 +395,16 @@ enyo.kind({
 			);
 
 		this.createComponent( paneArgs );
+		this.$[paneArgs['name']].render();
+
+		//Hide other panes
+		this.$['container'].hide();
+		for( var i = 0; i < this.paneStack.length; i++ ) {
+
+			this.$[this.paneStack[i]].hide();
+		}
 
 		//Display new pane
-		this.$[paneArgs['name']].render();
-		this.$['container'].hide();
 		this.$[paneArgs['name']].show();
 
 		//Add new pane to the display stack

@@ -1,7 +1,9 @@
 var dbArgs = {
-		name: "db",
 		database: "ext:checkbook-database",
 		version: "1",
+		name: "Checkbook DB",
+		estimatedSize: ( 5 * 1024 * 1024 ),
+
 		debug: false//Only debug when in Beta versions
 	};
 
@@ -32,142 +34,56 @@ var defaultAccountCategories = [
 
 //Remove and use file picker in modify account categories?
 var appIcons = [
-		/*{//Reserved for recurring events
-			"icon": "assets/calendar.png",
-			"value": "calendar.png"
-		},*/
-		{
-			"icon": "assets/cash_1.png",
-			"value": "cash_1.png"
-		}, {
-			"icon": "assets/cash_2.png",
-			"value": "cash_2.png"
-		}, {
-			"icon": "assets/cash_3.png",
-			"value": "cash_3.png"
-		}, {
-			"icon": "assets/cash_4.png",
-			"value": "cash_4.png"
-		}, {
-			"icon": "assets/cash_5.png",
-			"value": "cash_5.png"
-		}, {
-			"icon": "assets/checkbook_1.png",
-			"value": "checkbook_1.png"
-		}, {
-			"icon": "assets/checkbook_2.png",
-			"value": "checkbook_2.png"
-		}, {
-			"icon": "assets/coins_1.png",
-			"value": "coins_1.png"
-		}, {
-			"icon": "assets/coins_2.png",
-			"value": "coins_2.png"
-		}, {
-			"icon": "assets/coins_3.png",
-			"value": "coins_3.png"
-		}, {
-			"icon": "assets/coins_4.png",
-			"value": "coins_4.png"
-		}, {
-			"icon": "assets/credit_card_1.png",
-			"value": "credit_card_1.png"
-		}, {
-			"icon": "assets/credit_card_2.png",
-			"value": "credit_card_2.png"
-		}, {
-			"icon": "assets/credit_card_3.png",
-			"value": "credit_card_3.png"
-		}, {
-			"icon": "assets/dollar_sign_1.png",
-			"value": "dollar_sign_1.png"
-		}, {
-			"icon": "assets/dollar_sign_2.png",
-			"value": "dollar_sign_2.png"
-		}, {
-			"icon": "assets/dollar_sign_3.png",
-			"value": "dollar_sign_3.png"
-		}, {
-			"icon": "assets/echeck.png",
-			"value": "echeck.png"
-		}, {
-			/*
-			//Reserved for recurring transfers
-			"icon": "assets/future_transfer_1.png",
-			"value": "future_transfer_1.png"
-		}, {
-			*/
-			"icon": "assets/icon_1.png",
-			"value": "icon_1.png"
-		}, {
-			"icon": "assets/icon_2.png",
-			"value": "icon_2.png"
-		}, {
-			"icon": "assets/icon_3.png",
-			"value": "icon_3.png"
-		}, {
-			"icon": "assets/icon_4.png",
-			"value": "icon_4.png"
-		}, {
-			"icon": "assets/jewel_1.png",
-			"value": "jewel_1.png"
-		}, {
-			"icon": "assets/jewel_2.png",
-			"value": "jewel_2.png"
-		}, {
-			"icon": "assets/money_bag_1.png",
-			"value": "money_bag_1.png"
-		}, {
-			"icon": "assets/money_bag_2.png",
-			"value": "money_bag_2.png"
-		}, {
-			"icon": "assets/money_bag_3.png",
-			"value": "money_bag_3.png"
-		}, {
-			"icon": "assets/money_bag_4.png",
-			"value": "money_bag_4.png"
-		}, {
-			/*
-			//Reserved for locked accounts
-			"icon": "assets/padlock_1.png",
-			"value": "padlock_1.png"
-		}, {
-			*/
-			"icon": "assets/padlock_2.png",
-			"value": "padlock_2.png"
-		}, {
-			"icon": "assets/safe_1.png",
-			"value": "safe_1.png"
-		}, {
-			"icon": "assets/safe_2.png",
-			"value": "safe_2.png"
-		}, {
-			"icon": "assets/transfer_1.png",
-			"value": "transfer_1.png"
-		}, {
-			"icon": "assets/transfer_2.png",
-			"value": "transfer_2.png"
-		}, {
-			/*//Reserved for transfers
-			"icon": "assets/transfer_3.png",
-			"value": "transfer_3.png"
-		}, {
-			*/
-			"icon": "assets/transfer_4.png",
-			"value": "transfer_4.png"
-		}
+		 /*{//Reserved for recurring events icon: "assets/calendar.png", value: "calendar.png", components: [ { kind: "enyo.Image", src: "assets/calendar.png" } ] },*/
+		{ icon: "assets/cash_1.png", value: "cash_1.png", components: [ { kind: "enyo.Image", src: "assets/cash_1.png" } ] },
+		{ icon: "assets/cash_2.png", value: "cash_2.png", components: [ { kind: "enyo.Image", src: "assets/cash_2.png" } ] },
+		{ icon: "assets/cash_3.png", value: "cash_3.png", components: [ { kind: "enyo.Image", src: "assets/cash_3.png" } ] },
+		{ icon: "assets/cash_4.png", value: "cash_4.png", components: [ { kind: "enyo.Image", src: "assets/cash_4.png" } ] },
+		{ icon: "assets/cash_5.png", value: "cash_5.png", components: [ { kind: "enyo.Image", src: "assets/cash_5.png" } ] },
+		{ icon: "assets/checkbook_1.png", value: "checkbook_1.png", components: [ { kind: "enyo.Image", src: "assets/checkbook_1.png" } ] },
+		{ icon: "assets/checkbook_2.png", value: "checkbook_2.png", components: [ { kind: "enyo.Image", src: "assets/checkbook_2.png" } ] },
+		{ icon: "assets/coins_1.png", value: "coins_1.png", components: [ { kind: "enyo.Image", src: "assets/coins_1.png" } ] },
+		{ icon: "assets/coins_2.png", value: "coins_2.png", components: [ { kind: "enyo.Image", src: "assets/coins_2.png" } ] },
+		{ icon: "assets/coins_3.png", value: "coins_3.png", components: [ { kind: "enyo.Image", src: "assets/coins_3.png" } ] },
+		{ icon: "assets/coins_4.png", value: "coins_4.png", components: [ { kind: "enyo.Image", src: "assets/coins_4.png" } ] },
+		{ icon: "assets/credit_card_1.png", value: "credit_card_1.png", components: [ { kind: "enyo.Image", src: "assets/credit_card_1.png" } ] },
+		{ icon: "assets/credit_card_2.png", value: "credit_card_2.png", components: [ { kind: "enyo.Image", src: "assets/credit_card_2.png" } ] },
+		{ icon: "assets/credit_card_3.png", value: "credit_card_3.png", components: [ { kind: "enyo.Image", src: "assets/credit_card_3.png" } ] },
+		{ icon: "assets/dollar_sign_1.png", value: "dollar_sign_1.png", components: [ { kind: "enyo.Image", src: "assets/dollar_sign_1.png" } ] },
+		{ icon: "assets/dollar_sign_2.png", value: "dollar_sign_2.png", components: [ { kind: "enyo.Image", src: "assets/dollar_sign_2.png" } ] },
+		{ icon: "assets/dollar_sign_3.png", value: "dollar_sign_3.png", components: [ { kind: "enyo.Image", src: "assets/dollar_sign_3.png" } ] },
+		{ icon: "assets/echeck.png", value: "echeck.png", components: [ { kind: "enyo.Image", src: "assets/echeck.png" } ] },
+		/* { //Reserved for recurring transfers icon: "assets/future_transfer_1.png", value: "future_transfer_1.png", components: [ { kind: "enyo.Image", src: "assets/future_transfer_1.png" } ] },*/
+		{ icon: "assets/icon_1.png", value: "icon_1.png", components: [ { kind: "enyo.Image", src: "assets/icon_1.png" } ] },
+		{ icon: "assets/icon_2.png", value: "icon_2.png", components: [ { kind: "enyo.Image", src: "assets/icon_2.png" } ] },
+		{ icon: "assets/icon_3.png", value: "icon_3.png", components: [ { kind: "enyo.Image", src: "assets/icon_3.png" } ] },
+		{ icon: "assets/icon_4.png", value: "icon_4.png", components: [ { kind: "enyo.Image", src: "assets/icon_4.png" } ] },
+		{ icon: "assets/jewel_1.png", value: "jewel_1.png", components: [ { kind: "enyo.Image", src: "assets/jewel_1.png" } ] },
+		{ icon: "assets/jewel_2.png", value: "jewel_2.png", components: [ { kind: "enyo.Image", src: "assets/jewel_2.png" } ] },
+		{ icon: "assets/money_bag_1.png", value: "money_bag_1.png", components: [ { kind: "enyo.Image", src: "assets/money_bag_1.png" } ] },
+		{ icon: "assets/money_bag_2.png", value: "money_bag_2.png", components: [ { kind: "enyo.Image", src: "assets/money_bag_2.png" } ] },
+		{ icon: "assets/money_bag_3.png", value: "money_bag_3.png", components: [ { kind: "enyo.Image", src: "assets/money_bag_3.png" } ] },
+		{ icon: "assets/money_bag_4.png", value: "money_bag_4.png", components: [ { kind: "enyo.Image", src: "assets/money_bag_4.png" } ] },
+		 /*{ //Reserved for locked accounts icon: "assets/padlock_1.png", value: "padlock_1.png", components: [ { kind: "enyo.Image", src: "assets/padlock_1.png" } ] },*/
+		{ icon: "assets/padlock_2.png", value: "padlock_2.png", components: [ { kind: "enyo.Image", src: "assets/padlock_2.png" } ] },
+		{ icon: "assets/safe_1.png", value: "safe_1.png", components: [ { kind: "enyo.Image", src: "assets/safe_1.png" } ] },
+		{ icon: "assets/safe_2.png", value: "safe_2.png", components: [ { kind: "enyo.Image", src: "assets/safe_2.png" } ] },
+		{ icon: "assets/transfer_1.png", value: "transfer_1.png", components: [ { kind: "enyo.Image", src: "assets/transfer_1.png" } ] },
+		{ icon: "assets/transfer_2.png", value: "transfer_2.png", components: [ { kind: "enyo.Image", src: "assets/transfer_2.png" } ] },
+		 /*{ //Reserved for transfers icon: "assets/transfer_3.png", value: "transfer_3.png", components: [ { kind: "enyo.Image", src: "assets/transfer_3.png" } ] },*/
+		{ icon: "assets/transfer_4.png", value: "transfer_4.png", components: [ { kind: "enyo.Image", src: "assets/transfer_4.png" } ] }
 	];
 
 var appColors = [
-		{ caption: "Black", className: "custom-background black legend", name: "black" },
-		{ caption: "Blue", className: "custom-background blue legend", name: "blue" },
-		{ caption: "Green", className: "custom-background green legend", name: "green" },
-		{ caption: "Orange", className: "custom-background orange legend", name: "orange" },
-		{ caption: "Pink", className: "custom-background pink legend", name: "pink" },
-		{ caption: "Purple", className: "custom-background purple legend", name: "purple" },
-		{ caption: "Red", className: "custom-background red legend", name: "red" },
-		{ caption: "Teal", className: "custom-background teal legend", name: "teal" },
-		{ caption: "Yellow", className: "custom-background yellow legend", name: "yellow" }
+		{ content: "Black", classes: "custom-background black legend", name: "black" },
+		{ content: "Blue", classes: "custom-background blue legend", name: "blue" },
+		{ content: "Green", classes: "custom-background green legend", name: "green" },
+		{ content: "Orange", classes: "custom-background orange legend", name: "orange" },
+		{ content: "Pink", classes: "custom-background pink legend", name: "pink" },
+		{ content: "Purple", classes: "custom-background purple legend", name: "purple" },
+		{ content: "Red", classes: "custom-background red legend", name: "red" },
+		{ content: "Teal", classes: "custom-background teal legend", name: "teal" },
+		{ content: "Yellow", classes: "custom-background yellow legend", name: "yellow" }
 	];
 
 var defaultExpenseCategories = [

@@ -15,14 +15,25 @@ enyo.kind({
 		{
 			kind: "onyx.Toolbar",
 			classes: "text-center text-middle",
+			style: "position: relative;",
 			components: [
 				{
 					kind: "enyo.Image",
 					src: "assets/dollar_sign_1.png",
 					classes: "img-icon margin-half-right"
 				}, {
-					content: "Preferences & Accounts",
+					content: "Preferences",
 					classes: "bigger"
+				},
+
+				{
+					kind: "onyx.Button",
+					ontap: "doFinish",
+
+					content: "x",
+
+					classes: "onyx-negative",
+					style: "position: absolute; right: 15px;"
 				}
 			]
 		},
@@ -260,15 +271,12 @@ enyo.kind({
 			]
 		},
 
-
 		{
 			kind: "onyx.Toolbar",
 			classes: "text-center",
 			components: [
 				{
 					kind: "onyx.Button",
-
-					classes: "onyx-affirmative deep-green",
 
 					content: "Done",
 					ontap: "doFinish"
@@ -485,25 +493,20 @@ enyo.kind({
 
 			this.$['editAccountCategories'].setDisabled( true );
 
-			this.createComponent( {
-					name: "accountCategoryView",
-					kind: "Checkbook.accountCategory.view",
-
-					onClose: "modifyAccountCategoriesComplete",
-
-					owner: this
-				});
-
-			this.$['accountCategoryView'].show();
+			enyo.Signals.send(
+					"showPanePopup",
+					{
+						name: "accountCategoryView",
+						kind: "Checkbook.accountCategory.view",
+						onFinish: enyo.bind( this, this.modifyAccountCategoriesComplete )
+					}
+				);
 		}
 	},
 
 	modifyAccountCategoriesComplete: function() {
 
 		enyo.Signals.send( "accountChanged" );
-
-		this.$['accountCategoryView'].hide();
-		this.$['accountCategoryView'].destroy();
 
 		this.$['editAccountCategories'].setDisabled( false );
 	},

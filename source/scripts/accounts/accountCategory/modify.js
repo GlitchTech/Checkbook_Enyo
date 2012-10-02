@@ -1,18 +1,22 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.accountCategory.modify",
-	kind: enyo.Popup,
-//	layoutKind: enyo.VFlexLayout,
+	kind: "onyx.Popup",
 
+	classes: "login-system small-popup",
+
+	centered: true,
+	floating: true,
 	modal: true,
-	scrim: true,
 
-	style: "width: 400px;",
+	scrim: true,
+	scrimclasses: "onyx-scrim-translucent",
+
+	autoDismiss: false,
 
 	events: {
-		onChange: ""
+		onChangeComplete: ""
 	},
 
 	published: {
@@ -24,121 +28,105 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Header,
-			layoutKind: enyo.HFlexLayout,
-			align: "center",
-
-			className: "enyo-header-dark popup-header",
-			style: "border-radius: 10px; margin-bottom: 10px;",
-
+			kind: "enyo.FittableColumns",
+			classes: "text-middle margin-bottom",
+			noStretch: true,
 			components: [
 				{
 					name: "title",
 					content: "",
 
-					className: "bigger",
-					style: "text-align: center; margin-right: -32px;",
-					flex: 1
+					classes: "bigger text-left margin-half-right",
+					fit: true
 				}, {
-					kind: enyo.ToolButton,
-					icon: "assets/menu_icons/close.png",
+					kind: "onyx.Button",
 
-					className: "img-icon",
-					style: "text-align: center;",
+					content: "X",
+					ontap: "hide",
 
-					ontap: "close"
+					classes: "onyx-blue small-padding"
 				}
 			]
 		}, {
-			kind: enyo.RowGroup,
+			kind: "onyx.Groupbox",
+			classes: "light",
 			components: [
 				{
-					name: "name",
-					kind: enyo.Input,
-					autoKeyModifier: "shift-single",
-
+					kind: "onyx.InputDecorator",
+					layoutKind: "FittableColumnsLayout",
+					classes: "onyx-focused",
+					alwaysLooksFocused: true,
 					components: [
 						{
+							name: "name",
+							kind: "onyx.Input",
+
+							placeholder: "category name",
+
+							fit: true
+						}, {
 							content: "name",
-							className: "enyo-label"
+							classes: "small label"
 						}
 					]
 				}, {
+					//icon picker
 					name: "icon",
-					kind: "GTS.ListSelectorBar",
-					labelText: "Category Icon",
-					className: "iconListSelector",
+					kind: "GTS.SelectorBar",
+
+					label: "Icon",
+					maxHeight: 300,
+
 					choices: appIcons
 				}, {
-					name: "colorHolder",
-					kind: enyo.Item,
-					layoutKind: enyo.HFlexLayout,
+					//picker with background colors
+					name: "color",
+					kind: "GTS.SelectorBar",
 
-					ontap: "showColorPicker",
-					tapHightlight: true,
-					className: "custom-background legend",
+					label: "Color",
 
-					components: [
-						{
-							name: "color",
-							className: "enyo-text-ellipsis",
-							flex: 1
-						}, {
-							content: "Color",
-							className: "enyo-listselector-label enyo-label"
-						}, {
-							className: "enyo-listselector-arrow"
-						}
-					]
+					classes: "custom-background legend",
+					choices: appColors,
+
+					onChange: "colorChanged"
 				}
 			]
 		}, {
-			name: "errorMessageContainer",
-			layoutKind: enyo.HFlexLayout,
-			pack: "start",
-			showing: false,
-			components: [
-				{
-					kind: "Image",
-					src: "assets/status_icons/warning.png",
-					style: "margin-right: 5px;"
-				}, {
-					name: "errorMessage",
-					style: "color: #d70000;",
-					content: ""
-				}
-			]
+			name: "errorMessage",
+			kind: "GTS.InlineNotification",
+			type: "error",
+
+			content: "",
+
+			showing: false
 		}, {
-			kind: enyo.Toolbar,
+			//kind: "onyx.Toolbar",
+			classes: "padding-std margin-half-top text-center h-box",
 			components: [
 				{
 					kind: "onyx.Button",
 
-					flex: 2,
-					className: "enyo-button-primary",
+					classes: "margin-right box-flex",
 
-					caption: "Cancel",
-					ontap: "close"
+					content: "Cancel",
+					ontap: "hide"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
+					name: "deleteButton",
+					kind: "onyx.Button",
+
+					classes: "onyx-negative box-flex",
+
+					content: "Delete",
+					ontap: "deleteCategory"
 				}, {
 					kind: "onyx.Button",
 
-					flex: 2,
-					className: "onyx-affirmative",
+					classes: "onyx-affirmative margin-left box-flex",
 
-					caption: "Save",
+					content: "Save",
 					ontap: "save"
 				}
 			]
-		},
-
-		{
-			name: "colorPicker",
-			kind: "Menu",
-			allowHtml: true,
-			components: appColors
 		},
 
 		{
@@ -147,11 +135,19 @@ enyo.kind({
 		}
 	],
 
-	openAtCenter: function( inRowid, inName, inIcon, inColor ) {
+	show: function( inRowid, inName, inIcon, inColor ) {
 
 		this.inherited( arguments );
 
-		this.$['name'].forceFocus();
+		if( inRowid < 0 ) {
+
+			this.$['deleteButton'].hide();
+		} else {
+
+			this.$['deleteButton'].show();
+		}
+
+		this.$['name'].focus();
 		this.loadModifySystem( inRowid, inName, inIcon, inColor );
 	},
 
@@ -175,42 +171,79 @@ enyo.kind({
 			this.color = inColor;
 		} else {
 
-			this.close();
+			this.hide();
 		}
 
 		this.$['name'].setValue( this.name );
 		this.$['icon'].setValue( this.icon );
-		this.$['color'].setContent( this.color.ucfirst() );
+		this.$['color'].setValue( this.color.ucfirst() );
 
 		for( var i = 0; i < appColors.length; i++ ) {
 
-			this.$['colorHolder'].removeClass( appColors[i]['name'] );
+			this.$['color'].removeClass( appColors[i]['name'] );
 		}
 
-		this.$['colorHolder'].addClass( this.color );
+		this.$['color'].addClass( this.color );
 
 		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
 
-			this.$['colorHolder'].show();
+			this.$['color'].show();
 		} else {
 
-			this.$['colorHolder'].hide();
+			this.$['color'].hide();
 		}
 	},
 
-	showColorPicker: function( inSender ) {
+	colorChanged: function( inSender, inEvent ) {
 
-		this.$['colorPicker'].openAtControl( inSender );
+
+		this.$['color'].removeClass( this.color );
+
+		this.color = inEvent.selected.name;
+
+		this.$['color'].addClass( this.color );
+
+		return true;
 	},
 
-	menuItemClick: function( inSender, inEvent ) {
+	deleteCategory: function() {
 
-		this.$['colorHolder'].removeClass( this.color );
+		if( this.acctId < 0 ) {
 
-		this.color = inSender.name;
+			this.doFinish( 0 );
+		} else {
 
-		this.$['colorHolder'].addClass( this.color );
-		this.$['color'].setContent( this.color.ucfirst() );
+			this.createComponent( {
+					name: "deleteCategoryConfirm",
+					kind: "gts.ConfirmDialog",
+
+					title: "Delete Account",
+					message: "Are you sure you want to delete this account category?",
+
+					confirmText: "Delete",
+					confirmClass: "onyx-negative",
+
+					cancelText: "Cancel",
+					cancelClass: "",
+
+					onConfirm: "deleteCategoryHandler",
+					onCancel: "deleteCategoryConfirmClose"
+				});
+
+			this.$['deleteCategoryConfirm'].show();
+		}
+	},
+
+	deleteCategoryConfirmClose: function() {
+
+		this.$['deleteCategoryConfirm'].destroy();
+	},
+
+	deleteCategoryHandler: function() {
+
+		this.deleteCategoryConfirmClose();
+
+		this.$['manager'].deleteCategory( this.rowid, this.name, { "onSuccess": enyo.bind( this, this.doChangeComplete, { "action": "delete" } ) } );
 	},
 
 	save: function() {
@@ -221,7 +254,7 @@ enyo.kind({
 		if( newName.length <= 0 ) {
 
 			this.$['errorMessage'].setContent( "Category name may not be blank." );
-			this.$['errorMessageContainer'].show();
+			this.$['errorMessage'].show();
 			return;
 		}
 
@@ -233,18 +266,18 @@ enyo.kind({
 		if( count > 0 ) {
 
 			this.$['errorMessage'].setContent( "Category names must be unique." );
-			this.$['errorMessageContainer'].show();
+			this.$['errorMessage'].show();
 			return;
 		}
 
-		this.$['errorMessageContainer'].hide();
+		this.$['errorMessage'].hide();
 
 		if( this.rowid < 0 ) {
 
-			this.$['manager'].createCategory( { "name": newName, "icon": this.icon, "color": this.color }, { "onSuccess": enyo.bind( this, this.doChange, "new" ) } );
+			this.$['manager'].createCategory( { "name": newName, "icon": this.icon, "color": this.color }, { "onSuccess": enyo.bind( this, this.doChangeComplete, { "action": "new" } ) } );
 		} else {
 
-			this.$['manager'].editCategory( this.rowid, newName, this.icon, this.color, this.name, { "onSuccess": enyo.bind( this, this.doChange, "edit" ) } );
+			this.$['manager'].editCategory( this.rowid, newName, this.icon, this.color, this.name, { "onSuccess": enyo.bind( this, this.doChangeComplete, { "action": "edit" } ) } );
 		}
 	}
 });

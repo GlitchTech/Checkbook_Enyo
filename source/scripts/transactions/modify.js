@@ -394,24 +394,22 @@ enyo.kind( {
 
 		{
 			kind: "onyx.Toolbar",
-			classes: "text-center",
+			classes: "text-center two-button-toolbar",
 			components: [
 				{
 					kind: "onyx.Button",
 					content: "Cancel",
 
-					ontap: "doFinish",
-
-					style: "width: 150px",
-					classes: "margin-half-right"
+					ontap: "doFinish"
+				}, {
+					content: ""
 				}, {
 					kind: "onyx.Button",
 					content: "Save",
 
 					ontap: "saveTransaction",
 
-					style: "width: 150px;",
-					classes: "deep-green margin-half-left"
+					classes: "deep-green"
 				}
 			]
 		},

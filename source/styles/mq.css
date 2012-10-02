@@ -23,7 +23,15 @@
 	max-height: 500px;
 }
 
-/* Adjust for smaller screen sizes */
+.two-button-toolbar button {
+	width: 150px;
+}
+
+.two-button-toolbar div {
+	width: 50px;
+}
+
+/* Adjust for smaller screen sizes (width) */
 
 @media all and ( max-width: 800px ) {
 
@@ -45,6 +53,19 @@
 		width: 95%;
 	}
 }
+
+@media all and ( max-width: 400px ) {
+
+	.two-button-toolbar button {
+		width: 45%;
+	}
+
+	.two-button-toolbar div {
+		display: none;
+	}
+}
+
+/* Adjust for smaller screen sizes (height) */
 
 @media all and ( max-height: 600px ) {
 

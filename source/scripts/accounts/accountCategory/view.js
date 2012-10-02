@@ -1,32 +1,31 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
+/**
+ * @name Checkbook.accounts.modify
+ * @author Matthew Schott <glitchtechscience@gmail.com>
+ *
+ * @class
+ * @version 2.0 (2012/08/08)
+ */
+
 enyo.kind({
 	name: "Checkbook.accountCategory.view",
-	kind: "onyx.Popup",
-	//Should not be a popup. Maybe fullscreen or view to the side.
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
-	classes: "small-popup",
-
-	centered: true,
-	floating: true,
-
-	scrim: true,
-	scrimclasses: "onyx-scrim-translucent",
-
-	autoDismiss: false,
+	style: "height: 100%;",
 
 	categories: [],
 
 	events: {
-		onClose: ""
+		onFinish: ""
 	},
 
 	components: [
 		{
 			kind: "onyx.Toolbar",
-			classes: "text-center",
-			style: "position: relative; background: none; border: 0;",
-
+			classes: "text-center text-middle",
+			style: "position: relative;",
 			components: [
 				{
 					components: [
@@ -40,64 +39,74 @@ enyo.kind({
 					]
 				}, {
 					kind: "onyx.Button",
-					ontap: "closeView",
+					ontap: "doFinish",
 
 					content: "x",
 
 					classes: "onyx-negative",
-					style: "position: absolute; right: 5px; padding: 3px 12px;"
+					style: "position: absolute; right: 15px;"
 				}
 			]
-		}, {
+		},
 
-			name: "entries",
-			//kind: "ReorderableVirtualList",
-
-			style: "height: 325px;",
-			reorderable: true,
-
-			onReorder: "reorder",
-			onSetupRow: "setupRow",
-			onAcquirePage: "acquirePage",
-
+		{
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			classes: "rich-brown-gradient",
+			fit: true,
 			components: [
 				{
-					name: "item",
-
-				//	kind: enyo.SwipeableItem,
-				//	layoutKind: enyo.VFlexLayout,
-
-					tapHighlight: true,
-					ontap: "editItem",
-					onConfirm: "deleteItem",
-
+					classes: "light narrow-column padding-half-top padding-half-bottom",
+					style: "min-height: 100%; position: relative;",
 					components: [
 						{
-						//	kind: enyo.HFlexBox,
-							className: "account",
-							align: "center",
+							name: "entries",
+							kind: "enyo.Repeater",
+
+							classes: "enyo-fit",
+
+							//onReorder: "reorder",
+							onSetupItem: "setupRow",
+							//acquirePage
+
 							components: [
 								{
-									name: "icon",
-									//kind: enyo.Image,
-									className: "accountIcon"
-								}, {
-									name: "name",
-									className: "enyo-text-ellipsis",
-									flex: 1
+									name: "item",
+									kind: "onyx.Item",//SwipeableItem
+									tapHighlight: true,
+
+									classes: "bordered text-middle custom-background legend",
+
+									ontap: "editItem",
+									onDelete: "deleteItem",
+
+									components: [
+										{
+											name: "icon",
+											kind: "enyo.Image",
+											className: "accountIcon"
+										}, {
+											name: "name",
+											style: "display: inline-block",
+											classes: "margin-left"
+										}
+									]
 								}
 							]
 						}
 					]
 				}
 			]
-		}, {
-			classes: "padding-std text-center",
-			components:[
+		},
+
+		{
+			kind: "onyx.Toolbar",
+			classes: "text-center",
+			components: [
 				{
 					kind: "onyx.Button",
-					content: "Create New",
 
+					content: "Create New",
 					ontap: "createNew"
 				}
 			]
@@ -105,14 +114,14 @@ enyo.kind({
 
 		{
 			name: "modifyCat",
-			//kind: "Checkbook.accountCategory.modify",
+			kind: "Checkbook.accountCategory.modify",
 
-			onChange: "modificationComplete",
+			onChangeComplete: "modificationComplete",
 		},
 
 		{
 			name: "manager",
-			//kind: "Checkbook.accountCategory.manager"
+			kind: "Checkbook.accountCategory.manager"
 		}
 	],
 
@@ -120,75 +129,62 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.categories = [];
+		this.fetchCategories();
+	},
+
+	fetchCategories: function() {
+
+		this.$['manager'].fetchCategories(
+				{
+					"onSuccess": enyo.bind( this, this.dataResponse )
+				}
+			);
+	},
+
+	dataResponse: function( results ) {
+
+		this.categories = results;
+		this.$['entries'].setCount( this.categories.length );
 	},
 
 	/** List Control **/
 
-	setupRow: function( inSender, inIndex ) {
+	setupRow: function( inSender, inEvent ) {
 
-		var row = this.categories[inIndex];
+		var index = inEvent.index;
+		var item = inEvent.item;
+		var row = this.categories[index];
 
 		if( row ) {
 
-			this.$['icon'].setSrc( "assets/" + row['icon'] );
-			this.$['name'].setContent( row['name'] );
+			item.$['icon'].setSrc( "assets/" + row['icon'] );
+			item.$['name'].setContent( row['name'] );
 
-			this.$['item'].setClassName( "enyo-item enyo-swipeableitem custom-background legend " + row['color'] + " enyo-vflexbox" );
+			for( var i = 0; i < appColors.length; i++ ) {
+
+				item.$['item'].removeClass( appColors[i]['name'] );
+			}
+
+			item.$['item'].addClass( row['color'] );
 
 			return true;
 		}
-	},
-
-	acquirePage: function( inSender, inPage ) {
-
-		var index = inPage * inSender.pageSize;
-
-		if( index < 0 ) {
-			//No indexes below zero, don't bother calling
-
-			return;
-		}
-
-		if( !this.categories[index] ) {
-
-			this.$['manager'].fetchCategories(
-					{
-						"onSuccess": enyo.bind( this, this.dataResponse, index )
-					},
-					inSender.pageSize,//Limit
-					index//Offset
-				);
-		}
-	},
-
-	dataResponse: function( offset, results ) {
-		//Parse page data
-
-		for( var i = 0; i < results.length; i++ ) {
-
-			//Make a clone; else unable to modify account
-			this.categories[offset + i] = enyo.clone( results[i] );
-		}
-
-		//Reload list
-		this.$['entries'].refresh();
 	},
 
 	/** Events **/
 
 	createNew: function( inSender, inEvent ) {
 
-		this.$['modifyCat'].openAtCenter( -1 );
+		this.$['modifyCat'].show( -1 );
 	},
 
-	editItem: function( inSender, inEvent, inIndex ) {
+	editItem: function( inSender, inEvent ) {
 
-		var row = this.categories[inIndex];
+		var row = this.categories[inEvent.index];
 
 		if( row ) {
 
-			this.$['modifyCat'].openAtCenter( row['rowid'], row['name'], row['icon'], row['color'] );
+			this.$['modifyCat'].show( row['rowid'], row['name'], row['icon'], row['color'] );
 		}
 	},
 
@@ -202,25 +198,13 @@ enyo.kind({
 		}
 	},
 
-	modificationComplete: function( inSender, inAction ) {
+	modificationComplete: function( inSender, inEvent ) {
 
-		if( enyo.isString( inSender ) ) {
+		this.fetchCategories();
 
-			inAction = inSender;
-		}
+		if( inEvent['action'] != "reorder" ) {
 
-		if( enyo.isString( inAction ) ) {
-
-			if( inAction === "reorder" ) {
-
-				this.$['entries'].refresh();
-			} else {
-
-				this.$['modifyCat'].close();
-
-				this.categories = [];
-				this.$['entries'].punt();
-			}
+			this.$['modifyCat'].hide();
 		}
 	},
 
