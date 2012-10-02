@@ -17,18 +17,20 @@
 		<script src="source/package.js" type="text/javascript"></script>
 	</head>
 	<body class="enyo-unselectable">
-		<script>
-			//PhoneGap event
-			document.addEventListener( "deviceready", onDeviceReady, false );
-			onDeviceReady();
+		<div class="body-temp">
+			<script>
+				//PhoneGap event
+				document.addEventListener( "deviceready", onDeviceReady, false );
+				onDeviceReady();
 
-			// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
-			function onDeviceReady() {
+				// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
+				function onDeviceReady() {
 
-				enyo.Scroller.touchScrolling = true;
+					enyo.Scroller.touchScrolling = true;
 
-				new Checkbook.app().renderInto( document.body );
-			}
-		</script>
+					new Checkbook.app().renderInto( document.body );
+				}
+			</script>
+		</div>
 	</body>
 </html>

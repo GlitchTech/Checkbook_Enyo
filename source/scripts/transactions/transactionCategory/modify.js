@@ -191,8 +191,6 @@ enyo.kind({
 	keyPressed: function( inSender, inEvent ) {
 		//Prevent ~ and |
 
-		this.log( arguments );
-
 		if( inEvent.keyCode === 124 || inEvent.keyCode === 126 ) {
 
 			inEvent.preventDefault();
@@ -240,9 +238,7 @@ enyo.kind({
 
 	deleteCategory: function() {
 
-		this.log( arguments );
-
-		if( this.acctId >= 0 ) {
+		if( this.id >= 0 ) {
 
 			this.createComponent( {
 					name: "deleteCategoryConfirm",
