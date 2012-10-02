@@ -56,41 +56,35 @@ enyo.kind({
 			fit: true,
 			components: [
 				{
-					classes: "light narrow-column padding-half-top padding-half-bottom",
+					name: "entries",
+					kind: "enyo.Repeater",
+
+					classes: "enyo-fit light narrow-column padding-half-top padding-half-bottom",
 					style: "min-height: 100%; position: relative;",
+
+					//onReorder: "reorder",
+					onSetupItem: "setupRow",
+
 					components: [
 						{
-							name: "entries",
-							kind: "enyo.Repeater",
+							name: "item",
+							kind: "onyx.Item",//SwipeableItem
+							tapHighlight: true,
 
-							classes: "enyo-fit",
+							classes: "bordered text-middle custom-background legend",
 
-							//onReorder: "reorder",
-							onSetupItem: "setupRow",
-							//acquirePage
+							ontap: "editItem",
+							onDelete: "deleteItem",
 
 							components: [
 								{
-									name: "item",
-									kind: "onyx.Item",//SwipeableItem
-									tapHighlight: true,
-
-									classes: "bordered text-middle custom-background legend",
-
-									ontap: "editItem",
-									onDelete: "deleteItem",
-
-									components: [
-										{
-											name: "icon",
-											kind: "enyo.Image",
-											className: "accountIcon"
-										}, {
-											name: "name",
-											style: "display: inline-block",
-											classes: "margin-left"
-										}
-									]
+									name: "icon",
+									kind: "enyo.Image",
+									className: "accountIcon"
+								}, {
+									name: "name",
+									style: "display: inline-block",
+									classes: "margin-left"
 								}
 							]
 						}
@@ -194,7 +188,7 @@ enyo.kind({
 
 		if( row ) {
 
-			this.$['manager'].deleteCategory( row['rowid'], row['name'], { "onSuccess": enyo.bind( this, this.modificationComplete, "delete" ) } );
+			this.$['manager'].deleteCategory( row['rowid'], row['name'], { "onSuccess": enyo.bind( this, this.modificationComplete, { action: "delete" } ) } );
 		}
 	},
 
@@ -220,7 +214,7 @@ enyo.kind({
 			this.categories.push.apply( this.categories, temp );
 			this.categories.push.apply( this.categories, bottom );
 
-			this.$['manager'].reorderCategories( this.categories, { "onSuccess": enyo.bind( this, this.modificationComplete, "reorder" ) } );
+			this.$['manager'].reorderCategories( this.categories, { "onSuccess": enyo.bind( this, this.modificationComplete, { action: "reorder" } ) } );
 		}
 	}
 });

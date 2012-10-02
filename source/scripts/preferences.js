@@ -272,6 +272,8 @@ enyo.kind({
 		},
 
 		{
+			//multiple exit points makes navi complicated
+			showing: false,
 			kind: "onyx.Toolbar",
 			classes: "text-center",
 			components: [
@@ -517,23 +519,18 @@ enyo.kind({
 
 			this.$['editTransactionCategories'].setDisabled( true );
 
-			this.createComponent( {
-					name: "transactionCategoryView",
-					kind: "Checkbook.transactionCategory.view",
-
-					onClose: "modifyTransactionCategoriesComplete",
-
-					owner: this
-				});
-
-			this.$['transactionCategoryView'].show();
+			enyo.Signals.send(
+					"showPanePopup",
+					{
+						name: "transactionCategoryView",
+						kind: "Checkbook.transactionCategory.view",
+						onFinish: enyo.bind( this, this.modifyTransactionCategoriesComplete )
+					}
+				);
 		}
 	},
 
 	modifyTransactionCategoriesComplete: function() {
-
-		this.$['transactionCategoryView'].hide();
-		this.$['transactionCategoryView'].destroy();
 
 		this.$['editTransactionCategories'].setDisabled( false );
 	},

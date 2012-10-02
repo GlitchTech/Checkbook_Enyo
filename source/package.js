@@ -23,6 +23,7 @@ enyo.depends(
 	"$lib/gts-plugins/DecimalInput",
 	"$lib/gts-plugins/ConfirmDialog",
 	"$lib/gts-plugins/ProgressDialog",
+	"$lib/gts-plugins/AutoComplete",
 
 	"$lib/private",
 

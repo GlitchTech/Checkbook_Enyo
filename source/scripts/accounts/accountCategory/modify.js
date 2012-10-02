@@ -19,12 +19,9 @@ enyo.kind({
 		onChangeComplete: ""
 	},
 
-	published: {
-		id: -1,
-		general: "",
-		specific: "",
-		mode: ""
-	},
+	id: -1,
+	general: "",
+	specific: "",
 
 	components: [
 		{
@@ -135,11 +132,11 @@ enyo.kind({
 		}
 	],
 
-	show: function( inRowid, inName, inIcon, inColor ) {
+	show: function( inId, inName, inIcon, inColor ) {
 
 		this.inherited( arguments );
 
-		if( inRowid < 0 ) {
+		if( inId < 0 ) {
 
 			this.$['deleteButton'].hide();
 		} else {
@@ -147,13 +144,7 @@ enyo.kind({
 			this.$['deleteButton'].show();
 		}
 
-		this.$['name'].focus();
-		this.loadModifySystem( inRowid, inName, inIcon, inColor );
-	},
-
-	loadModifySystem: function( inRowid, inName, inIcon, inColor ) {
-
-		if( inRowid < 0 ) {
+		if( inId < 0 ) {
 
 			this.$['title'].setContent( "Create a Category" );
 
@@ -161,11 +152,11 @@ enyo.kind({
 			this.name = "";
 			this.icon = "";
 			this.color = "";
-		} else if( inRowid > 0 ) {
+		} else if( inId > 0 ) {
 
 			this.$['title'].setContent( "Edit Category" );
 
-			this.rowid = inRowid;
+			this.rowid = inId;
 			this.name = inName;
 			this.icon = inIcon;
 			this.color = inColor;
@@ -192,6 +183,8 @@ enyo.kind({
 
 			this.$['color'].hide();
 		}
+
+		this.$['name'].focus();
 	},
 
 	colorChanged: function( inSender, inEvent ) {
@@ -208,10 +201,7 @@ enyo.kind({
 
 	deleteCategory: function() {
 
-		if( this.acctId < 0 ) {
-
-			this.doFinish( 0 );
-		} else {
+		if( this.rowid >= 0 ) {
 
 			this.createComponent( {
 					name: "deleteCategoryConfirm",

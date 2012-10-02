@@ -1,35 +1,33 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
+/**
+ * @name Checkbook.accounts.modify
+ * @author Matthew Schott <glitchtechscience@gmail.com>
+ *
+ * @class
+ * @version 2.0 (2012/08/08)
+ */
+
 enyo.kind({
-
 	name: "Checkbook.transactionCategory.view",
-	kind: enyo.Popup,
-//	layoutKind: enyo.VFlexLayout,
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
-	modal: true,
-	scrim: true,
-
-	style: "width: 400px;",
+	style: "height: 100%;",
 
 	categories: [],
 
 	events: {
-		onClose: ""
+		onFinish: ""
 	},
 
 	components: [//Need a restore orig button or something
 		{
-			kind: enyo.Header,
-			layoutKind: enyo.HFlexLayout,
-			align: "center",
-
-			className: "enyo-header-dark popup-header",
-			style: "border-radius: 10px; margin-bottom: 10px;",
-
+			kind: "onyx.Toolbar",
+			classes: "text-center text-middle",
+			style: "position: relative;",
 			components: [
 				{
-					style: "text-align: center; margin-right: -32px;",
-					flex: 1,
 					components: [
 						{
 							content: "Transaction Categories",
@@ -40,47 +38,52 @@ enyo.kind({
 						}
 					]
 				}, {
-					kind: enyo.ToolButton,
-					icon: "assets/menu_icons/close.png",
-					className: "img-icon",
-					style: "text-align: center;",
-					ontap: "doClose"
+					kind: "onyx.Button",
+					ontap: "doFinish",
+
+					content: "x",
+
+					classes: "onyx-negative",
+					style: "position: absolute; right: 15px;"
 				}
 			]
-		}, {
-			name: "entries",
-			kind: enyo.VirtualList,
+		},
 
-			style: "height: 325px;",
-			onSetupRow: "setupRow",
-			onAcquirePage: "acquirePage",
-
+		{
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			classes: "deep-green-gradient",
+			fit: true,
 			components: [
 				{
-					name: "item",
+					name: "entries",
+					kind: "enyo.Repeater",
 
-					kind: enyo.SwipeableItem,
-				//	layoutKind: enyo.VFlexLayout,
+					classes: "enyo-fit light narrow-column padding-half-top padding-half-bottom",
+					style: "min-height: 100%; position: relative;",
 
-					tapHighlight: true,
-					ontap: "editItem",
-					onConfirm: "deleteItem",
+					//onReorder: "reorder",
+					onSetupItem: "setupRow",
 
 					components: [
 						{
-							name: "general",
-							kind: enyo.Divider,
-							showing: false,
-							ontap: "dividerTapped"
-						}, {
-							kind: enyo.HFlexBox,
-							className: "account",
-							align: "center",
+							name: "item",
+							kind: "onyx.Item",//SwipeableItem
+							tapHighlight: true,
+
+							classes: "bordered text-middle custom-background legend",
+
+							ontap: "editItem",
+							onDelete: "deleteItem",
+
 							components: [
 								{
+									name: "general",
+									style: "display: inline-block"
+								}, {
 									name: "specific",
-									className: "enyo-text-ellipsis",
-									flex: 1
+									style: "display: inline-block",
+									classes: "margin-left"
 								}
 							]
 						}
@@ -90,15 +93,13 @@ enyo.kind({
 		},
 
 		{
-			kind: enyo.Toolbar,
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
 					kind: "onyx.Button",
 
-					flex: 2,
-					className: "enyo-button-primary",
-
-					caption: "Create New",
+					content: "Create New",
 					ontap: "createNew"
 				}
 			]
@@ -108,7 +109,7 @@ enyo.kind({
 			name: "modifyCat",
 			kind: "Checkbook.transactionCategory.modify",
 
-			onChange: "modificationComplete",
+			onChangeComplete: "modificationComplete",
 		}
 	],
 
@@ -116,76 +117,55 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.categories = [];
+		this.fetchCategories();
+	},
+
+	fetchCategories: function() {
+
+		Checkbook.globals.transactionCategoryManager.fetchCategories( { "onSuccess": enyo.bind( this, this.dataResponse ) } );
+	},
+
+	dataResponse: function( results ) {
+
+		this.categories = results;
+		this.$['entries'].setCount( this.categories.length );
 	},
 
 	/** List Control **/
 
-	setupRow: function( inSender, inIndex ) {
+	setupRow: function( inSender, inEvent ) {
 
-		var row = this.categories[inIndex];
+		var index = inEvent.index;
+		var item = inEvent.item;
+		var row = this.categories[index];
 
 		if( row ) {
 
-			this.$['specific'].setContent( row['specCat'] );
+			item.$['general'].setContent( row['genCat'] );
+			item.$['specific'].setContent( row['specCat'] );
+/*
+			if( index <= 0 || row['genCat'] !== this.categories[index - 1]['genCat'] ) {
 
-			if( inIndex <= 0 || row['genCat'] !== this.categories[inIndex - 1]['genCat'] ) {
+				item.$['general'].show();
+				item.$['general'].setCaption( row['genCat'] );
 
-				this.$['general'].show();
-				this.$['general'].setCaption( row['genCat'] );
-
-				this.$['general'].parent.addClass( "categoryRow" );
+				item.$['general'].parent.addClass( "categoryRow" );
 			} else {
 
-				this.$['general'].hide();
+				item.$['general'].hide();
 
-				this.$['general'].parent.removeClass( "categoryRow" );
+				item.$['general'].parent.removeClass( "categoryRow" );
 			}
-
+*/
 			return true;
 		}
-	},
-
-	acquirePage: function( inSender, inPage ) {
-
-		var index = inPage * inSender.pageSize;
-
-		if( index < 0 ) {
-			//No indexes below zero, don't bother calling
-
-			return;
-		}
-
-		if( !this.categories[index] ) {
-
-			Checkbook.globals.transactionCategoryManager.fetchCategories(
-					{
-						"onSuccess": enyo.bind( this, this.dataResponse, index )
-					},
-					inSender.pageSize,//Limit
-					index//Offset
-				);
-		}
-	},
-
-	dataResponse: function( offset, results ) {
-		//Parse page data
-
-		for( var i = 0; i < results.length; i++ ) {
-
-			//Make a clone; else unable to modify account
-			this.categories[offset + i] = enyo.clone( results[i] );
-		}
-
-		//Reload list
-		this.$['entries'].refresh();
 	},
 
 	/** Events **/
 
 	createNew: function( inSender, inEvent ) {
 
-		this.$['modifyCat'].openAtCenter( -1 );
+		this.$['modifyCat'].show( -1 );
 	},
 
 	dividerTapped: function( inSender, inEvent ) {
@@ -193,45 +173,38 @@ enyo.kind({
 
 		inEvent.stopPropagation();
 
-		this.$['modifyCat'].openAtCenter( -1, inSender.caption, null );
+		this.$['modifyCat'].show( -1, inSender.caption, null );
 	},
 
-	editItem: function( inSender, inEvent, inIndex ) {
+	editItem: function( inSender, inEvent ) {
 
-		var row = this.categories[inIndex];
+		var row = this.categories[inEvent.index];
 
 		if( row ) {
 
-			this.$['modifyCat'].openAtCenter( row['catId'], row['genCat'], row['specCat'] );
+			this.$['modifyCat'].show( row['catId'], row['genCat'], row['specCat'] );
 		}
 	},
 
 	deleteItem: function( inSender, inIndex ) {
 
+		this.log( "NOT UPDATED" );
+
 		var row = this.categories[inIndex];
 
 		if( row ) {
 
-			Checkbook.globals.transactionCategoryManager.deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, "delete" ) } );
+			Checkbook.globals.transactionCategoryManager.deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, { action: "delete" } ) } );
 		}
 	},
 
-	modificationComplete: function( inSender, inAction ) {
+	modificationComplete: function( inSender, inEvent ) {
 
-		if( enyo.isString( inSender ) ) {
+		this.fetchCategories();
 
-			inAction = inSender;
-		}
+		if( inEvent['action'] != "reorder" ) {
 
-		if( enyo.isString( inAction ) ) {
-
-			this.$['modifyCat'].close();
-			//inAction == new || category || group || delete
-
-			//update list
-
-			this.categories = [];
-			this.$['entries'].punt();//heavy handed; should be cleaner; split into different groups? ( add-punt, edit(index change)-refresh, delete(index change)-refresh, group-punt(scroll))
+			this.$['modifyCat'].hide();
 		}
 	}
 });

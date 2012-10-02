@@ -254,8 +254,6 @@ enyo.kind({
 					{
 						"onSuccess": function() {
 
-		this.log();
-
 							enyo.Signals.send( "accountChanged", { "accountId": self.accounts[rowIndex]['acctId'] } );
 						}
 					}

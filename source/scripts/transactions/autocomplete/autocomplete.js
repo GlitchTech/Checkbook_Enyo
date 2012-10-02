@@ -5,76 +5,49 @@
  */
 enyo.kind( {
 	name: "Checkbook.transactions.autocomplete",
-	kind: "onyx.InputDecorator",
 
-	style: "position: relative;",
-
-	handlers: {
-		oninput: "input",
-		onSelect: "itemSelected",
+	events: {
+		onValueChanged: ""
 	},
 
 	published: {
-		enabled: true,
-		limit: 50,
-
-		values: "",
-		delay: 200,
-		//* private ... needed to support Menu ...
-		active: false
-	},
-
-	events: {
-		onInputChanged: "",
-		onValueSelected: ""
+		enabled: true
 	},
 
 	components:[
 		{
-			name: "options",
-			kind: "onyx.Menu",
-			floating: true
-		}, {
-			name: "icon",
-			kind: "enyo.Image",
-			classes: "img-icon",
-			style: "position: absolute; right: 5px;",
-			src: "assets/search.png"
-		},
+			name: "ac",
+			kind: "GTS.AutoComplete",
+
+			onValueSelected: "handleSuggestion",
+			onDataRequested: "fetchData",
+
+			components: [
+				{
+					tag: "",
+					name: "client"
+				}
+			]
+		}
 	],
 
 	rendered: function() {
+
+		this.inherited( arguments );
 
 		this.enabledChanged();
 	},
 
 	enabledChanged: function() {
 
-		this.log();
-
-		this.$['icon'].setShowing( this.enabled );
+		this.$['ac'].setEnabled( this.enabled );
 	},
 
-	input: function( source, event ) {
+	fetchData: function( inSender, inEvent ) {
 
-		if( !this.enabled ) {
+		if( inEvent.value.length <= 0 ) {
 
-			return;
-		}
-
-		// cache input instance. means we only support a single input but that's probably okay.
-		// works around a bug where originator is Menu rather than Input
-		this.inputField = this.inputField || event.originator;
-
-		enyo.job( null, enyo.bind( this, "fireInputChanged" ), this.delay );
-	},
-
-	fireInputChanged: function() {
-
-		this.searchValue = this.inputField.getValue();
-
-		if( this.searchValue.length <= 0 ) {
-
+			inEvent.callback( [] );
 			return;
 		}
 
@@ -86,66 +59,31 @@ enyo.kind( {
 									"FROM transactions " +
 									"WHERE " +
 										"desc LIKE ? " +
-										//AND desc NOT IN ( SELECT desc FROM suggestions )//Needs union or something with suggetions table
+										//AND desc NOT IN ( SELECT desc FROM suggestions WHERE ban = 1 )//Needs union or something with suggetions table
 									"ORDER BY desc ASC " +
 									"LIMIT ?;",
-							"values": [ this.searchValue + "%", this.limit ]
+							"values": [ inEvent.value + "%", inSender.getLimit() ]
 						}
 					),
 				{
-					"onSuccess": enyo.bind( this, this.buildSuggestionList, this.searchValue )
+					"onSuccess": enyo.bind( this, this.buildSuggestionList, inEvent.value, inEvent.callback )
 				}
 			);
-
-		this.doInputChanged( { value: this.inputField.getValue() } );
 	},
 
-	buildSuggestionList: function( oldSearchValue, results ) {
+	buildSuggestionList: function( oldSearchValue, callback, results ) {
 
-		if( this.searchValue !== oldSearchValue ) {
-			//prevent old data queries
+		var data = [];
 
-			return;
+		for( var i = 0; i < results.length; i++ ) {
+
+			data.push( results[i]['desc'] );
 		}
 
-		this.values = results;
-		this.valuesChanged();
+		callback( data );
 	},
 
-	valuesChanged: function() {
-
-		if( !this.values || this.values.length === 0 ) {
-
-			this.waterfall( "onRequestHideMenu", { activator: this } );
-			return;
-		}
-
-		this.$['options'].destroyClientControls();
-		var c = [];
-
-		for( var i = 0; i < this.values.length; i++ ) {
-
-			c.push( {
-					"content": this.values[i]['desc'],
-					index: i,
-					allowHtml: true
-				});
-		}
-
-		this.$['options'].createComponents( c );
-		this.$['options'].render();
-
-		this.waterfall( "onRequestShowMenu", { activator: this } );
-	},
-
-	itemSelected: function( inSender, inEvent ) {
-
-		if( inEvent.content && inEvent.content.length > 0 ) {
-
-			inEvent.content = inEvent.content.dirtyString();
-
-			this.inputField.setValue( inEvent.content );
-		}
+	handleSuggestion: function( inSender, inEvent ) {
 
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
@@ -165,13 +103,15 @@ enyo.kind( {
 									"GROUP BY category " +
 								"ORDER BY count DESC " +
 								"LIMIT 1;",
-							"values": [ this.getOwner().$['account'].getValue(), this.values[inEvent.selected.index]['desc'] ]
+							"values": [ this.getOwner().$['account'].getValue(), inEvent.value ]
 						}
 					),
 				{
-					"onSuccess": enyo.bind( this, this.dataHandler, inEvent.content )
+					"onSuccess": enyo.bind( this, this.dataHandler, inEvent.value )
 				}
 			);
+
+		return true;
 	},
 
 	dataHandler: function( desc, results ) {
@@ -188,39 +128,6 @@ enyo.kind( {
 				};
 		}
 
-		this.doValueSelected( data );
-
-		this.searchValue = "";
-	},
-
-	updatePosition: function() {
-
-		var descNode = this.getOwner().$['descWrapper'];
-
-		if( descNode.getBounds() ) {
-
-			var d = this.calcViewportSize();
-			var b = descNode.getBounds();
-
-			this.applyStyle( "left", b.left + "px" );
-			this.applyStyle( "width", b.width + "px" );
-
-			var t = 0;
-
-			if( descNode.hasNode() ) {
-
-				var obj = descNode.hasNode();
-
-				do {
-
-					t += obj.offsetTop;
-				} while( obj = obj.offsetParent );
-			} else {
-
-				t = b.top;
-			}
-
-			this.applyStyle( "top", ( t + b.height ) + "px" );
-		}
+		this.doValueChanged( data );
 	}
 });

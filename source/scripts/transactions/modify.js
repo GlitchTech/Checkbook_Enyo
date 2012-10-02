@@ -51,7 +51,7 @@ enyo.kind( {
 									name: "autocomplete",
 									kind: "Checkbook.transactions.autocomplete",
 
-									onValueSelected: "descAutoSuggestMade",
+									onValueChanged: "descAutoSuggestMade",
 
 									components: [
 										{
