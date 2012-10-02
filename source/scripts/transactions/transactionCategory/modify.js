@@ -51,11 +51,15 @@ enyo.kind({
 			components: [
 				{
 					name: "generalWrapper",
-					kind: "onyx.InputDecorator",
+					kind: "GTS.AutoComplete",
 					layoutKind: "FittableColumnsLayout",
 
-					classes: "onyx-focused",
 					alwaysLooksFocused: true,
+
+					onValueSelected: "generalAutoSuggestComplete",
+					onDataRequested: "fetchData",
+
+					zIndex: 200,
 
 					components: [
 						{
@@ -64,9 +68,7 @@ enyo.kind({
 
 							placeholder: "group name",
 
-							fit: true,
-
-							oninput: "generalContentChanged"
+							fit: true
 						}, {
 							content: "group",
 							classes: "small label"
@@ -133,12 +135,6 @@ enyo.kind({
 					ontap: "save"
 				}
 			]
-		},
-
-		{
-			name: "autocomplete",
-			//kind: "Checkbook.transactionCategory.autocomplete",
-			onSelect: "generalAutoSuggestComplete"
 		}
 	],
 
@@ -192,20 +188,6 @@ enyo.kind({
 		this.$['general'].focus();
 	},
 
-	generalContentChanged: function() {
-		//Autocomplete
-
-		this.log( "autocomplete: " + this.$['general'].getValue() );
-		return;
-
-		this.$['autocomplete'].setSearchValue( this.$['general'].getValue() );
-	},
-
-	generalAutoSuggestComplete: function( inSender, suggestion ) {
-
-		this.$['general'].setValue( suggestion );
-	},
-
 	keyPressed: function( inSender, inEvent ) {
 		//Prevent ~ and |
 
@@ -215,6 +197,45 @@ enyo.kind({
 
 			inEvent.preventDefault();
 		}
+	},
+
+	fetchData: function( inSender, inEvent ) {
+
+		if( inEvent.value.length <= 0 ) {
+
+			inEvent.callback( [] );
+			return;
+		}
+
+		Checkbook.globals.gts_db.query(
+				new GTS.databaseQuery(
+						{
+							"sql": "SELECT DISTINCT genCat FROM transactionCategories WHERE genCat LIKE ? LIMIT ?;",
+							"values": [ inEvent.value + "%", inSender.getLimit() ]
+						}
+					),
+				{
+					"onSuccess": enyo.bind( this, this.buildSuggestionList, inEvent.callback )
+				}
+			);
+	},
+
+	buildSuggestionList: function( callback, results ) {
+
+		var data = [];
+
+		for( var i = 0; i < results.length; i++ ) {
+
+			data.push( results[i]['genCat'] );
+		}
+
+		callback( data );
+	},
+
+	generalAutoSuggestComplete: function( inSender, inEvent ) {
+
+		this.$['general'].setValue( inEvent.value );
+		return true;
 	},
 
 	deleteCategory: function() {

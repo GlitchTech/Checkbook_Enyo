@@ -5,7 +5,5 @@ enyo.depends(
 
 	"select.js",
 	"view.js",
-	"modify.js",
-
-	"autocomplete.js"
+	"modify.js"
 );
