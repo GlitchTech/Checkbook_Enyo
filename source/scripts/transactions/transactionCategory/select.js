@@ -67,6 +67,46 @@ enyo.kind({
 			classes: "light popup-scroller",
 			components: [
 				{
+/*
+Change to Tree.
+enyo.kind({
+    name: "enyo.sample.TreeSample",
+    classes: "enyo-unselectable enyo-fit",
+    kind: "FittableRows",
+    fit: true,
+    components: [
+        {kind: "Scroller", fit: true, components: [
+            {kind: "Node", content: "Tree", expandable: false, expanded: true, onExpand: "nodeExpand", onNodeTap: "nodeTap", components: [
+                {content: "Alpha"},
+                {content: "Bravo", expandable: true, expanded: true, components: [
+                    {content: "Bravo-Alpha"},
+                    {content: "Bravo-Bravo"},
+                    {content: "Bravo-Charlie"}
+                ]},
+                {content: "Charlie", expandable: true, components: [
+                    {content: "Charlie-Alpha"},
+                    {content: "Charlie-Bravo"},
+                    {content: "Charlie-Charlie"}
+                ]},
+                {content: "Delta", expandable: true, expanded: true, components: [
+                    {content: "Delta-Alpha"},
+                    {content: "Delta-Bravo"},
+                    {content: "Delta-Charlie"}
+                ]},
+                {content: "Epsilon"}
+            ]}
+        ]}
+    ],
+    nodeExpand: function(inSender, inEvent) {
+       // inSender.setIcon("assets/" + (inSender.expanded ? "folder-open.png" : "folder.png"));
+    },
+    nodeTap: function(inSender, inEvent) {
+
+        console.log( arguments );
+        return true;
+    }
+});
+*/
 					name: "categoryList",
 					kind: "enyo.Repeater",
 

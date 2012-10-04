@@ -99,14 +99,14 @@ enyo.kind({
 
 				if( row['genCat'] !== "" ) {
 
-					this.trsnCategories['mainCats'].push( { "content": row['genCat'], "parent": "" } );
+					this.trsnCategories['mainCats'].push( { "id": row['catId'], "content": row['genCat'], "parent": "" } );
 				}
 
 				currentCategory = row['genCat'];
 				this.trsnCategories['subCats'][currentCategory] = [];
 			}
 
-			this.trsnCategories['subCats'][currentCategory].push( { "content": row['specCat'], "parent": currentCategory } );
+			this.trsnCategories['subCats'][currentCategory].push( { "id": row['catId'], "content": row['specCat'], "parent": currentCategory } );
 		}
 
 		if( results.length < limit ) {

@@ -15,8 +15,6 @@ enyo.kind({
 
 	style: "height: 100%;",
 
-	categories: [],
-
 	events: {
 		onFinish: ""
 	},
@@ -56,39 +54,56 @@ enyo.kind({
 			fit: true,
 			components: [
 				{
-					name: "entries",
+					name: "mainCategories",
 					kind: "enyo.Repeater",
 
 					classes: "enyo-fit light narrow-column padding-half-top padding-half-bottom",
 					style: "min-height: 100%; position: relative;",
 
-					//onReorder: "reorder",
-					onSetupItem: "setupRow",
+					onSetupItem: "setupMainRow",
 
 					components: [
 						{
 							name: "item",
-							kind: "onyx.Item",//SwipeableItem
+							kind: "onyx.Item",
 							tapHighlight: true,
 
-							classes: "bordered text-middle custom-background legend",
+							classes: "bordered text-middle",
 
-							ontap: "editItem",
-							onDelete: "deleteItem",
+							ontap: "editMainCategory",
 
 							components: [
 								{
-									name: "general",
-									style: "display: inline-block;"
+									name: "content",
+									classes: "bold"
 								}, {
-									content: "&gt;&gt;",
-									style: "display: inline-block;",
-									classes: "margin-left bold",
-									allowHtml: true
-								}, {
-									name: "specific",
-									style: "display: inline-block;",
-									classes: "margin-left"
+									name: "subCats",
+									kind: "enyo.Repeater",
+
+									count: 0,
+									parentContent: "",
+
+									onSetupItem: "setupSubRow",
+
+									components: [
+										{
+											name: "item",
+											kind: "onyx.Item",//SwipeableItem
+											tapHighlight: true,
+
+											ontap: "editChildCategory",
+											onDelete: "deleteItem",
+
+											components: [
+												{
+													name: "parent",
+													showing: false
+												}, {
+													name: "subContent"
+												}
+											]
+										}
+									]
 								}
 							]
 						}
@@ -127,41 +142,56 @@ enyo.kind({
 
 	fetchCategories: function() {
 
-		Checkbook.globals.transactionCategoryManager.fetchCategories( { "onSuccess": enyo.bind( this, this.dataResponse ) } );
+		if( Checkbook.globals.transactionCategoryManager.trsnCategories ) {
+
+			this.dataResponse();
+		} else {
+
+			Checkbook.globals.transactionCategoryManager.load( null, { "onSuccess": enyo.bind( this, this.dataResponse ) }, null, null );
+		}
 	},
 
-	dataResponse: function( results ) {
+	dataResponse: function() {
 
-		this.categories = results;
-		this.$['entries'].setCount( this.categories.length );
+		this.$['mainCategories'].setCount( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'].length );
 	},
 
 	/** List Control **/
 
-	setupRow: function( inSender, inEvent ) {
+	setupMainRow: function( inSender, inEvent ) {
 
 		var index = inEvent.index;
 		var item = inEvent.item;
-		var row = this.categories[index];
+		var row = Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'][index];
 
-		if( row ) {
+		if( row && item && item.$['content'] && index >= 0 ) {
 
-			item.$['general'].setContent( row['genCat'] );
-			item.$['specific'].setContent( row['specCat'] );
-/*
-			if( index <= 0 || row['genCat'] !== this.categories[index - 1]['genCat'] ) {
+			item.$['content'].setContent( row['content'] );
 
-				item.$['general'].show();
-				item.$['general'].setCaption( row['genCat'] );
+			item.$['subCats'].parentContent = row['content'];
+			item.$['subCats'].setCount( Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][row['content']].length );
 
-				item.$['general'].parent.addClass( "categoryRow" );
-			} else {
+			return true;
+		}
+	},
 
-				item.$['general'].hide();
+	setupSubRow: function( inSender, inEvent ) {
 
-				item.$['general'].parent.removeClass( "categoryRow" );
-			}
-*/
+		var item = inEvent.item;
+
+		if( !( item && item.$['subContent'] ) ) {
+
+			return;
+		}
+
+		var index = item.index;
+		var row = Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][inSender.parentContent][index];
+
+		if( row && index >= 0 ) {
+
+			item.$['subContent'].setContent( row['content'] );
+			item.$['parent'].setContent( row['parent'] );
+
 			return true;
 		}
 	},
@@ -170,36 +200,52 @@ enyo.kind({
 
 	createNew: function( inSender, inEvent ) {
 
+		this.log( arguments );
+		return true;
+
 		this.$['modifyCat'].show( -1 );
+		return true;
 	},
 
-	dividerTapped: function( inSender, inEvent ) {
-		//Not allowed, block action
+	editMainCategory: function( inSender, inEvent ) {
 
-		inEvent.stopPropagation();
-
-		this.$['modifyCat'].show( -1, inSender.caption, null );
-	},
-
-	editItem: function( inSender, inEvent ) {
-
-		var row = this.categories[inEvent.index];
+		var row = Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'][inEvent.index];
 
 		if( row ) {
 
+			this.$['modifyCat'].show( -1, row['content'], null );
+		}
+
+		return true;
+	},
+
+	editChildCategory: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		return true;
+
+		var row = Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][inSender.parentContent];
+
+		if( row && row[inEvent.index] ) {
+
+			row = row[inEvent.index];
+
 			this.$['modifyCat'].show( row['catId'], row['genCat'], row['specCat'] );
+			return true;
 		}
 	},
 
 	deleteItem: function( inSender, inIndex ) {
 
-		this.log( "NOT UPDATED" );
+		this.log( arguments );
+		return true;
 
-		var row = this.categories[inIndex];
+		var row = Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'][inIndex];
 
 		if( row ) {
 
 			Checkbook.globals.transactionCategoryManager.deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, { action: "delete" } ) } );
+			return true;
 		}
 	},
 
