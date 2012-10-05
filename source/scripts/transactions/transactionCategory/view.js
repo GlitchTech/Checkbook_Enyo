@@ -70,12 +70,12 @@ enyo.kind({
 
 							classes: "bordered text-middle",
 
-							ontap: "editMainCategory",
-
 							components: [
 								{
 									name: "content",
-									classes: "bold"
+									classes: "bold",
+
+									ontap: "editMainCategory"
 								}, {
 									name: "subCats",
 									kind: "enyo.Repeater",
@@ -200,9 +200,6 @@ enyo.kind({
 
 	createNew: function( inSender, inEvent ) {
 
-		this.log( arguments );
-		return true;
-
 		this.$['modifyCat'].show( -1 );
 		return true;
 	},
@@ -214,23 +211,28 @@ enyo.kind({
 		if( row ) {
 
 			this.$['modifyCat'].show( -1, row['content'], null );
-		}
 
-		return true;
+			return true;
+		}
 	},
 
 	editChildCategory: function( inSender, inEvent ) {
 
-		this.log( arguments );
-		return true;
+		var parent = Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'][inEvent.index];
 
-		var row = Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][inSender.parentContent];
+		if( !parent ) {
 
-		if( row && row[inEvent.index] ) {
+			return;
+		}
 
-			row = row[inEvent.index];
+		var row = Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][parent['content']];
 
-			this.$['modifyCat'].show( row['catId'], row['genCat'], row['specCat'] );
+		if( row[inSender.parent.index] ) {
+
+			row = row[inSender.parent.index];
+
+			this.$['modifyCat'].show( row['id'], row['parent'], row['content'] );
+
 			return true;
 		}
 	},
@@ -244,7 +246,7 @@ enyo.kind({
 
 		if( row ) {
 
-			Checkbook.globals.transactionCategoryManager.deleteCategory( row['catId'], { "onSuccess": enyo.bind( this, this.modificationComplete, { action: "delete" } ) } );
+			Checkbook.globals.transactionCategoryManager.deleteCategory( row['id'], { "onSuccess": enyo.bind( this, this.modificationComplete, { action: "delete" } ) } );
 			return true;
 		}
 	},

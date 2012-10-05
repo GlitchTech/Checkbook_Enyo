@@ -244,7 +244,7 @@ enyo.kind({
 					name: "deleteCategoryConfirm",
 					kind: "gts.ConfirmDialog",
 
-					title: "Delete Account",
+					title: "Delete Category",
 					message: "Are you sure you want to delete this transaction category?",
 
 					confirmText: "Delete",
