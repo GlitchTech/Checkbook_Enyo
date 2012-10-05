@@ -11,7 +11,7 @@ public class MainActivity extends DroidGap {
 
 		super.onCreate( savedInstanceState );
 		
-		//super.loadUrl( "file:///android_asset/www/index.html" );
-		super.loadUrl( "file:///android_asset/www/debug.html" );
+		super.loadUrl( "file:///android_asset/www/index.html" );
+		//super.loadUrl( "file:///android_asset/www/debug.html" );
 	}
 }
