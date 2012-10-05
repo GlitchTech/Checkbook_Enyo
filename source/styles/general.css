@@ -134,6 +134,10 @@ html, body {
 	margin-left: 0.5em;
 }
 
+.margin-double-left {
+	margin-left: 2em;
+}
+
 .margin-right {
 	margin-right: 1em;
 }
@@ -266,9 +270,12 @@ html, body {
 	border-radius: 5px;
 }
 
-.onyx-item.bordered {
+.bordered {
 	border-top: 1px solid rgba( 255, 255, 255, 0.5 );
 	border-bottom: 1px solid rgba( 0, 0, 0, 0.2 );
+}
+
+.onyx-item.bordered {
 	padding: 10px;
 	font-size: .9rem;
 }

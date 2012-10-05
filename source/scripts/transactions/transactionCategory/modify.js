@@ -19,7 +19,7 @@ enyo.kind({
 		onChangeComplete: ""
 	},
 
-	id: -1,
+	catId: -1,
 	general: "",
 	specific: "",
 	mode: "",
@@ -155,7 +155,7 @@ enyo.kind({
 			this.$['title'].setContent( "Create a Category" );
 			this.$['specificWrapper'].show();
 			this.mode = "new";
-			this.id = -1;
+			this.catId = -1;
 
 			this.general = "";
 			this.specific = "";
@@ -164,7 +164,7 @@ enyo.kind({
 			this.$['title'].setContent( "Edit Group Name" );
 			this.$['specificWrapper'].hide();
 			this.mode = "group";
-			this.id = -1;
+			this.catId = -1;
 
 			this.general = inGeneral;
 			this.specific = "";
@@ -173,7 +173,7 @@ enyo.kind({
 			this.$['title'].setContent( "Edit Category" );
 			this.$['specificWrapper'].show();
 			this.mode = "category";
-			this.id = inId;
+			this.catId = inId;
 
 			this.general = inGeneral;
 			this.specific = inSpecific;
@@ -238,7 +238,7 @@ enyo.kind({
 
 	deleteCategory: function() {
 
-		if( this.id >= 0 ) {
+		if( this.catId >= 0 ) {
 
 			this.createComponent( {
 					name: "deleteCategoryConfirm",
@@ -270,7 +270,7 @@ enyo.kind({
 
 		this.deleteCategoryConfirmClose();
 
-		Checkbook.globals.transactionCategoryManager.deleteCategory( this.id, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "delete" } ) } );
+		Checkbook.globals.transactionCategoryManager.deleteCategory( this.catId, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "delete" } ) } );
 	},
 
 	save: function() {
@@ -305,7 +305,7 @@ enyo.kind({
 			Checkbook.globals.transactionCategoryManager.createCategory( newGeneral, newSpecific, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "new" } ) } );
 		} else if( this.mode === "category" ) {
 
-			Checkbook.globals.transactionCategoryManager.editCategory( this.id, newGeneral, newSpecific, this.general, this.specific, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "category" } ) } );
+			Checkbook.globals.transactionCategoryManager.editCategory( this.catId, newGeneral, newSpecific, this.general, this.specific, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "category" } ) } );
 		} else if( this.mode === "group" ) {
 
 			Checkbook.globals.transactionCategoryManager.editGroup( newGeneral, this.general, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "group" } ) } );

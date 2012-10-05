@@ -195,6 +195,9 @@ enyo.kind( {
 
 													ontap: "categoryTapped"
 												}, {
+													name: "categoryItemBreak",
+													tag: "br"
+												}, {
 													kind: "onyx.InputDecorator",
 
 													classes: "margin-right",
@@ -792,6 +795,8 @@ enyo.kind( {
 		var item = inEvent.item;
 
 		if( row && item ) {
+
+			item.$['categoryItemBreak'].setShowing( enyo.Panels.isScreenNarrow() );
 
 			item.$['categoryText'].setContent( ( row['category'] + " >> " + row['category2'] ).dirtyString() );
 

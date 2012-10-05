@@ -49,12 +49,13 @@
 
 @media all and ( max-width: 400px ) {
 
+	body {
+		font-size: 16px !important;
+	}
+
 	.small-popup {
 		width: 95%;
 	}
-}
-
-@media all and ( max-width: 400px ) {
 
 	.two-button-toolbar button {
 		width: 45%;

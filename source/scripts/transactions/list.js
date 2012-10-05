@@ -287,7 +287,8 @@ enyo.kind( {
 
 			//Date
 			var dateObj = new Date( parseInt( row['date'] ) );
-			this.$['time'].setContent( dateObj.format( { date: 'longDate', time: ( this.account['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
+
+			this.$['time'].setContent( dateObj.format( { "date": ( enyo.Panels.isScreenNarrow() ? "shortDate" : "longDate" ), "time": ( this.account['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
 
 			var today = new Date();
 			if( this.account['showTransTime'] !== 1 ) {

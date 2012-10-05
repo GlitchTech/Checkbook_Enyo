@@ -1175,6 +1175,10 @@ enyo.kind({
 		this.$['instructions'].show();
 		this.$['sheetList'].hide();
 
+		//Hide all popups
+		this.$['errorMessage'].hide();
+		this.$['progress'].hide();
+
 		//Close & continue
 		this.doFinish( { "success": success } );
 	}

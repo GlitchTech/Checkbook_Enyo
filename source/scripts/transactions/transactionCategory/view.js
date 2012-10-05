@@ -21,6 +21,7 @@ enyo.kind({
 
 	components: [//Need a restore orig button or something
 		{
+			name: "header",
 			kind: "onyx.Toolbar",
 			classes: "text-center text-middle",
 			style: "position: relative;",
@@ -68,17 +69,20 @@ enyo.kind({
 							kind: "onyx.Item",
 							tapHighlight: true,
 
-							classes: "bordered text-middle",
+							classes: "text-middle",
+							style: "padding-top: 0; padding-bottom: 0;",
 
 							components: [
 								{
 									name: "content",
-									classes: "bold",
+									classes: "bold bordered padding-std",
 
 									ontap: "editMainCategory"
 								}, {
 									name: "subCats",
 									kind: "enyo.Repeater",
+
+									classes: "margin-double-left margin-right",
 
 									count: 0,
 									parentContent: "",
@@ -90,6 +94,8 @@ enyo.kind({
 											name: "item",
 											kind: "onyx.Item",//SwipeableItem
 											tapHighlight: true,
+
+											classes: "bordered text-middle",
 
 											ontap: "editChildCategory",
 											onDelete: "deleteItem",
@@ -136,6 +142,9 @@ enyo.kind({
 	rendered: function() {
 
 		this.inherited( arguments );
+
+		this.$['header'].addRemoveClass( "text-left", enyo.Panels.isScreenNarrow() );
+		this.$['header'].addRemoveClass( "text-center", !enyo.Panels.isScreenNarrow() );
 
 		this.fetchCategories();
 	},

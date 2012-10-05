@@ -13,6 +13,7 @@ enyo.kind({
 
 	components: [
 		{
+			name: "header",
 			kind: "onyx.Toolbar",
 			classes: "text-center text-middle",
 			style: "position: relative;",
@@ -308,6 +309,9 @@ enyo.kind({
 		this.$['entries'].renderAccountList();
 
 		this.inherited( arguments );
+
+		this.$['header'].addRemoveClass( "text-left", enyo.Panels.isScreenNarrow() );
+		this.$['header'].addRemoveClass( "text-center", !enyo.Panels.isScreenNarrow() );
 	},
 
 	/** PIN Controls **/
