@@ -221,6 +221,25 @@ enyo.kind({
 				});
 
 			this.$['deleteCategoryConfirm'].show();
+
+			var zIndex = this.getComputedStyleValue( "zIndex" );
+
+			if( !zIndex ) {
+
+				var css = this.domCssText.split( ";" );
+
+				for( var i = 0; i < css.length; i++ ) {
+
+					if( css[i].match( "z-index" ) ) {
+
+						css = css[i].split( ":" );
+						zIndex = css[1];
+						break;
+					}
+				}
+			}
+
+			this.$['deleteCategoryConfirm'].applyStyle( "z-index", ( ( zIndex - 5 ) + 10 ) );
 		}
 	},
 
