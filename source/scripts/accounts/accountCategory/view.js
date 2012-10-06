@@ -84,8 +84,29 @@ enyo.kind({
 									className: "accountIcon"
 								}, {
 									name: "name",
-									style: "display: inline-block",
+									style: "display: inline-block;",
 									classes: "margin-left"
+								}, {
+									style: "display: inline-block; float: right; width: 64px;",
+									components: [
+										{
+											name: "up",
+											kind: "onyx.IconButton",
+
+											src: "assets/menu_icons/up.png",
+											style: "float: left;",
+
+											ontap: "moveUp"
+										}, {
+											name: "down",
+											kind: "onyx.IconButton",
+
+											src: "assets/menu_icons/down.png",
+											style: "float: right;",
+
+											ontap: "moveDown"
+										}
+									]
 								}
 							]
 						}
@@ -165,6 +186,22 @@ enyo.kind({
 
 			item.$['item'].addClass( row['color'] );
 
+			if( index > 0 ) {
+
+				item.$['up'].show();
+			} else {
+
+				item.$['up'].hide();
+			}
+
+			if( index < ( this.categories.length - 1 ) ) {
+
+				item.$['down'].show();
+			} else {
+
+				item.$['down'].hide();
+			}
+
 			return true;
 		}
 	},
@@ -204,6 +241,18 @@ enyo.kind({
 
 			this.$['modifyCat'].hide();
 		}
+	},
+
+	moveUp: function( inSender, inEvent ) {
+
+		this.reorder( inSender, inEvent.index, inEvent.index - 1 );
+		return true;
+	},
+
+	moveDown: function( inSender, inEvent ) {
+
+		this.reorder( inSender, inEvent.index, inEvent.index + 1 );
+		return true;
 	},
 
 	reorder: function( inSender, toIndex, fromIndex ) {
