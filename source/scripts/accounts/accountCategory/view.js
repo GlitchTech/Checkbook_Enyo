@@ -72,7 +72,7 @@ enyo.kind({
 							kind: "onyx.Item",//SwipeableItem
 							tapHighlight: true,
 
-							classes: "bordered text-middle custom-background legend",
+							classes: "bordered text-middle custom-background legend h-box",
 
 							ontap: "editItem",
 							onDelete: "deleteItem",
@@ -81,13 +81,12 @@ enyo.kind({
 								{
 									name: "icon",
 									kind: "enyo.Image",
-									className: "accountIcon"
+									classes: "img-icon"
 								}, {
 									name: "name",
-									style: "display: inline-block;",
-									classes: "margin-left"
+									classes: "margin-left box-flex-1"
 								}, {
-									style: "display: inline-block; float: right; width: 64px;",
+									style: "width: 64px;",
 									components: [
 										{
 											name: "up",
