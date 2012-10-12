@@ -32,11 +32,15 @@ enyo.kind({
 	name: "Checkbook.about",
 	kind: "onyx.Popup",
 
+	classes: "small-popup",
+
 	centered: true,
 	floating: true,
 
 	scrim: true,
 	scrimclasses: "onyx-scrim-translucent",
+
+	autoDismiss: true,
 
 	events: {
 		onFinish: ""
@@ -157,6 +161,19 @@ enyo.kind({
 			content: appInfo['copyright'],
 			allowHtml: true,
 			classes: "smaller margin-top"
+		},
+
+		{
+			kind: "Signals",
+
+			onbackbutton: "backPopupHandler"
 		}
-	]
+	],
+
+	backPopupHandler: function( inEvent ) {
+
+		this.doFinish();
+
+		return true;
+	}
 });

@@ -16,11 +16,17 @@ NAME=${SOURCE##*/}
 
 # target names
 if [ -z "${DEPLOY}" ]; then
-    DEPLOY="$NAME$SUFFIX"
+	DEPLOY="$NAME$SUFFIX"
+fi
+
+if [ -d $1 ]; then
+	TARGET=$1
+	chmod -R 777 $TARGET;
+	rm -rf $TARGET;
 fi
 
 if [ -z "${TARGET}" ]; then
-    TARGET="$SOURCE/$FOLDER/$DEPLOY"
+	TARGET="$SOURCE/$FOLDER/$DEPLOY"
 fi
 
 if [ -d $TARGET ]; then
@@ -63,3 +69,6 @@ for i in "$SOURCE/lib/"*; do
 		cp -r "$i" "$TARGET/lib"
 	fi
 done
+
+echo ""
+echo "Deployed to $TARGET"

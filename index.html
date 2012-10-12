@@ -13,29 +13,35 @@
 		<link href="build/app.css" rel="stylesheet" />
 		<!-- js -->
 		<script src="lib/cordova-2.1.0.js"></script>
+		<script src="lib/childbrowser.js"></script>
 		<!--<script src="lib/backbone.js"></script>-->
 		<script src="build/enyo.js"></script>
 		<script src="build/app.js"></script>
 	</head>
 	<body class="enyo-unselectable">
 		<div class="body-temp">
+			<h1>Loading Checkbook</h1>
 			<script>
-					//PhoneGap event
-					document.addEventListener( "deviceready", onDeviceReady, false );
+				//PhoneGap event
+				document.addEventListener( "deviceready", onDeviceReady, false );
 
-					// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
-					function onDeviceReady() {
+				// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
+				function onDeviceReady() {
 
-						enyo.Scroller.touchScrolling = true;
+					enyo.Scroller.touchScrolling = true;
 
-						if( !window.Checkbook.app ) {
+					enyo.dispatcher.listen( document, "backbutton" );
+					enyo.dispatcher.listen( document, "menubutton" );
+					enyo.dispatcher.listen( document, "searchbutton" );
 
-							alert('No application build found, redirecting to debug.html.');
-							location = 'debug.html';
-						}
+					if( !window.Checkbook.app ) {
 
-						new Checkbook.app().renderInto( document.body );
+						alert('No application build found, redirecting to debug.html.');
+						location = 'debug.html';
 					}
+
+					new Checkbook.app().renderInto( document.body );
+				}
 			</script>
 		</div>
 	</body>

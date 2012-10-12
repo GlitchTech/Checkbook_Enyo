@@ -44,6 +44,7 @@ enyo.kind({
 											content: "Import Data",
 											ontap: "openImport"
 										}, {
+											showing: false,
 											content: "Export Data (NYI)",
 											ontap: "openExport"
 										}, {
@@ -69,8 +70,10 @@ enyo.kind({
 											content: "Report Bug (NYI)",
 											//ontap: "errorReport"
 										}, {
+											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
+											showing: false,//Convert to panel?
 											content: "About",
 											ontap: "showPopup",
 											popup: "about"
@@ -85,7 +88,7 @@ enyo.kind({
 					kind: "Panels",
 
 					fit: true,
-					draggable: true,
+					draggable: false,
 
 					classes: "app-panels",
 					arrangerKind: "CollapsingArranger",
@@ -148,6 +151,7 @@ enyo.kind({
 		}
 	],
 
+	appReady: false,
 	paneStack: [],
 
 	/**
@@ -171,6 +175,8 @@ enyo.kind({
 
 	keyboardHandler: function( inSender, inEvent ) {
 
+		if( !this.appReady ) { return; }
+
 		if( inEvent.which === 18 ) {
 			//alt key
 
@@ -184,6 +190,8 @@ enyo.kind({
 
 	menuHandler: function( inEvent ) {
 
+		if( !this.appReady ) { return; }
+
 		if( this.paneStack.length <= 0 ) {
 			//Menu is only available on Accounts or Transaction list screens.
 
@@ -194,6 +202,8 @@ enyo.kind({
 	},
 
 	backHandler: function( inEvent ) {
+
+		if( !this.appReady ) { return; }
 
 		if( this.paneStack.length > 0 ) {
 			//Exit top most layer
@@ -240,6 +250,8 @@ enyo.kind({
 	},
 
 	searchHandler: function( inEvent ) {
+
+		if( !this.appReady ) { return; }
 
 		this.log( "NYI" );
 
@@ -356,6 +368,8 @@ enyo.kind({
 					"assets/status_icons/warning.png"
 				);
 		}
+
+		this.appReady = true;
 	},
 
 	/** PopUp Controls **/

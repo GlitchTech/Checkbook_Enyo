@@ -60,6 +60,7 @@ enyo.kind({
 									"Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten. <span style='color:#cc0000;'>The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note.</span>" +
 								"</p>"
 						}, {
+							name: "saveCredentialsWrapper",
 							layoutKind: "enyo.FittableColumnsLayout",
 							noStretch: true,
 
@@ -295,7 +296,9 @@ enyo.kind({
 
 		this.$['gapi'].setApiKey( this.$['gapiAccess'].getApiKey() );
 		this.$['gapi'].setClientId( this.$['gapiAccess'].getClientId() );
+		this.$['gapi'].setClientSecret( this.$['gapiAccess'].getClientSecret() );
 
+		this.$['saveCredentialsWrapper'].hide();
 		this.$['gapi'].setAuthToken( enyo.json.parse( obj ) );
 
 		this.$['instructionsButton'].setDisabled( false );
@@ -309,6 +312,12 @@ enyo.kind({
 		this.$["gapi"].setScope( [ "https://www.googleapis.com/auth/drive", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ] );
 
 		this.$['gapi'].auth( { "onSuccess": enyo.bind( this, this.userAuthenticated ), "onError": enyo.bind( this, this.userNotAuthenticated ) } );
+
+		this.$['progress'].show( {
+				"title": "Import Progress",
+				"message": "Authenticating...",
+				"progress": 5
+			});
 	},
 
 	userNotAuthenticated: function() {
@@ -380,6 +389,9 @@ enyo.kind({
 
 				result = result.concat( resp.items );
 
+				console.log( enyo.json.stringify( resp ) );
+				console.log( enyo.json.stringify( result ) );
+
 				var nextPageToken = resp.nextPageToken;
 
 				if( nextPageToken ) {
@@ -397,6 +409,8 @@ enyo.kind({
 	},
 
 	rendersheetList: function( gapiSheetList ) {
+
+		this.log( gapiSheetList.length, enyo.json.stringify( gapiSheetList ) );
 
 		if( !gapiSheetList || typeof( gapiSheetList ) === "undefined" || gapiSheetList.length <= 0 ) {
 

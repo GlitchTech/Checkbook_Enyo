@@ -61,6 +61,7 @@ enyo.kind( {
 			classes: "deep-green",
 			components: [
 				{
+					showing: false,//While not draggable
 					kind: "onyx.Grabber",
 					style: "height: 27px;"//override MoreToolbar fitting
 				},{

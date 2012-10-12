@@ -58,6 +58,8 @@ enyo.kind( {
 			kind: "onyx.MoreToolbar",
 			classes: "rich-brown",
 			components: [
+				/*
+				planned design once search system is functional
 				{
 					kind: "onyx.MenuDecorator",
 					components: [
@@ -113,6 +115,43 @@ enyo.kind( {
 									menuParent: "searchMenu"
 								}
 							]
+						}
+					]
+				}*/
+				{
+					kind: "onyx.MenuDecorator",
+					components: [
+						{
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/sort.png"
+						}, {
+							name: "sortMenu",
+							kind: "GTS.SelectedMenu",
+							floating: true,
+							style: "min-width: 225px;",
+							components: accountSortOptions
+						}
+					]
+				}, {
+					classes: "text-center",
+					fit: true,
+					components: [
+						{
+							name: "addAccountButton",
+							kind: "onyx.Checkbox",
+
+							onchange: "addAccount",
+							classes: "add"
+						}
+					]
+				}, {
+					components: [
+						{
+							name: "editModeToggle",
+							kind: "onyx.Checkbox",
+
+							onchange: "toggleLock",
+							classes: "lock"
 						}
 					]
 				}
