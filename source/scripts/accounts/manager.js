@@ -467,7 +467,14 @@ enyo.kind({
 						// Call the onSuccess with results
 						if( enyo.isFunction( options['onSuccess'] ) ) {
 
-							options['onSuccess']( results[0] );
+							results = results[0];
+
+							results['balance0'] = Math.round( results['balance0'] * 100 ) / 100;
+							results['balance1'] = Math.round( results['balance1'] * 100 ) / 100;
+							results['balance2'] = Math.round( results['balance2'] * 100 ) / 100;
+							results['balance3'] = Math.round( results['balance3'] * 100 ) / 100;
+
+							options['onSuccess']( results );
 						}
 					},
 					"onError": options['onError']

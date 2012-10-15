@@ -1039,28 +1039,32 @@ All transactions in the series will be deleted.
 					name: "deleteTransactionConfirm",
 					kind: "GTS.deleteConfirm",
 
-					owner: this,
+					title: "Delete Transaction",
+					message: "Are you sure you want to delete this transaction?",
 
-					confirmTitle: "Delete Transaction",
-					confirmMessage: "Are you sure you want to delete this transaction?",
-					confirmButtonYes: "Delete",
-					confirmButtonNo: "Cancel",
+					confirmText: "Delete",
+					confirmClass: "onyx-negative",
 
-					onYes: "deleteTransactionHandler",
-					onNo: "deleteTransactionConfirmClose"
+					cancelText: "Cancel",
+					cancelClass: "",
+
+					onConfirm: "deleteTransactionHandler",
+					onCancel: "deleteTransactionConfirmClose"
 				});
 
-			this.$['deleteTransactionConfirm'].render();
-			this.$['deleteTransactionConfirm'].openAtCenter();
+			this.$['deleteTransactionConfirm'].show();
 		}
 	},
 
 	deleteTransactionConfirmClose: function() {
 
+		this.$['deleteTransactionConfirm'].hide();
 		this.$['deleteTransactionConfirm'].destroy();
 	},
 
 	deleteTransactionHandler: function() {
+
+		this.deleteTransactionConfirmClose();
 
 		Checkbook.globals.transactionManager.deleteTransaction(
 				this.trsnObj['itemId'],

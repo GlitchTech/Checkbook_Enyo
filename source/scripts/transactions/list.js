@@ -168,7 +168,6 @@ enyo.kind( {
 
 		this.reloadTransactionList();
 		this.initialScroll();
-		enyo.Signals.send( "accountBalanceChanged", {} );
 	},
 
 	reloadTransactionList: function() {
@@ -315,6 +314,8 @@ enyo.kind( {
 				this.$['runningBal'].addRemoveClass( "positiveBalance", ( row['runningBalance'] > 0 ) );
 				this.$['runningBal'].addRemoveClass( "negativeBalance", ( row['runningBalance'] < 0 ) );
 				this.$['runningBal'].addRemoveClass( "neutralBalance", ( row['runningBalance'] == 0 ) );
+
+				this.$['amount'].setClassAttribute( "" );
 			}
 
 			//Cleared
@@ -597,7 +598,7 @@ results = {
 
 		this.log();
 
-		this.log( arguments );
+		this.log( "I DO NOT WORK YET", arguments );
 		return true;
 
 		var rowIndex = this.$['transactonMenu'].rowIndex;
@@ -659,7 +660,16 @@ results = {
 		//Update row UI
 		this.$['list'].renderRow( index );
 
-		enyo.Signals.send( "accountBalanceChanged", {} );
+
+		enyo.Signals.send(
+				"accountBalanceChanged",
+				{
+					"accounts": {
+						"account": this.transactions[index]['account'],
+						"linkedAccount": this.transactions[index]['linkedAccount']
+					}
+				}
+			);
 
 		if( enyo.isFunction( inEvent.callback ) ) {
 

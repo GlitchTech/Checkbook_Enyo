@@ -6,10 +6,6 @@ enyo.kind( {
 
 	account: {},
 
-	events: {
-		onChanged: ""//Edit Made
-	},
-
 	/**
 	 * @private
 	 * @type Array
@@ -49,8 +45,6 @@ enyo.kind( {
 			fit: true,
 			classes: "checkbook-stamp",
 			style: "position: relative;",
-
-			onBalanceChanged: "balanceChangedEvent",
 
 			ondragstart: "listDrag",
 			ondrag: "listDrag",
@@ -159,7 +153,8 @@ enyo.kind( {
 			kind: "Signals",
 
 			viewAccount: "viewAccount",
-			accountChanged: "accountChanged"
+			accountChanged: "accountChanged",
+			accountBalanceChanged: "balanceChanged"
 		}
 	],
 
@@ -319,7 +314,8 @@ enyo.kind( {
 
 		this.reloadTransactionList();
 		this.$['entries'].initialScroll();
-		this.balanceChangedHandler();
+
+		this.balanceChanged();
 	},
 
 	reloadTransactionList: function() {
@@ -327,17 +323,34 @@ enyo.kind( {
 		this.$['entries'].reloadSystem();
 	},
 
-	balanceChangedEvent: function( inSender, inEvent ) {
+	balanceChanged: function( inSender, inEvent ) {
 
-		if( !Object.isUndefined( inEvent.account ) && !Object.isUndefined( inEvent.linkedAccount ) ) {
+		var accounts = {
+				"sendSignal": false
+			};
 
-			this.balanceChangedHandler( inEvent );
+		if( !inEvent || !inEvent['accounts'] || !inEvent['accounts']['account'] ) {
+
+			accounts['account'] = this.account['acctId'];
 		} else {
 
-			this.balanceChangedHandler();
+			enyo.mixin( accounts, inEvent['accounts'] );
 		}
 
-		return true;
+		if( typeof( accounts['accountBal'] ) !== "undefined" && accounts['accountBal'].length === 4 ) {
+
+			var results = {
+					"balance0": accounts['accountBal'][0],
+					"balance1": accounts['accountBal'][1],
+					"balance2": accounts['accountBal'][2],
+					"balance3": accounts['accountBal'][3]
+				};
+
+			this.balanceChangedHandler( accounts, results );
+		} else {
+
+			this.balanceChangedHandler( accounts );
+		}
 	},
 
 	balanceChangedHandler: function( accounts, results ) {
@@ -379,7 +392,13 @@ enyo.kind( {
 			accounts['accountBal'] = [];
 		}
 
-		this.doChanged( accounts );
+		if( typeof( accounts['sendSignal'] ) !== "undefined" && accounts['sendSignal'] === false ) {
+			//sendSignal is defined AND set to false
+
+			return;
+		}
+
+		enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
 	},
 
 	/* Header Control */

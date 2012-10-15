@@ -82,6 +82,7 @@ enyo.kind({
 			}
 
 			this.$['menu'].setChoices( options );
+			this.valueChanged();
 		}
 	},
 

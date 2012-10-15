@@ -891,6 +891,7 @@ enyo.kind( {
 	 */
 	deleteAccountConfirmClose: function() {
 
+		this.$['deleteAccountConfirm'].hide();
 		this.$['deleteAccountConfirm'].destroy();
 	},
 

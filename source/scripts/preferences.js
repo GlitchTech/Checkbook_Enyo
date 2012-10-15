@@ -597,14 +597,16 @@ enyo.kind({
 		this.createComponent( {
 				name: "wipeProgress",
 				kind: "GTS.ProgressDialog",
-				animateProgress: true,
+				animateProgress: true
 			});
 
-		this.$['progress'].show( {
+		this.$['wipeProgress'].show( {
 				"title": "Purging All Data",
 				"message": "Please wait...",
 				"progress": 50
 			});
+
+		this.$['wipeProgress'].reflow();
 
 		Checkbook.globals.gts_db.queries(
 				[

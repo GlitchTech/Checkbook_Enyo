@@ -108,7 +108,8 @@ enyo.kind({
 			kind: "Signals",
 
 			accountChanged: "renderAccountList",
-			balanceChanged: "refresh"
+			balanceChanged: "refresh",
+			accountBalanceChanged: "accountBalanceChanged"
 		}
 	],
 
@@ -181,6 +182,105 @@ enyo.kind({
 		this.log();
 
 		this.$['entries'].setCount( this.accounts.length );
+	},
+
+	renderRow: function( index ) {
+
+		if( typeof( index ) !== "undefined" && !isNaN( index ) ) {
+
+			this.$['entries'].renderRow( index );
+		}
+	},
+
+	/**
+	 * TODO DEFINITION
+	 */
+	accountBalanceChanged: function( inSender, inEvent ) {
+
+		if( !inEvent || !inEvent['accounts'] ) {
+			//No data, full rebuild
+
+			this.renderAccountList();
+			return;
+		}
+
+		inEvent = inEvent['accounts'];
+
+		if( typeof( inEvent['account'] ) === "undefined" && typeof( inEvent['linkedAccount'] ) === "undefined" && typeof( inEvent['atAccount'] ) === "undefined" ) {
+			//No data, full rebuild
+
+			this.renderAccountList();
+			return;
+		}
+
+		if( typeof( inEvent['account'] ) !== "undefined" ) {
+			//Main Account
+
+			var acctIndex = inEvent['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['account'] ) : - 1;
+
+			if( acctIndex >= 0 ) {
+
+				if( typeof( inEvent['accountBal'] ) !== "undefined" && inEvent['accountBal'].length > 0 ) {
+
+					this.accountBalanceChangedHandler( acctIndex, inEvent['accountBal'] );
+				} else {
+
+					Checkbook.globals.accountManager.fetchAccountBalance(
+							inEvent['account'],
+							{
+								"onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, acctIndex )
+							}
+						);
+				}
+			}
+		}
+
+		if( typeof( inEvent['linkedAccount'] ) !== "undefined" ) {
+			//Linked Account
+
+			var linkedIndex = inEvent['linkedAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['linkedAccount'] ) : - 1;
+
+			if( linkedIndex >= 0 ) {
+
+				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
+			}
+		}
+
+		if( typeof( inEvent['atAccount'] ) !== "undefined" && inEvent['linkedAccount'] != inEvent['atAccount'] ) {
+			//Auto-Transfer Account
+
+			var linkedIndex = inEvent['atAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['atAccount'] ) : - 1;
+
+			if( linkedIndex >= 0 ) {
+
+				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
+			}
+		}
+	},
+
+	/**
+	 * @private
+	 * @function
+	 * @name Checkbook.accounts.view#accountBalanceChangedHandler
+	 *
+	 * Handles updating specific item in account listing
+	 *
+	 * @param int	index	Index of account
+	 * @param [obj]	results	Result set from DB
+	 */
+	accountBalanceChangedHandler: function( index, results ) {
+
+		if( typeof( results ) === "undefined" || isNaN( index ) || index < 0 || index >= this.accounts.length ) {
+
+			return;
+		}
+
+		this.accounts[index]['balance0'] = results['balance0'];
+		this.accounts[index]['balance1'] = results['balance1'];
+		this.accounts[index]['balance2'] = results['balance2'];
+		this.accounts[index]['balance3'] = results['balance3'];
+
+		this.renderRow( index );
 	},
 
 	dividerTapped: function( inSender, inEvent ) {
@@ -375,7 +475,7 @@ enyo.kind({
 			item.$['balance'].addRemoveClass( "negativeBalance", ( row['balance'] < 0 ) );
 			item.$['balance'].addRemoveClass( "neutralBalance", ( row['balance'] == 0 ) );
 
-			item.$['note'].setContent( row['acctNotes'] );
+			item.$['note'].setContent( row['acctNotes'].replace( /\n/, "<br />" ) );
 
 			//proper sort mode && difference between categories
 			if( (

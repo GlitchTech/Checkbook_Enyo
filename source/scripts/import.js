@@ -10,7 +10,7 @@ enyo.kind({
 	allSheetsList: [],
 	importItems: [],
 
-	standardLimit: 100,
+	standardLimit: 1000,
 
 	events: {
 		onFinish: ""
@@ -55,9 +55,11 @@ enyo.kind({
 
 							content: "<p>" +
 									"To import your finances into this program you must have a Google Drive account. " + "<br />" +
-									"<a href='http://drive.google.com/' target='_blank'>" + "Sign up here" + "</a>" +
+									"Visit drive.google.com to sign up." +
 								"</p><p>" +
 									"Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten. <span style='color:#cc0000;'>The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note.</span>" +
+								"</p><p>" +
+									"<strong>Warning:</strong> Larger spreadsheets will take much longer to download." +
 								"</p>"
 						}, {
 							name: "saveCredentialsWrapper",
@@ -389,9 +391,6 @@ enyo.kind({
 
 				result = result.concat( resp.items );
 
-				console.log( enyo.json.stringify( resp ) );
-				console.log( enyo.json.stringify( result ) );
-
 				var nextPageToken = resp.nextPageToken;
 
 				if( nextPageToken ) {
@@ -409,8 +408,6 @@ enyo.kind({
 	},
 
 	rendersheetList: function( gapiSheetList ) {
-
-		this.log( gapiSheetList.length, enyo.json.stringify( gapiSheetList ) );
 
 		if( !gapiSheetList || typeof( gapiSheetList ) === "undefined" || gapiSheetList.length <= 0 ) {
 
@@ -531,7 +528,7 @@ enyo.kind({
 		try {
 			//Convert to Phonegap API
 
-			enyo.windows.setWindowProperties( window, { blockScreenTimeout: true } );
+			enyo.windows.blockScreenTimeout( true );
 			this.log( "Window: blockScreenTimeout: true" );
 		} catch( err ) {
 
@@ -937,7 +934,7 @@ enyo.kind({
 		var docProgress = ( ( pageProgress > 1 ? 1 : pageProgress ) + this.pageIndex ) / this.importItems[this.documentIndex]['pages'].length;
 		var totalProgress = ( ( ( docProgress / 2 ) + this.documentIndex ) / this.importItems.length ) * 100;
 
-		this.$['progress'].setMessage( this.importItems[this.documentIndex]['name'] + "<br />Downloading: " + ( new Number( isNaN( docProgress ) ? 0 : docProgress ) ).toFixed( 1 ) + "%" );
+		this.$['progress'].setMessage( this.importItems[this.documentIndex]['name'] + "<br />Downloading: " + ( new Number( isNaN( docProgress ) ? 0 : ( docProgress * 100 ) ) ).toFixed( 1 ) + "%" );
 
 		if( !isNaN( totalProgress ) ) {
 
@@ -1176,7 +1173,7 @@ enyo.kind({
 
 		try {
 
-			enyo.windows.setWindowProperties( window, { blockScreenTimeout: false } );
+			enyo.windows.blockScreenTimeout( false );
 			this.log( "Window: blockScreenTimeout: false" );
 		} catch( err ) {
 

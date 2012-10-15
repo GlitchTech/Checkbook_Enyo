@@ -2,9 +2,9 @@
 
 enyo.kind({
 	name: "Checkbook.export",
-////	kind: enyo.VFlexBox,
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
-	className: "light",
 	style: "height: 100%;",
 
 	acctList: [],
@@ -15,114 +15,64 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.PageHeader,
-			layoutKind: enyo.HFlexLayout,
-			pack: "center",
-
-			className: "enyo-header-dark",
+			kind: "onyx.Toolbar",
+			classes: "text-center",
+			style: "position: relative;",
 
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
 					content: "Export System",
-					className: "bigger",
-					style: "margin-right: -32px;"
+					classes: "bigger"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
-					kind: enyo.ToolButton,
+					kind: "onyx.Button",
+					ontap: "closeExport",
 
-					icon: "assets/menu_icons/close.png",
-					className: "img-icon",
+					content: "x",
 
-					ontap: "closeExport"
+					classes: "onyx-negative",
+					style: "position: absolute; right: 15px;"
 				}
 			]
 		},
 
 		{
-			kind: enyo.Scroller,
-			flex: 1,
-
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			classes: "tardis-blue",
+			fit: true,
 			components: [
 				{
-					name: "credentials",
-				//	layoutKind: enyo.VFlexLayout,
-
-					className: "light narrow-column",
-					flex: 1,
-
+					name: "instructions",
+					classes: "light narrow-column padding-half-top",
+					style: "height: 100%;",
 					components: [
 						{
-							kind: enyo.RowGroup,
-							caption: "Google Credentials",
-							components: [
-								{
-									name: "gUser",
-									kind: enyo.Input,
-									hint: "Google Username",
-
-									inputType: "email",
-
-									components: [
-										{
-											content: "Username",
-											className: "small",
-											style: "color: rgb( 32, 117, 191 );"
-										}
-									]
-								}, {
-									name: "gPassWrapper",
-									components: [
-										{
-											name: "gPass",
-											kind: enyo.PasswordInput,
-											hint: "Account Password",
-
-											components: [
-												{
-													content: "Password",
-													className: "small",
-													style: "color: rgb( 32, 117, 191 );"
-												}
-											]
-										}
-									]
-								}
-							]
-						}, {
-							content: "Enter your Google Spreadsheets credentials to export your financial data to <a href='http://docs.google.com/'>Google Documents</a> from your device.",
+							classes: "padding-std smaller",
 							allowHtml: true,
-							className: "smallest",
-							style: "padding: 0.5em 0.5em 0 0.5em;"
+
+							content: "<p>" +
+									"To export your finances from this program you must have a Google Drive account. " + "<br />" +
+									"Visit drive.google.com to sign up." +
+								"</p><p>" +
+									"<strong>Warning:</strong> Larger spreadsheets will take much longer to download." +
+								"</p>"
 						}, {
-							layoutKind: enyo.HFlexLayout,
-							style: "padding: 0.5em 0.5em 0.5em 0.5em;",
+							name: "saveCredentialsWrapper",
+							layoutKind: "enyo.FittableColumnsLayout",
+							noStretch: true,
+
+							classes: "padding-std text-middle",
 
 							components: [
 								{
 									name: "saveCredentials",
-									kind: enyo.CheckBox,
-									checked: true,
+									kind: "onyx.Checkbox",
+									value: true,
 
-									style: "margin-right: 10px;"
+									classes: "margin-right"
 								}, {
 									content: "Save credentials",
-									flex: 1
-								}, {
-									name: "showPass",
-									kind: enyo.ToggleButton,
-
-									state: false,
-									onLabel: "Show password",
-									offLabel: "Mask password",
-
-									onChange: 'togglePasswordVis',
-
-									style: "margin-left: 10px;"
+									fit: true
 								}
 							]
 						}

@@ -44,8 +44,7 @@ enyo.kind({
 											content: "Import Data",
 											ontap: "openImport"
 										}, {
-											showing: false,
-											content: "Export Data (NYI)",
+											content: "Export Data",
 											ontap: "openExport"
 										}, {
 											showing: false,
@@ -93,17 +92,7 @@ enyo.kind({
 					classes: "app-panels",
 					arrangerKind: "CollapsingArranger",
 
-					components: [
-						{
-							name: "accounts",
-							kind: "Checkbook.accounts.view"
-						}, {
-							name: "transactions",
-							kind: "Checkbook.transactions.view",
-
-							onChanged: "accountBalanceChanged"
-						}
-					]
+					components: [ { name: "destroyChild", content: "I am a dummy component so the panel structure doesn't crash on load." } ]
 				}
 			]
 		},
@@ -299,6 +288,22 @@ enyo.kind({
 
 	loadCheckbook: function() {
 
+		this.$['destroyChild'].destroy();
+		this.$['mainViews'].createComponents(
+				[
+					{
+						name: "accounts",
+						kind: "Checkbook.accounts.view"
+					}, {
+						name: "transactions",
+						kind: "Checkbook.transactions.view"
+					}
+				], {
+					owner: this
+				}
+			);
+
+		this.$['mainViews'].render();
 		this.$['container'].show();
 
 		this.waterfall( "onresize", "onresize", this );
