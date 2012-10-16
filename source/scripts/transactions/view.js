@@ -83,19 +83,19 @@ enyo.kind( {
 							kind: "onyx.Checkbox",
 
 							onchange: "addIncome",
-							classes: "income"
+							classes: "income margin-half-left margin-half-right"
 						}, {
 							name: "addTransferButton",
 							kind: "onyx.Checkbox",
 
 							onchange: "addTransfer",
-							classes: "transfer"
+							classes: "transfer margin-half-left margin-half-right"
 						}, {
 							name: "addExpenseButton",
 							kind: "onyx.Checkbox",
 
 							onchange: "addExpense",
-							classes: "expense"
+							classes: "expense margin-half-left margin-half-right"
 						}
 					]
 				}, {
@@ -261,9 +261,7 @@ enyo.kind( {
 				balance2
 				sortQry
 */
-			this.reloadTransactionList();
-
-			this.$['entries'].initialScroll();
+			this.$['entries'].reloadSystem();
 
 			if( this.account['frozen'] === 1 ) {
 
@@ -297,7 +295,7 @@ enyo.kind( {
 
 		this.account = {};
 
-		this.reloadTransactionList();
+		this.$['entries'].reloadSystem();
 
 		this.$['header'].hide();
 		this.$['footer'].hide();
@@ -312,15 +310,9 @@ enyo.kind( {
 			return false;
 		}
 
-		this.reloadTransactionList();
-		this.$['entries'].initialScroll();
+		this.$['entries'].reloadSystem();
 
 		this.balanceChanged();
-	},
-
-	reloadTransactionList: function() {
-
-		this.$['entries'].reloadSystem();
 	},
 
 	balanceChanged: function( inSender, inEvent ) {
@@ -501,8 +493,7 @@ enyo.kind( {
 				this.account['sort']
 			);
 
-		this.reloadTransactionList();
-		this.$['entries'].initialScroll();
+		this.$['entries'].reloadSystem();
 
 		return true;
 	},
@@ -587,8 +578,7 @@ enyo.kind( {
 
 			//Reload full list
 			this.account['itemCount']++;
-			this.reloadTransactionList();
-			this.$['entries'].initialScroll();
+			this.$['entries'].reloadSystem();
 		}
 	},
 

@@ -166,8 +166,8 @@ enyo.kind( {
 			return false;
 		}
 
+		this.initialScrollCompleted = false;
 		this.reloadTransactionList();
-		this.initialScroll();
 	},
 
 	reloadTransactionList: function() {
@@ -187,7 +187,10 @@ enyo.kind( {
 
 	initialScroll: function() {
 
-		this.log();
+		enyo.job( "initialScroll", enyo.bind( this, "_initialScroll" ), 100 );
+	},
+
+	_initialScroll: function() {
 
 		if( this.$['list'].getCount() <= 0 ) {
 
@@ -206,6 +209,7 @@ enyo.kind( {
 
 			currDate.setHours( 23, 59, 59, 999 );
 		}
+
 		currDate = Date.parse( currDate );
 
 		var qryScrollCount = null;
@@ -249,8 +253,6 @@ enyo.kind( {
 
 	initialScrollHandler: function( results ) {
 
-		this.log();
-
 		var scrollToIndex = 0;
 
 		if( this.account['sort'] === 1 ) {
@@ -262,8 +264,6 @@ enyo.kind( {
 		}
 
 		scrollToIndex = ( scrollToIndex >= 0 ? scrollToIndex : 0 );
-
-		this.log( this.account['sort'], scrollToIndex, arguments );
 
 		this.$['list'].scrollToRow( scrollToIndex );
 	},
@@ -454,6 +454,12 @@ results = {
 
 		this.$['list'].setCount( this.transactions.length );
 		this.$['list'].refresh();
+
+		if( !this.initialScrollCompleted ) {
+
+			this.initialScrollCompleted = true;
+			this.initialScroll();
+		}
 	},
 
 	/** List Reaction Events **/
