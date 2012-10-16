@@ -47,21 +47,21 @@
 	vertical-align: middle;
 }
 
-.account-item .account .accountLockIcon,
-.account-item .account .accountIcon {
+.accountLockIcon,
+.accountIcon {
 	height: 32px !important;
 	width: 32px !important;
 }
 
-.account-item .account .accountIcon {
+.accountIcon {
 	margin-right: 10px;
 }
 
-.account-item .account .accountLockIcon {
+.accountLockIcon {
 	margin-left: -42px;
 }
 
-.account-item .account .accountLockIcon.unlocked {
+.accountLockIcon.unlocked {
 	display: none;
 }
 

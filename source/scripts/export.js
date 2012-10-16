@@ -54,7 +54,7 @@ enyo.kind({
 									"To export your finances from this program you must have a Google Drive account. " + "<br />" +
 									"Visit drive.google.com to sign up." +
 								"</p><p>" +
-									"<strong>Warning:</strong> Larger spreadsheets will take much longer to download." +
+									"<strong>Warning:</strong> Larger spreadsheets will take much longer to upload." +
 								"</p>"
 						}, {
 							name: "saveCredentialsWrapper",
@@ -83,52 +83,52 @@ enyo.kind({
 					showing: false,
 
 					name: "accountList",
-				//	layoutKind: enyo.VFlexLayout,
+					kind: "Repeater",
 
-					className: "light narrow-column",
-					flex: 1,
+					classes: "light narrow-column padding-half-top",
+
+					onSetupItem: "setupRow",
 
 					components: [
 						{
-							name: "accounts",
-							kind: enyo.VirtualRepeater,
+							kind: "onyx.Item",
 
-							flex: 1,
-							onSetupRow: "setupRow",
+							tapHighlight: true,
+							ontap: "accountSelectedChanged",
+
+							classes: "bordered text-middle",
 
 							components: [
 								{
-									kind: enyo.Item,
-									layoutKind: enyo.HFlexLayout,
+									name: "accountSelected",
+									kind: "onyx.Checkbox",
 
-									tapHighlight: true,
-									ontap: "accountSelectedChanged",
+									value: false,
+									disabled: true,
 
+									classes: "margin-half-right"
+								}, {
+									classes: "inline",
 									components: [
 										{
 											name: "icon",
-											kind: enyo.Image,
-											className: "accountIcon"
+											kind: "enyo.Image",
+											classes: "accountIcon"
 										}, {
 											name: "iconLock",
-											kind: enyo.Image,
+											kind: "enyo.Image",
 											src: "assets/padlock_1.png",
-											className: "accountLockIcon unlocked"
+											classes: "accountLockIcon unlocked"
+										}
+									]
+								}, {
+									classes: "margin-half-left inline",
+									components: [
+										{
+											name: "accountName"
 										}, {
-											flex: 1,
-											components: [
-												{
-													name: "accountName"
-												}, {
-													name: "accountNote",
-													className: "smaller"
-												}
-											]
-										}, {
-											name: "accountSelected",
-											kind: enyo.CheckBox,
-
-											style: "margin-right: 10px;"
+											name: "accountNote",
+											classes: "smaller"
 										}
 									]
 								}
@@ -140,97 +140,99 @@ enyo.kind({
 		},
 
 		{
-			name: "credentialsBar",
-			kind: enyo.Toolbar,
+			name: "instructionsBar",
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
-					name: "credentialsButton",
+					name: "instructionsButton",
 					kind: "onyx.Button",
-					content: "Sign In",
+					content: "Authenticate",
 
 					ontap: "authenticateWithGoogle",
 
-					className: "onyx-affirmative deep-green",
+					classes: "onyx-affirmative",
 					style: "min-width: 150px;"
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
 				}
 			]
 		}, {
-			name: "accountListBar",
 			showing: false,
-			kind: enyo.Toolbar,
+
+			name: "accountListBar",
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 8
-				}, {
 					name: "accountListButton",
 					kind: "onyx.Button",
-					caption: "Export Accounts",
+					content: "Export Accounts",
 
 					ontap: "beginExportProcess",
 
-					className: "onyx-affirmative deep-green",
+					classes: "onyx-affirmative deep-green",
 					style: "min-width: 150px;"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
-					name: "accountListSelectButton",
-					kind: "onyx.Button",
-					caption: "Select" + "...",
-
-					ontap: "accountListSelectOptions"
-				}, {
-					kind: enyo.Spacer,
-					flex: 8
-				}
-			]
-		},
-
-		{
-			name: "selectMenu",
-			kind: enyo.Menu,
-			components: [
-				{
-					caption: "All",
-					value: 1
-				}, {
-					caption: "None",
-					value: 2
-				}, {
-					caption: "Invert",
-					value: 3
+					kind: "onyx.MenuDecorator",
+					onSelect: "menuItemClick",
+					components: [
+						{
+							kind: "onyx.Button",
+							components: [
+								{
+									content: "Select..."
+								}
+							]
+						}, {
+							kind: "onyx.Menu",
+							showOnTop: true,
+							floating: true,
+							components: [
+								{
+									content: "All",
+									value: 1
+								}, {
+									content: "None",
+									value: 2
+								}, {
+									content: "Invert",
+									value: 3
+								}
+							]
+						}
+					]
 				}
 			]
 		},
 
 		{
 			name: "progress",
-			kind: "GTS.progress",
-
-			title: "",
-			message: "",
-			progress: ""
+			kind: "GTS.ProgressDialog",
+			animateProgress: true,
+			onCancel: "closeExport",
+			cancelText: "Cancel"
 		}, {
 			name: "errorMessage",
-			kind: "GTS.system_error",
+			kind: "Checkbook.systemError",
 
 			errTitle: "Export Error",
-			errMessage: "",
-			errMessage2: "" ,
+			mainMessage: "",
+			secondaryMessage: "",
+
 			onFinish: "closeErrorMessage"
 		},
 
 		{
-			name: "gDataControls",
-			kind: "GTS.gdata"
-		}, {
+			name: "gapi",
+			kind: "GTS.Gapi",
+			onReady: "gapiReady"
+		},
+
+		{
+			name: "gapiAccess",
+			kind: "private.gapi"
+		},
+
+		{
 			name: "cryptoSystem",
 			kind: "Checkbook.encryption"
 		}
@@ -241,121 +243,110 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.log();
+		this.$['instructions'].show();
+		this.$['instructionsBar'].show();
+		this.$['instructionsButton'].setDisabled( true );
 
-		this.prepareCredentials();
+		this.$['accountList'].hide();
+		this.$['accountListBar'].hide();
+
+		//Show message of loading
+		this.$['progress'].show( {
+				"title": "Export Progress",
+				"message": "Linking to Google...",
+				"progress": 25
+			});
+
+		this.refreshLayout();
+	},
+
+	refreshLayout: function() {
+
+		this.waterfall( "onresize", "onresize", this );
+	},
+
+	gapiReady: function() {
+
+		this.$['progress'].setProgress( 60 );
 
 		//check for pre-existing g-data log in
 		Checkbook.globals.gts_db.query(
-				"SELECT saveGSheetsData, gSheetUser, gSheetPass FROM prefs LIMIT 1;",
+				"SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;",
 				{
-					"onSuccess": enyo.bind( this, this.fetchUserGData )
+					"onSuccess": enyo.bind( this, this.decryptGapiData )
 				}
 			);
 	},
 
-	prepareCredentials: function() {
+	decryptGapiData: function( results ) {
 
-		this.log();
-
-		this.$['credentialsButton'].setDisabled( false );
-		this.$['credentialsBar'].show();
-		this.$['accountListBar'].hide();
-
-		this.$['credentials'].show();
-		this.$['accountList'].hide();
-
-		this.resized();
-	},
-
-	fetchUserGData: function( results ) {
+		this.$['progress'].setProgress( 90 );
 
 		if( results.length > 0 ) {
+
+			this.$['saveCredentials'].setValue( results[0]['saveGSheetsData'] );
 
 			//Decrypt if exists
 			this.$['cryptoSystem'].decryptString(
 					results[0]['gSheetPass'],
 					enyo.bind(
 							this,
-							this.setUserGData,
-							results[0]['gSheetUser'],
-							( results[0]['saveGSheetsData'] === 1 )
+							this.loadGapiData
 						)
 				);
+		} else {
+
+			this.loadGapiData( "" );
 		}
 	},
 
-	setUserGData: function( user, save, pass ) {
+	loadGapiData: function( obj ) {
 
-		this.$['gUser'].setValue( user );
-		this.$['gPass'].setValue( pass );
-		this.$['saveCredentials'].setChecked( save );
+		this.$['gapi'].setApiKey( this.$['gapiAccess'].getApiKey() );
+		this.$['gapi'].setClientId( this.$['gapiAccess'].getClientId() );
+		this.$['gapi'].setClientSecret( this.$['gapiAccess'].getClientSecret() );
 
-		this.$['showPass'].setDisabled( save );//Disable show cred if loaded from DB
+		this.$['saveCredentialsWrapper'].hide();
+		this.$['gapi'].setAuthToken( enyo.json.parse( obj ) );
 
-		this.$['gUser'].forceFocus();
-	},
+		this.$['instructionsButton'].setDisabled( false );
 
-	togglePasswordVis: function( inSender, state ) {
-
-		var pass = this.$['gPass'].getValue();
-
-		this.$['gPass'].destroy();
-
-		this.$['gPassWrapper'].createComponent(
-				{
-					name: "gPass",
-					kind: ( state ? enyo.Input : enyo.PasswordInput ),
-					hint: "Account Password",
-
-					components: [
-						{
-							content: "Password",
-							className: "small",
-							style: "color: rgb( 32, 117, 191 );"
-						}
-					]
-				}, {
-					owner: this
-				}
-			);
-
-		this.$['gPassWrapper'].render();
-
-		this.$['gPass'].setValue( pass );
+		//hide message of loading
+		this.$['progress'].hide();
 	},
 
 	/** Authenticate **/
 	authenticateWithGoogle: function() {
 
-		this.log();
+		this.$['gapi'].setScope( [ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ] );
 
-		this.$['credentialsButton'].setDisabled( true );
+		this.$['gapi'].auth( { "onSuccess": enyo.bind( this, this.userAuthenticated ), "onError": enyo.bind( this, this.userNotAuthenticated ) } );
 
-		//Check username & password exist
-		this.$['progress'].load( "Authenticating", "Trying to authenticate credentials", 25 );
-
-		this.$['gDataControls'].gdata_authenticate(
-				this.$['gUser'].getValue(),
-				this.$['gPass'].getValue(),
-				"writely",
-				{
-					"onSuccess": enyo.bind( this, this.authenticationSuccessful ),
-					"onError": enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.prepareCredentials ) ),
-					"timeout": 15
-				}
-			);
+		this.$['progress'].show( {
+				"title": "Export Progress",
+				"message": "Authenticating...",
+				"progress": 5
+			});
 	},
 
-	authenticationSuccessful: function() {
+	userNotAuthenticated: function() {
 
-		this.$['progress'].setProgress( 35 );
+		this.closeExport();
+	},
+
+	userAuthenticated: function() {
+
+		this.$['progress'].show( {
+				"title": "Export Progress",
+				"message": "Authenticated...",
+				"progress": 15
+			});
 
 		//save credentials
-		if( this.$['saveCredentials'].getChecked() ) {
+		if( this.$['saveCredentials'].getValue() ) {
 
 			this.$['cryptoSystem'].encryptString(
-					this.$['gPass'].getValue(),
+					enyo.json.stringify( this.$['gapi'].getAuthToken() ),
 					enyo.bind(
 							this,
 							this.saveUserGData
@@ -365,46 +356,36 @@ enyo.kind({
 
 			this.saveUserGData( "" );
 		}
+
+		this.fetchAccounts();
 	},
 
-	saveUserGData: function( pass ) {
+	saveUserGData: function( token ) {
 
-		this.$['progress'].setProgress( 40 );
+		var updateObj = {
+					"saveGSheetsData": 0,
+					"gSheetPass": ""
+				};
 
-		var updateObj = null;
-
-		if( !this.$['saveCredentials'].getChecked() || pass.length <= 0 ) {
-
-			updateObj = {
-						"saveGSheetsData": 0,
-						"gSheetUser": "",
-						"gSheetPass": ""
-					};
-		} else {
+		if( this.$['saveCredentials'].getValue() && token.length > 0 ) {
 
 			updateObj = {
-						"saveGSheetsData": this.$['saveCredentials'].getChecked() ? 1 : 0,
-						"gSheetUser": this.$['gUser'].getValue(),
-						"gSheetPass": pass
+						"saveGSheetsData": this.$['saveCredentials'].getValue() ? 1 : 0,
+						"gSheetPass": token
 					};
 		}
 
-		Checkbook.globals.gts_db.query(
-				Checkbook.globals.gts_db.getUpdate(
-					"prefs",
-					updateObj,
-					{}
-				)
-			);
-
-		this.fetchAccounts();
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", updateObj, {} ) );
 	},
 
 	/** Render/Display Accounts **/
 	fetchAccounts: function() {
 
-		this.$['progress'].setMessage( "Retrieving accounts..." );
-		this.$['progress'].setProgress( 50 );
+		this.$['progress'].show( {
+				"title": "Export Progress",
+				"message": "Retrieving accounts...",
+				"progress": 50
+			});
 
 		Checkbook.globals.gts_db.query(
 				Checkbook.globals.gts_db.getSelect(
@@ -456,7 +437,7 @@ enyo.kind({
 
 		if( this.acctList.length <= 0 ) {
 
-			this.$['progress'].close();
+			this.$['progress'].hide();
 
 			this.showErrorMessage( enyo.bind( this, this.closeExport ), "No data available to be exported." );
 		} else {
@@ -470,57 +451,58 @@ enyo.kind({
 		this.$['progress'].setMessage( "Processing accounts..." );
 		this.$['progress'].setProgress( 75 );
 
-		this.$['accounts'].render();
+		this.$['instructionsBar'].hide();
+		this.$['instructions'].hide();
 
 		this.$['accountListButton'].setDisabled( false );
-		this.$['credentialsBar'].hide();
 		this.$['accountListBar'].show();
-
-		this.$['credentials'].hide();
 		this.$['accountList'].show();
 
-		this.resized();
+		this.$['accountList'].setCount( this.acctList.length );
 
-		this.$['progress'].close();
+		this.refreshLayout();
+
+		this.$['progress'].hide();
 	},
 
-	setupRow: function( inSender, inIndex ) {
-		//VirtualList render control
+	setupRow: function( inSender, inEvent ) {
 
-		var row = this.acctList[inIndex];
+		var index = inEvent.index;
+		var item = inEvent.item;
+
+		var row = this.acctList[index];
 
 		if( row ) {
 
-			this.$['accountName'].setContent( row['name'] );
-			this.$['accountNote'].setContent( row['itemCount'] + " " + "Transaction" + ( row['itemCount'] > 1 ? "s" : "" ) );
+			item.$['accountName'].setContent( row['name'] );
+			item.$['accountNote'].setContent( row['itemCount'] + " " + "Transaction" + ( row['itemCount'] > 1 ? "s" : "" ) );
 
-			this.$['icon'].setSrc( "assets/" + row['icon'] );
-			this.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 || row['bypass'] ) );
+			item.$['icon'].setSrc( "assets/" + row['icon'] );
+			item.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 || row['bypass'] ) );
 
-			this.$['accountSelected'].setChecked( row['selectStatus'] );
+			item.$['accountSelected'].setChecked( row['selectStatus'] );
 
 			return true;
 		}
 	},
 
 	accountSelectedChanged: function( inSender, inEvent ) {
-		//VirtualList checkbox control, keep data synced
 
-		if( this.acctList[inEvent.rowIndex]['acctLocked'] && !this.acctList[inEvent.rowIndex]['bypass'] ) {
+		if( this.acctList[inEvent.index]['acctLocked'] && !this.acctList[inEvent.index]['bypass'] ) {
 
 				Checkbook.globals.security.authUser(
-						this.acctList[inEvent.rowIndex]['name'] + " " + "PIN Code",
-						this.acctList[inEvent.rowIndex]['lockedCode'],
+						this.acctList[inEvent.index]['name'] + " " + "PIN Code",
+						this.acctList[inEvent.index]['lockedCode'],
 						{
-							"onSuccess": enyo.bind( this, this.authSuccessful, inEvent.rowIndex )
+							"onSuccess": enyo.bind( this, this.authSuccessful, inEvent.index )
 						}
 					);
 		} else {
 
-			this.acctList[inEvent.rowIndex]['selectStatus'] = !this.acctList[inEvent.rowIndex]['selectStatus'];
+			this.acctList[inEvent.index]['selectStatus'] = !this.acctList[inEvent.index]['selectStatus'];
 		}
 
-		this.$['accounts'].render();
+		this.$['accountList'].renderRow( inEvent.index );
 	},
 
 	authSuccessful: function( index ) {
@@ -528,56 +510,53 @@ enyo.kind({
 		this.acctList[index]['bypass'] = true;
 		this.acctList[index]['selectStatus'] = true;
 
-		this.$['accounts'].render();
+		this.$['accountList'].renderRow( index );
 	},
 
-	accountListSelectOptions: function( inSender ) {
+	menuItemClick: function( inSender, inEvent ) {
 
-		this.$['selectMenu'].openAtControl( inSender );
-	},
-
-	menuItemClick: function( inSender ) {
-
-		if( inSender.value === 1 ) {
+		if( inEvent.selected.value === 1 ) {
 			//All
 
 			for( var i = 0; i < this.acctList.length; i++ ) {
 
-				this.acctList[i]['selectStatus'] = true;
+				if( !this.acctList[i]['acctLocked'] || this.acctList[i]['bypass'] ) {
+
+					this.acctList[i]['selectStatus'] = true;
+				}
 			}
-		} else if( inSender.value === 2 ) {
+		} else if( inEvent.selected.value === 2 ) {
 			//None
 
 			for( var i = 0; i < this.acctList.length; i++ ) {
 
 				this.acctList[i]['selectStatus'] = false;
 			}
-		} else if( inSender.value === 3 ) {
+		} else if( inEvent.selected.value === 3 ) {
 			//Invert
 
 			for( var i = 0; i < this.acctList.length; i++ ) {
 
-				this.acctList[i]['selectStatus'] = !this.acctList[i]['selectStatus'];
+				if( !this.acctList[i]['acctLocked'] || this.acctList[i]['bypass'] ) {
+
+					this.acctList[i]['selectStatus'] = !this.acctList[i]['selectStatus'];
+				}
 			}
 		}
 
-		this.$['accounts'].render();
+		this.$['accountList'].setCount( this.acctList.length );
 	},
 
 	/** Run export process **/
 	beginExportProcess: function() {
 
-		this.$['progress'].load( "Exporting", "Preparing data", 0 );
+		this.$['progress'].show( {
+				"title": "Exporting",
+				"message": "Preparing data...",
+				"progress": 0
+			});
 
 		this.$['accountListButton'].setDisabled( true );
-
-		try {
-
-			enyo.windows.setWindowProperties( window, { blockScreenTimeout: true } );
-		} catch( err ) {
-
-			this.log( "Window Error (Start)", err );
-		}
 
 		var accountsToExport = [];
 
@@ -590,16 +569,23 @@ enyo.kind({
 			}
 		}
 
+		//No accounts selected; exit system
 		if( accountsToExport.length <= 0 ) {
 
-			this.$['progress'].close();
-
-			this.$['errorMessage'].setErrTitle( "Export Complete" );
-			this.showErrorMessage( enyo.bind( this, this.closeExport ), "Nothing to export." );
-		} else {
-
-			this.startNewSheet( accountsToExport, 0 );
+			this.showErrorMessage( enyo.bind( this, this.closeExport ), "Export complete." );
+			return;
 		}
+
+		try {
+
+			enyo.windows.blockScreenTimeout( true );
+			this.log( "Window: blockScreenTimeout: true" );
+		} catch( err ) {
+
+			this.log( "Window Error (Start)", err );
+		}
+
+		this.startNewSheet( accountsToExport, 0 );
 	},
 
 	startNewSheet: function( accountsToExport, index ) {
@@ -716,17 +702,54 @@ enyo.kind({
 		this.$['progress'].setMessage( ( index + 1 ) + " of " + accountsToExport.length + "<br />" + "Uploading data" );
 		this.$['progress'].setProgress( ( ( ( index + 1 ) * 3 / 4 ) / accountsToExport.length ) * 100 );
 
-		var docTitle = "[" + "Checkbook HD" + "] " + uploadData['accountName'] + " [" + uploadData['accountCategory'] + "] [" + Date.format( { date: "short", time: "" } ) + "]";
+		const boundary = "----END_OF_PART----";
+		const delimiter = "\r\n--" + boundary + "\r\n";
+		const close_delim = "\r\n--" + boundary + "--";
+		const contentType = "text/csv";
 
-		this.$['gDataControls'].gdata_upload_file(
-				docTitle,
-				uploadData['csv'],
-				{
-					"onSuccess": enyo.bind( this, this.sheetComplete, accountsToExport, index ),
-					"onError": enyo.bind( this, this.showErrorMessage, enyo.bind( this, this.showAccountList ) ),
-					"timeout": 60
-				}
-			);
+		var dateObj = new Date();
+		var docTitle = "[" + "Checkbook GUTOC" + "] " + uploadData['accountName'] + " [" + uploadData['accountCategory'] + "] [" + dateObj.format( { date: "longDate", time: "shortTime" } ) + "]";
+
+		var metadata = {
+				"title": docTitle.cleanString(),
+				"mimeType": contentType
+			};
+
+		var multipartRequestBody =
+			delimiter +
+			"Content-Type: application/json\r\n\r\n" +
+			JSON.stringify( metadata ) +
+			delimiter +
+			"Content-Type: " + contentType + "\r\n" +
+			"\r\n" +
+			uploadData['csv'] +
+			close_delim;
+
+		var request = gapi.client.request( {
+				"path": "/upload/drive/v2/files?convert=true",
+				"method": "POST",
+				"params": { "uploadType": "multipart" },
+				"headers": {
+					"Content-Type": 'multipart/mixed; boundary="' + boundary + '"'
+				},
+				"body": multipartRequestBody
+			});
+
+		request.execute( enyo.bind( this, this.requestComplete, accountsToExport, index ) );
+	},
+
+	requestComplete: function( accountsToExport, index, resp ) {
+
+		if( !resp.error ) {
+
+			this.sheetComplete( accountsToExport, index );
+		} else {
+
+			var error = "Code: " + resp.error.code + "<br />" + "Message" + resp.error.message;
+			// More error information can be retrieved with resp.error.errors.
+
+			this.showErrorMessage( this.showAccountList, error );
+		}
 	},
 
 	sheetComplete: function( accountsToExport, index ) {
@@ -742,7 +765,7 @@ enyo.kind({
 			this.startNewSheet( accountsToExport, index );
 		} else {
 
-			this.$['progress'].close();
+			this.$['progress'].hide();
 
 			this.$['errorMessage'].setErrTitle( "Export Complete" );
 			this.showErrorMessage( enyo.bind( this, this.closeExport ), accountsToExport.length + " account"  + ( accountsToExport.length > 1 ? "s" : "" ) + " exported." );
@@ -752,19 +775,26 @@ enyo.kind({
 	/** Finisher **/
 	closeExport: function() {
 
-		//Reset system
-		this.$['credentialsButton'].setDisabled( false );
-
-		this.$['credentials'].show();
-		this.$['accountList'].hide();
-
 		try {
 
-			enyo.windows.setWindowProperties( window, { blockScreenTimeout: false } );
+			enyo.windows.blockScreenTimeout( false );
+			this.log( "Window: blockScreenTimeout: false" );
 		} catch( err ) {
 
 			this.log( "Window Error (End)", err );
 		}
+
+		//Reset system
+		this.$['instructions'].show();
+		this.$['instructionsBar'].show();
+		this.$['instructionsButton'].setDisabled( false );
+
+		this.$['accountList'].hide();
+		this.$['accountListBar'].hide();
+
+		//Hide all popups
+		this.$['errorMessage'].hide();
+		this.$['progress'].hide();
 
 		//Close & continue
 		this.doFinish();
@@ -775,16 +805,16 @@ enyo.kind({
 
 		this.onErrorClose = callbackFn;
 
-		this.$['progress'].close();
+		this.$['progress'].hide();
 
 		//set error message
-		this.$['errorMessage'].setErrMessage( error );
-		this.$['errorMessage'].openAtCenter();
+		this.$['errorMessage'].show();
+		this.$['errorMessage'].setMainMessage( error );
 	},
 
 	closeErrorMessage: function() {
 
-		this.$['errorMessage'].close();
+		this.$['errorMessage'].hide();
 
 		this.onErrorClose();
 	}

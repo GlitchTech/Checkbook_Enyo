@@ -176,6 +176,10 @@ html, body {
 
 /*****************/
 
+.inline {
+	display: inline-block;
+}
+
 .label {
 	color: #1879cd;
 	font-size: .7rem;

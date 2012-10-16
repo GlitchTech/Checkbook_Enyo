@@ -311,7 +311,7 @@ enyo.kind({
 
 	authenticateWithGoogle: function() {
 
-		this.$["gapi"].setScope( [ "https://www.googleapis.com/auth/drive", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ] );
+		this.$['gapi'].setScope( [ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ] );
 
 		this.$['gapi'].auth( { "onSuccess": enyo.bind( this, this.userAuthenticated ), "onError": enyo.bind( this, this.userNotAuthenticated ) } );
 
@@ -1182,6 +1182,8 @@ enyo.kind({
 
 		//Reset system
 		this.$['instructionsButton'].setDisabled( false );
+		this.$['instructionsBar'].show();
+		this.$['sheetListBar'].hide();
 
 		this.$['instructions'].show();
 		this.$['sheetList'].hide();
