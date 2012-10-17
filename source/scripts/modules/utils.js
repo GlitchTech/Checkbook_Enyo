@@ -23,7 +23,7 @@ function formatAmount( amount ) {
 /** Convert amount display version to number **/
 function deformatAmount( amount ) {
 
-	amount = amount.trim();
+	amount = GTS.String.trim( amount );
 
 	if( !amount ) {
 		//If null or undefined
@@ -38,7 +38,7 @@ function deformatAmount( amount ) {
 		var negative = ( amount[0] === "(" && amount[amount.length - 1] === ")" );
 
 		//Remove all letters and currency symbols
-		amount = amount.replace( /[^0-9\s,'".-]*/g, "" ).trim();
+		amount = GTS.String.trim( amount.replace( /[^0-9\s,'".-]*/g, "" ) );
 
 		var decimal = amount.length;
 

@@ -512,8 +512,8 @@ results = {
 */
 			this.budgets[offset + i] =  results[i];
 
-			this.budgets[offset + i]['category'] = this.budgets[offset + i]['category'].dirtyString();
-			this.budgets[offset + i]['category2'] = this.budgets[offset + i]['category2'].dirtyString();
+			this.budgets[offset + i]['category'] = GTS.String.dirtyString( this.budgets[offset + i]['category'] );
+			this.budgets[offset + i]['category2'] = GTS.String.dirtyString( this.budgets[offset + i]['category2'] );
 		}
 
 		this.$['entries'].refresh();

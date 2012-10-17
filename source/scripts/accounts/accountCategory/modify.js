@@ -167,7 +167,7 @@ enyo.kind({
 
 		this.$['name'].setValue( this.name );
 		this.$['icon'].setValue( this.icon );
-		this.$['color'].setValue( this.color.ucfirst() );
+		this.$['color'].setValue( GTS.String.ucfirst( this.color ) );
 
 		for( var i = 0; i < appColors.length; i++ ) {
 

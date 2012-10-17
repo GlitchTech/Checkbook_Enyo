@@ -441,10 +441,10 @@ results = {
 					results[i]//fetched properties
 				);
 
-			this.transactions[offset + i]['desc'] = this.transactions[offset + i]['desc'].dirtyString();
-			this.transactions[offset + i]['category'] = this.transactions[offset + i]['category'].dirtyString();
-			this.transactions[offset + i]['category2'] = this.transactions[offset + i]['category2'].dirtyString();
-			this.transactions[offset + i]['note'] = this.transactions[offset + i]['note'].dirtyString();
+			this.transactions[offset + i]['desc'] = GTS.String.dirtyString( this.transactions[offset + i]['desc'] );
+			this.transactions[offset + i]['category'] = GTS.String.dirtyString( this.transactions[offset + i]['category'] );
+			this.transactions[offset + i]['category2'] = GTS.String.dirtyString( this.transactions[offset + i]['category2'] );
+			this.transactions[offset + i]['note'] = GTS.String.dirtyString( this.transactions[offset + i]['note'] );
 
 			if( this.account['sort'] !== 0 && this.account['sort'] !== 6 && this.account['sort'] !== 8 ) {
 

@@ -264,7 +264,7 @@ enyo.kind({
 			searchStr += '"' + category + '"' + ( ( category2 && category2 !== "%" ) ? ' "' + category2 + '"' : "" );
 		}
 
-		this.$['searchString'].setValue( searchStr.trim() );
+		this.$['searchString'].setValue( GTS.String.trim( searchStr ) );
 
 		if( this.$['searchString'].getValue().length > 0 ) {
 
@@ -339,12 +339,12 @@ enyo.kind({
 		var whereStrs = "";
 		var whereArgs = [];
 
-		var searchStr = this.$['searchString'].getValue().dirtyString().trim();
+		var searchStr = GTS.String.trim( GTS.String.dirtyString( this.$['searchString'].getValue() ) );
 
 		//Extract quote items
 		var phrases = searchStr.match( /"([^"]*)"/gi );
 
-		searchStr = searchStr.replace( /"[^"]*"/gi, "" ).trim();
+		searchStr = GTS.String.trim( searchStr.replace( /"[^"]*"/gi, "" ) );
 		searchStr = searchStr.split( " " );
 
 		if( phrases && phrases.length > 0 ) {

@@ -886,7 +886,7 @@ enyo.kind({
 						];
 				} else {
 
-					if( trsn['category'].isJSON() ) {
+					if( GTS.String.isJSON( trsn['category'] ) ) {
 						//valid JSON (prototype.js function)
 
 						trsn['category'] = enyo.json.parse( trsn['category'] );
@@ -950,7 +950,7 @@ enyo.kind({
 		} else {
 
 			//Trim extra space from start and end of node content
-			return container[id]['#text'].trim();
+			return GTS.String.trim( container[id]['#text'] );
 		}
 	},
 

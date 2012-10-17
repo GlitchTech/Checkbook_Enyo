@@ -672,19 +672,19 @@ enyo.kind({
 
 			var row = results[i];
 
-			uploadData['csv'] += '"' + row['accountName'].cleanString() + '",' +
-										'"' + row['accountCat'].cleanString() + '",' +
+			uploadData['csv'] += '"' + GTS.String.cleanString( row['accountName'] ) + '",' +
+										'"' + GTS.String.cleanString( row['accountCat'] ) + '",' +
 										'"\'' + ( new Date( parseInt( row['date'] ) ) ).format( "special" ) + '",' +// The \' at the start forces GDocs to treat as a string and not reformat the date
 										'"' + formatAmount( row['amount'] ) + '",' +
-										'"' + row['desc'].cleanString() + '",' +
+										'"' + GTS.String.cleanString( row['desc'] ) + '",' +
 										'"' + ( row['cleared'] == 1 ? "Yes" : "No" ) + '",' +
-										'"' + row['checkNum'].cleanString() + '",' +
-										'"' + row['note'].cleanString() + '",' +
+										'"' + GTS.String.cleanString( row['checkNum'] ) + '",' +
+										'"' + GTS.String.cleanString( row['note'] ) + '",' +
 										'"' + row['itemId'] + '",' +
 										'"' + enyo.json.stringify( Checkbook.globals.transactionManager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
 										'"' + row['linkedRecord'] + '",' +
-										'"' + row['linkedAccountName'].cleanString() + '",' +
-										'"' + row['linkedAccountCat'].cleanString() + '"\n';
+										'"' + GTS.String.cleanString( row['linkedAccountName'] ) + '",' +
+										'"' + GTS.String.cleanString( row['linkedAccountCat'] ) + '"\n';
 		}
 
 		if( endIndex < results.length ) {

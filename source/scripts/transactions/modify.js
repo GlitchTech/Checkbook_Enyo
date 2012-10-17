@@ -798,7 +798,7 @@ enyo.kind( {
 
 			item.$['categoryItemBreak'].setShowing( enyo.Panels.isScreenNarrow() );
 
-			item.$['categoryText'].setContent( ( row['category'] + " >> " + row['category2'] ).dirtyString() );
+			item.$['categoryText'].setContent( ( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) ) );
 
 			if( this.trsnObj['category'].length > 1 ) {
 				//If only one category, takes up full amount
