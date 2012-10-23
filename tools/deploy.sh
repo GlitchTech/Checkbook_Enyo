@@ -19,15 +19,9 @@ if [ -z "${DEPLOY}" ]; then
     DEPLOY="$NAME$SUFFIX"
 fi
 
-if [ -d $1 ]; then
-    TARGET=$1
-    chmod -R 777 $TARGET;
-    rm -rf $TARGET;
-fi
-
 if [ -z "${TARGET}" ]; then
     TARGET="$SOURCE/$FOLDER/$DEPLOY"
-fi
+fi    
 
 if [ -d $TARGET ]; then
 	echo "$TARGET folder already exists, please rename or remove it and try again."
@@ -60,7 +54,7 @@ while getopts hco: OPT; do
             ;;
     esac
 done
-
+	
 echo "This script can create a deployment in $TARGET"
 
 cat <<EOF
