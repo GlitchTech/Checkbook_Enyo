@@ -3,8 +3,8 @@
 enyo.depends(
 	"mq.css",
 	"flexbox.css",
-	"general.css",
+	"general.less",
 	"checkbook.css",
-	"backgrounds.css",
+	"backgrounds.less",
 	"balanceColors.css"
 );

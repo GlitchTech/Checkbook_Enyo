@@ -16,23 +16,50 @@ NAME=${SOURCE##*/}
 
 # target names
 if [ -z "${DEPLOY}" ]; then
-	DEPLOY="$NAME$SUFFIX"
+    DEPLOY="$NAME$SUFFIX"
 fi
 
 if [ -d $1 ]; then
-	TARGET=$1
-	chmod -R 777 $TARGET;
-	rm -rf $TARGET;
+    TARGET=$1
+    chmod -R 777 $TARGET;
+    rm -rf $TARGET;
 fi
 
 if [ -z "${TARGET}" ]; then
-	TARGET="$SOURCE/$FOLDER/$DEPLOY"
+    TARGET="$SOURCE/$FOLDER/$DEPLOY"
 fi
 
 if [ -d $TARGET ]; then
 	echo "$TARGET folder already exists, please rename or remove it and try again."
 	exit 1
 fi
+
+# use less by default
+NO_LESS=""
+
+USAGE="Usage: `basename $0` [-h] [-c] [-o output_dir] args"
+
+# Parse command line options.
+while getopts hco: OPT; do
+    case "$OPT" in
+        h)
+            echo $USAGE
+            exit 0
+            ;;
+        o)
+            TARGET=$OPTARG
+            rm -rf $TARGET
+            ;;
+        c)
+            NO_LESS="-no-less"
+            ;;
+        \?)
+            # getopts issues an error message
+            echo $USAGE >&2
+            exit 1
+            ;;
+    esac
+done
 
 echo "This script can create a deployment in $TARGET"
 
@@ -42,7 +69,7 @@ build step
 ==========
 EOF
 
-./minify.sh
+./minify.sh $NO_LESS
 
 cat <<EOF
 =========
@@ -69,6 +96,3 @@ for i in "$SOURCE/lib/"*; do
 		cp -r "$i" "$TARGET/lib"
 	fi
 done
-
-echo ""
-echo "Deployed to $TARGET"
