@@ -2,7 +2,11 @@
 
 enyo.depends(
 	"$lib/layout",
+
+	//To theme Onyx using Theme.less, swap commented lines and follow the steps described in Theme.less
 	"$lib/onyx",
+	//"$lib/onyx/source",
+	//"Theme.less",
 
 	"$lib/canvas-spinner/heartcode_canvas.js",
 	"$lib/canvas-spinner/canvasSpinner.js",

@@ -16,3 +16,6 @@
 [submodule "lib/private"]
 	path = lib/private
 	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/checkbook_private.git
+[submodule "lib/g11n"]
+	path = lib/g11n
+	url = https://github.com/enyojs/g11n.git
