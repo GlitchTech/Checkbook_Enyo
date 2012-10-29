@@ -55,8 +55,7 @@ enyo.kind({
 					components: [
 						{
 							name: "catDivider",
-							//kind: enyo.Divider,
-							showing: false,
+							kind: "GTS.Divider",
 							ontap: "dividerTapped"
 						}, {
 							layoutKind: "",
@@ -478,20 +477,13 @@ enyo.kind({
 			item.$['note'].setContent( row['acctNotes'].replace( /\n/, "<br />" ) );
 
 			//proper sort mode && difference between categories
-			if( (
-					Checkbook.globals.prefs['custom_sort'] === 0 ||
-					Checkbook.globals.prefs['custom_sort'] === 3
-				) && (
-					row['index'] <= 0 ||
-					row['acctCategory'] !== this.accounts[row['index'] - 1]['acctCategory']
-				) ) {
+			var showDivider = (
+					( Checkbook.globals.prefs['custom_sort'] === 0 || Checkbook.globals.prefs['custom_sort'] === 3 ) &&
+					( row['index'] <= 0 || row['acctCategory'] !== this.accounts[row['index'] - 1]['acctCategory'] )
+				);
 
-				item.$['catDivider'].show();
-				item.$['catDivider'].setContent( row['acctCategory'] );
-			} else {
-
-				item.$['catDivider'].hide();
-			}
+			item.$['catDivider'].setContent( row['acctCategory'] );
+			item.$['catDivider'].canGenerate = showDivider;
 
 /*
 				"acctId"

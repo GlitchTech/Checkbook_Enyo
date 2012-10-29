@@ -19,6 +19,7 @@ enyo.depends(
 	"$lib/gts-plugins/LazyList",
 	"$lib/gts-plugins/SelectorBar",
 	"$lib/gts-plugins/ToggleBar",
+	"$lib/gts-plugins/Divider",
 	"$lib/gts-plugins/DividerDrawer",
 	"$lib/gts-plugins/SelectedMenu",
 	"$lib/gts-plugins/InlineNotification",

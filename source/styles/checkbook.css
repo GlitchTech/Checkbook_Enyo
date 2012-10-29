@@ -31,11 +31,6 @@
 	color: #0000cc;
 }
 
-.account-item .onyx-item,
-.account-item .onyx-swipeable-item-content {
-	padding: 9px 3px;
-}
-
 .account-item .account {
 	border-top: 1px solid rgba(255, 255, 255, 0.5);
 

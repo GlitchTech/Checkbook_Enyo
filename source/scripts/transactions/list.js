@@ -11,10 +11,19 @@ enyo.kind( {
 			name: "list",
 			kind: "GTS.LazyList",
 
+			fit: true,
+
 			classes: "checkbook-stamp enyo-fit",
 
 			onSetupItem: "transactionBuildRow",
 			onAcquirePage: "transactionFetchGroup",
+
+			aboveComponents: [
+				{
+					content: "TEST"
+				}
+			],
+
 			components: [
 				{
 					name: "transactionWrapper",
@@ -79,6 +88,12 @@ enyo.kind( {
 							allowHtml: true
 						}
 					]
+				}
+			],
+
+			belowComponents: [
+				{
+					content: "TEST 2"
 				}
 			]
 		},
@@ -181,7 +196,6 @@ enyo.kind( {
 
 		this.transactions = [];
 		this.$['list'].setCount( 0 );
-		this.$['list'].reset();
 		this.$['list'].lazyLoad();
 	},
 
@@ -351,9 +365,7 @@ enyo.kind( {
 
 	transactionFetchGroup: function( inSender, inEvent ) {
 
-		this.log();
-
-		inEvent['pageSize'] = 50;//Event doesn't carry this detail by default. Change this.
+		this.log( inSender, "|", inEvent );
 
 		var index = inEvent['page'] * inEvent['pageSize'];
 
