@@ -18,11 +18,7 @@ enyo.kind( {
 			onSetupItem: "transactionBuildRow",
 			onAcquirePage: "transactionFetchGroup",
 
-			aboveComponents: [
-				{
-					content: "TEST"
-				}
-			],
+			aboveComponents: [ /* Content that displays above the list */ ],
 
 			components: [
 				{
@@ -92,6 +88,7 @@ enyo.kind( {
 			],
 
 			belowComponents: [
+				/* Content that displays below the list NYI */
 				{
 					content: "TEST 2"
 				}

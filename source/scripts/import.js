@@ -418,6 +418,11 @@ enyo.kind({
 			return;
 		}
 
+		if( typeof( this.$['progress'] ) === "undefined" ) {
+
+			return;
+		}
+
 		this.$['progress'].setMessage( "Processing spreadsheets..." );
 		this.$['progress'].setProgress( 75 );
 
@@ -1193,6 +1198,6 @@ enyo.kind({
 		this.$['progress'].hide();
 
 		//Close & continue
-		this.doFinish( { "success": success } );
+		enyo.asyncMethod( this, this.doFinish, { "success": success } );
 	}
 });
