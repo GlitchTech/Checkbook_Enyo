@@ -6,3 +6,6 @@ thumbs.db
 /gen/*
 /bin/*
 /.settings/*
+
+#ignore build files
+assets/www/*

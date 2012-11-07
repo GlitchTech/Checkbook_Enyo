@@ -76,6 +76,7 @@ enyo.kind({
 name: "enyo.FlyweightRepeater",
 published: {
 count: 0,
+noSelect: !1,
 multiSelect: !1,
 toggleSelected: !1,
 clientClasses: "",
@@ -94,7 +95,10 @@ name: "client"
 } ],
 rowOffset: 0,
 create: function() {
-this.inherited(arguments), this.multiSelectChanged(), this.clientClassesChanged(), this.clientStyleChanged();
+this.inherited(arguments), this.noSelectChanged(), this.multiSelectChanged(), this.clientClassesChanged(), this.clientStyleChanged();
+},
+noSelectChanged: function() {
+this.noSelect && this.$.selection.clear();
 },
 multiSelectChanged: function() {
 this.$.selection.setMulti(this.multiSelect);
@@ -126,6 +130,7 @@ var r = t && t.index != null ? t.index : this.index;
 t && r != null && (t.index = r, t.flyweight = this), this.inherited(arguments);
 },
 tap: function(e, t) {
+if (this.noSelect) return;
 this.toggleSelected ? this.$.selection.toggle(t.index) : this.$.selection.select(t.index);
 },
 selectDeselect: function(e, t) {
@@ -185,6 +190,7 @@ published: {
 count: 0,
 rowsPerPage: 50,
 bottomUp: !1,
+noSelect: !1,
 multiSelect: !1,
 toggleSelected: !1,
 fixedHeight: !1
@@ -218,7 +224,7 @@ classes: "enyo-list-page"
 } ]
 } ],
 create: function() {
-this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.multiSelectChanged(), this.toggleSelectedChanged();
+this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged();
 },
 createStrategy: function() {
 this.controlParentName = "strategy", this.inherited(arguments), this.createChrome(this.listTools), this.controlParentName = "client", this.discoverControlParent();
@@ -231,6 +237,9 @@ this.inherited(arguments), this.refresh();
 },
 bottomUpChanged: function() {
 this.$.generator.bottomUp = this.bottomUp, this.$.page0.applyStyle(this.pageBound, null), this.$.page1.applyStyle(this.pageBound, null), this.pageBound = this.bottomUp ? "bottom" : "top", this.hasNode() && this.reset();
+},
+noSelectChanged: function() {
+this.$.generator.setNoSelect(this.noSelect);
 },
 multiSelectChanged: function() {
 this.$.generator.setMultiSelect(this.multiSelect);
@@ -1147,7 +1156,8 @@ onTransitionFinish: ""
 handlers: {
 ondragstart: "dragstart",
 ondrag: "drag",
-ondragfinish: "dragfinish"
+ondragfinish: "dragfinish",
+onscroll: "domScroll"
 },
 tools: [ {
 kind: "Animator",
@@ -1156,7 +1166,10 @@ onEnd: "completed"
 } ],
 fraction: 0,
 create: function() {
-this.transitionPoints = [], this.inherited(arguments), this.arrangerKindChanged(), this.narrowFitChanged(), this.indexChanged();
+this.transitionPoints = [], this.inherited(arguments), this.arrangerKindChanged(), this.narrowFitChanged(), this.indexChanged(), this.setAttribute("onscroll", enyo.bubbler);
+},
+domScroll: function(e, t) {
+this.hasNode() && this.node.scrollLeft > 0 && (this.node.scrollLeft = 0);
 },
 initComponents: function() {
 this.createChrome(this.tools), this.inherited(arguments);
@@ -1473,7 +1486,8 @@ onStep: "zoomAnimationStep",
 onEnd: "zoomAnimationEnd"
 }, {
 name: "viewport",
-style: "overflow:hidden;min-width:100%; min-height:100%;",
+style: "overflow:hidden;min-height:100%;min-width:100%;",
+classes: "enyo-fit",
 ongesturechange: "gestureTransform",
 ongestureend: "saveState",
 ontap: "singleTap",
@@ -1485,7 +1499,7 @@ ondown: "down"
 } ]
 } ],
 create: function() {
-this.inherited(arguments), this.canTransform = enyo.dom.canTransform(), this.canTransform || this.$.image.applyStyle("position", "relative"), this.canAccelerate = enyo.dom.canAccelerate(), this.bufferImage = new Image, this.bufferImage.onload = enyo.bind(this, "imageLoaded"), this.bufferImage.onerror = enyo.bind(this, "imageError"), this.srcChanged();
+this.inherited(arguments), this.canTransform = enyo.dom.canTransform(), this.canTransform || this.$.image.applyStyle("position", "relative"), this.canAccelerate = enyo.dom.canAccelerate(), this.bufferImage = new Image, this.bufferImage.onload = enyo.bind(this, "imageLoaded"), this.bufferImage.onerror = enyo.bind(this, "imageError"), this.srcChanged(), this.getStrategy().setDragDuringGesture(!1);
 },
 down: function(e, t) {
 t.preventDefault();
@@ -1500,13 +1514,16 @@ var n = (this.maxScale - this.minScale) / 10, r = this.scale;
 if (t.wheelDelta > 0 || t.detail < 0) this.scale = this.limitScale(this.scale + n); else if (t.wheelDelta < 0 || t.detail > 0) this.scale = this.limitScale(this.scale - n);
 return this.eventPt = this.calcEventLocation(t), this.transformImage(this.scale), r != this.scale && this.doZoom({
 scale: this.scale
-}), t.preventDefault(), !0;
+}), this.ratioX = this.ratioY = null, t.preventDefault(), !0;
 },
 srcChanged: function() {
 this.src && this.src.length > 0 && this.bufferImage && this.src != this.bufferImage.src && (this.bufferImage.src = this.src);
 },
 imageLoaded: function(e) {
-this.originalWidth = this.bufferImage.width, this.originalHeight = this.bufferImage.height, this.scaleChanged(), this.$.image.setSrc(this.bufferImage.src);
+this.originalWidth = this.bufferImage.width, this.originalHeight = this.bufferImage.height, this.scaleChanged(), this.$.image.setSrc(this.bufferImage.src), enyo.dom.transformValue(this.getStrategy().$.client, "translate3d", "0px, 0px, 0");
+},
+resizeHandler: function() {
+this.inherited(arguments), this.$.image.src && this.scaleChanged();
 },
 scaleChanged: function() {
 var e = this.hasNode();
@@ -1521,7 +1538,7 @@ imageError: function(e) {
 enyo.error("Error loading image: " + this.src), this.bubble("onerror", e);
 },
 gestureTransform: function(e, t) {
-this.eventPt = this.calcEventLocation(t), this.transformImage(this.scale * t.scale);
+this.eventPt = this.calcEventLocation(t), this.transformImage(this.limitScale(this.scale * t.scale));
 },
 calcEventLocation: function(e) {
 var t = {
@@ -1540,9 +1557,9 @@ var t = this.imageBounds || this.innerImageBounds(e);
 this.imageBounds = this.innerImageBounds(e), this.scale > this.minScale ? this.$.viewport.applyStyle("cursor", "move") : this.$.viewport.applyStyle("cursor", null), this.$.viewport.setBounds({
 width: this.imageBounds.width + "px",
 height: this.imageBounds.height + "px"
-}), this.ratioX = (this.eventPt.x + this.getScrollLeft()) / t.width, this.ratioY = (this.eventPt.y + this.getScrollTop()) / t.height;
+}), this.ratioX = this.ratioX || (this.eventPt.x + this.getScrollLeft()) / t.width, this.ratioY = this.ratioY || (this.eventPt.y + this.getScrollTop()) / t.height;
 var n, r;
-this.$.animator.ratioLock ? (n = this.$.animator.ratioLock.x * this.imageBounds.width - this.containerWidth / 2, r = this.$.animator.ratioLock.y * this.imageBounds.height - this.containerHeight / 2) : (n = this.ratioX * this.imageBounds.width - this.containerWidth / 2, r = this.ratioY * this.imageBounds.height - this.containerHeight / 2), n = Math.max(0, Math.min(this.imageBounds.width - this.containerWidth, n)), r = Math.max(0, Math.min(this.imageBounds.height - this.containerHeight, r)), this.setScrollLeft(n), this.setScrollTop(r);
+this.$.animator.ratioLock ? (n = this.$.animator.ratioLock.x * this.imageBounds.width - this.containerWidth / 2, r = this.$.animator.ratioLock.y * this.imageBounds.height - this.containerHeight / 2) : (n = this.ratioX * this.imageBounds.width - this.eventPt.x, r = this.ratioY * this.imageBounds.height - this.eventPt.y), n = Math.max(0, Math.min(this.imageBounds.width - this.containerWidth, n)), r = Math.max(0, Math.min(this.imageBounds.height - this.containerHeight, r));
 if (this.canTransform) {
 var i = {
 scale: e
@@ -1558,6 +1575,7 @@ height: this.imageBounds.height + "px",
 left: this.imageBounds.left + "px",
 top: this.imageBounds.top + "px"
 });
+this.setScrollLeft(n), this.setScrollTop(r);
 },
 limitScale: function(e) {
 return this.disableZoom ? e = this.scale : e > this.maxScale ? e = this.maxScale : e < this.minScale && (e = this.minScale), e;
@@ -1582,7 +1600,7 @@ saveState: function(e, t) {
 var n = this.scale;
 this.scale *= t.scale, this.scale = this.limitScale(this.scale), n != this.scale && this.doZoom({
 scale: this.scale
-});
+}), this.ratioX = this.ratioY = null;
 },
 doubleClick: function(e, t) {
 enyo.platform.ie == 8 && (this.tapped = !0, t.pageX = t.clientX + t.target.scrollLeft, t.pageY = t.clientY + t.target.scrollTop, this.singleTap(e, t), t.preventDefault());
@@ -2318,6 +2336,362 @@ if (t.originator != this) return !0;
 }
 });
 
+// DatePicker.js
+
+enyo.kind({
+name: "onyx.DatePicker",
+classes: "onyx-toolbar-inline",
+published: {
+disabled: !1,
+locale: null,
+dayHidden: !1,
+monthHidden: !1,
+yearHidden: !1,
+minYear: 1900,
+maxYear: 2099,
+value: null
+},
+events: {
+onSelect: ""
+},
+create: function() {
+this.inherited(arguments);
+if (!this.locale) try {
+this.locale = enyo.g11n.currentLocale().getLocale();
+} catch (e) {
+this.locale = "en_us";
+}
+this.initDefaults();
+},
+initDefaults: function() {
+var e;
+try {
+this._tf = new enyo.g11n.Fmts({
+locale: this.locale
+}), e = this._tf.getMonthFields();
+} catch (t) {
+e = [ "Jan", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" ];
+}
+this.setupPickers(this._tf ? this._tf.getDateFieldOrder() : "mdy"), this.dayHiddenChanged(), this.monthHiddenChanged(), this.yearHiddenChanged();
+var n = this.value = this.value || new Date;
+for (var r = 0, i; i = e[r]; r++) this.$.monthPicker.createComponent({
+content: i,
+value: r,
+active: r == n.getMonth()
+});
+var s = n.getFullYear();
+this.$.yearPicker.setSelected(s - this.minYear), this.$.year.setContent(s);
+for (r = 1; r <= this.monthLength(n.getYear(), n.getMonth()); r++) this.$.dayPicker.createComponent({
+content: r,
+value: r,
+active: r == n.getDate()
+});
+},
+monthLength: function(e, t) {
+return 32 - (new Date(e, t, 32)).getDate();
+},
+setupYear: function(e, t) {
+this.$.year.setContent(this.minYear + t.index);
+},
+setupPickers: function(e) {
+var t = e.split(""), n, r, i;
+for (r = 0, i = t.length; r < i; r++) {
+n = t[r];
+switch (n) {
+case "d":
+this.createDay();
+break;
+case "m":
+this.createMonth();
+break;
+case "y":
+this.createYear();
+break;
+default:
+}
+}
+},
+createYear: function() {
+var e = this.maxYear - this.minYear;
+this.createComponent({
+kind: "onyx.PickerDecorator",
+onSelect: "updateYear",
+components: [ {
+classes: "onyx-datepicker-year",
+name: "yearPickerButton",
+disabled: this.disabled
+}, {
+name: "yearPicker",
+kind: "onyx.FlyweightPicker",
+count: ++e,
+onSetupItem: "setupYear",
+components: [ {
+name: "year"
+} ]
+} ]
+});
+},
+createMonth: function() {
+this.createComponent({
+kind: "onyx.PickerDecorator",
+onSelect: "updateMonth",
+components: [ {
+classes: "onyx-datepicker-month",
+name: "monthPickerButton",
+disabled: this.disabled
+}, {
+name: "monthPicker",
+kind: "onyx.Picker"
+} ]
+});
+},
+createDay: function() {
+this.createComponent({
+kind: "onyx.PickerDecorator",
+onSelect: "updateDay",
+components: [ {
+classes: "onyx-datepicker-day",
+name: "dayPickerButton",
+disabled: this.disabled
+}, {
+name: "dayPicker",
+kind: "onyx.Picker"
+} ]
+});
+},
+localeChanged: function() {
+this.refresh();
+},
+dayHiddenChanged: function() {
+this.$.dayPicker.getParent().setShowing(this.dayHidden ? !1 : !0);
+},
+monthHiddenChanged: function() {
+this.$.monthPicker.getParent().setShowing(this.monthHidden ? !1 : !0);
+},
+yearHiddenChanged: function() {
+this.$.yearPicker.getParent().setShowing(this.yearHidden ? !1 : !0);
+},
+minYearChanged: function() {
+this.refresh();
+},
+maxYearChanged: function() {
+this.refresh();
+},
+valueChanged: function() {
+this.refresh();
+},
+disabledChanged: function() {
+this.yearPickerButton.setDisabled(this.disabled), this.monthPickerButton.setDisabled(this.disabled), this.dayPickerButton.setDisabled(this.disabled);
+},
+updateDay: function(e, t) {
+var n = this.calcDate(this.value.getFullYear(), this.value.getMonth(), t.selected.value);
+return this.doSelect({
+name: this.name,
+value: n
+}), this.setValue(n), !0;
+},
+updateMonth: function(e, t) {
+var n = this.calcDate(this.value.getFullYear(), t.selected.value, this.value.getDate());
+return this.doSelect({
+name: this.name,
+value: n
+}), this.setValue(n), !0;
+},
+updateYear: function(e, t) {
+if (t.originator.selected != -1) {
+var n = this.calcDate(this.minYear + t.originator.selected, this.value.getMonth(), this.value.getDate());
+this.doSelect({
+name: this.name,
+value: n
+}), this.setValue(n);
+}
+return !0;
+},
+calcDate: function(e, t, n) {
+return new Date(e, t, n, this.value.getHours(), this.value.getMinutes(), this.value.getSeconds(), this.value.getMilliseconds());
+},
+refresh: function() {
+this.destroyClientControls(), this.initDefaults(), this.render();
+}
+});
+
+// TimePicker.js
+
+enyo.kind({
+name: "onyx.TimePicker",
+classes: "onyx-toolbar-inline",
+published: {
+disabled: !1,
+locale: null,
+is24HrMode: null,
+value: null
+},
+events: {
+onSelect: ""
+},
+create: function() {
+this.inherited(arguments);
+if (!this.locale) try {
+this.locale = enyo.g11n.currentLocale().getLocale();
+} catch (e) {
+this.locale = "en_us";
+}
+this.initDefaults();
+},
+initDefaults: function() {
+var e, t;
+try {
+this._tf = new enyo.g11n.Fmts({
+locale: this.locale
+}), e = this._tf.getAmCaption(), t = this._tf.getPmCaption(), this.is24HrMode == null && (this.is24HrMode = !this._tf.isAmPm());
+} catch (n) {
+e = "AM", t = "PM", this.is24HrMode = !1;
+}
+this.setupPickers(this._tf ? this._tf.getTimeFieldOrder() : "hma");
+var r = this.value = this.value || new Date, i;
+if (!this.is24HrMode) {
+var s = r.getHours();
+s = s === 0 ? 12 : s;
+for (i = 1; i <= 12; i++) this.$.hourPicker.createComponent({
+content: i,
+value: i,
+active: i == (s > 12 ? s % 12 : s)
+});
+} else for (i = 0; i < 24; i++) this.$.hourPicker.createComponent({
+content: i,
+value: i,
+active: i == r.getHours()
+});
+for (i = 0; i <= 59; i++) this.$.minutePicker.createComponent({
+content: i < 10 ? "0" + i : i,
+value: i,
+active: i == r.getMinutes()
+});
+r.getHours() >= 12 ? this.$.ampmPicker.createComponents([ {
+content: e
+}, {
+content: t,
+active: !0
+} ]) : this.$.ampmPicker.createComponents([ {
+content: e,
+active: !0
+}, {
+content: t
+} ]), this.$.ampmPicker.getParent().setShowing(!this.is24HrMode);
+},
+setupPickers: function(e) {
+var t = e.split(""), n, r, i;
+for (r = 0, i = t.length; r < i; r++) {
+n = t[r];
+switch (n) {
+case "h":
+this.createHour();
+break;
+case "m":
+this.createMinute();
+break;
+case "a":
+this.createAmPm();
+break;
+default:
+}
+}
+},
+createHour: function() {
+this.createComponent({
+kind: "onyx.PickerDecorator",
+onSelect: "updateHour",
+components: [ {
+classes: "onyx-timepicker-hour",
+name: "hourPickerButton",
+disabled: this.disabled
+}, {
+name: "hourPicker",
+kind: "onyx.Picker"
+} ]
+});
+},
+createMinute: function() {
+this.createComponent({
+kind: "onyx.PickerDecorator",
+onSelect: "updateMinute",
+components: [ {
+classes: "onyx-timepicker-minute",
+name: "minutePickerButton",
+disabled: this.disabled
+}, {
+name: "minutePicker",
+kind: "onyx.Picker"
+} ]
+});
+},
+createAmPm: function() {
+this.createComponent({
+kind: "onyx.PickerDecorator",
+onSelect: "updateAmPm",
+components: [ {
+classes: "onyx-timepicker-ampm",
+name: "ampmPickerButton",
+disabled: this.disabled
+}, {
+name: "ampmPicker",
+kind: "onyx.Picker"
+} ]
+});
+},
+disabledChanged: function() {
+this.$.hourPickerButton.setDisabled(this.disabled), this.$.minutePickerButton.setDisabled(this.disabled), this.$.ampmPickerButton.setDisabled(this.disabled);
+},
+localeChanged: function() {
+this.is24HrMode = null, this.refresh();
+},
+is24HrModeChanged: function() {
+this.refresh();
+},
+valueChanged: function() {
+this.refresh();
+},
+updateHour: function(e, t) {
+var n = t.selected.value;
+if (!this.is24HrMode) {
+var r = this.$.ampmPicker.getParent().controlAtIndex(0).content;
+n = n + (n == 12 ? -12 : 0) + (this.isAm(r) ? 0 : 12);
+}
+return this.value = this.calcTime(n, this.value.getMinutes()), this.doSelect({
+name: this.name,
+value: this.value
+}), !0;
+},
+updateMinute: function(e, t) {
+return this.value = this.calcTime(this.value.getHours(), t.selected.value), this.doSelect({
+name: this.name,
+value: this.value
+}), !0;
+},
+updateAmPm: function(e, t) {
+var n = this.value.getHours();
+return this.is24HrMode || (n += n > 11 ? this.isAm(t.content) ? -12 : 0 : this.isAm(t.content) ? 0 : 12), this.value = this.calcTime(n, this.value.getMinutes()), this.doSelect({
+name: this.name,
+value: this.value
+}), !0;
+},
+calcTime: function(e, t) {
+return new Date(this.value.getFullYear(), this.value.getMonth(), this.value.getDate(), e, t, this.value.getSeconds(), this.value.getMilliseconds());
+},
+isAm: function(e) {
+var t, n, r;
+try {
+t = this._tf.getAmCaption(), n = this._tf.getPmCaption();
+} catch (i) {
+t = "AM", n = "PM";
+}
+return e == t ? !0 : !1;
+},
+refresh: function() {
+this.destroyClientControls(), this.initDefaults(), this.render();
+}
+});
+
 // RadioButton.js
 
 enyo.kind({
@@ -2368,10 +2742,13 @@ create: function() {
 this.inherited(arguments), this.value = Boolean(this.value || this.active), this.onContentChanged(), this.offContentChanged(), this.disabledChanged();
 },
 rendered: function() {
-this.inherited(arguments), this.valueChanged();
+this.inherited(arguments), this.updateVisualState();
+},
+updateVisualState: function() {
+this.addRemoveClass("off", !this.value), this.$.contentOn.setShowing(this.value), this.$.contentOff.setShowing(!this.value), this.setActive(this.value);
 },
 valueChanged: function() {
-this.addRemoveClass("off", !this.value), this.$.contentOn.setShowing(this.value), this.$.contentOff.setShowing(!this.value), this.setActive(this.value), this.doChange({
+this.updateVisualState(), this.doChange({
 value: this.value
 });
 },
@@ -2794,6 +3171,7 @@ onChange: "",
 onChanging: ""
 },
 showStripes: !1,
+showLabels: !1,
 handlers: {
 ondragstart: "dragstart",
 ondrag: "drag",
@@ -2816,7 +3194,13 @@ var e = this.calcPercent(this.beginValue);
 this.updateBarPosition(e);
 },
 initControls: function() {
-this.$.bar.applyStyle("position", "relative"), this.refreshRangeSlider();
+this.$.bar.applyStyle("position", "relative"), this.refreshRangeSlider(), this.showLabels && (this.$.startKnob.createComponent({
+name: "startLabel",
+kind: "onyx.RangeSliderKnobLabel"
+}), this.$.endKnob.createComponent({
+name: "endLabel",
+kind: "onyx.RangeSliderKnobLabel"
+}));
 },
 refreshRangeSlider: function() {
 this.beginValue = this.calcKnobPercent(this.rangeStart), this.endValue = this.calcKnobPercent(this.rangeEnd), this.beginValueChanged(), this.endValueChanged();
@@ -2916,6 +3300,21 @@ this.refreshRangeSlider();
 },
 rangeEndChanged: function() {
 this.refreshRangeSlider();
+},
+setStartLabel: function(e) {
+this.$.startKnob.waterfallDown("onSetLabel", e);
+},
+setEndLabel: function(e) {
+this.$.endKnob.waterfallDown("onSetLabel", e);
+}
+}), enyo.kind({
+name: "onyx.RangeSliderKnobLabel",
+classes: "onyx-range-slider-label",
+handlers: {
+onSetLabel: "setLabel"
+},
+setLabel: function(e, t) {
+this.setContent(t);
 }
 });
 
@@ -2990,6 +3389,7 @@ clientLayoutKind: "FittableColumnsLayout"
 },
 tools: [ {
 name: "client",
+noStretch: !0,
 fit: !0,
 classes: "onyx-toolbar-inline"
 }, {
@@ -3908,27 +4308,38 @@ return typeof object == "undefined";
 
 // String.js
 
-String.prototype.stripHTML = function() {
-return this.replace(/<\S[^><]*>/g, "");
-}, String.prototype.cleanString = function() {
-var e = [ /&/g, /"/g, /</g, />/g, /`/g, /'/g, /\n/g ], t = [ "&amp;", "&quot;", "$lt;", "&gt;", "'", "'", " " ], n = this;
-for (var r = 0; r < e.length; r++) n = n.replace(e[r], t[r]);
-return n;
-}, String.prototype.dirtyString = function() {
-var e = [ /&amp;/g, /&quot;/g, /$lt;/g, /&gt;/g, /&rsquo;/g, /&nbsp;/g ], t = [ "&", '"', "<", ">", "'", " " ], n = this;
-for (var r = 0; r < t.length; r++) n = n.replace(e[r], t[r]);
-return n;
-}, String.prototype.trim = function() {
-return this.replace(/^\s\s*/, "").replace(/\s\s*$/, "");
-}, String.prototype.ucfirst = function() {
-var e = this.charAt(0).toUpperCase();
-return e + this.substr(1);
-}, String.prototype.blank = function() {
-return /^\s*$/.test(this);
-}, String.prototype.isJSON = function() {
-var e = this;
+enyo.singleton({
+name: "GTS.String",
+kind: "enyo.Component",
+published: {
+dirtyItem: [ "&", "<", ">", '"', "`", "'", "\n" ],
+cleanItem: [ "&amp;", "$lt;", "&gt;", "&quot;", "'", "'", " " ]
+},
+stripHTML: function(e) {
+return e.replace(/<\S[^><]*>/g, "");
+},
+cleanString: function(e) {
+for (var t = 0; t < this.dirtyItem.length; t++) e = e.replace(new RegExp(this.dirtyItem[t], "g"), this.cleanItem[t]);
+return e;
+},
+dirtyString: function(e) {
+for (var t = 0; t < this.dirtyItem.length; t++) e = e.replace(new RegExp(this.cleanItem[t], "g"), this.dirtyItem[t]);
+return e;
+},
+trim: function(e) {
+return e.replace(/^\s\s*/, "").replace(/\s\s*$/, "");
+},
+ucfirst: function(e) {
+var t = e.charAt(0).toUpperCase();
+return t + e.substr(1);
+},
+isBlank: function(e) {
+return /^\s*$/.test(e);
+},
+isJSON: function(e) {
 return e.blank() ? !1 : (e = e.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@"), e = e.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]"), e = e.replace(/(?:^|:|,)(?:\s*\[)+/g, ""), /^[\],:{}\s]*$/.test(e));
-};
+}
+});
 
 // gapi.js
 
@@ -3938,13 +4349,28 @@ nextSteps: {},
 published: {
 apiKey: "",
 clientId: "",
-scope: []
+clientSecret: "",
+scope: [],
+gapiConfig: {
+endpoint: "https://accounts.google.com/o/oauth2/auth",
+endtoken: "https://accounts.google.com/o/oauth2/token",
+response_type: "code",
+redirect_uri: "http://localhost",
+accessTokenExpireLimit: 348e4,
+grantTypes: {
+AUTHORIZE: "authorization_code",
+REFRESH: "refresh_token"
+},
+access_type: "offline",
+state: "lligtaskinit"
+}
 },
 events: {
 onReady: ""
 },
 constructor: function() {
 this.inherited(arguments), this._binds = {
+_cbUrlChanged: enyo.bind(this, this.cbUrlChanged),
 _handleAuthResult: enyo.bind(this, this.handleAuthResult)
 };
 },
@@ -3973,11 +4399,93 @@ setAuthToken: function(e) {
 return gapi.auth.setToken(e);
 },
 auth: function(e) {
-this.nextSteps = e, gapi.auth.authorize({
+this.nextSteps = e;
+if (window.device && window.plugins.childBrowser) {
+var t = this.getAuthToken();
+this.log("Phonegap-ChildBrowsers Auth");
+var n = {
+client_id: encodeURIComponent(this.clientId),
+scope: encodeURIComponent(this.scope.join(" ")),
+redirect_uri: encodeURIComponent(this.gapiConfig.redirect_uri),
+response_type: encodeURIComponent(this.gapiConfig.response_type),
+state: encodeURIComponent(this.gapiConfig.state),
+access_type: encodeURIComponent(this.gapiConfig.access_type),
+approval_prompt: "force"
+}, r = this.gapiConfig.endpoint + "?" + Object.keys(n).map(function(e) {
+return e + "=" + n[e];
+}).join("&");
+window.plugins.childBrowser.onClose = function() {}, window.plugins.childBrowser.onLocationChange = this._binds._cbUrlChanged, window.plugins.childBrowser.showWebPage(r, {
+showLocationBar: !1
+});
+} else gapi.auth.authorize({
 client_id: this.clientId,
 scope: this.scope.join(" "),
 immediate: !0
 }, this._binds._handleAuthResult);
+},
+cbUrlChanged: function(e) {
+if (e.indexOf("code=") != -1) {
+this.log("Authenticated");
+var t = this.getParameterByName("code", e);
+enyo.job("refreshFromUrlChange", enyo.bind(this, this.getRefreshToken, t, this.nextSteps), 1e3), window.plugins.childBrowser.close();
+} else if (e.indexOf("error=") != -1) {
+window.plugins.childBrowser.close();
+if (enyo.isFunction(this.nextSteps.onError)) {
+this.nextSteps.onError(this.getParameterByName("error", e));
+return;
+}
+} else this.log("Status unknown: " + e);
+},
+getParameterByName: function(e, t) {
+e = e.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+var n = new RegExp("[\\?&]" + e + "=([^&#]*)"), r = n.exec(t);
+return r == null ? !1 : decodeURIComponent(r[1].replace(/\+/g, " "));
+},
+getAccessToken: function(e) {
+this.log("Update token"), this.nextSteps = {};
+var t = (new Date).getTime(), n = this.getAuthToken();
+if (n && n.access_token && t < n.expires_in + this.gapiConfig.accessTokenExpireLimit) {
+enyo.isFunction(e.onSuccess) && e.onSuccess();
+return;
+}
+this.log("Fetching fresh token");
+var r = new enyo.Ajax({
+url: this.gapiConfig.endtoken,
+method: "POST"
+});
+r.go({
+client_id: this.clientId,
+client_secret: this.clientSecret,
+refresh_token: n.access_token,
+redirect_uri: this.gapiConfig.redirect_uri,
+grant_type: this.gapiConfig.grantTypes.AUTHORIZE
+}), r.response(this, function(t, n) {
+this.log("Access complete");
+var r = {
+access_token: n.access_token
+};
+return this.setAuthToken(r), n.error = !1, enyo.isFunction(e.onSuccess) && e.onSuccess(n), !0;
+}), r.error(this, function(t, n) {
+return this.log("Access error"), enyo.isFunction(e.onError) && (n.error = !0, e.onError(n)), !0;
+});
+},
+getRefreshToken: function(e, t) {
+this.log("Refresh token");
+var n = new enyo.Ajax({
+url: this.gapiConfig.endtoken,
+method: "POST"
+});
+n.go({
+code: e,
+client_id: this.clientId,
+client_secret: this.clientSecret,
+redirect_uri: this.gapiConfig.redirect_uri,
+grant_type: this.gapiConfig.grantTypes.AUTHORIZE
+}), n.response(this, function(e, n) {
+return this.log("Refresh complete"), this.setAuthToken(n), enyo.isFunction(t.onSuccess) && t.onSuccess(n), !0;
+}), n.error(this, function(e, n) {
+return this.log("Refresh error", enyo.json.stringify(n)), enyo.isFunction(t.onError) && (n.error = !0, t.onError(n)), !0;
+});
 },
 handleAuthResult: function(e) {
 this.$.authPop && (this.$.authPop.hide(), this.$.authPop.destroy());
@@ -3993,6 +4501,8 @@ components: [ {
 content: "Authenticate with Google",
 classes: "margin-half-bottom bigger text-center"
 }, {
+classes: "text-center",
+components: [ {
 kind: "onyx.Button",
 content: "Cancel",
 ontap: "handleAuthAbort",
@@ -4004,8 +4514,18 @@ content: "Authenticate",
 onclick: "handleAuthClick",
 classes: "onyx-affirmative"
 } ]
+} ]
 };
 this.createComponent(t), this.render(), this.$.authPop.show();
+var n = this.$.authPop.getComputedStyleValue("zIndex");
+if (!n) {
+var r = this.$.authPop.domCssText.split(";");
+for (var i = 0; i < r.length; i++) if (r[i].match("z-index")) {
+r = r[i].split(":"), n = r[1];
+break;
+}
+}
+this.$.authPop.applyStyle("z-index", n - 5 + 10), this.$.authPop.reflow();
 }
 },
 handleAuthAbort: function() {
@@ -4320,7 +4840,7 @@ handlers: {
 onSelect: "selectionChanged"
 },
 choicesChanged: function() {
-this.destroyClientControls(), enyo.isArray(this.choices) && this.createComponents(this.choices), this.valueChanged(), this.reflow();
+this.destroyClientControls(), enyo.isArray(this.choices) && this.createComponents(this.choices), this.valueChanged(), this.render(), this.reflow();
 },
 valueChanged: function() {
 var e = this.getClientControls(), t;
@@ -5124,7 +5644,8 @@ name: "private.gapi",
 kind: "enyo.Component",
 published: {
 apiKey: "AIzaSyBOKT9NrmlBVx4RFPk2p3c5ee5cHMvs8Lc",
-clientId: "933238428058-smvr0gsdpbpiuo2q59gcll54rau9ivus.apps.googleusercontent.com"
+clientId: "933238428058-smvr0gsdpbpiuo2q59gcll54rau9ivus.apps.googleusercontent.com",
+clientSecret: "mqgBXW7pTj1kUvpGswmD7miK"
 }
 });
 
@@ -5169,7 +5690,7 @@ classes: n
 } ]
 });
 }
-this.$.menu.setChoices(e);
+this.$.menu.setChoices(e), this.valueChanged();
 }
 },
 valueChanged: function() {
@@ -6034,42 +6555,6 @@ var n = s.xmlToJson(t);
 i.onSuccess(e, n);
 }).error(enyo.bind(this, this.generalFailure, i.onError));
 },
-upload_spreadsheet: function(e, t, n) {
-var r = new Ajax.Request("https://docs.google.com/feeds/upload/create-session/default/private/full?convert=false", {
-method: "post",
-contentType: "text/csv",
-"Content-Length": 0,
-postBody: "",
-requestHeaders: {
-"GData-Version": this.version,
-Authorization: this.authKey,
-Slug: e,
-"X-Upload-Content-Type": "text/csv",
-"X-Upload-Content-Length": 0
-},
-timeout: n.timeout,
-onSuccess: n.onSuccess,
-onFailure: this.generalFailure.bind(this, n.onError)
-});
-},
-upload_spreadsheet_2: function(e, t, n, r) {
-this.log("REQUEST RETURNED"), this.log("|" + r + "|");
-},
-upload_file: function(e, t, n) {
-var r = '<?xml version=\'1.0\' encoding=\'UTF-8\'?><entry xmlns="http://www.w3.org/2005/Atom"><category scheme="http://schemas.google.com/g/2005kind" term="http://schemas.google.com/docs/2007spreadsheet"/><title>' + e.cleanString() + "</title>" + "</entry>", i = "--END_OF_PART\r\nContent-Type: application/atom+xml;\r\n\r\n" + r + "\r\n" + "--END_OF_PART\r\n" + "Content-Type: " + "text/csv" + "\r\n\r\n" + t + "\r\n" + "--END_OF_PART--\r\n", s = new Ajax.Request("https://docs.google.com/feeds/documents/private/full", {
-method: "post",
-contentType: "multipart/related; boundary=END_OF_PART",
-postBody: i,
-Slug: e,
-"GData-Version": this.version,
-requestHeaders: {
-Authorization: this.authKey
-},
-timeout: n.timeout,
-onSuccess: n.onSuccess,
-onFailure: this.generalFailure.bind(this, n.onError)
-});
-},
 generalFailure: function(e, t, n) {
 var r = "";
 n && n === "timeout" ? r = "The request timed out. Please check your network connection and try again." : typeof t.responseText != "undefined" ? t.responseText.match("Error=BadAuthentication") ? r = "Did you enter your username and password correctly?" : t.responseText.match("Error=CaptchaRequired") ? r = "Google is requesting that you complete a CAPTCHA Challenge. Please go to <a href='https://www.google.com/accounts/DisplayUnlockCaptcha'>https://www.google.com/accounts/DisplayUnlockCaptcha</a> to complete it." : t.responseText.match("Error=NotVerified") ? r = "The account email address has not been verified. You will need to access your Google account directly to resolve the issue before logging in using a non-Google application." : t.responseText.match("Error=TermsNotAgreed") ? r = "You have not agreed to Google's terms. You will need to access your Google account directly to resolve the issue before logging in using a non-Google application." : t.responseText.match("Error=AccountDeleted") ? r = "The user account has been deleted and is therefore unable to log in." : t.responseText.match("Error=AccountDisabled") ? r = "The user account has been disabled. Please contact Google." : t.responseText.match("Error=ServiceDisabled") ? r = "Your access to the specified service has been disabled. (Your account may still be valid.)" : t.responseText.match("Error=ServiceUnavailable") ? r = "The service is not available; try again later." : t.responseText.match("Error=Unknown") ? r = "Unknown Error. Did you enter your username and password correctly?" : r = "There has been an error: " + t.responseText : r = "An unknown error occurred.", e && typeof e == "function" && e(r);
@@ -6584,11 +7069,11 @@ return e.formatCurrency(2, "$", ".", ",");
 }
 
 function deformatAmount(e) {
-e = e.trim();
+e = GTS.String.trim(e);
 if (!e) return 0;
 if (isNaN(e)) {
 var t = e[0] === "(" && e[e.length - 1] === ")";
-e = e.replace(/[^0-9\s,'".-]*/g, "").trim();
+e = GTS.String.trim(e.replace(/[^0-9\s,'".-]*/g, ""));
 var n = e.length;
 if (n <= 0) return 0;
 var r = 3, i = e.length - 1;
@@ -6656,7 +7141,7 @@ classes: "onyx-menu-divider"
 content: "Import Data",
 ontap: "openImport"
 }, {
-content: "Export Data (NYI)",
+content: "Export Data",
 ontap: "openExport"
 }, {
 showing: !1,
@@ -6677,8 +7162,10 @@ classes: "onyx-menu-divider"
 showing: !1,
 content: "Report Bug (NYI)"
 }, {
+showing: !1,
 classes: "onyx-menu-divider"
 }, {
+showing: !1,
 content: "About",
 ontap: "showPopup",
 popup: "about"
@@ -6689,16 +7176,12 @@ popup: "about"
 name: "mainViews",
 kind: "Panels",
 fit: !0,
-draggable: !0,
+draggable: !1,
 classes: "app-panels",
 arrangerKind: "CollapsingArranger",
 components: [ {
-name: "accounts",
-kind: "Checkbook.accounts.view"
-}, {
-name: "transactions",
-kind: "Checkbook.transactions.view",
-onChanged: "accountBalanceChanged"
+name: "destroyChild",
+content: "I am a dummy component so the panel structure doesn't crash on load."
 } ]
 } ]
 }, {
@@ -6732,18 +7215,22 @@ onmenubutton: "menuHandler",
 onsearchbutton: "searchHandler",
 onkeydown: "keyboardHandler"
 } ],
+appReady: !1,
 paneStack: [],
 rendered: function() {
 this.inherited(arguments), this.$.splash.show(), (enyo.platform.android || enyo.platform.androidChrome) && this.$.menubar.hide();
 },
 keyboardHandler: function(e, t) {
+if (!this.appReady) return;
 if (t.which === 18) return this.menuHandler(t);
 if (t.which === 27) return this.backHandler(t);
 },
 menuHandler: function(e) {
+if (!this.appReady) return;
 return this.paneStack.length <= 0 && this.$.appMenuButton.waterfall("ontap", "ontap", this), !0;
 },
 backHandler: function(e) {
+if (!this.appReady) return;
 if (this.paneStack.length > 0) this.$[this.paneStack[this.paneStack.length - 1]].doFinish(); else if (this.$.mainViews.getIndex() > 0) this.$.mainViews.previous(); else if (enyo.platform.android || enyo.platform.androidChrome) this.createComponent({
 name: "exitConfirmation",
 kind: "gts.ConfirmDialog",
@@ -6763,6 +7250,7 @@ exitConfirmationHandler: function() {
 this.exitConfirmationClose(), this.log("exit app"), navigator.app.exitApp();
 },
 searchHandler: function(e) {
+if (!this.appReady) return;
 return this.log("NYI"), !0;
 },
 splashFinisher: function() {
@@ -6775,7 +7263,15 @@ appAuthFailure: function() {
 this.log("App Auth Failure"), window.close();
 },
 loadCheckbook: function() {
-this.$.container.show(), this.waterfall("onresize", "onresize", this), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, enyo.asyncMethod(this, this.loadCheckbookStage2);
+this.$.destroyChild.destroy(), this.$.mainViews.createComponents([ {
+name: "accounts",
+kind: "Checkbook.accounts.view"
+}, {
+name: "transactions",
+kind: "Checkbook.transactions.view"
+} ], {
+owner: this
+}), this.$.mainViews.render(), this.$.container.show(), this.waterfall("onresize", "onresize", this), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, enyo.asyncMethod(this, this.loadCheckbookStage2);
 },
 loadCheckbookStage2: function() {
 Checkbook.globals.accountManager.fetchDefaultAccount({
@@ -6791,7 +7287,7 @@ account: e
 }
 }) : enyo.Signals.send("viewAccount", {
 account: e
-})), enyo.Signals.send("accountChanged"), (this.notificationType !== !0 || Checkbook.globals.prefs["updateCheckNotification"] != 1) && this.notificationType === !1 && (Checkbook.globals.criticalError.load("Welcome to Checkbook", "If you have any questions, visit <a href='http://glitchtechscience.com' target='_blank'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>glitchtechscience@gmail.com</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png"));
+})), enyo.Signals.send("accountChanged"), (this.notificationType !== !0 || Checkbook.globals.prefs["updateCheckNotification"] != 1) && this.notificationType === !1 && (Checkbook.globals.criticalError.load("Welcome to Checkbook", "If you have any questions, visit <a href='http://glitchtechscience.com' target='_blank'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>glitchtechscience@gmail.com</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png")), this.appReady = !0;
 },
 showPopup: function(e) {
 var t = this.$[e.popup];
@@ -7704,11 +8200,11 @@ this.fullwipeConfirmClose(), this.createComponent({
 name: "wipeProgress",
 kind: "GTS.ProgressDialog",
 animateProgress: !0
-}), this.$.progress.show({
+}), this.$.wipeProgress.show({
 title: "Purging All Data",
 message: "Please wait...",
 progress: 50
-}), Checkbook.globals.gts_db.queries([ "DROP TABLE IF EXISTS budget;", "DROP TABLE IF EXISTS rules;", "DROP TABLE IF EXISTS accounts;", "DROP TABLE IF EXISTS accountCategories;", "DROP TABLE IF EXISTS transactions;", "DROP TABLE IF EXISTS transactionCategories;", "DROP TABLE IF EXISTS transactionSplit;", "DROP TABLE IF EXISTS repeats;", "DROP TABLE IF EXISTS prefs;" ], {
+}), this.$.wipeProgress.reflow(), Checkbook.globals.gts_db.queries([ "DROP TABLE IF EXISTS budget;", "DROP TABLE IF EXISTS rules;", "DROP TABLE IF EXISTS accounts;", "DROP TABLE IF EXISTS accountCategories;", "DROP TABLE IF EXISTS transactions;", "DROP TABLE IF EXISTS transactionCategories;", "DROP TABLE IF EXISTS transactionSplit;", "DROP TABLE IF EXISTS repeats;", "DROP TABLE IF EXISTS prefs;" ], {
 onSuccess: enyo.bind(this, this.deleteEverythingDone)
 });
 },
@@ -7726,7 +8222,7 @@ classes: "enyo-fit",
 style: "height: 100%;",
 allSheetsList: [],
 importItems: [],
-standardLimit: 100,
+standardLimit: 1e3,
 events: {
 onFinish: ""
 },
@@ -7756,8 +8252,9 @@ style: "height: 100%;",
 components: [ {
 classes: "padding-std smaller",
 allowHtml: !0,
-content: "<p>To import your finances into this program you must have a Google Drive account. <br /><a href='http://drive.google.com/' target='_blank'>Sign up here</a></p><p>Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten. <span style='color:#cc0000;'>The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note.</span></p>"
+content: "<p>To import your finances into this program you must have a Google Drive account. <br />Visit drive.google.com to sign up.</p><p>Upload or create a spreadsheet with all the information to import. Once that is complete, tap 'Continue', select your spreadsheet, then the system will import your data. Existing data may be overwritten. <span style='color:#cc0000;'>The first row of the spreadsheet must have the following columns: account, accountCat, date, amount, description, cleared, note.</span></p><p><strong>Warning:</strong> Larger spreadsheets will take much longer to download.</p>"
 }, {
+name: "saveCredentialsWrapper",
 layoutKind: "enyo.FittableColumnsLayout",
 noStretch: !0,
 classes: "padding-std text-middle",
@@ -7892,12 +8389,16 @@ decryptGapiData: function(e) {
 this.$.progress.setProgress(90), e.length > 0 ? (this.$.saveCredentials.setValue(e[0].saveGSheetsData), this.$.cryptoSystem.decryptString(e[0].gSheetPass, enyo.bind(this, this.loadGapiData))) : this.loadGapiData("");
 },
 loadGapiData: function(e) {
-this.$.gapi.setApiKey(this.$.gapiAccess.getApiKey()), this.$.gapi.setClientId(this.$.gapiAccess.getClientId()), this.$.gapi.setAuthToken(enyo.json.parse(e)), this.$.instructionsButton.setDisabled(!1), this.$.progress.hide();
+this.$.gapi.setApiKey(this.$.gapiAccess.getApiKey()), this.$.gapi.setClientId(this.$.gapiAccess.getClientId()), this.$.gapi.setClientSecret(this.$.gapiAccess.getClientSecret()), this.$.saveCredentialsWrapper.hide(), this.$.gapi.setAuthToken(enyo.json.parse(e)), this.$.instructionsButton.setDisabled(!1), this.$.progress.hide();
 },
 authenticateWithGoogle: function() {
-this.$.gapi.setScope([ "https://www.googleapis.com/auth/drive", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ]), this.$.gapi.auth({
+this.$.gapi.setScope([ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ]), this.$.gapi.auth({
 onSuccess: enyo.bind(this, this.userAuthenticated),
 onError: enyo.bind(this, this.userNotAuthenticated)
+}), this.$.progress.show({
+title: "Import Progress",
+message: "Authenticating...",
+progress: 5
 });
 },
 userNotAuthenticated: function() {
@@ -7983,9 +8484,7 @@ return;
 }
 this.documentIndex = 0, this.errorCount = 0;
 try {
-enyo.windows.setWindowProperties(window, {
-blockScreenTimeout: !0
-}), this.log("Window: blockScreenTimeout: true");
+enyo.windows.blockScreenTimeout(!0), this.log("Window: blockScreenTimeout: true");
 } catch (t) {
 this.log("Window Error (Start)", t);
 }
@@ -8095,7 +8594,7 @@ n.cleared = this.getNode(t[r], "gsx:cleared").toLowerCase(), n["cleared"] == 0 |
 category: "",
 category2: "",
 amount: ""
-} ] : n.category.isJSON() ? n.category = enyo.json.parse(n.category) : n.category = [ {
+} ] : GTS.String.isJSON(n.category) ? n.category = enyo.json.parse(n.category) : n.category = [ {
 category: n.category.split("|", 2)[0],
 category2: n.category.split("|", 2)[1],
 amount: ""
@@ -8106,10 +8605,10 @@ this.updateDocDownloadProgress(t.length), this.importItems[this.documentIndex].l
 },
 updateDocDownloadProgress: function(e) {
 var t = (e + this.importItems[this.documentIndex].offset) / this.importItems[this.documentIndex].totalResults, n = ((t > 1 ? 1 : t) + this.pageIndex) / this.importItems[this.documentIndex].pages.length, r = (n / 2 + this.documentIndex) / this.importItems.length * 100;
-this.$.progress.setMessage(this.importItems[this.documentIndex].name + "<br />Downloading: " + (new Number(isNaN(n) ? 0 : n)).toFixed(1) + "%"), isNaN(r) || this.$.progress.setProgress(r);
+this.$.progress.setMessage(this.importItems[this.documentIndex].name + "<br />Downloading: " + (new Number(isNaN(n) ? 0 : n * 100)).toFixed(1) + "%"), isNaN(r) || this.$.progress.setProgress(r);
 },
 getNode: function(e, t) {
-return typeof e == "undefined" || typeof e[t] == "undefined" || typeof e[t]["#text"] == "undefined" ? "" : e[t]["#text"].trim();
+return typeof e == "undefined" || typeof e[t] == "undefined" || typeof e[t]["#text"] == "undefined" ? "" : GTS.String.trim(e[t]["#text"]);
 },
 nextDocumentPage: function() {
 this.pageIndex++, this.pageIndex < this.importItems[this.documentIndex].pages.length ? this.downloadDocData(1, this.standardLimit) : this.newAccounts.length > 0 ? this.insertNewAccounts() : this.saveDocData(0, this.standardLimit / 2);
@@ -8158,13 +8657,11 @@ this.$.errorMessage.hide(), this.onErrorClose();
 },
 closeImport: function(e) {
 try {
-enyo.windows.setWindowProperties(window, {
-blockScreenTimeout: !1
-}), this.log("Window: blockScreenTimeout: false");
+enyo.windows.blockScreenTimeout(!1), this.log("Window: blockScreenTimeout: false");
 } catch (t) {
 this.log("Window Error (End)", t);
 }
-this.$.instructionsButton.setDisabled(!1), this.$.instructions.show(), this.$.sheetList.hide(), this.$.errorMessage.hide(), this.$.progress.hide(), this.doFinish({
+this.$.instructionsButton.setDisabled(!1), this.$.instructionsBar.show(), this.$.sheetListBar.hide(), this.$.instructions.show(), this.$.sheetList.hide(), this.$.errorMessage.hide(), this.$.progress.hide(), this.doFinish({
 success: e
 });
 }
@@ -8174,262 +8671,224 @@ success: e
 
 enyo.kind({
 name: "Checkbook.export",
-className: "light",
+kind: "FittableRows",
+classes: "enyo-fit",
 style: "height: 100%;",
 acctList: [],
 events: {
 onFinish: ""
 },
 components: [ {
-kind: enyo.PageHeader,
-layoutKind: enyo.HFlexLayout,
-pack: "center",
-className: "enyo-header-dark",
+kind: "onyx.Toolbar",
+classes: "text-center",
+style: "position: relative;",
 components: [ {
-kind: enyo.Spacer,
-flex: 1
-}, {
 content: "Export System",
-className: "bigger",
-style: "margin-right: -32px;"
+classes: "bigger"
 }, {
-kind: enyo.Spacer,
-flex: 1
-}, {
-kind: enyo.ToolButton,
-icon: "assets/menu_icons/close.png",
-className: "img-icon",
-ontap: "closeExport"
+kind: "onyx.Button",
+ontap: "closeExport",
+content: "x",
+classes: "onyx-negative",
+style: "position: absolute; right: 15px;"
 } ]
 }, {
-kind: enyo.Scroller,
-flex: 1,
+kind: "enyo.Scroller",
+horizontal: "hidden",
+classes: "tardis-blue",
+fit: !0,
 components: [ {
-name: "credentials",
-className: "light narrow-column",
-flex: 1,
+name: "instructions",
+classes: "light narrow-column padding-half-top",
+style: "height: 100%;",
 components: [ {
-kind: enyo.RowGroup,
-caption: "Google Credentials",
-components: [ {
-name: "gUser",
-kind: enyo.Input,
-hint: "Google Username",
-inputType: "email",
-components: [ {
-content: "Username",
-className: "small",
-style: "color: rgb( 32, 117, 191 );"
-} ]
-}, {
-name: "gPassWrapper",
-components: [ {
-name: "gPass",
-kind: enyo.PasswordInput,
-hint: "Account Password",
-components: [ {
-content: "Password",
-className: "small",
-style: "color: rgb( 32, 117, 191 );"
-} ]
-} ]
-} ]
-}, {
-content: "Enter your Google Spreadsheets credentials to export your financial data to <a href='http://docs.google.com/'>Google Documents</a> from your device.",
+classes: "padding-std smaller",
 allowHtml: !0,
-className: "smallest",
-style: "padding: 0.5em 0.5em 0 0.5em;"
+content: "<p>To export your finances from this program you must have a Google Drive account. <br />Visit drive.google.com to sign up.</p><p><strong>Warning:</strong> Larger spreadsheets will take much longer to upload.</p>"
 }, {
-layoutKind: enyo.HFlexLayout,
-style: "padding: 0.5em 0.5em 0.5em 0.5em;",
+name: "saveCredentialsWrapper",
+layoutKind: "enyo.FittableColumnsLayout",
+noStretch: !0,
+classes: "padding-std text-middle",
 components: [ {
 name: "saveCredentials",
-kind: enyo.CheckBox,
-checked: !0,
-style: "margin-right: 10px;"
+kind: "onyx.Checkbox",
+value: !0,
+classes: "margin-right"
 }, {
 content: "Save credentials",
-flex: 1
-}, {
-name: "showPass",
-kind: enyo.ToggleButton,
-state: !1,
-onLabel: "Show password",
-offLabel: "Mask password",
-onChange: "togglePasswordVis",
-style: "margin-left: 10px;"
+fit: !0
 } ]
 } ]
 }, {
 showing: !1,
 name: "accountList",
-className: "light narrow-column",
-flex: 1,
+kind: "Repeater",
+classes: "light narrow-column padding-half-top",
+onSetupItem: "setupRow",
 components: [ {
-name: "accounts",
-kind: enyo.VirtualRepeater,
-flex: 1,
-onSetupRow: "setupRow",
-components: [ {
-kind: enyo.Item,
-layoutKind: enyo.HFlexLayout,
+kind: "onyx.Item",
 tapHighlight: !0,
 ontap: "accountSelectedChanged",
+classes: "bordered text-middle",
+components: [ {
+name: "accountSelected",
+kind: "onyx.Checkbox",
+value: !1,
+disabled: !0,
+classes: "margin-half-right"
+}, {
+classes: "inline",
 components: [ {
 name: "icon",
-kind: enyo.Image,
-className: "accountIcon"
+kind: "enyo.Image",
+classes: "accountIcon"
 }, {
 name: "iconLock",
-kind: enyo.Image,
+kind: "enyo.Image",
 src: "assets/padlock_1.png",
-className: "accountLockIcon unlocked"
+classes: "accountLockIcon unlocked"
+} ]
 }, {
-flex: 1,
+classes: "margin-half-left inline",
 components: [ {
 name: "accountName"
 }, {
 name: "accountNote",
-className: "smaller"
-} ]
-}, {
-name: "accountSelected",
-kind: enyo.CheckBox,
-style: "margin-right: 10px;"
+classes: "smaller"
 } ]
 } ]
 } ]
 } ]
 }, {
-name: "credentialsBar",
-kind: enyo.Toolbar,
+name: "instructionsBar",
+kind: "onyx.Toolbar",
+classes: "text-center",
 components: [ {
-kind: enyo.Spacer,
-flex: 1
-}, {
-name: "credentialsButton",
+name: "instructionsButton",
 kind: "onyx.Button",
-content: "Sign In",
+content: "Authenticate",
 ontap: "authenticateWithGoogle",
-className: "onyx-affirmative deep-green",
+classes: "onyx-affirmative",
 style: "min-width: 150px;"
-}, {
-kind: enyo.Spacer,
-flex: 1
 } ]
 }, {
-name: "accountListBar",
 showing: !1,
-kind: enyo.Toolbar,
+name: "accountListBar",
+kind: "onyx.Toolbar",
+classes: "text-center",
 components: [ {
-kind: enyo.Spacer,
-flex: 8
-}, {
 name: "accountListButton",
 kind: "onyx.Button",
-caption: "Export Accounts",
+content: "Export Accounts",
 ontap: "beginExportProcess",
-className: "onyx-affirmative deep-green",
+classes: "onyx-affirmative deep-green",
 style: "min-width: 150px;"
 }, {
-kind: enyo.Spacer,
-flex: 1
-}, {
-name: "accountListSelectButton",
+kind: "onyx.MenuDecorator",
+onSelect: "menuItemClick",
+components: [ {
 kind: "onyx.Button",
-caption: "Select...",
-ontap: "accountListSelectOptions"
-}, {
-kind: enyo.Spacer,
-flex: 8
+components: [ {
+content: "Select..."
 } ]
 }, {
-name: "selectMenu",
-kind: enyo.Menu,
+kind: "onyx.Menu",
+showOnTop: !0,
+floating: !0,
 components: [ {
-caption: "All",
+content: "All",
 value: 1
 }, {
-caption: "None",
+content: "None",
 value: 2
 }, {
-caption: "Invert",
+content: "Invert",
 value: 3
+} ]
+} ]
 } ]
 }, {
 name: "progress",
-kind: "GTS.progress",
-title: "",
-message: "",
-progress: ""
+kind: "GTS.ProgressDialog",
+animateProgress: !0,
+onCancel: "closeExport",
+cancelText: "Cancel"
 }, {
 name: "errorMessage",
-kind: "GTS.system_error",
+kind: "Checkbook.systemError",
 errTitle: "Export Error",
-errMessage: "",
-errMessage2: "",
+mainMessage: "",
+secondaryMessage: "",
 onFinish: "closeErrorMessage"
 }, {
-name: "gDataControls",
-kind: "GTS.gdata"
+name: "gapi",
+kind: "GTS.Gapi",
+onReady: "gapiReady"
+}, {
+name: "gapiAccess",
+kind: "private.gapi"
 }, {
 name: "cryptoSystem",
 kind: "Checkbook.encryption"
 } ],
 rendered: function() {
-this.inherited(arguments), this.log(), this.prepareCredentials(), Checkbook.globals.gts_db.query("SELECT saveGSheetsData, gSheetUser, gSheetPass FROM prefs LIMIT 1;", {
-onSuccess: enyo.bind(this, this.fetchUserGData)
+this.inherited(arguments), this.$.instructions.show(), this.$.instructionsBar.show(), this.$.instructionsButton.setDisabled(!0), this.$.accountList.hide(), this.$.accountListBar.hide(), this.$.progress.show({
+title: "Export Progress",
+message: "Linking to Google...",
+progress: 25
+}), this.refreshLayout();
+},
+refreshLayout: function() {
+this.waterfall("onresize", "onresize", this);
+},
+gapiReady: function() {
+this.$.progress.setProgress(60), Checkbook.globals.gts_db.query("SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;", {
+onSuccess: enyo.bind(this, this.decryptGapiData)
 });
 },
-prepareCredentials: function() {
-this.log(), this.$.credentialsButton.setDisabled(!1), this.$.credentialsBar.show(), this.$.accountListBar.hide(), this.$.credentials.show(), this.$.accountList.hide(), this.resized();
+decryptGapiData: function(e) {
+this.$.progress.setProgress(90), e.length > 0 ? (this.$.saveCredentials.setValue(e[0].saveGSheetsData), this.$.cryptoSystem.decryptString(e[0].gSheetPass, enyo.bind(this, this.loadGapiData))) : this.loadGapiData("");
 },
-fetchUserGData: function(e) {
-e.length > 0 && this.$.cryptoSystem.decryptString(e[0].gSheetPass, enyo.bind(this, this.setUserGData, e[0].gSheetUser, e[0].saveGSheetsData === 1));
-},
-setUserGData: function(e, t, n) {
-this.$.gUser.setValue(e), this.$.gPass.setValue(n), this.$.saveCredentials.setChecked(t), this.$.showPass.setDisabled(t), this.$.gUser.forceFocus();
-},
-togglePasswordVis: function(e, t) {
-var n = this.$.gPass.getValue();
-this.$.gPass.destroy(), this.$.gPassWrapper.createComponent({
-name: "gPass",
-kind: t ? enyo.Input : enyo.PasswordInput,
-hint: "Account Password",
-components: [ {
-content: "Password",
-className: "small",
-style: "color: rgb( 32, 117, 191 );"
-} ]
-}, {
-owner: this
-}), this.$.gPassWrapper.render(), this.$.gPass.setValue(n);
+loadGapiData: function(e) {
+this.$.gapi.setApiKey(this.$.gapiAccess.getApiKey()), this.$.gapi.setClientId(this.$.gapiAccess.getClientId()), this.$.gapi.setClientSecret(this.$.gapiAccess.getClientSecret()), this.$.saveCredentialsWrapper.hide(), this.$.gapi.setAuthToken(enyo.json.parse(e)), this.$.instructionsButton.setDisabled(!1), this.$.progress.hide();
 },
 authenticateWithGoogle: function() {
-this.log(), this.$.credentialsButton.setDisabled(!0), this.$.progress.load("Authenticating", "Trying to authenticate credentials", 25), this.$.gDataControls.gdata_authenticate(this.$.gUser.getValue(), this.$.gPass.getValue(), "writely", {
-onSuccess: enyo.bind(this, this.authenticationSuccessful),
-onError: enyo.bind(this, this.showErrorMessage, enyo.bind(this, this.prepareCredentials)),
-timeout: 15
+this.$.gapi.setScope([ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ]), this.$.gapi.auth({
+onSuccess: enyo.bind(this, this.userAuthenticated),
+onError: enyo.bind(this, this.userNotAuthenticated)
+}), this.$.progress.show({
+title: "Export Progress",
+message: "Authenticating...",
+progress: 5
 });
 },
-authenticationSuccessful: function() {
-this.$.progress.setProgress(35), this.$.saveCredentials.getChecked() ? this.$.cryptoSystem.encryptString(this.$.gPass.getValue(), enyo.bind(this, this.saveUserGData)) : this.saveUserGData("");
+userNotAuthenticated: function() {
+this.closeExport();
+},
+userAuthenticated: function() {
+this.$.progress.show({
+title: "Export Progress",
+message: "Authenticated...",
+progress: 15
+}), this.$.saveCredentials.getValue() ? this.$.cryptoSystem.encryptString(enyo.json.stringify(this.$.gapi.getAuthToken()), enyo.bind(this, this.saveUserGData)) : this.saveUserGData(""), this.fetchAccounts();
 },
 saveUserGData: function(e) {
-this.$.progress.setProgress(40);
-var t = null;
-!this.$.saveCredentials.getChecked() || e.length <= 0 ? t = {
+var t = {
 saveGSheetsData: 0,
-gSheetUser: "",
 gSheetPass: ""
-} : t = {
-saveGSheetsData: this.$.saveCredentials.getChecked() ? 1 : 0,
-gSheetUser: this.$.gUser.getValue(),
+};
+this.$.saveCredentials.getValue() && e.length > 0 && (t = {
+saveGSheetsData: this.$.saveCredentials.getValue() ? 1 : 0,
 gSheetPass: e
-}, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", t, {})), this.fetchAccounts();
+}), Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", t, {}));
 },
 fetchAccounts: function() {
-this.$.progress.setMessage("Retrieving accounts..."), this.$.progress.setProgress(50), Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("accounts", [ "acctId", "acctName", "acctCategory", "acctLocked", "lockedCode", "IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = acctCategory ), 'icon_2.png' ) AS acctCategoryIcon", "( SELECT accountCategories.catOrder FROM accountCategories WHERE accountCategories.name = acctCategory ) AS acctCatOrder", "IFNULL( ( SELECT COUNT( transactions.amount ) FROM transactions WHERE transactions.account = acctId ), 0 ) AS itemCount" ], null, [ "acctCatOrder", "acctName" ]), {
+this.$.progress.show({
+title: "Export Progress",
+message: "Retrieving accounts...",
+progress: 50
+}), Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("accounts", [ "acctId", "acctName", "acctCategory", "acctLocked", "lockedCode", "IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = acctCategory ), 'icon_2.png' ) AS acctCategoryIcon", "( SELECT accountCategories.catOrder FROM accountCategories WHERE accountCategories.name = acctCategory ) AS acctCatOrder", "IFNULL( ( SELECT COUNT( transactions.amount ) FROM transactions WHERE transactions.account = acctId ), 0 ) AS itemCount" ], null, [ "acctCatOrder", "acctName" ]), {
 onSuccess: enyo.bind(this, this.renderAccountList)
 });
 },
@@ -8449,44 +8908,49 @@ bypass: !1,
 selectStatus: n["acctLocked"] != 1
 });
 }
-this.acctList.length <= 0 ? (this.$.progress.close(), this.showErrorMessage(enyo.bind(this, this.closeExport), "No data available to be exported.")) : this.showAccountList();
+this.acctList.length <= 0 ? (this.$.progress.hide(), this.showErrorMessage(enyo.bind(this, this.closeExport), "No data available to be exported.")) : this.showAccountList();
 },
 showAccountList: function() {
-this.$.progress.setMessage("Processing accounts..."), this.$.progress.setProgress(75), this.$.accounts.render(), this.$.accountListButton.setDisabled(!1), this.$.credentialsBar.hide(), this.$.accountListBar.show(), this.$.credentials.hide(), this.$.accountList.show(), this.resized(), this.$.progress.close();
+this.$.progress.setMessage("Processing accounts..."), this.$.progress.setProgress(75), this.$.instructionsBar.hide(), this.$.instructions.hide(), this.$.accountListButton.setDisabled(!1), this.$.accountListBar.show(), this.$.accountList.show(), this.$.accountList.setCount(this.acctList.length), this.refreshLayout(), this.$.progress.hide();
 },
 setupRow: function(e, t) {
-var n = this.acctList[t];
-if (n) return this.$.accountName.setContent(n.name), this.$.accountNote.setContent(n.itemCount + " " + "Transaction" + (n.itemCount > 1 ? "s" : "")), this.$.icon.setSrc("assets/" + n.icon), this.$.iconLock.addRemoveClass("unlocked", n.acctLocked !== 1 || n.bypass), this.$.accountSelected.setChecked(n.selectStatus), !0;
+var n = t.index, r = t.item, i = this.acctList[n];
+if (i) return r.$.accountName.setContent(i.name), r.$.accountNote.setContent(i.itemCount + " " + "Transaction" + (i.itemCount > 1 ? "s" : "")), r.$.icon.setSrc("assets/" + i.icon), r.$.iconLock.addRemoveClass("unlocked", i.acctLocked !== 1 || i.bypass), r.$.accountSelected.setChecked(i.selectStatus), !0;
 },
 accountSelectedChanged: function(e, t) {
-this.acctList[t.rowIndex].acctLocked && !this.acctList[t.rowIndex].bypass ? Checkbook.globals.security.authUser(this.acctList[t.rowIndex].name + " " + "PIN Code", this.acctList[t.rowIndex].lockedCode, {
-onSuccess: enyo.bind(this, this.authSuccessful, t.rowIndex)
-}) : this.acctList[t.rowIndex].selectStatus = !this.acctList[t.rowIndex].selectStatus, this.$.accounts.render();
+this.acctList[t.index].acctLocked && !this.acctList[t.index].bypass ? Checkbook.globals.security.authUser(this.acctList[t.index].name + " " + "PIN Code", this.acctList[t.index].lockedCode, {
+onSuccess: enyo.bind(this, this.authSuccessful, t.index)
+}) : this.acctList[t.index].selectStatus = !this.acctList[t.index].selectStatus, this.$.accountList.renderRow(t.index);
 },
 authSuccessful: function(e) {
-this.acctList[e].bypass = !0, this.acctList[e].selectStatus = !0, this.$.accounts.render();
+this.acctList[e].bypass = !0, this.acctList[e].selectStatus = !0, this.$.accountList.renderRow(e);
 },
-accountListSelectOptions: function(e) {
-this.$.selectMenu.openAtControl(e);
-},
-menuItemClick: function(e) {
-if (e.value === 1) for (var t = 0; t < this.acctList.length; t++) this.acctList[t].selectStatus = !0; else if (e.value === 2) for (var t = 0; t < this.acctList.length; t++) this.acctList[t].selectStatus = !1; else if (e.value === 3) for (var t = 0; t < this.acctList.length; t++) this.acctList[t].selectStatus = !this.acctList[t].selectStatus;
-this.$.accounts.render();
+menuItemClick: function(e, t) {
+if (t.selected.value === 1) {
+for (var n = 0; n < this.acctList.length; n++) if (!this.acctList[n].acctLocked || this.acctList[n].bypass) this.acctList[n].selectStatus = !0;
+} else if (t.selected.value === 2) for (var n = 0; n < this.acctList.length; n++) this.acctList[n].selectStatus = !1; else if (t.selected.value === 3) for (var n = 0; n < this.acctList.length; n++) if (!this.acctList[n].acctLocked || this.acctList[n].bypass) this.acctList[n].selectStatus = !this.acctList[n].selectStatus;
+this.$.accountList.setCount(this.acctList.length);
 },
 beginExportProcess: function() {
-this.$.progress.load("Exporting", "Preparing data", 0), this.$.accountListButton.setDisabled(!0);
-try {
-enyo.windows.setWindowProperties(window, {
-blockScreenTimeout: !0
-});
-} catch (e) {
-this.log("Window Error (Start)", e);
+this.$.progress.show({
+title: "Exporting",
+message: "Preparing data...",
+progress: 0
+}), this.$.accountListButton.setDisabled(!0);
+var e = [];
+for (var t = 0; t < this.acctList.length; t++) this.acctList[t].selectStatus === !0 && e.push(enyo.mixin({
+index: t
+}, this.acctList[t]));
+if (e.length <= 0) {
+this.showErrorMessage(enyo.bind(this, this.closeExport), "Export complete.");
+return;
 }
-var t = [];
-for (var n = 0; n < this.acctList.length; n++) this.acctList[n].selectStatus === !0 && t.push(enyo.mixin({
-index: n
-}, this.acctList[n]));
-t.length <= 0 ? (this.$.progress.close(), this.$.errorMessage.setErrTitle("Export Complete"), this.showErrorMessage(enyo.bind(this, this.closeExport), "Nothing to export.")) : this.startNewSheet(t, 0);
+try {
+enyo.windows.blockScreenTimeout(!0), this.log("Window: blockScreenTimeout: true");
+} catch (n) {
+this.log("Window Error (Start)", n);
+}
+this.startNewSheet(e, 0);
 },
 startNewSheet: function(e, t) {
 this.$.progress.setTitle("Exporting " + e[t].name), this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Retrieving transactions"), this.$.progress.setProgress((t + 1) * 1 / 4 / e.length * 100), Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("transactions", [ "itemId", "linkedRecord", "amount", "checkNum", "cleared", "date", "desc", "note", ' ( CASE WHEN category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE category END ) AS category', " ( CASE WHEN category = '||~SPLIT~||' THEN 'PARSE_CATEGORY' ELSE category2 END ) AS category2", "IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountName", "IFNULL( ( SELECT accounts.acctCategory FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountCat", "IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.linkedAccount ), '' ) AS linkedAccountName", "IFNULL( ( SELECT accounts.acctCategory FROM accounts WHERE accounts.acctId = transactions.linkedAccount ), '' ) AS linkedAccountCat" ], {
@@ -8509,41 +8973,54 @@ var o = 0;
 n + r < s.length ? o = n + r : o = s.length, this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Processing account"), this.$.progress.setProgress((t + 1) * (2 + o / s.length) / 4 / e.length * 100);
 for (var u = n; u < o; u++) {
 var a = s[u];
-i.csv += '"' + a.accountName.cleanString() + '",' + '"' + a.accountCat.cleanString() + '",' + "\"'" + (new Date(parseInt(a.date))).format("special") + '",' + '"' + formatAmount(a.amount) + '",' + '"' + a.desc.cleanString() + '",' + '"' + (a["cleared"] == 1 ? "Yes" : "No") + '",' + '"' + a.checkNum.cleanString() + '",' + '"' + a.note.cleanString() + '",' + '"' + a.itemId + '",' + '"' + enyo.json.stringify(Checkbook.globals.transactionManager.parseCategoryDB(a.category, a.category2)).replace(/"/g, '""') + '",' + '"' + a.linkedRecord + '",' + '"' + a.linkedAccountName.cleanString() + '",' + '"' + a.linkedAccountCat.cleanString() + '"\n';
+i.csv += '"' + GTS.String.cleanString(a.accountName) + '",' + '"' + GTS.String.cleanString(a.accountCat) + '",' + "\"'" + (new Date(parseInt(a.date))).format("special") + '",' + '"' + formatAmount(a.amount) + '",' + '"' + GTS.String.cleanString(a.desc) + '",' + '"' + (a["cleared"] == 1 ? "Yes" : "No") + '",' + '"' + GTS.String.cleanString(a.checkNum) + '",' + '"' + GTS.String.cleanString(a.note) + '",' + '"' + a.itemId + '",' + '"' + enyo.json.stringify(Checkbook.globals.transactionManager.parseCategoryDB(a.category, a.category2)).replace(/"/g, '""') + '",' + '"' + a.linkedRecord + '",' + '"' + GTS.String.cleanString(a.linkedAccountName) + '",' + '"' + GTS.String.cleanString(a.linkedAccountCat) + '"\n';
 }
 o < s.length ? enyo.asyncMethod(this, this.buildSheetContent, e, t, o, r, i, s) : this.uploadSheet(e, t, i);
 },
 uploadSheet: function(e, t, n) {
 this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Uploading data"), this.$.progress.setProgress((t + 1) * 3 / 4 / e.length * 100);
-var r = "[Checkbook HD] " + n.accountName + " [" + n.accountCategory + "] [" + Date.format({
-date: "short",
-time: ""
-}) + "]";
-this.$.gDataControls.gdata_upload_file(r, n.csv, {
-onSuccess: enyo.bind(this, this.sheetComplete, e, t),
-onError: enyo.bind(this, this.showErrorMessage, enyo.bind(this, this.showAccountList)),
-timeout: 60
+const r = "----END_OF_PART----", i = "\r\n--" + r + "\r\n", s = "\r\n--" + r + "--", o = "text/csv";
+var u = new Date, a = "[Checkbook GUTOC] " + n.accountName + " [" + n.accountCategory + "] [" + u.format({
+date: "longDate",
+time: "shortTime"
+}) + "]", f = {
+title: a.cleanString(),
+mimeType: o
+}, l = i + "Content-Type: application/json\r\n\r\n" + JSON.stringify(f) + i + "Content-Type: " + o + "\r\n" + "\r\n" + n.csv + s, c = gapi.client.request({
+path: "/upload/drive/v2/files?convert=true",
+method: "POST",
+params: {
+uploadType: "multipart"
+},
+headers: {
+"Content-Type": 'multipart/mixed; boundary="' + r + '"'
+},
+body: l
 });
+c.execute(enyo.bind(this, this.requestComplete, e, t));
+},
+requestComplete: function(e, t, n) {
+if (!n.error) this.sheetComplete(e, t); else {
+var r = "Code: " + n.error.code + "<br />" + "Message" + n.error.message;
+this.showErrorMessage(this.showAccountList, r);
+}
 },
 sheetComplete: function(e, t) {
-this.$.progress.setMessage("Account uploaded"), this.$.progress.setProgress((t + 1) * 4 / 4 / e.length * 100), t++, t < e.length ? this.startNewSheet(e, t) : (this.$.progress.close(), this.$.errorMessage.setErrTitle("Export Complete"), this.showErrorMessage(enyo.bind(this, this.closeExport), e.length + " account" + (e.length > 1 ? "s" : "") + " exported."));
+this.$.progress.setMessage("Account uploaded"), this.$.progress.setProgress((t + 1) * 4 / 4 / e.length * 100), t++, t < e.length ? this.startNewSheet(e, t) : (this.$.progress.hide(), this.$.errorMessage.setErrTitle("Export Complete"), this.showErrorMessage(enyo.bind(this, this.closeExport), e.length + " account" + (e.length > 1 ? "s" : "") + " exported."));
 },
 closeExport: function() {
-this.$.credentialsButton.setDisabled(!1), this.$.credentials.show(), this.$.accountList.hide();
 try {
-enyo.windows.setWindowProperties(window, {
-blockScreenTimeout: !1
-});
+enyo.windows.blockScreenTimeout(!1), this.log("Window: blockScreenTimeout: false");
 } catch (e) {
 this.log("Window Error (End)", e);
 }
-this.doFinish();
+this.$.instructions.show(), this.$.instructionsBar.show(), this.$.instructionsButton.setDisabled(!1), this.$.accountList.hide(), this.$.accountListBar.hide(), this.$.errorMessage.hide(), this.$.progress.hide(), this.doFinish();
 },
 showErrorMessage: function(e, t) {
-this.onErrorClose = e, this.$.progress.close(), this.$.errorMessage.setErrMessage(t), this.$.errorMessage.openAtCenter();
+this.onErrorClose = e, this.$.progress.hide(), this.$.errorMessage.show(), this.$.errorMessage.setMainMessage(t);
 },
 closeErrorMessage: function() {
-this.$.errorMessage.close(), this.onErrorClose();
+this.$.errorMessage.hide(), this.onErrorClose();
 }
 });
 
@@ -8565,10 +9042,12 @@ miniicon: "assets/icon_1_32x32.png"
 enyo.kind({
 name: "Checkbook.about",
 kind: "onyx.Popup",
+classes: "small-popup",
 centered: !0,
 floating: !0,
 scrim: !0,
 scrimclasses: "onyx-scrim-translucent",
+autoDismiss: !0,
 events: {
 onFinish: ""
 },
@@ -8652,7 +9131,13 @@ allowHtml: !0
 content: appInfo.copyright,
 allowHtml: !0,
 classes: "smaller margin-top"
-} ]
+}, {
+kind: "Signals",
+onbackbutton: "backPopupHandler"
+} ],
+backPopupHandler: function(e) {
+return this.doFinish(), !0;
+}
 });
 
 // manager.js
@@ -8782,7 +9267,7 @@ values: [ r, n, r, n, e ]
 });
 Checkbook.globals.gts_db.query(i, {
 onSuccess: function(e) {
-enyo.isFunction(t.onSuccess) && t.onSuccess(e[0]);
+enyo.isFunction(t.onSuccess) && (e = e[0], e.balance0 = Math.round(e.balance0 * 100) / 100, e.balance1 = Math.round(e.balance1 * 100) / 100, e.balance2 = Math.round(e.balance2 * 100) / 100, e.balance3 = Math.round(e.balance3 * 100) / 100, t.onSuccess(e));
 },
 onError: t.onError
 });
@@ -8957,7 +9442,8 @@ style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; mar
 }, {
 kind: "Signals",
 accountChanged: "renderAccountList",
-balanceChanged: "refresh"
+balanceChanged: "refresh",
+accountBalanceChanged: "accountBalanceChanged"
 } ],
 rendered: function() {
 this.log(), this.inherited(arguments);
@@ -8978,6 +9464,42 @@ this.log(), this.refresh();
 },
 refresh: function() {
 this.log(), this.$.entries.setCount(this.accounts.length);
+},
+renderRow: function(e) {
+typeof e != "undefined" && !isNaN(e) && this.$.entries.renderRow(e);
+},
+accountBalanceChanged: function(e, t) {
+if (!t || !t.accounts) {
+this.renderAccountList();
+return;
+}
+t = t.accounts;
+if (typeof t.account == "undefined" && typeof t.linkedAccount == "undefined" && typeof t.atAccount == "undefined") {
+this.renderAccountList();
+return;
+}
+if (typeof t["account"] != "undefined") {
+var n = t.account >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.account) : -1;
+n >= 0 && (typeof t.accountBal != "undefined" && t.accountBal.length > 0 ? this.accountBalanceChangedHandler(n, t.accountBal) : Checkbook.globals.accountManager.fetchAccountBalance(t.account, {
+onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, n)
+}));
+}
+if (typeof t["linkedAccount"] != "undefined") {
+var r = t.linkedAccount >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.linkedAccount) : -1;
+r >= 0 && Checkbook.globals.accountManager.fetchAccountBalance(t.linkedAccount, {
+onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, r)
+});
+}
+if (typeof t.atAccount != "undefined" && t["linkedAccount"] != t["atAccount"]) {
+var r = t.atAccount >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.atAccount) : -1;
+r >= 0 && Checkbook.globals.accountManager.fetchAccountBalance(t.atAccount, {
+onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, r)
+});
+}
+},
+accountBalanceChangedHandler: function(e, t) {
+if (typeof t == "undefined" || isNaN(e) || e < 0 || e >= this.accounts.length) return;
+this.accounts[e].balance0 = t.balance0, this.accounts[e].balance1 = t.balance1, this.accounts[e].balance2 = t.balance2, this.accounts[e].balance3 = t.balance3, this.renderRow(e);
 },
 dividerTapped: function(e, t) {
 return t.preventDefault(), !0;
@@ -9065,7 +9587,7 @@ break;
 default:
 i.balance = 0;
 }
-return i.balance = prepAmount(i.balance), r.$.balance.setContent(formatAmount(i.balance)), r.$.balance.addRemoveClass("positiveBalance", i.balance > 0), r.$.balance.addRemoveClass("negativeBalance", i.balance < 0), r.$.balance.addRemoveClass("neutralBalance", i["balance"] == 0), r.$.note.setContent(i.acctNotes), Checkbook.globals.prefs.custom_sort !== 0 && Checkbook.globals.prefs.custom_sort !== 3 || !(i.index <= 0 || i.acctCategory !== this.accounts[i.index - 1].acctCategory) ? r.$.catDivider.hide() : (r.$.catDivider.show(), r.$.catDivider.setContent(i.acctCategory)), !0;
+return i.balance = prepAmount(i.balance), r.$.balance.setContent(formatAmount(i.balance)), r.$.balance.addRemoveClass("positiveBalance", i.balance > 0), r.$.balance.addRemoveClass("negativeBalance", i.balance < 0), r.$.balance.addRemoveClass("neutralBalance", i["balance"] == 0), r.$.note.setContent(i.acctNotes.replace(/\n/, "<br />")), Checkbook.globals.prefs.custom_sort !== 0 && Checkbook.globals.prefs.custom_sort !== 3 || !(i.index <= 0 || i.acctCategory !== this.accounts[i.index - 1].acctCategory) ? r.$.catDivider.hide() : (r.$.catDivider.show(), r.$.catDivider.setContent(i.acctCategory)), !0;
 }
 }
 });
@@ -9126,39 +9648,20 @@ name: "addAccountButton",
 kind: "onyx.Checkbox",
 onchange: "addAccount",
 classes: "add"
+} ]
 }, {
+components: [ {
 name: "editModeToggle",
 kind: "onyx.Checkbox",
 onchange: "toggleLock",
 classes: "lock"
 } ]
-}, {
-showing: !1,
-kind: "onyx.MenuDecorator",
-components: [ {
-kind: "onyx.IconButton",
-src: "assets/menu_icons/search.png"
-}, {
-kind: "onyx.Menu",
-floating: !0,
-components: [ {
-content: "Reports",
-menuParent: "searchMenu"
-}, {
-content: "Budget",
-menuParent: "searchMenu"
-}, {
-content: "Search",
-menuParent: "searchMenu"
-} ]
-} ]
 } ]
 }, {
 kind: "Signals",
 accountChanged: "renderAccountList",
-balanceChanged: "refresh",
 balanceViewChanged: "accountBalanceViewChanged",
-accountBalanceChanged: "accountBalanceChanged"
+accountBalanceChanged: "accountBalanceForceUpdate"
 } ],
 handlers: {
 onSelect: "menuItemSelected"
@@ -9167,27 +9670,18 @@ renderAccountList: function() {
 this.accountBalanceForceUpdate(), this.$.sortMenu.setValue(Checkbook.globals.prefs.custom_sort);
 },
 accountBalanceViewChanged: function(e, t) {
-if (Object.isUndefined(t.index) || t.index < 0 || t.index >= this.$.entries.accounts.length) {
+if (typeof t.index == "undefined" || t.index < 0 || t.index >= this.$.entries.accounts.length) {
 for (var n = 0; n < this.$.entries.accounts.length; n++) if (this.$.entries.accounts[n].acctId === t.id) {
-this.$.entries.accounts[n].bal_view = t.mode, enyo.isFunction(t.callbackFn) && t.callbackFn(n);
+this.$.entries.accounts[n].bal_view = t.mode, t.index = n;
 break;
 }
 } else this.$.entries.accounts[t.index].bal_view = t.mode;
-this.$.entries.refresh();
+this.$.entries.refresh(t.index), enyo.isFunction(t.callbackFn) && t.callbackFn(t.index);
 },
 accountBalanceForceUpdate: function() {
 Checkbook.globals.accountManager.fetchOverallBalances({
 onSuccess: enyo.bind(this, this.buildBalanceButton, enyo.bind(this, this.renderBalanceButton))
 });
-},
-accountBalanceChanged: function(e, t) {
-this.log(arguments);
-return;
-var n, r, i;
-},
-accountBalanceChangedHandler: function(e, t) {
-if (!Object.isNumber(e) || e < 0 || e >= this.$.entries.accounts.length) return;
-this.$.entries.accounts[e].balance0 = newBal[0], this.$.entries.accounts[e].balance1 = newBal[1], this.$.entries.accounts[e].balance2 = newBal[2], this.$.entries.accounts[e].balance3 = newBal[3], this.$.entries.refresh(), this.accountBalanceForceUpdate();
 },
 menuItemSelected: function(e, t) {
 if (!t.selected) return;
@@ -9738,7 +10232,7 @@ onCancel: "deleteAccountConfirmClose"
 }), this.$.deleteAccountConfirm.show());
 },
 deleteAccountConfirmClose: function() {
-this.$.deleteAccountConfirm.destroy();
+this.$.deleteAccountConfirm.hide(), this.$.deleteAccountConfirm.destroy();
 },
 deleteAccountHandler: function() {
 this.deleteAccountConfirmClose(), Checkbook.globals.accountManager.deleteAccount(this.acctId, {
@@ -10067,7 +10561,7 @@ name: "manager",
 kind: "Checkbook.accountCategory.manager"
 } ],
 show: function(e, t, n, r) {
-this.inherited(arguments), e < 0 ? this.$.deleteButton.hide() : this.$.deleteButton.show(), e < 0 ? (this.$.title.setContent("Create a Category"), this.rowid = -1, this.name = "", this.icon = "", this.color = "") : e > 0 ? (this.$.title.setContent("Edit Category"), this.rowid = e, this.name = t, this.icon = n, this.color = r) : this.hide(), this.$.name.setValue(this.name), this.$.icon.setValue(this.icon), this.$.color.setValue(this.color.ucfirst());
+this.inherited(arguments), e < 0 ? this.$.deleteButton.hide() : this.$.deleteButton.show(), e < 0 ? (this.$.title.setContent("Create a Category"), this.rowid = -1, this.name = "", this.icon = "", this.color = "") : e > 0 ? (this.$.title.setContent("Edit Category"), this.rowid = e, this.name = t, this.icon = n, this.color = r) : this.hide(), this.$.name.setValue(this.name), this.$.icon.setValue(this.icon), this.$.color.setValue(GTS.String.ucfirst(this.color));
 for (var i = 0; i < appColors.length; i++) this.$.color.removeClass(appColors[i].name);
 this.$.color.addClass(this.color), Checkbook.globals.prefs.dispColor === 1 ? this.$.color.show() : this.$.color.hide(), this.$.name.focus();
 },
@@ -10495,9 +10989,6 @@ enyo.kind({
 name: "Checkbook.transactions.view",
 layoutKind: "FittableRowsLayout",
 account: {},
-events: {
-onChanged: ""
-},
 components: [ {
 name: "header",
 kind: "onyx.Toolbar",
@@ -10526,7 +11017,6 @@ kind: "Checkbook.transactions.list",
 fit: !0,
 classes: "checkbook-stamp",
 style: "position: relative;",
-onBalanceChanged: "balanceChangedEvent",
 ondragstart: "listDrag",
 ondrag: "listDrag",
 ondragfinish: "listDrag"
@@ -10535,6 +11025,7 @@ name: "footer",
 kind: "onyx.MoreToolbar",
 classes: "deep-green",
 components: [ {
+showing: !1,
 kind: "onyx.Grabber",
 style: "height: 27px;"
 }, {
@@ -10556,17 +11047,17 @@ components: [ {
 name: "addIncomeButton",
 kind: "onyx.Checkbox",
 onchange: "addIncome",
-classes: "income"
+classes: "income margin-half-left margin-half-right"
 }, {
 name: "addTransferButton",
 kind: "onyx.Checkbox",
 onchange: "addTransfer",
-classes: "transfer"
+classes: "transfer margin-half-left margin-half-right"
 }, {
 name: "addExpenseButton",
 kind: "onyx.Checkbox",
 onchange: "addExpense",
-classes: "expense"
+classes: "expense margin-half-left margin-half-right"
 } ]
 }, {
 showing: !1,
@@ -10611,7 +11102,8 @@ value: "clear"
 }, {
 kind: "Signals",
 viewAccount: "viewAccount",
-accountChanged: "accountChanged"
+accountChanged: "accountChanged",
+accountBalanceChanged: "balanceChanged"
 } ],
 rendered: function() {
 this.inherited(arguments), this.$.header.hide(), this.$.footer.hide();
@@ -10629,7 +11121,7 @@ this.unloadSystem();
 return;
 }
 this.account.acctId || (this.$.header.show(), this.$.footer.show());
-if (t.force || !this.account.acctId || this.account.acctId !== t.account.acctId) this.account = enyo.clone(t.account), this.$.entries.account = enyo.clone(t.account), this.$.acctName.setContent(this.account.acctName), this.$.acctTypeIcon.setSrc("assets/" + this.account.acctCategoryIcon), this.renderBalanceButton(), this.renderSortButton(), this.reloadTransactionList(), this.$.entries.initialScroll(), this.account.frozen === 1 ? (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0)) : (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1));
+if (t.force || !this.account.acctId || this.account.acctId !== t.account.acctId) this.account = enyo.clone(t.account), this.$.entries.account = enyo.clone(t.account), this.$.acctName.setContent(this.account.acctName), this.$.acctTypeIcon.setSrc("assets/" + this.account.acctCategoryIcon), this.renderBalanceButton(), this.renderSortButton(), this.$.entries.reloadSystem(), this.account.frozen === 1 ? (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0)) : (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1));
 this.$.header.reflow(), this.$.footer.reflow(), this.reflow();
 },
 getAccountId: function() {
@@ -10639,17 +11131,26 @@ setAccountIndex: function(e) {
 this.account.index = e;
 },
 unloadSystem: function() {
-this.account = {}, this.reloadTransactionList(), this.$.header.hide(), this.$.footer.hide();
+this.account = {}, this.$.entries.reloadSystem(), this.$.header.hide(), this.$.footer.hide();
 },
 reloadSystem: function() {
 if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
-this.reloadTransactionList(), this.$.entries.initialScroll(), this.balanceChangedHandler();
+this.$.entries.reloadSystem(), this.balanceChanged();
 },
-reloadTransactionList: function() {
-this.$.entries.reloadSystem();
-},
-balanceChangedEvent: function(e, t) {
-return !Object.isUndefined(t.account) && !Object.isUndefined(t.linkedAccount) ? this.balanceChangedHandler(t) : this.balanceChangedHandler(), !0;
+balanceChanged: function(e, t) {
+var n = {
+sendSignal: !1
+};
+!t || !t.accounts || !t.accounts.account ? n.account = this.account.acctId : enyo.mixin(n, t.accounts);
+if (typeof n.accountBal != "undefined" && n.accountBal.length === 4) {
+var r = {
+balance0: n.accountBal[0],
+balance1: n.accountBal[1],
+balance2: n.accountBal[2],
+balance3: n.accountBal[3]
+};
+this.balanceChangedHandler(n, r);
+} else this.balanceChangedHandler(n);
 },
 balanceChangedHandler: function(e, t) {
 e || (e = {
@@ -10662,7 +11163,11 @@ onSuccess: enyo.bind(this, this.balanceChangedHandler, e)
 });
 return;
 }
-this.account.balance0 = prepAmount(t.balance0), this.account.balance1 = prepAmount(t.balance1), this.account.balance2 = prepAmount(t.balance2), this.account.balance3 = prepAmount(t.balance3), this.renderBalanceButton(), e["account"] == this.account["acctId"] ? e.accountBal = [ this.account.balance0, this.account.balance1, this.account.balance2, this.account.balance3 ] : e.accountBal = [], this.doChanged(e);
+this.account.balance0 = prepAmount(t.balance0), this.account.balance1 = prepAmount(t.balance1), this.account.balance2 = prepAmount(t.balance2), this.account.balance3 = prepAmount(t.balance3), this.renderBalanceButton(), e["account"] == this.account["acctId"] ? e.accountBal = [ this.account.balance0, this.account.balance1, this.account.balance2, this.account.balance3 ] : e.accountBal = [];
+if (typeof e.sendSignal != "undefined" && e.sendSignal === !1) return;
+enyo.Signals.send("accountBalanceChanged", {
+accounts: e
+});
 },
 renderBalanceButton: function() {
 this.$.balanceMenu.setChoices([ {
@@ -10702,7 +11207,7 @@ buildTransactionSorting: function() {
 enyo.isArray(transactionSortOptions) && (this.$.sortMenu.setChoices(transactionSortOptions), this.$.sortMenu.setValue(this.account.sort));
 },
 transactionSortingChanged: function(e, t) {
-return this.account.sort === t.value ? !0 : (this.account.sort = t.value, this.account.sortQry = t.qry, Checkbook.globals.accountManager.updateAccountSorting(this.account.acctId, this.account.sort), this.reloadTransactionList(), this.$.entries.initialScroll(), !0);
+return this.account.sort === t.value ? !0 : (this.account.sort = t.value, this.account.sortQry = t.qry, Checkbook.globals.accountManager.updateAccountSorting(this.account.acctId, this.account.sort), this.$.entries.reloadSystem(), !0);
 },
 addIncome: function() {
 this.newTransaction("Income");
@@ -10734,7 +11239,7 @@ onFinish: enyo.bind(this, this.addTransactionComplete)
 addTransactionComplete: function(e, t) {
 this.toggleCreateButtons();
 var n = t.modifyStatus;
-delete t.modifyStatus, n === 1 && (this.balanceChangedHandler(t), this.account.itemCount++, this.reloadTransactionList(), this.$.entries.initialScroll());
+delete t.modifyStatus, n === 1 && (this.balanceChangedHandler(t), this.account.itemCount++, this.$.entries.reloadSystem());
 },
 toggleCreateButtons: function() {
 this.$.addIncomeButton.getDisabled() ? (this.$.addIncomeButton.setChecked(!1), this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setChecked(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setChecked(!1), this.$.addExpenseButton.setDisabled(!1)) : (this.$.addIncomeButton.setChecked(!0), this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setChecked(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setChecked(!0), this.$.addExpenseButton.setDisabled(!0));
@@ -10846,7 +11351,7 @@ this.log(), this.account = {}, this.$.list.empty();
 reloadSystem: function() {
 this.log();
 if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
-this.reloadTransactionList(), this.initialScroll(), enyo.Signals.send("accountBalanceChanged", {});
+this.initialScrollCompleted = !1, this.reloadTransactionList();
 },
 reloadTransactionList: function() {
 this.log();
@@ -10854,7 +11359,9 @@ if (!this.account.acctId || this.account.acctId < 0) return !1;
 this.transactions = [], this.$.list.setCount(0), this.$.list.reset(), this.$.list.lazyLoad();
 },
 initialScroll: function() {
-this.log();
+enyo.job("initialScroll", enyo.bind(this, "_initialScroll"), 100);
+},
+_initialScroll: function() {
 if (this.$.list.getCount() <= 0) return;
 if (this.account.sort !== 0 && this.account.sort !== 1 && this.account.sort !== 6 && this.account.sort !== 7) {
 this.$.list.scrollToRow(0);
@@ -10896,9 +11403,8 @@ Checkbook.globals.gts_db.query(t, n);
 }
 },
 initialScrollHandler: function(e) {
-this.log();
 var t = 0;
-this.account.sort === 1 ? t = this.account.itemCount - e[0].itemIndex - 3 : t = e[0].itemIndex - 3, t = t >= 0 ? t : 0, this.log(this.account.sort, t, arguments), this.$.list.scrollToRow(t);
+this.account.sort === 1 ? t = this.account.itemCount - e[0].itemIndex - 3 : t = e[0].itemIndex - 3, t = t >= 0 ? t : 0, this.$.list.scrollToRow(t);
 },
 transactionBuildRow: function(e, t) {
 var n = t.index, r = this.transactions[n];
@@ -10910,7 +11416,7 @@ date: enyo.Panels.isScreenNarrow() ? "shortDate" : "longDate",
 time: this.account.showTransTime === 1 ? "shortTime" : ""
 }));
 var s = new Date;
-this.account.showTransTime !== 1 && s.setHours(23, 59, 59, 999), this.$.transactionWrapper.addRemoveClass("futureTransaction", r.date > Date.parse(s)), this.$.amount.setContent(formatAmount(r.amount)), r.dispRunningBalance ? (this.$.runningBal.setContent(formatAmount(r.runningBalance)), this.$.runningBal.addRemoveClass("positiveBalance", r.runningBalance > 0), this.$.runningBal.addRemoveClass("negativeBalance", r.runningBalance < 0), this.$.runningBal.addRemoveClass("neutralBalance", r["runningBalance"] == 0)) : (this.$.runningBal.setContent(""), this.$.amount.addRemoveClass("positiveBalance", r.amount > 0), this.$.amount.addRemoveClass("negativeBalance", r.amount < 0), this.$.amount.addRemoveClass("neutralBalance", r["amount"] == 0)), this.$.cleared.addRemoveClass("checked", r.cleared === 1), this.account.enableCategories === 1 ? (this.$.category.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(r.category, r.category2, !0, "smaller"))) : this.$.category.hide(), this.$.checkNum.setContent(this.account.checkField === 1 && r.checkNum && r.checkNum !== "" ? "Check #" + r.checkNum : ""), this.$.note.setContent(this.account.hideNotes === 1 ? "" : r.note);
+this.account.showTransTime !== 1 && s.setHours(23, 59, 59, 999), this.$.transactionWrapper.addRemoveClass("futureTransaction", r.date > Date.parse(s)), this.$.amount.setContent(formatAmount(r.amount)), r.dispRunningBalance ? (this.$.runningBal.setContent(formatAmount(r.runningBalance)), this.$.runningBal.addRemoveClass("positiveBalance", r.runningBalance > 0), this.$.runningBal.addRemoveClass("negativeBalance", r.runningBalance < 0), this.$.runningBal.addRemoveClass("neutralBalance", r["runningBalance"] == 0), this.$.amount.setClassAttribute("")) : (this.$.runningBal.setContent(""), this.$.amount.addRemoveClass("positiveBalance", r.amount > 0), this.$.amount.addRemoveClass("negativeBalance", r.amount < 0), this.$.amount.addRemoveClass("neutralBalance", r["amount"] == 0)), this.$.cleared.addRemoveClass("checked", r.cleared === 1), this.account.enableCategories === 1 ? (this.$.category.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(r.category, r.category2, !0, "smaller"))) : this.$.category.hide(), this.$.checkNum.setContent(this.account.checkField === 1 && r.checkNum && r.checkNum !== "" ? "Check #" + r.checkNum : ""), this.$.note.setContent(this.account.hideNotes === 1 ? "" : r.note);
 var o = r.linkedRecord && !isNaN(r.linkedRecord) && r["linkedRecord"] != "", u = r.repeatId && !isNaN(r.repeatId) && r["repeatId"] != "";
 return this.$.mainBody.addRemoveClass("repeatTransferIcon", o && u), this.$.mainBody.addRemoveClass("transferIcon", o && !u), this.$.mainBody.addRemoveClass("repeatIcon", !o && u), !0;
 }
@@ -10934,9 +11440,9 @@ this.transactions[e + s] = enyo.mixin({
 dispRunningBalance: i,
 runningBalance: prepAmount(r),
 amount: prepAmount(t[s].amount)
-}, t[s]), this.transactions[e + s].desc = this.transactions[e + s].desc.dirtyString(), this.transactions[e + s].category = this.transactions[e + s].category.dirtyString(), this.transactions[e + s].category2 = this.transactions[e + s].category2.dirtyString(), this.transactions[e + s].note = this.transactions[e + s].note.dirtyString(), this.account.sort !== 0 && this.account.sort !== 6 && this.account.sort !== 8 && (r -= this.transactions[e + s].amount);
+}, t[s]), this.transactions[e + s].desc = GTS.String.dirtyString(this.transactions[e + s].desc), this.transactions[e + s].category = GTS.String.dirtyString(this.transactions[e + s].category), this.transactions[e + s].category2 = GTS.String.dirtyString(this.transactions[e + s].category2), this.transactions[e + s].note = GTS.String.dirtyString(this.transactions[e + s].note), this.account.sort !== 0 && this.account.sort !== 6 && this.account.sort !== 8 && (r -= this.transactions[e + s].amount);
 }
-this.$.list.setCount(this.transactions.length), this.$.list.refresh();
+this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted || (this.initialScrollCompleted = !0, this.initialScroll());
 },
 duplicateTransaction: function(e) {
 this.log(), this.toggleCreateButtons();
@@ -10977,7 +11483,7 @@ this.log(), this.log("I DO NOT WORK YET", arguments);
 return;
 },
 transactionHeldHandler: function(e, t) {
-this.log(), this.log(arguments);
+this.log(), this.log("I DO NOT WORK YET", arguments);
 return !0;
 var n;
 },
@@ -10993,7 +11499,12 @@ this.$.list.refresh();
 return;
 }
 var r = this.transactions[n].cleared !== 1;
-return this.transactions[n].cleared = r ? 1 : 0, Checkbook.globals.transactionManager.clearTransaction(this.transactions[n].itemId, r), this.$.list.renderRow(n), enyo.Signals.send("accountBalanceChanged", {}), enyo.isFunction(t.callback) && t.callback(r), !0;
+return this.transactions[n].cleared = r ? 1 : 0, Checkbook.globals.transactionManager.clearTransaction(this.transactions[n].itemId, r), this.$.list.renderRow(n), enyo.Signals.send("accountBalanceChanged", {
+accounts: {
+account: this.transactions[n].account,
+linkedAccount: this.transactions[n].linkedAccount
+}
+}), enyo.isFunction(t.callback) && t.callback(r), !0;
 },
 deleteTransactionConfirmHandler: function() {
 this.log(), this.transactionDeleted(null, this.$.deleteTransactionConfirm.rowIndex), this.deleteTransactionConfirmClose();
@@ -11708,7 +12219,7 @@ time: this.accountObj.showTransTime === 1 ? "shortTime" : ""
 getCategoryItem: function(e, t) {
 if (!this.renderCategories) return;
 var n = this.trsnObj.category[t.index], r = t.item;
-if (n && r) return r.$.categoryItemBreak.setShowing(enyo.Panels.isScreenNarrow()), r.$.categoryText.setContent((n.category + " >> " + n.category2).dirtyString()), this.trsnObj.category.length > 1 ? (n.amount = Math.abs(n.amount).toFixed(2), this.accountObj["atmEntry"] == 1 ? (r.$.categoryAmount.setValue(deformatAmount(n.amount)), r.$.categoryAmount.setAtm(!0), r.$.categoryAmount.setSelectAllOnFocus(!1)) : (r.$.categoryAmount.setAtm(!1), r.$.categoryAmount.setSelectAllOnFocus(!0)), r.$.categoryAmount.setDisabled(!1), r.$.categoryDelete.setDisabled(!1)) : (r.$.categoryAmount.setDisabled(!0), r.$.categoryDelete.setDisabled(!0), n.amount = 0), !0;
+if (n && r) return r.$.categoryItemBreak.setShowing(enyo.Panels.isScreenNarrow()), r.$.categoryText.setContent(n.category + " >> " + GTS.String.dirtyString(n.category2)), this.trsnObj.category.length > 1 ? (n.amount = Math.abs(n.amount).toFixed(2), this.accountObj["atmEntry"] == 1 ? (r.$.categoryAmount.setValue(deformatAmount(n.amount)), r.$.categoryAmount.setAtm(!0), r.$.categoryAmount.setSelectAllOnFocus(!1)) : (r.$.categoryAmount.setAtm(!1), r.$.categoryAmount.setSelectAllOnFocus(!0)), r.$.categoryAmount.setDisabled(!1), r.$.categoryDelete.setDisabled(!1)) : (r.$.categoryAmount.setDisabled(!0), r.$.categoryDelete.setDisabled(!0), n.amount = 0), !0;
 },
 categoryTapped: function(e, t) {
 this.$.categorySystem.getCategoryChoice(enyo.bind(this, this.categorySelected, t.index), this.trsnObj.category[t.index]);
@@ -11778,20 +12289,21 @@ status: 0
 }) : (this.createComponent({
 name: "deleteTransactionConfirm",
 kind: "GTS.deleteConfirm",
-owner: this,
-confirmTitle: "Delete Transaction",
-confirmMessage: "Are you sure you want to delete this transaction?",
-confirmButtonYes: "Delete",
-confirmButtonNo: "Cancel",
-onYes: "deleteTransactionHandler",
-onNo: "deleteTransactionConfirmClose"
-}), this.$.deleteTransactionConfirm.render(), this.$.deleteTransactionConfirm.openAtCenter());
+title: "Delete Transaction",
+message: "Are you sure you want to delete this transaction?",
+confirmText: "Delete",
+confirmClass: "onyx-negative",
+cancelText: "Cancel",
+cancelClass: "",
+onConfirm: "deleteTransactionHandler",
+onCancel: "deleteTransactionConfirmClose"
+}), this.$.deleteTransactionConfirm.show());
 },
 deleteTransactionConfirmClose: function() {
-this.$.deleteTransactionConfirm.destroy();
+this.$.deleteTransactionConfirm.hide(), this.$.deleteTransactionConfirm.destroy();
 },
 deleteTransactionHandler: function() {
-Checkbook.globals.transactionManager.deleteTransaction(this.trsnObj.itemId, {
+this.deleteTransactionConfirmClose(), Checkbook.globals.transactionManager.deleteTransaction(this.trsnObj.itemId, {
 onSuccess: enyo.bind(this, this.doFinish, {
 status: "2"
 })
@@ -12766,7 +13278,7 @@ if (t.length > 0) var n = {
 data: !0,
 desc: e,
 linkedAccount: t[0].linkedAccount,
-category: Checkbook.globals.transactionManager.parseCategoryDB(t[0].category.dirtyString(), t[0].category2.dirtyString())
+category: Checkbook.globals.transactionManager.parseCategoryDB(GTS.String.dirtyString(t[0].category), GTS.String.dirtyString(t[0].category2))
 };
 this.doValueChanged(n);
 }
@@ -13019,7 +13531,7 @@ Date.validDate(a) ? (a.setHours(23, 59, 59, 999), this.$.toDate.setValue(a), thi
 }
 this.toggleToggles();
 var f = "";
-t && (f += '"' + t + '"' + (n && n !== "%" ? ' "' + n + '"' : "")), this.$.searchString.setValue(f.trim()), this.$.searchString.getValue().length > 0 && this.search();
+t && (f += '"' + t + '"' + (n && n !== "%" ? ' "' + n + '"' : "")), this.$.searchString.setValue(GTS.String.trim(f)), this.$.searchString.getValue().length > 0 && this.search();
 },
 toggleToggles: function() {
 this.$.fromDrawer.setOpen(this.$.fromToggle.getValue()), this.$.toDrawer.setOpen(this.$.toToggle.getValue());
@@ -13041,8 +13553,8 @@ authSuccessful: function(e) {
 this.acctList.items[e.rowIndex].bypass = !0, this.accountSelectedChanged(null, e);
 },
 search: function() {
-var e = "", t = [], n = this.$.searchString.getValue().dirtyString().trim(), r = n.match(/"([^"]*)"/gi);
-n = n.replace(/"[^"]*"/gi, "").trim(), n = n.split(" ");
+var e = "", t = [], n = GTS.String.trim(GTS.String.dirtyString(this.$.searchString.getValue())), r = n.match(/"([^"]*)"/gi);
+n = GTS.String.trim(n.replace(/"[^"]*"/gi, "")), n = n.split(" ");
 if (r && r.length > 0) {
 for (var i = 0; i < r.length; i++) r[i] = r[i].replace(/"/g, "");
 n = n.concat(r);
@@ -13285,7 +13797,7 @@ onSuccess: enyo.bind(this, this.acquirePageHandler, n)
 acquirePageHandler: function(e, t) {
 for (var n = 0; n < t.length; n++) this.transactions[e + n] = enyo.mixin({
 amount: prepAmount(t[n].amount)
-}, t[n]), this.transactions[e + n].desc = this.transactions[e + n].desc.dirtyString(), this.transactions[e + n].category = this.transactions[e + n].category.dirtyString(), this.transactions[e + n].category2 = this.transactions[e + n].category2.dirtyString(), this.transactions[e + n].note = this.transactions[e + n].note.dirtyString();
+}, t[n]), this.transactions[e + n].desc = GTS.String.dirtyString(this.transactions[e + n].desc), this.transactions[e + n].category = GTS.String.dirtyString(this.transactions[e + n].category), this.transactions[e + n].category2 = GTS.String.dirtyString(this.transactions[e + n].category2), this.transactions[e + n].note = GTS.String.dirtyString(this.transactions[e + n].note);
 this.$.entries && this.$.entries.refresh(), this.doLoading(!1);
 }
 });
@@ -13625,7 +14137,7 @@ onSuccess: enyo.bind(this, this.buildPage, n)
 }, this.sort, e.getPageSize(), n));
 },
 buildPage: function(e, t) {
-for (var n = 0; n < t.length; n++) this.budgets[e + n] = t[n], this.budgets[e + n].category = this.budgets[e + n].category.dirtyString(), this.budgets[e + n].category2 = this.budgets[e + n].category2.dirtyString();
+for (var n = 0; n < t.length; n++) this.budgets[e + n] = t[n], this.budgets[e + n].category = GTS.String.dirtyString(this.budgets[e + n].category), this.budgets[e + n].category2 = GTS.String.dirtyString(this.budgets[e + n].category2);
 this.$.entries.refresh(), this.loadingDisplay(!1);
 },
 loadingDisplay: function(e) {
