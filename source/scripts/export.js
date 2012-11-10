@@ -772,6 +772,27 @@ enyo.kind({
 		}
 	},
 
+	/** Error System **/
+	showErrorMessage: function( callbackFn, error ) {
+
+		this.onErrorClose = callbackFn;
+
+		this.$['progress'].hide();
+
+		//set error message
+		this.$['errorMessage'].show();
+		this.$['errorMessage'].setMainMessage( error );
+	},
+
+	closeErrorMessage: function() {
+
+		this.$['errorMessage'].hide();
+
+		this.onErrorClose();
+
+		return true;
+	},
+
 	/** Finisher **/
 	closeExport: function() {
 
@@ -798,24 +819,5 @@ enyo.kind({
 
 		//Close & continue
 		this.doFinish();
-	},
-
-	/** Error System **/
-	showErrorMessage: function( callbackFn, error ) {
-
-		this.onErrorClose = callbackFn;
-
-		this.$['progress'].hide();
-
-		//set error message
-		this.$['errorMessage'].show();
-		this.$['errorMessage'].setMainMessage( error );
-	},
-
-	closeErrorMessage: function() {
-
-		this.$['errorMessage'].hide();
-
-		this.onErrorClose();
 	}
 });

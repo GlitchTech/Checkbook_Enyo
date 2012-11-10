@@ -1153,7 +1153,7 @@ enyo.kind({
 
 	fatalError: function( message ) {
 
-		this.showErrorMessage( enyo.bind( this, this.closeImport, true ), message );
+		this.showErrorMessage( enyo.bind( this, this.closeImport, false ), message );
 	},
 
 	showErrorMessage: function( callbackFn, error ) {
@@ -1172,6 +1172,8 @@ enyo.kind({
 		this.$['errorMessage'].hide();
 
 		this.onErrorClose();
+
+		return true;
 	},
 
 	closeImport: function( success ) {
