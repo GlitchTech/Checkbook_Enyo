@@ -1,6 +1,7 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.depends(
+	"$lib/g11n",
 	"$lib/layout",
 
 	//To theme Onyx using Theme.less, swap commented lines and follow the steps described in Theme.less
@@ -11,7 +12,6 @@ enyo.depends(
 	"$lib/canvas-spinner/heartcode_canvas.js",
 	"$lib/canvas-spinner/canvasSpinner.js",
 
-	"$lib/date.format.js",
 	"$lib/aes.js",
 
 	"$lib/gts-plugins/PrototypeExt",

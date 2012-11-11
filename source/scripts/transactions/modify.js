@@ -149,17 +149,19 @@ enyo.kind( {
 										{
 											name: "date",
 											kind: "GTS.DatePicker",
-											onChange: "dateChanged",
+											onSelect: "dateChanged",
 
 											components: [
 												{
 													name: "time",
 													kind: "GTS.TimePicker",
 
+													label: "Time",
+
 													minuteInterval: 5,
 													is24HrMode: false,
 
-													label: "Time"
+													onSelect: "dateChanged"
 												}
 											]
 										}
@@ -768,7 +770,7 @@ enyo.kind( {
 		this.$['date'].render();
 	},
 
-	dateChanged: function( inSender, inDate ) {
+	dateChanged: function( inSender, inEvent ) {
 
 		var date = this.$['date'].getValue();
 		var time = this.$['time'].getValue();
@@ -776,9 +778,11 @@ enyo.kind( {
 		date.setHours( time.getHours() );
 		date.setMinutes( time.getMinutes() );
 
-		this.$['dateDisplay'].setContent( date.format( { date: 'longDate', time: ( this.accountObj['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
+		this.$['dateDisplay'].setContent( date.format( { date: 'long', time: ( this.accountObj['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
 		//this.$['recurrence'].setDate( date );//TEMP
+
+		return true;
 	},
 
 	/** Category Controls **/
