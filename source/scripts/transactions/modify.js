@@ -143,29 +143,7 @@ enyo.kind( {
 								}, {
 									name: "dateDrawer",
 									kind: "onyx.Drawer",
-									open: false,
-
-									components: [
-										{
-											name: "date",
-											kind: "GTS.DatePicker",
-											onSelect: "dateChanged",
-
-											components: [
-												{
-													name: "time",
-													kind: "GTS.TimePicker",
-
-													label: "Time",
-
-													minuteInterval: 5,
-													is24HrMode: false,
-
-													onSelect: "dateChanged"
-												}
-											]
-										}
-									]
+									open: false
 								}
 							]
 						}, {
@@ -436,20 +414,79 @@ enyo.kind( {
 		{
 			name: "categorySystem",
 			kind: "Checkbook.transactionCategory.select"
-		},
-/*
-		{
-			name: "appMenu",
-			kind: enyo.AppMenu,
-			scrim: true,
-			components: [
-				{
-					kind: "EditMenu"
-				}
-			]
 		}
-*/
 	],
+
+	create: function() {
+
+		this.inherited( arguments );
+
+		this.buildDateSystem();
+	},
+
+	buildDateSystem: function() {
+
+		if( 1 == 2 ) {
+			//Big Screen
+
+			this.$['dateDrawer'].createComponent(
+					{
+						name: "date",
+						kind: "GTS.DatePicker",
+						onSelect: "dateChanged",
+
+						components: [
+							{
+								name: "time",
+								kind: "GTS.TimePicker",
+
+								label: "Time",
+
+								minuteInterval: 5,
+								is24HrMode: false,
+
+								onSelect: "dateChanged"
+							}
+						]
+					}, {
+						owner: this
+					}
+				);
+		} else {
+			//Small Screen
+
+			this.$['dateDrawer'].createComponents(
+					[
+						{
+							classes: "onyx-toolbar-inline",
+							components: [
+								{
+									name: "label",
+									classes: "label",
+									content: "Date"
+								}, {
+									name: "date",
+									kind: "onyx.DatePicker",
+									onSelect: "dateChanged"
+								}
+							]
+						}, {
+							name: "time",
+							kind: "GTS.TimePicker",
+
+							label: "Time",
+
+							minuteInterval: 5,
+							is24HrMode: false,
+
+							onSelect: "dateChanged"
+						}
+					], {
+						owner: this
+					}
+				);
+		}
+	},
 
 	rendered: function() {
 
