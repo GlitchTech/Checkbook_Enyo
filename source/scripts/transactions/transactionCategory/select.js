@@ -125,7 +125,7 @@ enyo.kind({
 					expandable: true,
 					expanded: false,
 
-					icon: "assets/tree-closed.png",
+					icon: "assets/folder.png",
 
 					content: parents[i]['content'],
 
@@ -141,8 +141,9 @@ enyo.kind({
 
 				parentNode['components'].push(
 						{
-							classes: "enyo-tool-decorator onyx-button enyo-unselectable margin-half-bottom",
-							style: "display: block; width: 90%;",
+							classes: "padding-half-std margin-right bordered",
+
+							icon: "assets/tag.png",
 
 							content: children[j]['content'],
 							parentNode: children[j]['parent']
@@ -162,7 +163,7 @@ enyo.kind({
 
 	nodeExpand: function( inSender, inEvent ) {
 
-		inSender.setIcon( "assets/" + ( inSender.expanded ? "tree-open.png" : "tree-closed.png" ) );
+		inSender.setIcon( "assets/" + ( inSender.expanded ? "folder-open.png" : "folder.png" ) );
 	},
 
 	nodeTap: function(inSender, inEvent) {
