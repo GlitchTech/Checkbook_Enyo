@@ -172,7 +172,6 @@ enyo.kind( {
 													name: "categoryText",
 													kind: "onyx.Button",
 													classes: "margin-right box-flex",
-													fit: true,
 
 													ontap: "categoryTapped"
 												}, {
@@ -197,9 +196,9 @@ enyo.kind( {
 														}, {
 															name: "categoryDelete",
 															kind: "onyx.Button",
-															content: "-",
-
 															classes: "small-padding",
+
+															content: "-",
 
 															ontap: "categoryDelete"
 														}
@@ -844,7 +843,7 @@ enyo.kind( {
 			item.$['categoryWrapper'].addRemoveClass( "h-box", !enyo.Panels.isScreenNarrow() );
 			item.$['categoryItemBreak'].setShowing( enyo.Panels.isScreenNarrow() );
 
-			item.$['categoryText'].setContent( ( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) ) );
+			item.$['categoryText'].setContent( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) );
 			item.$['categoryText'].addRemoveClass( "margin-half-bottom", enyo.Panels.isScreenNarrow() );
 			item.$['categoryText'].addRemoveClass( "full-width", enyo.Panels.isScreenNarrow() );
 
@@ -867,10 +866,14 @@ enyo.kind( {
 
 				item.$['categoryAmount'].setDisabled( false );
 				item.$['categoryDelete'].setDisabled( false );
+
+				item.$['categoryDelete'].addClass( "onyx-negative" );
 			} else {
 
 				item.$['categoryAmount'].setDisabled( true );
 				item.$['categoryDelete'].setDisabled( true );
+
+				item.$['categoryDelete'].removeClass( "onyx-negative" );
 
 				row['amount'] = 0;
 			}
