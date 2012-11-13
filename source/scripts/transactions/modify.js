@@ -165,41 +165,44 @@ enyo.kind( {
 
 									components: [
 										{
-											kind: "enyo.FittableColumns",
-											classes: "onyx-item text-middle bordered",
+											name: "categoryWrapper",
+											classes: "onyx-item text-middle bordered h-box",
 											components: [
 												{
 													name: "categoryText",
-													classes: "margin-right",
-													fit: true,
+													kind: "onyx.Button",
+													classes: "margin-right box-flex",
 
 													ontap: "categoryTapped"
 												}, {
 													name: "categoryItemBreak",
 													tag: "br"
 												}, {
-													kind: "onyx.InputDecorator",
-
-													classes: "margin-right",
-													style: "display: inline-block;",
-
 													components: [
 														{
-															name: "categoryAmount",
-															kind: "GTS.DecimalInput",
-															oninput: "categoryAmountChanged",
+															kind: "onyx.InputDecorator",
 
-															placeholder: "0.00"
+															classes: "inline-force margin-right",
+
+															components: [
+																{
+																	name: "categoryAmount",
+																	kind: "GTS.DecimalInput",
+																	oninput: "categoryAmountChanged",
+
+																	placeholder: "0.00"
+																}
+															]
+														}, {
+															name: "categoryDelete",
+															kind: "onyx.Button",
+															classes: "small-padding",
+
+															content: "-",
+
+															ontap: "categoryDelete"
 														}
 													]
-												}, {
-													name: "categoryDelete",
-													kind: "onyx.Button",
-													content: "-",
-
-													classes: "small-padding",
-
-													ontap: "categoryDelete"
 												}
 											]
 										}
@@ -426,7 +429,7 @@ enyo.kind( {
 
 	buildDateSystem: function() {
 
-		if( 1 == 2 ) {
+		if( !enyo.Panels.isScreenNarrow() ) {
 			//Big Screen
 
 			this.$['dateDrawer'].createComponent(
@@ -837,9 +840,12 @@ enyo.kind( {
 
 		if( row && item ) {
 
+			item.$['categoryWrapper'].addRemoveClass( "h-box", !enyo.Panels.isScreenNarrow() );
 			item.$['categoryItemBreak'].setShowing( enyo.Panels.isScreenNarrow() );
 
-			item.$['categoryText'].setContent( ( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) ) );
+			item.$['categoryText'].setContent( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) );
+			item.$['categoryText'].addRemoveClass( "margin-half-bottom", enyo.Panels.isScreenNarrow() );
+			item.$['categoryText'].addRemoveClass( "full-width", enyo.Panels.isScreenNarrow() );
 
 			if( this.trsnObj['category'].length > 1 ) {
 				//If only one category, takes up full amount
@@ -860,10 +866,14 @@ enyo.kind( {
 
 				item.$['categoryAmount'].setDisabled( false );
 				item.$['categoryDelete'].setDisabled( false );
+
+				item.$['categoryDelete'].addClass( "onyx-negative" );
 			} else {
 
 				item.$['categoryAmount'].setDisabled( true );
 				item.$['categoryDelete'].setDisabled( true );
+
+				item.$['categoryDelete'].removeClass( "onyx-negative" );
 
 				row['amount'] = 0;
 			}
