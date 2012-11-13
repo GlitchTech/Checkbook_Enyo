@@ -125,6 +125,8 @@ enyo.kind({
 					expandable: true,
 					expanded: false,
 
+					style: "padding: 0.5em;",//must override style declared in enyo.Node
+					classes: "padding-std bordered",
 					icon: "assets/folder.png",
 
 					content: parents[i]['content'],
@@ -141,7 +143,8 @@ enyo.kind({
 
 				parentNode['components'].push(
 						{
-							classes: "padding-half-std margin-right bordered",
+							style: "padding: 0.25em;",//must override style declared in enyo.Node
+							classes: "padding-half-std margin-left margin-right bordered",
 
 							icon: "assets/tag.png",
 
