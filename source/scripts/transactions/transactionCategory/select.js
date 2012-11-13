@@ -65,75 +65,7 @@ enyo.kind({
 			horizontal: "hidden",
 
 			classes: "light popup-scroller",
-			components: [
-				{
-/*
-Change to Tree.
-enyo.kind({
-    name: "enyo.sample.TreeSample",
-    classes: "enyo-unselectable enyo-fit",
-    kind: "FittableRows",
-    fit: true,
-    components: [
-        {kind: "Scroller", fit: true, components: [
-            {kind: "Node", content: "Tree", expandable: false, expanded: true, onExpand: "nodeExpand", onNodeTap: "nodeTap", components: [
-                {content: "Alpha"},
-                {content: "Bravo", expandable: true, expanded: true, components: [
-                    {content: "Bravo-Alpha"},
-                    {content: "Bravo-Bravo"},
-                    {content: "Bravo-Charlie"}
-                ]},
-                {content: "Charlie", expandable: true, components: [
-                    {content: "Charlie-Alpha"},
-                    {content: "Charlie-Bravo"},
-                    {content: "Charlie-Charlie"}
-                ]},
-                {content: "Delta", expandable: true, expanded: true, components: [
-                    {content: "Delta-Alpha"},
-                    {content: "Delta-Bravo"},
-                    {content: "Delta-Charlie"}
-                ]},
-                {content: "Epsilon"}
-            ]}
-        ]}
-    ],
-    nodeExpand: function(inSender, inEvent) {
-       // inSender.setIcon("assets/" + (inSender.expanded ? "folder-open.png" : "folder.png"));
-    },
-    nodeTap: function(inSender, inEvent) {
-
-        console.log( arguments );
-        return true;
-    }
-});
-*/
-					name: "categoryList",
-					kind: "enyo.Repeater",
-
-					onSetupItem: "setupRow",
-
-					components: [
-						{
-							name: "item",
-							kind: "enyo.FittableColumns",
-							classes: "onyx-item text-middle bordered",
-
-							tapHighlight: true,
-							ontap: "rowClicked",//Select item
-
-							components: [
-								{
-									name: "sheetName",
-									fit: true
-								}, {
-									name: "arrows",
-									content: ""
-								}
-							]
-						}
-					]
-				}
-			]
+			components: []
 		}
 	],
 
@@ -158,9 +90,8 @@ enyo.kind({
 		//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
 		this.show();
+		this._generateTree();
 		//Popup loaded, now can do UI changes
-
-		this.datasetChanged();
 
 		this.doCategorySelect = callbackFn;
 
@@ -175,83 +106,78 @@ enyo.kind({
 
 			this.$['subheader'].setContent( "" );
 		}
-	},
-
-	rowClicked: function( inSender, inEvent ) {
-
-		var row = this.dispCategories[inEvent.index];
-
-		if( row ) {
-
-			if( row['parent'] === "|-add_edit-|" ) {
-				//Add/Edit Transaction Category system
-
-				//NON FUNCTIONAL
-				/*
-				this.createComponent( {
-						name: "transactionCategoryView",
-						kind: "Checkbook.transactionCategory.view",
-
-						owner: this,
-
-						onClose: enyo.bind( this, this.returnedFromView )
-					});
-
-				//DOM ERROR caused here.
-				this.$['transactionCategoryView'].render();
-				this.$['transactionCategoryView'].openAtCenter();
-				*/
-			} else if( row['parent'] === "|-go_back-|" ) {
-				//Parent <- Child
-
-				this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'] );
-				//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
-
-				this.datasetChanged();
-			} else if( row['parent'] !== "" ) {
-				//Return selected category set
-
-				if( enyo.isFunction( this.doCategorySelect ) ) {
-
-					this.doCategorySelect( { "category": row['parent'], "category2": ( row['content'] === "All Sub Categories" ? "%" : row['content'] ) } );
-				}
-
-				this.hide();
-			} else {
-				//Parent -> Child
-
-				this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][row['content']] );
-
-				if( this.entireGeneral ) {
-
-					this.dispCategories.unshift( { "content": "All Sub Categories", "parent": row['content'] } );
-				}
-
-				this.dispCategories.push( { "content": "Back", "parent": "|-go_back-|" } );
-
-				this.datasetChanged();
-			}
-		}
-	},
-
-	datasetChanged: function() {
-
-		this.$['categoryList'].setCount( this.dispCategories.length );
 
 		this.reflow();
 	},
 
-	/**
-	 * @protected
-	 * @extends onyx.Popup#reflow
-	 */
-	reflow: function() {
+	_generateTree: function() {
 
-		this.$['scroller'].applyStyle( "height", null );
+		this.$['scroller'].destroyClientControls();
 
-		this.inherited( arguments );
+		var tree = [];
 
-		this.$['scroller'].applyStyle( "height", this.$['scroller'].getBounds().height + "px" );
+		var parents = Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'];
+
+		for( var i = 0; i < parents.length; i++ ) {
+
+			var parentNode = {
+					kind: "enyo.Node",
+					expandable: true,
+					expanded: false,
+
+					icon: "assets/tree-closed.png",
+
+					content: parents[i]['content'],
+
+					onExpand: "nodeExpand",
+					onNodeTap: "nodeTap",
+
+					components: []
+				};
+
+			var children = Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][parents[i]['content']];
+
+			for( var j = 0; j < children.length; j++ ) {
+
+				parentNode['components'].push(
+						{
+							classes: "enyo-tool-decorator onyx-button enyo-unselectable margin-half-bottom",
+							style: "display: block; width: 90%;",
+
+							content: children[j]['content'],
+							parentNode: children[j]['parent']
+						}
+					);
+			}
+
+			tree.push( parentNode );
+		}
+
+		//tree.push( Edit button );?
+
+		this.$['scroller'].createComponents( tree, { owner: this } );
+
+		this.$['scroller'].render();
+	},
+
+	nodeExpand: function( inSender, inEvent ) {
+
+		inSender.setIcon( "assets/" + ( inSender.expanded ? "tree-open.png" : "tree-closed.png" ) );
+	},
+
+	nodeTap: function(inSender, inEvent) {
+
+		if( inEvent.originator['parentNode'] ) {
+
+			if( enyo.isFunction( this.doCategorySelect ) ) {
+
+				this.doCategorySelect( { "category": inEvent.originator['parentNode'], "category2": ( inEvent.originator['content'] === "All Sub Categories" ? "%" : inEvent.originator['content'] ) } );
+			}
+
+			this.hide();
+		}
+
+		return true;
 	},
 
 	returnedFromView: function() {
@@ -260,49 +186,5 @@ enyo.kind({
 		this.$['transactionCategoryView'].destroy();
 
 		this.datasetChanged();
-	},
-
-	setupRow: function( inSender, inEvent ) {
-
-		var row = this.dispCategories[inEvent.index];
-		var item = inEvent.item;
-
-		if( row && item ) {
-
-			item.$['sheetName'].setContent( row['content'] );
-			item.$['sheetName'].addRemoveClass( "positiveBalance", ( row['parent'] === "|-add_edit-|" ) );
-
-			if( row['parent'] === "|-add_edit-|" ) {
-				//Edit Categories (category view)
-
-				item.$['arrows'].hide();
-			} else if( row['parent'] === "|-go_back-|" ) {
-				//Back Item (subcategory view)
-
-				item.$['arrows'].setContent( "<<" );
-				item.$['arrows'].show();
-			} else if( row['parent'] !== "" ) {
-				//Subcategory View
-
-				var selected = ( this.selected['category2'] === row['content'] );
-
-				item.$['item'].addRemoveClass( 'selected', selected );
-				item.$['item'].addRemoveClass( 'normal', !selected );
-
-				item.$['arrows'].hide();
-			} else {
-				//Category View
-
-				var selected = ( this.selected['category'] === row['content'] );
-
-				item.$['item'].addRemoveClass( 'selected', selected );
-				item.$['item'].addRemoveClass( 'normal', !selected );
-
-				item.$['arrows'].setContent( ">>" );
-				item.$['arrows'].show();
-			}
-
-			return true;
-		}
 	}
 });
