@@ -69,6 +69,17 @@ enyo.kind({
 		}
 	],
 
+	handlers: {
+		onShow: "_show"
+	},
+
+	_show: function() {
+
+		var b = this.$['scroller'].getBounds();
+
+		this.$['scroller'].applyStyle( "height", b['height'] + "px" );
+	},
+
 	//Go directly to the source for general & specific categories to avoid callbacks
 
 	loadCategories: function( callbackFn ) {
@@ -89,9 +100,9 @@ enyo.kind({
 		this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'] );
 		//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
-		this.show();
 		this._generateTree();
-		//Popup loaded, now can do UI changes
+
+		this.show();
 
 		this.doCategorySelect = callbackFn;
 
@@ -111,6 +122,8 @@ enyo.kind({
 	},
 
 	_generateTree: function() {
+
+		this.log();
 
 		this.$['scroller'].destroyClientControls();
 
