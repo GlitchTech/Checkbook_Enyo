@@ -565,6 +565,7 @@ enyo.kind( {
 
 		//Check this.accountObj properties
 		var count = 0;
+
 		for( var k in this.accountObj ) {
 
 			if( this.accountObj.hasOwnProperty( k ) ) {

@@ -18,7 +18,7 @@ enyo.kind( {
 	balanceView: 4,
 
 	/**
-	 * @private
+	 * @protected
 	 * @type Array
 	 * Components of the control
 	 */
@@ -168,7 +168,7 @@ enyo.kind( {
 	],
 
 	/**
-	 * @private
+	 * @protected
 	 * List of events to handle
 	 */
 	handlers: {
