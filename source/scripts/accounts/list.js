@@ -258,7 +258,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * @function
 	 * @name Checkbook.accounts.view#accountBalanceChangedHandler
 	 *
