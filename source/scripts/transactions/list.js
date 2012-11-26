@@ -193,6 +193,7 @@ enyo.kind( {
 
 		this.transactions = [];
 		this.$['list'].setCount( 0 );
+		this.$['list'].reset();
 		this.$['list'].lazyLoad();
 	},
 
