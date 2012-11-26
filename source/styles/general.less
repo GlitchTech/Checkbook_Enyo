@@ -187,7 +187,7 @@ html, body {
 }
 
 .label {
-	color: #1879cd;
+	color: @label-blue;
 	font-size: .8rem;
 	text-transform: uppercase;
 }
@@ -274,9 +274,9 @@ html, body {
 .onyx-popup .light {
 
 	background-color: #eeeeee;
-	color: #333333;
+	color: @charcoal;
 
-	border-radius: 5px;
+	.border-radius( 5px );
 }
 
 .bordered {
@@ -313,7 +313,7 @@ html, body {
 /*****************/
 
 .enyo-label-fullsize {
-	color: #1879cd;
+	color: @label-blue;
 	text-transform: uppercase;
 }
 
@@ -351,5 +351,5 @@ html, body {
 .dividerDrawerBlack .enyo-divider-caption {
 	font-size: 18px;
 	font-weight: normal;
-	color: #333333;
+	color: @charcoal;
 }

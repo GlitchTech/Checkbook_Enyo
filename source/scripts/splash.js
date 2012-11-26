@@ -24,7 +24,7 @@ enyo.kind({
 		{
 			name: "headerWrapper",
 			kind: "onyx.Toolbar",
-			layoutKind: "FittableColumnsLayout",
+			noStretch: true,
 			classes: "transparent"
 		}, {
 			classes: "padding-std light",
@@ -74,12 +74,10 @@ enyo.kind({
 					[
 						{
 							name: "spinner",
-							kind: "jmtk.Spinner",
-							color: "#272D70",
-							diameter: "30",
-							shape: "spiral",
+							kind: "onyx.Spinner",
+							classes: "size-half",
 
-							style: "margin-right: 5px;"
+							style: "margin: 0 5px 0 0;"
 						}, {
 							name: "icon",
 							kind: "Image",
@@ -99,6 +97,8 @@ enyo.kind({
 
 			this.headerBuilt = true;
 		}
+
+		this.$['spinner'].show();
 
 		this.checkSystem();
 
