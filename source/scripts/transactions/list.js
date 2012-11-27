@@ -522,10 +522,11 @@ results = {
 			this.$['viewSingle'].setIndex( inEvent.rowIndex );
 			this.$['viewSingle'].setTransaction( this.transactions[inEvent.rowIndex] );
 			this.$['viewSingle'].setAccount( this.account );
-			this.$['viewSingle'].show();
+
+			enyo.asyncMethod( this.$['viewSingle'], this.$['viewSingle'].show );
 		} else {
 
-			this.vsEdit( null, inEvent );
+			enyo.asyncMethod( this, this.vsEdit, null, inEvent );
 		}
 
 		return true;

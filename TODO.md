@@ -29,7 +29,6 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 	- Data: json of object to sync
 	- Where: where args for edit, delete
 
-Phone Mode
-==========
 
-Needs to be tested on an actual device to see behaviour. Work on optimizing list loading (ie only when in view).
+
+Checkout Twitter bootstrap
