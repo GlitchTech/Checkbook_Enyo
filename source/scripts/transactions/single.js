@@ -164,6 +164,22 @@ enyo.kind( {
 								}
 							]
 						}, {
+							name: "payeeHolder",
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "bordered padding-std text-middle",
+
+							components: [
+								{
+									name: "payee",
+									fit: true
+								}, {
+									content: "payee",
+									classes: "label"
+								}
+							]
+						}, {
 							name: "cleared",
 							kind: "GTS.ToggleBar",
 							classes: "bordered",
@@ -393,7 +409,7 @@ enyo.kind( {
 
 		//Date
 		var dateObj = new Date( parseInt( this.transaction['date'] ) );
-		this.$['time'].setContent( dateObj.format( { date: "longDate", time: ( this.account["showTransTime"] === 1 ? "shortTime" : "" ) } ) );
+		this.$['time'].setContent( dateObj.format( { date: "long", time: ( this.account["showTransTime"] === 1 ? "short" : "" ) } ) );
 
 		//Categories
 		if( this.account['enableCategories'] === 1 ) {
@@ -418,6 +434,16 @@ enyo.kind( {
 
 		//Cleared
 		this.$['cleared'].setValue( this.transaction['cleared'] == 1 );
+
+		//Payee
+		if( this.account['payeeField'] === 1 && this.transaction['payee'] && this.transaction['payee'] !== "" ) {
+
+			this.$['payeeHolder'].show();
+			this.$['payee'].setContent( this.transaction['payee']  );
+		} else {
+
+			this.$['payeeHolder'].hide();
+		}
 
 		//Note
 		if( this.transaction['note'] != "" ) {
