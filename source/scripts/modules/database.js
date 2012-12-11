@@ -520,7 +520,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Subfunction for both getInsert && getReplace
 	 * @param sql ( string, required ):
 	 *	 * primer from getInsert || getReplace
@@ -793,7 +793,7 @@ enyo.kind({
 	// === Private methods ===
 
 	/**
-	 * @private
+	 * @protected
 	 * Sets the local tracking variable for the DB version
 	 *
 	 * PRIVATE FUNCTION; use the changeVersion* functions to modify
@@ -806,7 +806,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Merge user options into the standard set
 	 *
 	 * @param userOptions ( object, required ): options passed by the user
@@ -845,12 +845,12 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 */
 	_emptyFunction: function() {},
 
 	/**
-	 * @private
+	 * @protected
 	 * Converts an SQLResultSet into a standard Javascript array of results
 	 */
 	_convertResultSet: function( rs ) {
@@ -869,7 +869,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Used to report generic database errors
 	 */
 	_errorHandler: function( transaction, error ) {
@@ -901,7 +901,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * Used to output "database lost" error
 	 */
 	_db_lost: function() {

@@ -42,7 +42,7 @@ enyo.kind({
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * @type Array
 	 * Components of the control
 	 */

@@ -44,7 +44,7 @@ enyo.kind( {
 	pinChanged: false,
 
 	/**
-	 * @private
+	 * @protected
 	 * @type Array
 	 * Components of the control
 	 */

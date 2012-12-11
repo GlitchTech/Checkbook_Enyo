@@ -33,11 +33,3 @@ Phone Mode
 ==========
 
 Needs to be tested on an actual device to see behaviour. Work on optimizing list loading (ie only when in view).
-
-Enyo Update
-===========
-
-* Update code to run on EnyoJS (2) instead of Enyo 1
-* Check performance on canvas spinner, replace with onyx if causing lag
-* Convert event chains to enyo.Signals (https://github.com/enyojs/enyo/wiki/Event-Handling)
-* Integrate Backbone.js (?) (http://documentcloud.github.com/backbone/#)

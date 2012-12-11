@@ -7,7 +7,7 @@ enyo.kind( {
 	account: {},
 
 	/**
-	 * @private
+	 * @protected
 	 * @type Array
 	 * Components of the control
 	 */
@@ -174,7 +174,7 @@ enyo.kind( {
 	},
 
 	/**
-	 * @private
+	 * @protected
 	 * @function
 	 * @name Checkbook.transactions.view#listDrag
 	 *

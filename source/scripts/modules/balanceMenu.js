@@ -31,7 +31,7 @@ enyo.kind({
 	],
 
 	/**
-	 * @private
+	 * @protected
 	 * List of events to handle
 	 */
 	handlers: {
