@@ -423,7 +423,7 @@ enyo.kind( {
 		if( this.transaction['note'] != "" ) {
 
 			this.$['noteHolder'].show();
-			this.$['note'].setContent( this.transaction['note'] );
+			this.$['note'].setContent( this.transaction['note'].replace( /\n/g, "<br />" )  );
 		} else {
 
 			this.$['noteHolder'].hide();

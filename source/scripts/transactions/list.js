@@ -347,7 +347,7 @@ enyo.kind( {
 			this.$['checkNum'].setContent( ( this.account['checkField'] === 1 && row['checkNum'] && row['checkNum'] !== "" ) ? ( "Check #" + row['checkNum'] ) : "" );
 
 			//Notes
-			this.$['note'].setContent( ( this.account['hideNotes'] === 1 ? "" : row['note'] ) );
+			this.$['note'].setContent( ( this.account['hideNotes'] === 1 ? "" : row['note'] ).replace( /\n/g, "<br />" ) );
 
 			//Row Icons
 			var transferCheck = ( row['linkedRecord'] && !isNaN( row['linkedRecord'] ) && row['linkedRecord'] != "" );
