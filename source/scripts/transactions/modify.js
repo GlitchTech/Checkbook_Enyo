@@ -146,7 +146,9 @@ enyo.kind( {
 									open: false
 								}
 							]
-						}, {
+						},
+
+						{
 							name: "categoryHolder",
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
@@ -238,7 +240,9 @@ enyo.kind( {
 									]
 								}
 							]
-						}, {//TODO
+						},
+
+						{//TODO
 							showing: false,
 
 							kind: "onyx.Groupbox",
@@ -285,7 +289,9 @@ enyo.kind( {
 									]
 								}
 							]
-						}, {
+						},
+
+						{
 							name: "checkNumHolder",
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
@@ -312,6 +318,30 @@ enyo.kind( {
 								}
 							]
 						}, {
+							name: "payeeFieldHolder",
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
+							components: [
+								{
+									kind: "onyx.InputDecorator",
+									layoutKind: "FittableColumnsLayout",
+									noStretch: true,
+									classes: "padding-half-top",
+									components: [
+										{
+											name: "payeeField",
+											kind: "onyx.Input",
+											fit: true
+										}, {
+											content: "Payee",
+											classes: "label"
+										}
+									]
+								}
+							]
+						},
+
+						{
 							name: "cleared",
 							kind: "GTS.ToggleBar",
 							classes: "bordered",
@@ -516,7 +546,8 @@ enyo.kind( {
 					"repeatId": -1,
 					"checkNum": "",
 					"category": "Uncategorized",
-					"category2": "Other"
+					"category2": "Other",
+					"payee": ""
 					//TODO default repeat information
 				},
 				this.trsnObj
@@ -628,6 +659,7 @@ enyo.kind( {
 		this.$['time'].setValue( this.trsnObj['date'] );
 
 		this.$['checkNum'].setValue( this.trsnObj['checkNum'] );
+		this.$['payeeField'].setValue( this.trsnObj['payee'] );
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
@@ -696,6 +728,14 @@ enyo.kind( {
 		} else {
 
 			this.$['checkNumHolder'].hide();
+		}
+
+		if( this.accountObj['payeeField'] == 1 ) {
+
+			this.$['payeeFieldHolder'].show();
+		} else {
+
+			this.$['payeeFieldHolder'].hide();
 		}
 
 		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
@@ -1021,6 +1061,7 @@ enyo.kind( {
 		//this.trsnObj['category2']
 
 		this.trsnObj['checkNum'] = this.$['checkNum'].getValue();
+		this.trsnObj['payee'] = this.$['payeeField'].getValue();
 		this.trsnObj['cleared'] = this.$['cleared'].getValue();
 		this.trsnObj['note'] = this.$['notes'].getValue();
 

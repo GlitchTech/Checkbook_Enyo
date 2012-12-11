@@ -311,15 +311,6 @@ enyo.kind( {
 										}
 									]
 								}, {
-									name: "checkNumber",
-									kind: "GTS.ToggleBar",
-									classes: "bordered",
-
-									label: "Add Check Number Field",
-									sublabel: "Add a field to record the check number in the add/edit transaction screen.",
-									onContent: "Yes",
-									offContent: "No"
-								}, {
 									name: "expenseCategories",
 									kind: "GTS.ToggleBar",
 									classes: "bordered",
@@ -329,6 +320,15 @@ enyo.kind( {
 									onContent: "Yes",
 									offContent: "No",
 									value: true
+								}, {
+									name: "checkNumber",
+									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
+									label: "Add Check Number Field",
+									sublabel: "Add a field to record the check number in the add/edit transaction screen.",
+									onContent: "Yes",
+									offContent: "No"
 								}, {
 									name: "payeeField",
 									kind: "GTS.ToggleBar",
