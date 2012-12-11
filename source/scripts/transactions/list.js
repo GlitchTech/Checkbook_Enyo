@@ -93,7 +93,7 @@ enyo.kind( {
 			belowComponents: [
 				/* Content that displays below the list NYI */
 				{
-					content: "TEST 2"
+					content: "&nbsp;"
 				}
 			]
 		},

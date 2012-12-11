@@ -8,7 +8,7 @@
 var appInfo = {
 	"title": "Checkbook",
 	"id": "com.glitchtechscience.enyo.checkbook",
-	"version": "1.1.0",
+	"version": "1.0.9",
 
 	"vendor": "GlitchTech Science",
 	"vendorurl": "http://www.glitchtechscience.com",
