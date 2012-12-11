@@ -915,6 +915,7 @@ enyo.kind({
 				//Special checks not needed
 				trsn['checkNum'] = this.getNode( data[i], 'gsx:checknum' );
 				trsn['note'] = this.getNode( data[i], 'gsx:note' );
+				trsn['payee'] = this.getNode( data[i], 'gsx:payee' );
 
 				this.importItems[this.documentIndex]['transactions'].push( trsn );
 			}

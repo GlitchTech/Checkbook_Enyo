@@ -410,6 +410,8 @@ enyo.kind({
 
 		if( row ) {
 
+			item.$['catDivider'].hide();
+
 			row['index'] = index;
 
 			item.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );

@@ -79,6 +79,9 @@ enyo.kind( {
 							name: "checkNum",
 							classes: "smaller"
 						}, {
+							name: "payee",
+							classes: "smaller"
+						}, {
 							name: "note",
 							classes: "smaller",
 							allowHtml: true
@@ -90,7 +93,7 @@ enyo.kind( {
 			belowComponents: [
 				/* Content that displays below the list NYI */
 				{
-					content: "TEST 2"
+					content: "&nbsp;"
 				}
 			]
 		},
@@ -193,6 +196,7 @@ enyo.kind( {
 
 		this.transactions = [];
 		this.$['list'].setCount( 0 );
+		this.$['list'].reset();
 		this.$['list'].lazyLoad();
 	},
 
@@ -298,7 +302,7 @@ enyo.kind( {
 			//Date
 			var dateObj = new Date( parseInt( row['date'] ) );
 
-			this.$['time'].setContent( dateObj.format( { "date": ( enyo.Panels.isScreenNarrow() ? "shortDate" : "longDate" ), "time": ( this.account['showTransTime'] === 1 ? 'shortTime' : '' ) } ) );
+			this.$['time'].setContent( dateObj.format( { "date": ( enyo.Panels.isScreenNarrow() ? "short" : "long" ), "time": ( this.account['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
 			var today = new Date();
 			if( this.account['showTransTime'] !== 1 ) {
@@ -342,11 +346,15 @@ enyo.kind( {
 
 				this.$['category'].hide();
 			}
+
 			//Check Number
 			this.$['checkNum'].setContent( ( this.account['checkField'] === 1 && row['checkNum'] && row['checkNum'] !== "" ) ? ( "Check #" + row['checkNum'] ) : "" );
 
+			//Payee
+			this.$['payee'].setContent( ( this.account['payeeField'] === 1 && row['payee'] && row['payee'] !== "" ) ? ( "Payee: " + row['payee'] ) : "" );
+
 			//Notes
-			this.$['note'].setContent( ( this.account['hideNotes'] === 1 ? "" : row['note'] ) );
+			this.$['note'].setContent( ( this.account['hideNotes'] === 1 ? "" : row['note'] ).replace( /\n/g, "<br />" ) );
 
 			//Row Icons
 			var transferCheck = ( row['linkedRecord'] && !isNaN( row['linkedRecord'] ) && row['linkedRecord'] != "" );
@@ -521,10 +529,11 @@ results = {
 			this.$['viewSingle'].setIndex( inEvent.rowIndex );
 			this.$['viewSingle'].setTransaction( this.transactions[inEvent.rowIndex] );
 			this.$['viewSingle'].setAccount( this.account );
-			this.$['viewSingle'].show();
+
+			enyo.asyncMethod( this.$['viewSingle'], this.$['viewSingle'].show );
 		} else {
 
-			this.vsEdit( null, inEvent );
+			enyo.asyncMethod( this, this.vsEdit, null, inEvent );
 		}
 
 		return true;

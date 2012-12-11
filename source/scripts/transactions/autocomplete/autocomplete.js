@@ -66,12 +66,12 @@ enyo.kind( {
 						}
 					),
 				{
-					"onSuccess": enyo.bind( this, this.buildSuggestionList, inEvent.callback )
+					"onSuccess": enyo.bind( this, this.buildSuggestionList )
 				}
 			);
 	},
 
-	buildSuggestionList: function( callback, results ) {
+	buildSuggestionList: function( results ) {
 
 		var data = [];
 
@@ -80,7 +80,7 @@ enyo.kind( {
 			data.push( results[i]['desc'] );
 		}
 
-		callback( data );
+		this.$['ac'].setValues( data );
 	},
 
 	handleSuggestion: function( inSender, inEvent ) {

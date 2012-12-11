@@ -160,7 +160,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			.error( enyo.bind( this, this.generalFailure, options['onError'] ) );
 	},
 
-	/** @private */
+	/** @protected */
 	generalFailure: function( callbackFn, failure, timeout ) {
 		//inSender, inResponse, inRequest
 

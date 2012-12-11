@@ -146,7 +146,9 @@ enyo.kind( {
 									open: false
 								}
 							]
-						}, {
+						},
+
+						{
 							name: "categoryHolder",
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
@@ -165,41 +167,44 @@ enyo.kind( {
 
 									components: [
 										{
-											kind: "enyo.FittableColumns",
-											classes: "onyx-item text-middle bordered",
+											name: "categoryWrapper",
+											classes: "onyx-item text-middle bordered h-box",
 											components: [
 												{
 													name: "categoryText",
-													classes: "margin-right",
-													fit: true,
+													kind: "onyx.Button",
+													classes: "margin-right box-flex",
 
 													ontap: "categoryTapped"
 												}, {
 													name: "categoryItemBreak",
 													tag: "br"
 												}, {
-													kind: "onyx.InputDecorator",
-
-													classes: "margin-right",
-													style: "display: inline-block;",
-
 													components: [
 														{
-															name: "categoryAmount",
-															kind: "GTS.DecimalInput",
-															oninput: "categoryAmountChanged",
+															kind: "onyx.InputDecorator",
 
-															placeholder: "0.00"
+															classes: "inline-force margin-right",
+
+															components: [
+																{
+																	name: "categoryAmount",
+																	kind: "GTS.DecimalInput",
+																	oninput: "categoryAmountChanged",
+
+																	placeholder: "0.00"
+																}
+															]
+														}, {
+															name: "categoryDelete",
+															kind: "onyx.Button",
+															classes: "small-padding",
+
+															content: "-",
+
+															ontap: "categoryDelete"
 														}
 													]
-												}, {
-													name: "categoryDelete",
-													kind: "onyx.Button",
-													content: "-",
-
-													classes: "small-padding",
-
-													ontap: "categoryDelete"
 												}
 											]
 										}
@@ -235,7 +240,9 @@ enyo.kind( {
 									]
 								}
 							]
-						}, {//TODO
+						},
+
+						{//TODO
 							showing: false,
 
 							kind: "onyx.Groupbox",
@@ -282,7 +289,9 @@ enyo.kind( {
 									]
 								}
 							]
-						}, {
+						},
+
+						{
 							name: "checkNumHolder",
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
@@ -309,6 +318,30 @@ enyo.kind( {
 								}
 							]
 						}, {
+							name: "payeeFieldHolder",
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
+							components: [
+								{
+									kind: "onyx.InputDecorator",
+									layoutKind: "FittableColumnsLayout",
+									noStretch: true,
+									classes: "padding-half-top",
+									components: [
+										{
+											name: "payeeField",
+											kind: "onyx.Input",
+											fit: true
+										}, {
+											content: "Payee",
+											classes: "label"
+										}
+									]
+								}
+							]
+						},
+
+						{
 							name: "cleared",
 							kind: "GTS.ToggleBar",
 							classes: "bordered",
@@ -403,12 +436,10 @@ enyo.kind( {
 			classes: "onyx-scrim-translucent"
 		}, {
 			name: "loadingSpinner",
-			kind: "jmtk.Spinner",
-			color: "#272D70",
-			diameter: "90",
-			shape: "spiral",
+			kind: "onyx.Spinner",
+			classes: "size-double",
 
-			style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+			style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 		},
 
 		{
@@ -426,7 +457,7 @@ enyo.kind( {
 
 	buildDateSystem: function() {
 
-		if( 1 == 2 ) {
+		if( !enyo.Panels.isScreenNarrow() ) {
 			//Big Screen
 
 			this.$['dateDrawer'].createComponent(
@@ -515,7 +546,8 @@ enyo.kind( {
 					"repeatId": -1,
 					"checkNum": "",
 					"category": "Uncategorized",
-					"category2": "Other"
+					"category2": "Other",
+					"payee": ""
 					//TODO default repeat information
 				},
 				this.trsnObj
@@ -562,6 +594,7 @@ enyo.kind( {
 
 		//Check this.accountObj properties
 		var count = 0;
+
 		for( var k in this.accountObj ) {
 
 			if( this.accountObj.hasOwnProperty( k ) ) {
@@ -626,6 +659,7 @@ enyo.kind( {
 		this.$['time'].setValue( this.trsnObj['date'] );
 
 		this.$['checkNum'].setValue( this.trsnObj['checkNum'] );
+		this.$['payeeField'].setValue( this.trsnObj['payee'] );
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
@@ -694,6 +728,14 @@ enyo.kind( {
 		} else {
 
 			this.$['checkNumHolder'].hide();
+		}
+
+		if( this.accountObj['payeeField'] == 1 ) {
+
+			this.$['payeeFieldHolder'].show();
+		} else {
+
+			this.$['payeeFieldHolder'].hide();
 		}
 
 		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
@@ -837,9 +879,12 @@ enyo.kind( {
 
 		if( row && item ) {
 
+			item.$['categoryWrapper'].addRemoveClass( "h-box", !enyo.Panels.isScreenNarrow() );
 			item.$['categoryItemBreak'].setShowing( enyo.Panels.isScreenNarrow() );
 
-			item.$['categoryText'].setContent( ( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) ) );
+			item.$['categoryText'].setContent( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) );
+			item.$['categoryText'].addRemoveClass( "margin-half-bottom", enyo.Panels.isScreenNarrow() );
+			item.$['categoryText'].addRemoveClass( "full-width", enyo.Panels.isScreenNarrow() );
 
 			if( this.trsnObj['category'].length > 1 ) {
 				//If only one category, takes up full amount
@@ -860,10 +905,14 @@ enyo.kind( {
 
 				item.$['categoryAmount'].setDisabled( false );
 				item.$['categoryDelete'].setDisabled( false );
+
+				item.$['categoryDelete'].addClass( "onyx-negative" );
 			} else {
 
 				item.$['categoryAmount'].setDisabled( true );
 				item.$['categoryDelete'].setDisabled( true );
+
+				item.$['categoryDelete'].removeClass( "onyx-negative" );
 
 				row['amount'] = 0;
 			}
@@ -1012,6 +1061,7 @@ enyo.kind( {
 		//this.trsnObj['category2']
 
 		this.trsnObj['checkNum'] = this.$['checkNum'].getValue();
+		this.trsnObj['payee'] = this.$['payeeField'].getValue();
 		this.trsnObj['cleared'] = this.$['cleared'].getValue();
 		this.trsnObj['note'] = this.$['notes'].getValue();
 

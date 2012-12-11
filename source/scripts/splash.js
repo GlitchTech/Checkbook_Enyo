@@ -24,7 +24,7 @@ enyo.kind({
 		{
 			name: "headerWrapper",
 			kind: "onyx.Toolbar",
-			layoutKind: "FittableColumnsLayout",
+			noStretch: true,
 			classes: "transparent"
 		}, {
 			classes: "padding-std light",
@@ -74,12 +74,10 @@ enyo.kind({
 					[
 						{
 							name: "spinner",
-							kind: "jmtk.Spinner",
-							color: "#272D70",
-							diameter: "30",
-							shape: "spiral",
+							kind: "onyx.Spinner",
+							classes: "size-half",
 
-							style: "margin-right: 5px;"
+							style: "margin: 0 5px 0 0;"
 						}, {
 							name: "icon",
 							kind: "Image",
@@ -99,6 +97,8 @@ enyo.kind({
 
 			this.headerBuilt = true;
 		}
+
+		this.$['spinner'].show();
 
 		this.checkSystem();
 
@@ -159,10 +159,8 @@ enyo.kind({
 			currVersion = results[0]['dbVer'];
 		}
 
-		this.log( currVersion );
-
 		//DB Version
-		this.versionCheck = 24;
+		this.versionCheck = 25;
 
 		if( currVersion == this.versionCheck ) {
 
@@ -794,11 +792,17 @@ enyo.kind({
 
 				this.versionCheck = 24;
 			case 24:
-				//this.versionCheck = 25;
+				//Payee field option
+				querySet.push( "ALTER TABLE accounts ADD COLUMN payeeField INTEGER NOT NULL DEFAULT 0;" );
+				querySet.push( "ALTER TABLE transactions ADD COLUMN payee TEXT;" );
 
+				this.versionCheck = 25;
+			case 25:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );
+
+				//this.versionCheck = 26;
 		}
 
 		querySet.push(

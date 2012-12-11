@@ -196,6 +196,7 @@ enyo.kind({
 		atData['category2'] = "Auto Transfer";
 
 		delete atData['checkNum'];
+		delete atData['payee'];
 
 		var sql = [];
 
@@ -907,7 +908,7 @@ enyo.kind({
 					"sql": "SELECT" +
 						//Expense table data
 						" DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account," +
-						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum," +
+						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee," +
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
@@ -962,7 +963,7 @@ enyo.kind({
 					"sql": "SELECT" +
 						//Expense table data
 						" DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account," +
-						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum," +
+						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee," +
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
@@ -1087,7 +1088,7 @@ enyo.kind({
 					"sql": "SELECT" +
 						//Expense table data
 						" DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account," +
-						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum," +
+						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee," +
 
 						//Account information
 						" ( SELECT accts.acctName FROM accounts accts WHERE accts.acctId = main.account ) AS acctName," +

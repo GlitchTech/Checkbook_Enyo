@@ -29,15 +29,11 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 	- Data: json of object to sync
 	- Where: where args for edit, delete
 
-Phone Mode
-==========
 
-Needs to be tested on an actual device to see behaviour. Work on optimizing list loading (ie only when in view).
 
-Enyo Update
-===========
+Checkout Twitter bootstrap
 
-* Update code to run on EnyoJS (2) instead of Enyo 1
-* Check performance on canvas spinner, replace with onyx if causing lag
-* Convert event chains to enyo.Signals (https://github.com/enyojs/enyo/wiki/Event-Handling)
-* Integrate Backbone.js (?) (http://documentcloud.github.com/backbone/#)
+REPORT
+Today I switch from Checkbook Beta to Checkbook (finally...) and found a bug during export. When the amount is greater than a million, ex $1,200,000, it will export "1.2M" instead of the real number. When the account is imported the amount becomes $1.2.
+
+PS. I'm not that rich, just my currency is smaller than dollars. For the same reason I'll appreciate if the number after decimal can be set to not shown. It occupies too much space, ex. $986,000.00

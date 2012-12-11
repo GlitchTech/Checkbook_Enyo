@@ -1,0 +1,34 @@
+/** Horizontal Box **/
+
+.h-box {
+	display: inline-block;/* fallback for crappy browsers */
+
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-align: stretch;
+
+	display: -moz-box;
+	-moz-box-orient: horizontal;
+	-moz-box-align: stretch;
+
+	display: box;
+	box-orient: horizontal;
+	box-align: stretch;
+}
+
+.h-box > * {
+	.box-flex-generator( 0 );
+	display: block;
+}
+
+/** Flexes **/
+
+.box-flex-0 { .box-flex-generator( 0 ); }
+.box-flex-1, .box-flex { .box-flex-generator( 1 ); }
+.box-flex-2 { .box-flex-generator( 2 ); }
+
+/** Packing **/
+
+.pack-start { .box-pack-generator( start ); }
+.pack-end { .box-pack-generator( end ); }
+.pack-center { .box-pack-generator( center ); }
