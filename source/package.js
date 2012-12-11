@@ -9,6 +9,10 @@ enyo.depends(
 	"$lib/onyx/source",
 	"Theme.less",
 
+	"$lib/database.js",
+	"$lib/gdata.js",
+	"$lib/utils.js",
+
 	"$lib/aes.js",
 
 	"$lib/gts-plugins/PrototypeExt",
