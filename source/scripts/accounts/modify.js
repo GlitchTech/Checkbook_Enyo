@@ -413,12 +413,10 @@ enyo.kind( {
 			classes: "onyx-scrim-translucent"
 		}, {
 			name: "loadingSpinner",
-			kind: "jmtk.Spinner",
-			color: "#284907",
-			diameter: "90",
-			shape: "spiral",
+			kind: "onyx.Spinner",
+			classes: "size-double",
 
-			style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+			style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 		},
 
 		{

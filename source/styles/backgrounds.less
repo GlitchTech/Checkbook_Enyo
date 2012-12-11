@@ -16,8 +16,8 @@
 .light,
 .light-row ,
 .light .norm-row {
-	background-color: #f1f1f1;
-	color: #333333;
+	background-color: @light-grey;
+	color: @charcoal;
 }
 
 .alt-row {
@@ -25,10 +25,6 @@
 }
 
 /* Backgrounds/Gradients */
-
-@deep-green: #284907;//Dark
-@rich-brown: #382513;
-@tardis-blue: #272d70;//Dark
 
 .deep-green { .solid-background( dark, @deep-green ); }
 .deep-green-gradient { .gradient( @deep-green ); }
@@ -38,27 +34,6 @@
 
 .tardis-blue { .solid-background( dark, @tardis-blue ); }
 .tardis-blue-gradient { .gradient( @tardis-blue ); }
-
-.solid-background ( dark, @color ) {
-	color: #f1f1f1;
-}
-
-.solid-background ( @_, @color ) {
-	background-color: @color;
-}
-
-.gradient ( @color ) {
-	/* Horizontal, Center based */
-
-	background: @color; /* Old browsers */
-	background: -moz-linear-gradient( left, @color 0%, @color 10%, #f1f1f1 40%, #f1f1f1 60%, @color 90%, @color 100% ); /* FF3.6+ */
-	background: -webkit-gradient( linear, left top, right top, color-stop( 0%, @color ), color-stop( 10%, @color ), color-stop( 40%, #f1f1f1 ), color-stop( 60%, #f1f1f1 ), color-stop( 90%, @color ), color-stop( 100%, @color ) ); /* Chrome, Safari4+ */
-	background: -webkit-linear-gradient( left, @color 0%, @color 10%, #f1f1f1 40%, #f1f1f1 60%, @color 90%, @color 100% ); /* Chrome10+, Safari5.1+ */
-	background: -o-linear-gradient( left, @color 0%, @color 10%, #f1f1f1 40%, #f1f1f1 60%, @color 90%, @color 100% ); /* Opera 11.10+ */
-	background: -ms-linear-gradient( left, @color 0%, @color 10%, #f1f1f1 40%, #f1f1f1 60%, @color 90%, @color 100% ); /* IE10+ */
-	background: linear-gradient( to right, @color 0%, @color 10%, #f1f1f1 40%, #f1f1f1 60%, @color 90%, @color 100% ); /* W3C */
-	filter: ~"progid:DXImageTransform.Microsoft.gradient( startColorstr='@{color}', endColorstr='@{color}', GradientType=1 )";/* IE6-9 */
-}
 
 /* Checkbook Stamp Background */
 
@@ -73,7 +48,7 @@
 .custom-background {
 
 	&.blue { .color( #dbeaf9, #0d71d7, #02406d, #f4f9ff ); }
-	&.black { .color( #8f8f8f, #000000, #333333, #333333 ); }
+	&.black { .color( #8f8f8f, @black, @charcoal, @charcoal ); }
 	&.green { .color( #e5f3d9, #52b400, #008000, #f0ffe4 ); }
 	&.orange { .color( #ffead9, #ff7200, #ee8e00, #faf0e8 ); }
 	&.pink { .color( #ffd9f1, #ff00a2, #ffc0cb, #fce9f5 ); }
@@ -81,21 +56,4 @@
 	&.red { .color( #ffd9d9, #ff0000, #b22222, #fff3f3 ); }
 	&.teal { .color( #d9f2f7, #00a6c9, #008080, #48d1cc ); }
 	&.yellow { .color( #fdf9d9, #f4d400, #ffef00, #f8e359 ); }
-}
-
-.color ( @color, @color2, @color3, @color4 ) {
-
-	background-color: @color;
-	border-color: @color2;
-
-	&.legend {
-
-		background-color: @color3;
-		color: contrast( @color3, #000000, #ffffff );
-	}
-
-	&.held {
-
-		background-color: @color4;
-	}
 }

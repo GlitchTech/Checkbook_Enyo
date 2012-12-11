@@ -187,7 +187,7 @@ html, body {
 }
 
 .label {
-	color: #1879cd;
+	color: @label-blue;
 	font-size: .8rem;
 	text-transform: uppercase;
 }
@@ -274,9 +274,9 @@ html, body {
 .onyx-popup .light {
 
 	background-color: #eeeeee;
-	color: #333333;
+	color: @charcoal;
 
-	border-radius: 5px;
+	.border-radius( 5px );
 }
 
 .bordered {
@@ -313,7 +313,7 @@ html, body {
 /*****************/
 
 .enyo-label-fullsize {
-	color: #1879cd;
+	color: @label-blue;
 	text-transform: uppercase;
 }
 
@@ -325,35 +325,6 @@ html, body {
 
 .onyx-button.small-padding {
 	padding: 2px 6px;
-}
-
-/* Custom Checkbox States */
-
-.onyx-checkbox {
-
-	&.add {
-		background: url( "../../assets/menu_icons/new.png" ) no-repeat;
-	}
-
-	&.lock {
-		background: url( "../../assets/menu_icons/lock.png" ) no-repeat;
-	}
-
-	&.lock[checked] {
-		background: url( "../../assets/menu_icons/unlock.png" ) no-repeat;
-	}
-
-	&.income {
-		background: url( "../../assets/menu_icons/income.png" ) no-repeat;
-	}
-
-	&.transfer {
-		background: url( "../../assets/menu_icons/transfer.png" ) no-repeat;
-	}
-
-	&.expense {
-		background: url( "../../assets/menu_icons/expense.png" ) no-repeat;
-	}
 }
 
 /*****************/
@@ -380,5 +351,5 @@ html, body {
 .dividerDrawerBlack .enyo-divider-caption {
 	font-size: 18px;
 	font-weight: normal;
-	color: #333333;
+	color: @charcoal;
 }
