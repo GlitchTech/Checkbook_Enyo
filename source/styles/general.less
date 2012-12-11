@@ -182,6 +182,10 @@ html, body {
 	display: inline-block;
 }
 
+.inline-force {
+	display: inline-block !important;
+}
+
 .label {
 	color: #1879cd;
 	font-size: .8rem;
@@ -239,8 +243,8 @@ html, body {
 }
 
 .arrow,
-.arrow:active:hover:not( [disabled] ),
-.arrow.active {
+.arrow.active,
+.arrow:active:hover:not( [disabled] ) {
 	height: 32px;
 	padding-right: 32px;
 
@@ -251,8 +255,8 @@ html, body {
 }
 
 .arrow.dark,
-.arrow.dark:active:hover:not( [disabled] ),
-.arrow.dark {
+.arrow.dark:active,
+.arrow.dark:active:hover:not( [disabled] ) {
 	background-image: url( "../../assets/menu-arrow-light.png" );
 }
 
@@ -282,6 +286,17 @@ html, body {
 
 .onyx-item.bordered {
 	font-size: .9rem;
+}
+
+.enyo-node {
+	.bordered {
+		&:first-child {
+			border-top: 0px;
+		}
+		&:last-child {
+			border-bottom: 0px;
+		}
+	}
 }
 
 .onyx-input-decorator > input {
@@ -363,7 +378,7 @@ html, body {
 /*****************/
 
 .dividerDrawerBlack .enyo-divider-caption {
-	font-size:18px;
+	font-size: 18px;
 	font-weight: normal;
 	color: #333333;
 }
