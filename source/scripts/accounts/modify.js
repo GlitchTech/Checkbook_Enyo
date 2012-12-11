@@ -330,6 +330,16 @@ enyo.kind( {
 									offContent: "No",
 									value: true
 								}, {
+									name: "payeeField",
+									kind: "GTS.ToggleBar",
+									classes: "bordered",
+
+									label: "Add Payee Field",
+									sublabel: "Add a field to record the payee in the add/edit transaction screen.",
+									onContent: "Yes",
+									offContent: "No",
+									value: false
+								}, {
 									showing: false,
 
 									name: "hideCleared",
@@ -731,7 +741,8 @@ enyo.kind( {
 							"hide_cleared": 0,
 							"last_sync": "",
 							"auto_savings": 0,
-							"auto_savings_link": -1
+							"auto_savings_link": -1,
+							"payeeField": 0
 						}
 				);
 		}
@@ -771,6 +782,7 @@ enyo.kind( {
 		this.$['autoTransferLink'].setValue( results['auto_savings_link'] );
 		this.$['checkNumber'].setValue( results['checkField'] === 1 );
 		this.$['expenseCategories'].setValue( results['enableCategories'] === 1 );
+		this.$['payeeField'].setValue( results['payeeField'] === 1 );
 		this.$['hideCleared'].setValue( results['hide_cleared'] === 1 );//DNE
 
 		//Adjust Sublabel elements
@@ -832,6 +844,7 @@ enyo.kind( {
 				"checkField": this.$['checkNumber'].getValue(),
 				"hideNotes": this.$['hideTransNotes'].getValue(),
 				"enableCategories": this.$['expenseCategories'].getValue(),
+				"payeeField": this.$['payeeField'].getValue(),
 				"hide_cleared": false
 			};
 
