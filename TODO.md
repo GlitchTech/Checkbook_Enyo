@@ -1,6 +1,8 @@
 Recurrance
 ==========
 
+http://www.ietf.org/rfc/rfc2445
+
 GTS Syncing
 ===========
 
@@ -30,8 +32,8 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 	- Where: where args for edit, delete
 
 
-
 Checkout Twitter bootstrap
+
 
 REPORT
 Today I switch from Checkbook Beta to Checkbook (finally...) and found a bug during export. When the amount is greater than a million, ex $1,200,000, it will export "1.2M" instead of the real number. When the account is imported the amount becomes $1.2.
