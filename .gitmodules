@@ -7,15 +7,15 @@
 [submodule "lib/layout"]
 	path = lib/layout
 	url = https://github.com/enyojs/layout.git
-[submodule "lib/gts-plugins"]
-	path = lib/gts-plugins
-	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
-[submodule "lib/canvas-spinner"]
-	path = lib/canvas-spinner
-	url = https://github.com/JMTK/canvas-spinner.git
-[submodule "lib/private"]
-	path = lib/private
-	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/checkbook_private.git
 [submodule "lib/g11n"]
 	path = lib/g11n
 	url = https://github.com/enyojs/g11n.git
+[submodule "lib/mvc"]
+	path = lib/mvc
+	url = https://github.com/enyojs/bootplate-mvc.git
+[submodule "lib/gts-plugins"]
+	path = lib/gts-plugins
+	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
+[submodule "lib/private"]
+	path = lib/private
+	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/checkbook_private.git

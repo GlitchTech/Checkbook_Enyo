@@ -1,0 +1,93 @@
+/* Border Radius */
+
+.border-radius ( @radius ) {
+
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+}
+
+.border-radius ( top-left, @radius ) {
+
+	-webkit-border-top-left-radius: @radius;
+	-moz-border-top-left-radius: @radius;
+	border-top-left-radius: @radius;
+}
+
+.border-radius ( top-right, @radius ) {
+
+	-webkit-border-top-right-radius: @radius;
+	-moz-border-top-right-radius: @radius;
+	border-top-right-radius: @radius;
+}
+
+.border-radius ( bottom-left, @radius ) {
+
+	-webkit-border-bottom-left-radius: @radius;
+	-moz-border-bottom-left-radius: @radius;
+	border-bottom-left-radius: @radius;
+}
+
+.border-radius ( bottom-right, @radius ) {
+
+	-webkit-border-bottom-right-radius: @radius;
+	-moz-border-bottom-right-radius: @radius;
+	border-bottom-right-radius: @radius;
+}
+
+/* Backgrounds/Gradients */
+
+.solid-background ( dark, @color ) {
+	color: @light-grey;
+}
+
+.solid-background ( @_, @color ) {
+	background-color: @color;
+}
+
+.gradient ( @color ) {
+	/* Horizontal, Center based */
+
+	background: @color; /* Old browsers */
+	background: -moz-linear-gradient( left, @color 0%, @color 10%, @light-grey 40%, @light-grey 60%, @color 90%, @color 100% ); /* FF3.6+ */
+	background: -webkit-gradient( linear, left top, right top, color-stop( 0%, @color ), color-stop( 10%, @color ), color-stop( 40%, @light-grey ), color-stop( 60%, @light-grey ), color-stop( 90%, @color ), color-stop( 100%, @color ) ); /* Chrome, Safari4+ */
+	background: -webkit-linear-gradient( left, @color 0%, @color 10%, @light-grey 40%, @light-grey 60%, @color 90%, @color 100% ); /* Chrome10+, Safari5.1+ */
+	background: -o-linear-gradient( left, @color 0%, @color 10%, @light-grey 40%, @light-grey 60%, @color 90%, @color 100% ); /* Opera 11.10+ */
+	background: -ms-linear-gradient( left, @color 0%, @color 10%, @light-grey 40%, @light-grey 60%, @color 90%, @color 100% ); /* IE10+ */
+	background: linear-gradient( to right, @color 0%, @color 10%, @light-grey 40%, @light-grey 60%, @color 90%, @color 100% ); /* W3C */
+	filter: ~"progid:DXImageTransform.Microsoft.gradient( startColorstr='@{color}', endColorstr='@{color}', GradientType=1 )";/* IE6-9 */
+}
+
+/* Background Colors */
+
+.color ( @color, @color2, @color3, @color4 ) {
+
+	background-color: @color;
+	border-color: @color2;
+
+	&.legend {
+
+		background-color: @color3;
+		color: contrast( @color3, @black, @white );
+	}
+
+	&.held {
+
+		background-color: @color4;
+	}
+}
+
+/** Box-Flex Flexes **/
+.box-flex-generator ( @span ) {
+	-webkit-box-flex: @span;
+	-moz-box-flex: @span;
+	box-flex: @span;
+}
+
+/** Box-Flex Packing **/
+
+.box-pack-generator ( @loc ) {
+	-webkit-box-pack: @loc;
+	-moz-box-pack: @loc;
+	box-pack: @loc;
+}

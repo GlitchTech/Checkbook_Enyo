@@ -80,21 +80,24 @@ enyo.kind( {
 					components: [
 						{
 							name: "addIncomeButton",
-							kind: "onyx.Checkbox",
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/income.png",
 
-							onchange: "addIncome",
+							ontap: "addIncome",
 							classes: "income margin-half-left margin-half-right"
 						}, {
 							name: "addTransferButton",
-							kind: "onyx.Checkbox",
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/transfer.png",
 
-							onchange: "addTransfer",
+							ontap: "addTransfer",
 							classes: "transfer margin-half-left margin-half-right"
 						}, {
 							name: "addExpenseButton",
-							kind: "onyx.Checkbox",
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/expense.png",
 
-							onchange: "addExpense",
+							ontap: "addExpense",
 							classes: "expense margin-half-left margin-half-right"
 						}
 					]
@@ -546,8 +549,7 @@ enyo.kind( {
 	newTransaction: function( type ) {
 
 		//Prevent user from launching multiple New Transaction windows
-		if( this.$['add' + type + 'Button'].getChecked() &&
-			!( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
+		if( !( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
 
 			this.toggleCreateButtons();
 
@@ -586,23 +588,13 @@ enyo.kind( {
 
 		if( this.$['addIncomeButton'].getDisabled() ) {
 
-			this.$['addIncomeButton'].setChecked( false );
 			this.$['addIncomeButton'].setDisabled( false );
-
-			this.$['addTransferButton'].setChecked( false );
 			this.$['addTransferButton'].setDisabled( false );
-
-			this.$['addExpenseButton'].setChecked( false );
 			this.$['addExpenseButton'].setDisabled( false );
 		} else {
 
-			this.$['addIncomeButton'].setChecked( true );
 			this.$['addIncomeButton'].setDisabled( true );
-
-			this.$['addTransferButton'].setChecked( true );
 			this.$['addTransferButton'].setDisabled( true );
-
-			this.$['addExpenseButton'].setChecked( true );
 			this.$['addExpenseButton'].setDisabled( true );
 		}
 	}

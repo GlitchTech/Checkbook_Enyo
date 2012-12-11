@@ -80,16 +80,17 @@ enyo.kind( {
 					components: [
 						{
 							name: "addAccountButton",
-							kind: "onyx.Checkbox",
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/new.png",
 
-							onchange: "addAccount",
+							ontap: "addAccount",
 							classes: "add"
 						}, {
 							name: "editModeToggle",
-							kind: "onyx.Checkbox",
+							kind: "onyx.ToggleIconButton",
+							src: "assets/menu_icons/lock.png?1=2",
 
-							onchange: "toggleLock",
-							classes: "lock"
+							ontap: "toggleLock"
 						}
 					]
 				}, {
@@ -138,9 +139,10 @@ enyo.kind( {
 					components: [
 						{
 							name: "addAccountButton",
-							kind: "onyx.Checkbox",
+							kind: "onyx.IconButton",
+							src: "assets/menu_icons/new.png",
 
-							onchange: "addAccount",
+							ontap: "addAccount",
 							classes: "add"
 						}
 					]
@@ -148,10 +150,10 @@ enyo.kind( {
 					components: [
 						{
 							name: "editModeToggle",
-							kind: "onyx.Checkbox",
+							kind: "onyx.ToggleIconButton",
+							src: "assets/menu_icons/lock.png?1=2",
 
-							onchange: "toggleLock",
-							classes: "lock"
+							ontap: "toggleLock"
 						}
 					]
 				}
@@ -351,7 +353,7 @@ enyo.kind( {
 	addAccount: function() {
 
 		//Prevent user from launching multiple New Account windows
-		if( this.$['addAccountButton'].getChecked() && !this.$['addAccountButton'].getDisabled() ) {
+		if( !this.$['addAccountButton'].getDisabled() ) {
 
 			this.$['addAccountButton'].setDisabled( true );
 
@@ -372,7 +374,6 @@ enyo.kind( {
 	 */
 	addAccountComplete: function( inSender, inEvent ) {
 
-		this.$['addAccountButton'].setChecked( false );
 		this.$['addAccountButton'].setDisabled( false );
 
 		if( inEvent['action'] === 1 && inEvent['actionStatus'] === true ) {
@@ -386,7 +387,7 @@ enyo.kind( {
 	 */
 	toggleLock: function() {
 
-		if( this.$['editModeToggle'].getChecked() ) {
+		if( this.$['editModeToggle'].getActive() ) {
 
 			this.$['entries'].setEditMode( true );
 		} else {
