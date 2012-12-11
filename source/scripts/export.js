@@ -608,6 +608,7 @@ enyo.kind({
 							"date",
 							"desc",
 							"note",
+							"payee",
 
 							" ( CASE WHEN category = '||~SPLIT~||' THEN" +
 									" ( '[' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = itemId ORDER BY ts.amount DESC ) ), '{ \"category\": \"?\", \"category2\" : \"?\", \"amount\": \"0\" }' ) || ']' )" +
@@ -640,7 +641,7 @@ enyo.kind({
 								"accountId": accountsToExport[index]['acctId'],
 								"accountName": accountsToExport[index]['name'],
 								"accountCategory": accountsToExport[index]['cat'],
-								"csv": "account,accountCat,date,amount,description,cleared,checkNum,note,gtId,gtCat,gtLinkId,gtLinkedAccount,gtLinkedAccountCat\n"
+								"csv": "account,accountCat,date,amount,description,cleared,checkNum,note,payee,gtId,gtCat,gtLinkId,gtLinkedAccount,gtLinkedAccountCat\n"
 							}
 						)
 				}
@@ -680,6 +681,7 @@ enyo.kind({
 										'"' + ( row['cleared'] == 1 ? "Yes" : "No" ) + '",' +
 										'"' + GTS.String.cleanString( row['checkNum'] ) + '",' +
 										'"' + GTS.String.cleanString( row['note'] ) + '",' +
+										'"' + GTS.String.cleanString( row['payee'] ) + '",' +
 										'"' + row['itemId'] + '",' +
 										'"' + enyo.json.stringify( Checkbook.globals.transactionManager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
 										'"' + row['linkedRecord'] + '",' +
