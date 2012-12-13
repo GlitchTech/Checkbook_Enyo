@@ -219,7 +219,7 @@ enyo.kind({
 
 			if( acctIndex >= 0 ) {
 
-				if( typeof( inEvent['accountBal'] ) !== "undefined" && inEvent['accountBal'].length > 0 ) {
+				if( typeof( inEvent['accountBal'] ) !== "undefined" && Object.size( inEvent['accountBal'] ) > 0 ) {
 
 					this.accountBalanceChangedHandler( acctIndex, inEvent['accountBal'] );
 				} else {
@@ -268,6 +268,8 @@ enyo.kind({
 	 * @param [obj]	results	Result set from DB
 	 */
 	accountBalanceChangedHandler: function( index, results ) {
+
+		this.log( arguments );
 
 		if( typeof( results ) === "undefined" || isNaN( index ) || index < 0 || index >= this.accounts.length ) {
 

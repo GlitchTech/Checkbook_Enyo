@@ -376,15 +376,15 @@ enyo.kind( {
 		if( accounts['account'] == this.account['acctId'] ) {
 			//current account is main account of transaction
 
-			accounts['accountBal'] = [
-					this.account['balance0'],
-					this.account['balance1'],
-					this.account['balance2'],
-					this.account['balance3']
-				];
+			accounts['accountBal'] = {
+					"balance0": this.account['balance0'],
+					"balance1": this.account['balance1'],
+					"balance2": this.account['balance2'],
+					"balance3": this.account['balance3']
+				};
 		} else {
 
-			accounts['accountBal'] = [];
+			accounts['accountBal'] = {};
 		}
 
 		if( typeof( accounts['sendSignal'] ) !== "undefined" && accounts['sendSignal'] === false ) {
