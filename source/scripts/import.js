@@ -781,7 +781,7 @@ enyo.kind({
 
 			trsn['amount'] = deformatAmount( this.getNode( data[i], 'gsx:amount' ) );
 
-			if( Object.validNumber( trsn['amount'] ) ) {
+			if( GTS.Object.validNumber( trsn['amount'] ) ) {
 				//Only continue if amount field is not empty && is a number
 
 				trsn['amount'] = parseFloat( trsn['amount'] );
@@ -789,7 +789,7 @@ enyo.kind({
 				//Transaction Id
 				trsn['itemId'] = parseInt( this.getNode( data[i], 'gsx:gtid' ) );
 
-				if( !Object.validNumber( trsn['itemId'] ) ) {
+				if( !GTS.Object.validNumber( trsn['itemId'] ) ) {
 
 					trsn['itemId'] = "";
 				}
@@ -824,7 +824,7 @@ enyo.kind({
 				trsn['linkedAccountCat'] = this.getNode( data[i], 'gsx:gtlinkedaccountcat' );
 				trsn['linkedRecord'] = parseInt( this.getNode( data[i], 'gsx:gtlinkid' ) );
 
-				if( Object.validNumber( trsn['linkedRecord'] ) ) {
+				if( GTS.Object.validNumber( trsn['linkedRecord'] ) ) {
 
 					if( trsn['linkedAccountName'] === "" ) {
 
@@ -871,7 +871,7 @@ enyo.kind({
 				//Date
 				trsn['date'] = Date.deformat( this.getNode( data[i], 'gsx:date' ) );
 
-				if( !Object.validNumber( trsn['date'] ) ) {
+				if( !GTS.Object.validNumber( trsn['date'] ) ) {
 
 					trsn['date'] = Date.parse( new Date() );
 				}
@@ -1037,7 +1037,7 @@ enyo.kind({
 			delete this.importItems[this.documentIndex]['transactions'][i]['linkedAccountCat'];
 
 			//Check for invalid itemId
-			if( !Object.validNumber( this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) ) {
+			if( !GTS.Object.validNumber( this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) ) {
 
 				delete this.importItems[this.documentIndex]['transactions'][i]['itemId'];
 			}

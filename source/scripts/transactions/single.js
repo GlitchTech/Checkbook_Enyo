@@ -369,7 +369,7 @@ enyo.kind( {
 		this.$['desc'].setContent( this.transaction['desc'] );
 
 		//Amount
-		if( Object.isNumber( this.transaction['linkedRecord'] ) && this.transaction['linkedRecord'] >= 0 ) {
+		if( GTS.Object.isNumber( this.transaction['linkedRecord'] ) && this.transaction['linkedRecord'] >= 0 ) {
 
 			this.transactionType = "transfer";
 		} else if( this.transaction['amount'] < 0 ) {

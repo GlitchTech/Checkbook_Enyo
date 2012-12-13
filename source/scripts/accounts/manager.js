@@ -95,7 +95,7 @@ enyo.kind({
 	 */
 	_createAccountFollower: function( data, options, code ) {
 
-		if( data['auto_savings'] == 0 || !Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
+		if( data['auto_savings'] == 0 || !GTS.Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
 			//Linking turned off || No account linked
 
 			data['auto_savings'] = 0;
@@ -156,7 +156,7 @@ enyo.kind({
 	 */
 	_updateAccountFollower: function( data, acctId, pinChanged, options, code ) {
 
-		if( data['auto_savings'] == 0 || !Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
+		if( data['auto_savings'] == 0 || !GTS.Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
 			//Linking turned off || No account linked
 
 			data['auto_savings'] = 0;
@@ -323,7 +323,7 @@ enyo.kind({
 
 			if( enyo.isFunction( options['onSuccess'] ) ) {
 
-				if( Object.isNumber( this.accountObject.defaultAccountIndex ) && this.accountObject.defaultAccountIndex >= 0 ) {
+				if( GTS.Object.isNumber( this.accountObject.defaultAccountIndex ) && this.accountObject.defaultAccountIndex >= 0 ) {
 
 					options['onSuccess']( this.accountObject.accounts[this.accountObject.defaultAccountIndex] );
 				} else {
@@ -502,7 +502,7 @@ enyo.kind({
 
 			if( enyo.isFunction( options['onSuccess'] ) ) {
 
-				options['onSuccess']( this.accountObject.accounts.slice( ( Object.isNumber( offset ) ? offset : 0 ), limit ) );
+				options['onSuccess']( this.accountObject.accounts.slice( ( GTS.Object.isNumber( offset ) ? offset : 0 ), limit ) );
 			}
 		} else {
 
@@ -537,7 +537,7 @@ enyo.kind({
 
 			if( enyo.isFunction( options['onSuccess'] ) ) {
 
-				options['onSuccess']( this.accountObject.accountsList.slice( ( Object.isNumber( offset ) ? offset : 0 ), limit ) );
+				options['onSuccess']( this.accountObject.accountsList.slice( ( GTS.Object.isNumber( offset ) ? offset : 0 ), limit ) );
 			}
 		} else {
 
@@ -651,8 +651,8 @@ enyo.kind({
 	 */
 	_buildAccountObjects: function( onError, limit, offset ) {
 
-		limit = ( Object.isNumber( limit ) ? limit : 100 );
-		offset = ( Object.isNumber( offset ) ? offset : 0 );
+		limit = ( GTS.Object.isNumber( limit ) ? limit : 100 );
+		offset = ( GTS.Object.isNumber( offset ) ? offset : 0 );
 
 		if( offset <= 0 ) {
 
