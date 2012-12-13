@@ -230,9 +230,9 @@ enyo.kind({
 	 */
 	fetchBudgets: function( startTime, endTime, options, sort, limit, offset ) {
 
-		sort = ( Object.validNumber( sort ) ? sort : 0 );
-		limit = ( Object.validNumber( limit ) ? limit : 100 );
-		offset = ( Object.validNumber( offset ) ? offset : 0 );
+		sort = ( GTS.Object.validNumber( sort ) ? sort : 0 );
+		limit = ( GTS.Object.validNumber( limit ) ? limit : 100 );
+		offset = ( GTS.Object.validNumber( offset ) ? offset : 0 );
 
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(

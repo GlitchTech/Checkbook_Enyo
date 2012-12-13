@@ -300,8 +300,6 @@ enyo.kind( {
 
 			this.inherited( arguments );
 		}
-
-		this.reflow();
 	},
 
 	/**
@@ -371,7 +369,7 @@ enyo.kind( {
 		this.$['desc'].setContent( this.transaction['desc'] );
 
 		//Amount
-		if( Object.isNumber( this.transaction['linkedRecord'] ) && this.transaction['linkedRecord'] >= 0 ) {
+		if( GTS.Object.isNumber( this.transaction['linkedRecord'] ) && this.transaction['linkedRecord'] >= 0 ) {
 
 			this.transactionType = "transfer";
 		} else if( this.transaction['amount'] < 0 ) {
@@ -461,8 +459,6 @@ enyo.kind( {
 
 	renderFromAccount: function( acct ) {
 
-		this.log();
-
 		this.$['fromAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['fromAccount'].setContent( acct['acctName'] );
 
@@ -476,8 +472,6 @@ enyo.kind( {
 	},
 
 	renderToAccount: function( acct ) {
-
-		this.log();
 
 		this.$['toAccountImg'].setSrc( "assets/" + acct['acctCategoryIcon'] );
 		this.$['toAccount'].setContent( acct['acctName'] );
@@ -495,16 +489,12 @@ enyo.kind( {
 
 	clearToggled: function() {
 
-		this.log();
-
 		var cleared = this.doClear( { "rowIndex": this.index, "callback": enyo.bind( this, this.clearToggledHandler ) } );
 
 		return true;
 	},
 
 	clearToggledHandler: function( cleared ) {
-
-		this.log();
 
 		this.$['cleared'].setValue( cleared );
 
@@ -513,15 +503,11 @@ enyo.kind( {
 
 	editClicked: function() {
 
-		this.log();
-
 		this.doEdit( { "rowIndex": this.index } );
 		enyo.asyncMethod( this, this.hide );
 	},
 
 	deleteClicked: function() {
-
-		this.log();
 
 		this.createComponent( {
 				name: "deleteTransactionConfirm",
@@ -546,17 +532,15 @@ enyo.kind( {
 
 	deleteTransactionConfirmClose: function() {
 
-		this.log();
-
+		this.$['deleteTransactionConfirm'].hide();
 		this.$['deleteTransactionConfirm'].destroy();
 		this.show( true );
 	},
 
 	deleteTransactionHandler: function() {
 
-		this.log();
-
 		this.deleteTransactionConfirmClose();
+
 		this.doDelete( { "rowIndex": this.index } );
 		enyo.asyncMethod( this, this.hide );
 	}

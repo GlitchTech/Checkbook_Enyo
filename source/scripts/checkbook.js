@@ -69,10 +69,8 @@ enyo.kind({
 											content: "Report Bug (NYI)",
 											//ontap: "errorReport"
 										}, {
-											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
-											showing: false,//Convert to panel?
 											content: "About",
 											ontap: "showPopup",
 											popup: "about"
@@ -169,15 +167,15 @@ enyo.kind({
 		if( inEvent.which === 18 ) {
 			//alt key
 
-			return this.menuHandler( inEvent );
+			return this.menuHandler();
 		} else if( inEvent.which === 27 ) {
 			//escape key
 
-			return this.backHandler( inEvent );
+			return this.backHandler();
 		}
 	},
 
-	menuHandler: function( inEvent ) {
+	menuHandler: function() {
 
 		if( !this.appReady ) { return; }
 
@@ -190,7 +188,7 @@ enyo.kind({
 		return true;
 	},
 
-	backHandler: function( inEvent ) {
+	backHandler: function() {
 
 		if( !this.appReady ) { return; }
 
@@ -227,6 +225,7 @@ enyo.kind({
 
 	exitConfirmationClose: function() {
 
+		this.$['exitConfirmation'].hide();
 		this.$['exitConfirmation'].destroy();
 	},
 
@@ -234,7 +233,6 @@ enyo.kind({
 
 		this.exitConfirmationClose();
 
-		this.log( "exit app" );
 		navigator.app.exitApp();
 	},
 

@@ -21,6 +21,29 @@
 	display: block;
 }
 
+/** Vertical Box **/
+
+.v-box {
+	display: inline-block;/* fallback for crappy browsers */
+
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-box-align: stretch;
+
+	display: -moz-box;
+	-moz-box-orient: vertical;
+	-moz-box-align: stretch;
+
+	display: box;
+	box-orient: vertical;
+	box-align: stretch;
+}
+
+.v-box > * {
+	.box-flex-generator( 0 );
+	display: block;
+}
+
 /** Flexes **/
 
 .box-flex-0 { .box-flex-generator( 0 ); }
@@ -28,7 +51,14 @@
 .box-flex-2 { .box-flex-generator( 2 ); }
 
 /** Packing **/
+.box-pack-start { .box-pack-generator( start ); }
+.box-pack-end { .box-pack-generator( end ); }
+.box-pack-center { .box-pack-generator( center ); }
+.box-pack-justify { .box-pack-generator( justify ); }
 
-.pack-start { .box-pack-generator( start ); }
-.pack-end { .box-pack-generator( end ); }
-.pack-center { .box-pack-generator( center ); }
+/** Alignment **/
+.box-align-start { .box-align-generator( start ); }
+.box-align-end { .box-align-generator( end ); }
+.box-align-center { .box-align-generator( center ); }
+.box-align-baseline { .box-align-generator( baseline ); }
+.box-align-stretch { .box-align-generator( stretch ); }

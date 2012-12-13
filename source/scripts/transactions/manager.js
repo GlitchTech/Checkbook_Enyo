@@ -114,13 +114,13 @@ enyo.kind({
 
 		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", data ) );
 
-		if( Object.validNumber( data['linkedRecord'] ) && data['linkedRecord'] >= 0 ) {
+		if( GTS.Object.validNumber( data['linkedRecord'] ) && data['linkedRecord'] >= 0 ) {
 			//Set up Linked Transaction
 
 			var linkedData = enyo.clone( data );
 
-			Object.swap( linkedData, 'linkedRecord', 'itemId' );
-			Object.swap( linkedData, 'linkedAccount', 'account' );
+			GTS.Object.swap( linkedData, 'linkedRecord', 'itemId' );
+			GTS.Object.swap( linkedData, 'linkedAccount', 'account' );
 			linkedData['amount'] = -linkedData['amount'];
 
 			sql.push( Checkbook.globals.gts_db.getInsert( "transactions", linkedData ) );
@@ -148,7 +148,7 @@ enyo.kind({
 
 		var atData = enyo.clone( data );//Don't manipulate origional data
 
-		if( Object.validNumber( atData['linkedRecord'] ) && atData['linkedRecord'] >= 0 ) {
+		if( GTS.Object.validNumber( atData['linkedRecord'] ) && atData['linkedRecord'] >= 0 ) {
 
 			atData['itemId'] += 2;
 		} else {
@@ -203,8 +203,8 @@ enyo.kind({
 		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", atData ) );
 
 		//Build linked auto transaction
-		Object.swap( atData, 'linkedRecord', 'itemId' );
-		Object.swap( atData, 'linkedAccount', 'account' );
+		GTS.Object.swap( atData, 'linkedRecord', 'itemId' );
+		GTS.Object.swap( atData, 'linkedAccount', 'account' );
 		atData['amount'] = -atData['amount'];
 
 		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", atData ) );
@@ -274,13 +274,13 @@ enyo.kind({
 
 		sql.push( Checkbook.globals.gts_db.getUpdate( "transactions", data, { "itemId": data['itemId'] } ) );
 
-		if( Object.validNumber( data['linkedRecord'] ) ) {
+		if( GTS.Object.validNumber( data['linkedRecord'] ) ) {
 			//Transfer Controls
 
 			var linkedData = enyo.clone( data );
 
-			Object.swap( linkedData, 'linkedRecord', 'itemId' );
-			Object.swap( linkedData, 'linkedAccount', 'account' );
+			GTS.Object.swap( linkedData, 'linkedRecord', 'itemId' );
+			GTS.Object.swap( linkedData, 'linkedAccount', 'account' );
 
 			linkedData['amount'] = -linkedData['amount'];
 
@@ -324,7 +324,7 @@ enyo.kind({
 		data['desc'] = ( ( data['desc'] === "" || data['desc'] === null ) ? "Description" : data['desc'] );
 		data['cleared'] = ( data['cleared'] ? 1 : 0 );
 
-		data['amount'] = ( Object.isNumber( data['amount'] ) ? 0 : Number( data['amount'] ).toFixed( 2 ).valueOf() );
+		data['amount'] = ( GTS.Object.isNumber( data['amount'] ) ? 0 : Number( data['amount'] ).toFixed( 2 ).valueOf() );
 
 		data['date'] = Date.parse( data['date'] );
 
@@ -510,7 +510,7 @@ enyo.kind({
 						"last_sync": "",
 
 						//Temp data
-						"maxItemId": ( ( Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['itemId'] + 2 : data['itemId'] + 1 ),
+						"maxItemId": ( ( GTS.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['itemId'] + 2 : data['itemId'] + 1 ),
 						"autoTransfer": autoTransfer,
 						"autoTransferLink": autoTransferLink
 					};
@@ -789,7 +789,7 @@ enyo.kind({
 						"autoTransferLink": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransferLink'] : -1 )
 					};
 
-					if( Object.validNumber( repeatArray[i]['rep_linkedAcctId'] ) && repeatArray[i]['rep_linkedAcctId'] >= 0 ) {
+					if( GTS.Object.validNumber( repeatArray[i]['rep_linkedAcctId'] ) && repeatArray[i]['rep_linkedAcctId'] >= 0 ) {
 
 						type = "transfer";
 					} else if( repeatArray[i]['rep_amount'] < 0 ) {
@@ -803,7 +803,7 @@ enyo.kind({
 					sql = sql.concat( this.generateInsertTransactionSQL( trsnData, type ) );
 
 					serCount++;
-					maxItemId += ( ( Object.validNumber( repeatArray[i]['linkedAccount'] ) && repeatArray[i]['linkedAccount'] >= 0 ) ? 2 : 1 );
+					maxItemId += ( ( GTS.Object.validNumber( repeatArray[i]['linkedAccount'] ) && repeatArray[i]['linkedAccount'] >= 0 ) ? 2 : 1 );
 				}
 
 				//update repeat item
@@ -1238,7 +1238,7 @@ enyo.kind({
 	 */
 	 fetchMaxCheckNumber: function( acctId, options ) {
 
-		if( !Object.isNumber( acctId ) ) {
+		if( !GTS.Object.isNumber( acctId ) ) {
 
 			this.log( "No account number specified." );
 
