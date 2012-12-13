@@ -93,7 +93,8 @@ enyo.kind( {
 			belowComponents: [
 				/* Content that displays below the list NYI */
 				{
-					content: "&nbsp;"
+					content: "&nbsp;",
+					allowHtml: true
 				}
 			]
 		},
@@ -197,6 +198,7 @@ enyo.kind( {
 		this.transactions = [];
 		this.$['list'].setCount( 0 );
 		this.$['list'].reset();
+
 		this.$['list'].lazyLoad();
 	},
 
@@ -514,14 +516,12 @@ results = {
 					accountObj: this.account,
 					trsnObj: newTrsn,
 					transactionType: type.toLowerCase(),
-					onFinish: enyo.bind( this, this.addTransactionComplete )//TODO
+					onFinish: enyo.bind( this, this.addTransactionComplete )//TODO -- needs linking to parent
 				}
 			);
 	},
 
 	transactiontapped: function( inSender, inEvent ) {
-
-		this.log();
 
 		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode
@@ -563,8 +563,6 @@ results = {
 	modifyTransactionComplete: function( rowIndex, inSender, accounts ) {
 
 		this.log();
-
-		this.log( arguments );
 
 		var action = accounts['modifyStatus'];
 		delete accounts['modifyStatus'];
@@ -663,8 +661,6 @@ results = {
 
 	vsCleared: function( inSender, inEvent ) {
 
-		this.log();
-
 		var index = inEvent.rowIndex;
 
 		if( !this.transactions[index] ) {
@@ -754,6 +750,8 @@ results = {
 				) ) {
 
 			if( rowIndex === 0 ) {
+
+				enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
 
 				this.reloadTransactionList();
 				return;

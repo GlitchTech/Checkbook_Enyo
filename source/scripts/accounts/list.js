@@ -190,7 +190,9 @@ enyo.kind({
 	},
 
 	/**
-	 * TODO DEFINITION
+	 * @protected
+	 *
+	 * Update balance for recently changed account.
 	 */
 	accountBalanceChanged: function( inSender, inEvent ) {
 

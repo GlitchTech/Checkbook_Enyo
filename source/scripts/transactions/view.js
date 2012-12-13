@@ -571,10 +571,9 @@ enyo.kind( {
 
 		this.toggleCreateButtons();
 
-		var action = inEvent['modifyStatus'];
-		delete inEvent['modifyStatus'];
+		if( inEvent['modifyStatus'] === 1 ) {
 
-		if( action === 1 ) {
+			delete inEvent['modifyStatus'];
 
 			this.balanceChangedHandler( inEvent );
 
