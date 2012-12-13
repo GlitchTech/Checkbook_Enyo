@@ -625,14 +625,14 @@ enyo.kind( {
 
 		this.log();
 
-		if( Object.validNumber( this.trsnObj['amount'] ) ) {
+		if( GTS.Object.validNumber( this.trsnObj['amount'] ) ) {
 
 			this.trsnObj['amount_old'] = this.trsnObj['amount'];
 		}
 
 		if( this.trsnObj['itemId'] >= 0 ) {
 
-			if( Object.validNumber( this.trsnObj['linkedRecord'] ) && this.trsnObj['linkedRecord'] >= 0 ) {
+			if( GTS.Object.validNumber( this.trsnObj['linkedRecord'] ) && this.trsnObj['linkedRecord'] >= 0 ) {
 
 				this.transactionType = "transfer";
 			} else if( this.trsnObj['amount'] < 0 ) {

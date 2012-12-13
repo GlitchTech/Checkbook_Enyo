@@ -261,7 +261,7 @@ enyo.kind({
 
 	save: function() {
 
-		this.budgetObj['spending_limit'] = ( Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
+		this.budgetObj['spending_limit'] = ( GTS.Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
 
 		if( this.budgetObj['spending_limit'] === 0 ) {
 

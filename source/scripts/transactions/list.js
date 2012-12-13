@@ -491,7 +491,7 @@ results = {
 
 		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
 
-		if( Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
+		if( GTS.Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
 
 			type = "transfer";
 		} else if( newTrsn['amount'] < 0 ) {
@@ -625,7 +625,7 @@ results = {
 
 		var rowIndex = this.$['transactonMenu'].rowIndex;
 
-		if( !Object.validNumber( rowIndex ) || rowIndex < 0 ) {
+		if( !GTS.Object.validNumber( rowIndex ) || rowIndex < 0 ) {
 
 			return;
 		}

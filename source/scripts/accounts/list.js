@@ -219,7 +219,7 @@ enyo.kind({
 
 			if( acctIndex >= 0 ) {
 
-				if( typeof( inEvent['accountBal'] ) !== "undefined" && Object.size( inEvent['accountBal'] ) > 0 ) {
+				if( typeof( inEvent['accountBal'] ) !== "undefined" && GTS.Object.size( inEvent['accountBal'] ) > 0 ) {
 
 					this.accountBalanceChangedHandler( acctIndex, inEvent['accountBal'] );
 				} else {
