@@ -353,11 +353,11 @@ enyo.kind({
 		} else if( this.notificationType === false ) {
 			//First run notice
 
+			var info = enyo.fetchAppInfo();
+
 			Checkbook.globals.criticalError.load(
-					//"Welcome to " + enyo.fetchAppInfo()['title'],
-					//"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "' target='_blank'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
-					"Welcome to Checkbook",
-					"If you have any questions, visit <a href='http://glitchtechscience.com' target='_blank'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>glitchtechscience@gmail.com</a>.",
+					"Welcome to " + info['title'],
+					"If you have any questions, visit <a href='" + info['vendorurl'] + "' target='_blank'>" + info['vendorurl'] + "</a> or email <a href='mailto:" + info['vendoremail'] + "?subject=" + info['title'] + " Support'>" + info['vendoremail'] + "</a>.",
 					"",
 					"assets/icon_1_32x32.png"
 				);
