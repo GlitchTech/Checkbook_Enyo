@@ -7,5 +7,4 @@ thumbs.db
 /bin/*
 /.settings/*
 
-#ignore build files
-assets/www/*
+assets/*

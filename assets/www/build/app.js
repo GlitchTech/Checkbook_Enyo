@@ -1,7 +1,1060 @@
 
 // minifier: path aliases
 
-enyo.path.addPaths({layout: "/home/ryltar/git/gutoc/enyo/tools/../../lib/layout/", onyx: "/home/ryltar/git/gutoc/enyo/tools/../../lib/onyx/", onyx: "/home/ryltar/git/gutoc/enyo/tools/../../lib/onyx/source/", private: "/home/ryltar/git/gutoc/enyo/tools/../../lib/private/", scripts: "../source/scripts/", styles: "../source/styles/"});
+enyo.path.addPaths({g11n: "/home/ryltar/git/gutoc/enyo/tools/../../lib/g11n/", layout: "/home/ryltar/git/gutoc/enyo/tools/../../lib/layout/", onyx: "/home/ryltar/git/gutoc/enyo/tools/../../lib/onyx/source/", private: "/home/ryltar/git/gutoc/enyo/tools/../../lib/private/", scripts: "../source/scripts/"});
+
+// javascript/g11n.js
+
+if (!this.enyo) {
+this.enyo = {};
+var empty = {};
+enyo.mixin = function(e, t) {
+e = e || {};
+if (t) {
+var n, r;
+for (n in t) r = t[n], empty[n] !== r && (e[n] = r);
+}
+return e;
+};
+}
+
+"trim" in String.prototype || (String.prototype.trim = function() {
+return this.replace(/^\s+|\s+$/g, "");
+}), enyo.g11n = function() {}, enyo.g11n._init = function() {
+if (!enyo.g11n._initialized) {
+typeof window != "undefined" ? (enyo.g11n._platform = "browser", enyo.g11n._enyoAvailable = !0) : (enyo.g11n._platform = "node", enyo.g11n._enyoAvailable = !1);
+if (navigator) {
+var t = (navigator.language || navigator.userLanguage).replace(/-/g, "_").toLowerCase();
+enyo.g11n._locale = new enyo.g11n.Locale(t), enyo.g11n._formatLocale = enyo.g11n._locale, enyo.g11n._phoneLocale = enyo.g11n._locale;
+}
+enyo.g11n._locale === undefined && (enyo.warn("enyo.g11n._init: could not find current locale, so using default of en_us."), enyo.g11n._locale = new enyo.g11n.Locale("en_us")), enyo.g11n._formatLocale === undefined && (enyo.warn("enyo.g11n._init: could not find current formats locale, so using default of us."), enyo.g11n._formatLocale = new enyo.g11n.Locale("en_us")), enyo.g11n._phoneLocale === undefined && (enyo.warn("enyo.g11n._init: could not find current phone locale, so defaulting to the same thing as the formats locale."), enyo.g11n._phoneLocale = enyo.g11n._formatLocale), enyo.g11n._sourceLocale === undefined && (enyo.g11n._sourceLocale = new enyo.g11n.Locale("en_us")), enyo.g11n._initialized = !0;
+}
+}, enyo.g11n.getPlatform = function() {
+return enyo.g11n._platform || enyo.g11n._init(), enyo.g11n._platform;
+}, enyo.g11n.isEnyoAvailable = function() {
+return enyo.g11n._enyoAvailable || enyo.g11n._init(), enyo.g11n._enyoAvailable;
+}, enyo.g11n.currentLocale = function() {
+return enyo.g11n._locale || enyo.g11n._init(), enyo.g11n._locale;
+}, enyo.g11n.formatLocale = function() {
+return enyo.g11n._formatLocale || enyo.g11n._init(), enyo.g11n._formatLocale;
+}, enyo.g11n.phoneLocale = function() {
+return enyo.g11n._phoneLocale || enyo.g11n._init(), enyo.g11n._phoneLocale;
+}, enyo.g11n.sourceLocale = function() {
+return enyo.g11n._sourceLocale || enyo.g11n._init(), enyo.g11n._sourceLocale;
+}, enyo.g11n.setLocale = function(t) {
+t && (enyo.g11n._init(), t.uiLocale && (enyo.g11n._locale = new enyo.g11n.Locale(t.uiLocale)), t.formatLocale && (enyo.g11n._formatLocale = new enyo.g11n.Locale(t.formatLocale)), t.phoneLocale && (enyo.g11n._phoneLocale = new enyo.g11n.Locale(t.phoneLocale)), t.sourceLocale && (enyo.g11n._sourceLocale = new enyo.g11n.Locale(t.sourceLocale)), enyo.g11n._enyoAvailable && enyo.reloadG11nResources());
+};
+
+// javascript/fmts.js
+
+enyo.g11n.Fmts = function(t) {
+var n;
+typeof t == "undefined" || !t.locale ? this.locale = enyo.g11n.formatLocale() : typeof t.locale == "string" ? this.locale = new enyo.g11n.Locale(t.locale) : this.locale = t.locale, this.dateTimeFormatHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/formats",
+locale: this.locale,
+type: "region"
+}), this.dateTimeHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/datetime_data",
+locale: this.locale
+}), this.dateTimeHash || (this.dateTimeHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/datetime_data",
+locale: enyo.g11n.currentLocale()
+})), this.dateTimeHash || (this.dateTimeHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/datetime_data",
+locale: new enyo.g11n.Locale("en_us")
+}));
+}, enyo.g11n.Fmts.prototype.isAmPm = function() {
+return typeof this.twelveHourFormat == "undefined" && (this.twelveHourFormat = this.dateTimeFormatHash.is12HourDefault), this.twelveHourFormat;
+}, enyo.g11n.Fmts.prototype.isAmPmDefault = function() {
+return this.dateTimeFormatHash.is12HourDefault;
+}, enyo.g11n.Fmts.prototype.getFirstDayOfWeek = function() {
+return this.dateTimeFormatHash.firstDayOfWeek;
+}, enyo.g11n.Fmts.prototype.getDateFieldOrder = function() {
+return this.dateTimeFormatHash ? this.dateTimeFormatHash.dateFieldOrder : (enyo.warn("Failed to load date time format hash"), "mdy");
+}, enyo.g11n.Fmts.prototype.getTimeFieldOrder = function() {
+return this.dateTimeFormatHash ? this.dateTimeFormatHash.timeFieldOrder : (enyo.warn("Failed to load date time format hash"), "hma");
+}, enyo.g11n.Fmts.prototype.getMonthFields = function() {
+return this.dateTimeHash ? this.dateTimeHash.medium.month : [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+}, enyo.g11n.Fmts.prototype.getAmCaption = function() {
+return this.dateTimeHash ? this.dateTimeHash.am : (enyo.error("Failed to load dateTimeHash."), "AM");
+}, enyo.g11n.Fmts.prototype.getPmCaption = function() {
+return this.dateTimeHash ? this.dateTimeHash.pm : (enyo.error("Failed to load dateTimeHash."), "PM");
+}, enyo.g11n.Fmts.prototype.getMeasurementSystem = function() {
+return this.dateTimeFormatHash && this.dateTimeFormatHash.measurementSystem || "metric";
+}, enyo.g11n.Fmts.prototype.getDefaultPaperSize = function() {
+return this.dateTimeFormatHash && this.dateTimeFormatHash.defaultPaperSize || "A4";
+}, enyo.g11n.Fmts.prototype.getDefaultPhotoSize = function() {
+return this.dateTimeFormatHash && this.dateTimeFormatHash.defaultPhotoSize || "10X15CM";
+}, enyo.g11n.Fmts.prototype.getDefaultTimeZone = function() {
+return this.dateTimeFormatHash && this.dateTimeFormatHash.defaultTimeZone || "Europe/London";
+}, enyo.g11n.Fmts.prototype.isAsianScript = function() {
+return this.dateTimeFormatHash && typeof this.dateTimeFormatHash.asianScript != "undefined" ? this.dateTimeFormatHash.asianScript : !1;
+}, enyo.g11n.Fmts.prototype.isHanTraditional = function() {
+return this.dateTimeFormatHash && typeof this.dateTimeFormatHash.scriptStyle != "undefined" ? this.dateTimeFormatHash.scriptStyle === "traditional" : !1;
+}, enyo.g11n.Fmts.prototype.textDirection = function() {
+return this.dateTimeFormatHash && this.dateTimeFormatHash.scriptDirection || "ltr";
+};
+
+// javascript/locale.js
+
+enyo.g11n.Locale = function(t) {
+var n = t ? t.split(/_/) : [];
+return this.locale = t, this.language = n[0] || undefined, this.region = n[1] ? n[1].toLowerCase() : undefined, this.variant = n[2] ? n[2].toLowerCase() : undefined, this;
+}, enyo.g11n.Locale.prototype.getLocale = function() {
+return this.locale;
+}, enyo.g11n.Locale.prototype.getLanguage = function() {
+return this.language;
+}, enyo.g11n.Locale.prototype.getRegion = function() {
+return this.region;
+}, enyo.g11n.Locale.prototype.getVariant = function() {
+return this.variant;
+}, enyo.g11n.Locale.prototype.toString = function() {
+return this.locale || (this.locale = this.language + "_" + this.region, this.variant && (this.locale = this.locale + "_" + this.variant)), this.locale;
+}, enyo.g11n.Locale.prototype.toISOString = function() {
+var e = this.language || "";
+return this.region && (e += "_" + this.region.toUpperCase()), this.variant && (e += "_" + this.variant.toUpperCase()), e;
+}, enyo.g11n.Locale.prototype.isMatch = function(e) {
+return e.language && e.region ? (!this.language || this.language === e.language) && (!this.region || this.region === e.region) : e.language ? !this.language || this.language === e.language : !this.region || this.region === e.region;
+}, enyo.g11n.Locale.prototype.equals = function(e) {
+return this.language === e.language && this.region === e.region && this.variant === e.variant;
+}, enyo.g11n.Locale.prototype.useDefaultLang = function() {
+var e, t, n;
+this.language || (e = enyo.g11n.Utils.getNonLocaleFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/formats/defLangs.json"
+}), t = e && e[this.region], t || (n = enyo.g11n.currentLocale(), t = n.language), this.language = t || "en", this.locale = this.language + "_" + this.region);
+};
+
+// javascript/loadfile.js
+
+enyo.g11n.Utils = enyo.g11n.Utils || function() {}, enyo.g11n.Utils._fileCache = {}, enyo.g11n.Utils._getBaseURL = function(e) {
+if ("baseURI" in e) return e.baseURI;
+var t = e.getElementsByTagName("base");
+return t.length > 0 ? t[0].href : window.location.href;
+}, enyo.g11n.Utils._fetchAppRootPath = function() {
+var e = window.document, t = enyo.g11n.Utils._getBaseURL(e).match(new RegExp(".*://[^#]*/"));
+if (t) return t[0];
+}, enyo.g11n.Utils._setRoot = function(t) {
+var n = t;
+return !t && enyo.g11n.isEnyoAvailable() ? n = enyo.g11n.Utils._fetchAppRootPath() + "assets" : n = ".", enyo.g11n.root = n;
+}, enyo.g11n.Utils._getRoot = function() {
+return enyo.g11n.root || enyo.g11n.Utils._setRoot();
+}, enyo.g11n.Utils._getEnyoRoot = function(t) {
+var n = "";
+return !enyo.g11n.isEnyoAvailable() && t && (n = t), n + enyo.path.paths.enyo + "/../lib/g11n/source";
+}, enyo.g11n.Utils._loadFile = function(t) {
+var n, r, i = enyo.g11n.getPlatform();
+if (i === "node") try {
+this.fs || (this.fs = IMPORTS.require("fs")), r = this.fs.readFileSync(t, "utf8"), r && (n = JSON.parse(r));
+} catch (s) {
+n = undefined;
+} else try {
+n = JSON.parse(enyo.xhr.request({
+url: t,
+sync: !0
+}).responseText);
+} catch (o) {}
+return n;
+}, enyo.g11n.Utils.getNonLocaleFile = function(t) {
+var n, r, i;
+if (!t || !t.path) return undefined;
+t.path.charAt(0) !== "/" ? (r = t.root || this._getRoot(), i = r + "/" + t.path) : i = t.path;
+if (enyo.g11n.Utils._fileCache[i] !== undefined) n = enyo.g11n.Utils._fileCache[i].json; else {
+n = enyo.g11n.Utils._loadFile(i);
+if (t.cache === undefined || t.cache !== !1) enyo.g11n.Utils._fileCache[i] = {
+path: i,
+json: n,
+locale: undefined,
+timestamp: new Date
+}, this.oldestStamp === undefined && (this.oldestStamp = enyo.g11n.Utils._fileCache[i].timestamp);
+}
+return n;
+}, enyo.g11n.Utils.getJsonFile = function(t) {
+var n, r, i, s, o, u, a, f, l;
+if (!t || !t.path || !t.locale) return undefined;
+i = t.path.charAt(0) !== "/" ? t.root || this._getRoot() : "", i.slice(-1) !== "/" && (i += "/"), t.path ? (s = t.path, s.slice(-1) !== "/" && (s += "/")) : s = "", s += t.prefix || "", i += s, l = i + t.locale.toString() + ".json";
+if (enyo.g11n.Utils._fileCache[l] !== undefined) n = enyo.g11n.Utils._fileCache[l].json; else {
+t.merge ? (t.locale.language && (r = i + t.locale.language + ".json", o = this._loadFile(r)), t.locale.region && (r = i + t.locale.language + "_" + t.locale.region + ".json", u = this._loadFile(r), t.locale.language !== t.locale.region && (r = i + t.locale.region + ".json", a = this._loadFile(r))), t.locale.variant && (r = i + t.locale.language + "_" + t.locale.region + "_" + t.locale.variant + ".json", f = this._loadFile(r)), n = this._merge([ o, a, u, f ])) : (r = i + t.locale.toString() + ".json", n = this._loadFile(r), !n && t.type !== "region" && t.locale.language && (r = i + t.locale.language + ".json", n = this._loadFile(r)), !n && t.type !== "language" && t.locale.region && (r = i + t.locale.region + ".json", n = this._loadFile(r)), !n && t.type !== "language" && t.locale.region && (r = i + "_" + t.locale.region + ".json", n = this._loadFile(r)));
+if (t.cache === undefined || t.cache !== !1) enyo.g11n.Utils._fileCache[l] = {
+path: l,
+json: n,
+locale: t.locale,
+timestamp: new Date
+}, this.oldestStamp === undefined && (this.oldestStamp = enyo.g11n.Utils._fileCache[l].timestamp);
+}
+return n;
+}, enyo.g11n.Utils._merge = function(t) {
+var n, r, i = {};
+for (n = 0, r = t.length; n < r; n++) i = enyo.mixin(i, t[n]);
+return i;
+}, enyo.g11n.Utils.releaseAllJsonFiles = function(t, n) {
+var r = new Date, i = [], s, o, u, a;
+t = t || 6e4;
+if (this.oldestStamp !== undefined && this.oldestStamp.getTime() + t < r.getTime()) {
+s = r;
+for (o in enyo.g11n.Utils._fileCache) o && enyo.g11n.Utils._fileCache[o] && (a = enyo.g11n.Utils._fileCache[o], !a.locale || n || !enyo.g11n.currentLocale().isMatch(a.locale) && !enyo.g11n.formatLocale().isMatch(a.locale) && !enyo.g11n.phoneLocale().isMatch(a.locale) ? a.timestamp.getTime() + t < r.getTime() ? i.push(a.path) : a.timestamp.getTime() < s.getTime() && (s = a.timestamp) : a.timestamp.getTime() < s.getTime() && (s = a.timestamp));
+this.oldestStamp = s.getTime() < r.getTime() ? s : undefined;
+for (u = 0; u < i.length; u++) enyo.g11n.Utils._fileCache[i[u]] = undefined;
+}
+return i.length;
+}, enyo.g11n.Utils._cacheSize = function() {
+var t = 0, n;
+for (n in enyo.g11n.Utils._fileCache) enyo.g11n.Utils._fileCache[n] && t++;
+return t;
+};
+
+// javascript/template.js
+
+enyo.g11n.Template = function(e, t) {
+this.template = e, this.pattern = t || /(.?)(#\{(.*?)\})/;
+}, enyo.g11n.Template.prototype._evalHelper = function(e, t) {
+function s(e) {
+return e === undefined || e === null ? "" : e;
+}
+function o(e, n, r) {
+var i = t, o, u;
+e = s(e);
+if (e === "\\") return n;
+o = r.split("."), u = o.shift();
+while (i && u) {
+i = i[u], u = o.shift();
+if (!u) return e + s(i) || e || "";
+}
+return e || "";
+}
+var n = [], r = this.pattern, i;
+if (!t || !e) return "";
+while (e.length) i = e.match(r), i ? (n.push(e.slice(0, i.index)), n.push(o(i[1], i[2], i[3])), e = e.slice(i.index + i[0].length)) : (n.push(e), e = "");
+return n.join("");
+}, enyo.g11n.Template.prototype.evaluate = function(e) {
+return this._evalHelper(this.template, e);
+}, enyo.g11n.Template.prototype.formatChoice = function(e, t) {
+try {
+var n = this.template ? this.template.split("|") : [], r = [], i = [], s = "", o;
+t = t || {};
+for (o = 0; o < n.length; o++) {
+var u = enyo.indexOf("#", n[o]);
+if (u !== -1) {
+r[o] = n[o].substring(0, u), i[o] = n[o].substring(u + 1);
+if (e == r[o]) return this._evalHelper(i[o], t);
+r[o] === "" && (s = i[o]);
+}
+}
+for (o = 0; o < r.length; o++) {
+var a = r[o];
+if (a) {
+var f = a.charAt(a.length - 1), l = parseFloat(a);
+if (f === "<" && e < l || f === ">" && e > l) return this._evalHelper(i[o], t);
+}
+}
+return this._evalHelper(s, t);
+} catch (c) {
+return enyo.error("formatChoice error : ", c), "";
+}
+};
+
+// javascript/resources.js
+
+$L = function(e) {
+return $L._resources || ($L._resources = new enyo.g11n.Resources), $L._resources.$L(e);
+}, $L._resources = null, enyo.g11n.Resources = function(e) {
+e && e.root && (this.root = typeof window != "undefined" ? enyo.path.rewrite(e.root) : e.root), this.root = this.root || enyo.g11n.Utils._getRoot(), this.resourcePath = this.root + "/resources/", e && e.locale ? this.locale = typeof e.locale == "string" ? new enyo.g11n.Locale(e.locale) : e.locale : this.locale = enyo.g11n.currentLocale(), this.$L = this.locale.toString() === "en_pl" ? this._pseudo : this._$L, this.localizedResourcePath = this.resourcePath + this.locale.locale + "/", this.languageResourcePath = this.resourcePath + (this.locale.language ? this.locale.language + "/" : ""), this.regionResourcePath = this.languageResourcePath + (this.locale.region ? this.locale.region + "/" : ""), this.carrierResourcePath = this.regionResourcePath + (this.locale.variant ? this.locale.variant + "/" : "");
+}, enyo.g11n.Resources.prototype.getResource = function(e) {
+var t;
+if (this.carrierResourcePath) try {
+t = enyo.g11n.Utils.getNonLocaleFile({
+path: this.carrierResourcePath + e
+});
+} catch (n) {
+t = undefined;
+}
+if (!t) try {
+t = enyo.g11n.Utils.getNonLocaleFile({
+path: this.regionResourcePath + e
+});
+} catch (r) {
+t = undefined;
+}
+if (!t) try {
+t = enyo.g11n.Utils.getNonLocaleFile({
+path: this.languageResourcePath + e
+});
+} catch (i) {
+t = undefined;
+}
+if (!t) try {
+t = enyo.g11n.Utils.getNonLocaleFile({
+path: this.resourcePath + "en/" + e
+});
+} catch (s) {
+t = undefined;
+}
+if (!t) try {
+t = enyo.g11n.Utils.getNonLocaleFile({
+path: this.root + "/" + e
+});
+} catch (o) {
+t = undefined;
+}
+return t;
+}, enyo.g11n.Resources.prototype.$L = function(e) {}, enyo.g11n.Resources.prototype._$L = function(e) {
+var t, n;
+return e ? this.locale.equals(enyo.g11n.sourceLocale()) ? typeof e == "string" ? e : e.value : (this.strings || this._loadStrings(), typeof e == "string" ? (t = e, n = e) : (t = e.key, n = e.value), this.strings && typeof this.strings[t] != "undefined" ? this.strings[t] : n) : "";
+}, enyo.g11n.Resources.prototype._pseudo = function(e) {
+var t, n;
+if (!e) return "";
+n = "";
+for (t = 0; t < e.length; t++) if (e.charAt(t) === "#" && t + 1 < e.length && e.charAt(t + 1) === "{") {
+while (e.charAt(t) !== "}" && t < e.length) n += e.charAt(t++);
+t < e.length && (n += e.charAt(t));
+} else if (e.charAt(t) === "<") {
+while (e.charAt(t) !== ">" && t < e.length) n += e.charAt(t++);
+t < e.length && (n += e.charAt(t));
+} else if (e.charAt(t) === "&" && t + 1 < e.length && !enyo.g11n.Char.isSpace(e.charAt(t + 1))) {
+while (e.charAt(t) !== ";" && !enyo.g11n.Char.isSpace(e.charAt(t)) && t < e.length) n += e.charAt(t++);
+t < e.length && (n += e.charAt(t));
+} else n += enyo.g11n.Resources._pseudoMap[e.charAt(t)] || e.charAt(t);
+return n;
+}, enyo.g11n.Resources.prototype._loadStrings = function() {
+this.strings = enyo.g11n.Utils.getJsonFile({
+root: this.root,
+path: "resources",
+locale: this.locale,
+merge: !0
+}), enyo.g11n.Utils.releaseAllJsonFiles();
+}, enyo.g11n.Resources._pseudoMap = {
+a: "\u00e1",
+e: "\u00e8",
+i: "\u00ef",
+o: "\u00f5",
+u: "\u00fb",
+c: "\u00e7",
+A: "\u00c5",
+E: "\u00cb",
+I: "\u00ce",
+O: "\u00d5",
+U: "\u00db",
+C: "\u00c7",
+B: "\u00df",
+y: "\u00ff",
+Y: "\u00dd",
+D: "\u010e",
+d: "\u0111",
+g: "\u011d",
+G: "\u011c",
+H: "\u0124",
+h: "\u0125",
+J: "\u0134",
+j: "\u0135",
+K: "\u0136",
+k: "\u0137",
+N: "\u00d1",
+n: "\u00f1",
+S: "\u015e",
+s: "\u015f",
+T: "\u0164",
+t: "\u0165",
+W: "\u0174",
+w: "\u0175",
+Z: "\u0179",
+z: "\u017a"
+};
+
+// javascript/character.js
+
+enyo.g11n.Char = enyo.g11n.Char || {}, enyo.g11n.Char._strTrans = function(t, n) {
+var r = "", i, s;
+for (s = 0; s < t.length; s++) i = n[t.charAt(s)], r += i || t.charAt(s);
+return r;
+}, enyo.g11n.Char._objectIsEmpty = function(e) {
+var t;
+for (t in e) return !1;
+return !0;
+}, enyo.g11n.Char._isIdeoLetter = function(e) {
+return e >= 19968 && e <= 40907 || e >= 63744 && e <= 64217 || e >= 13312 && e <= 19893 || e >= 12353 && e <= 12447 || e >= 12449 && e <= 12543 || e >= 65382 && e <= 65437 || e >= 12784 && e <= 12799 || e >= 12549 && e <= 12589 || e >= 12704 && e <= 12727 || e >= 12593 && e <= 12686 || e >= 65440 && e <= 65500 || e >= 44032 && e <= 55203 || e >= 40960 && e <= 42124 || e >= 4352 && e <= 4607 || e >= 43360 && e <= 43388 || e >= 55216 && e <= 55291 ? !0 : !1;
+}, enyo.g11n.Char._isIdeoOther = function(e) {
+return e >= 42125 && e <= 42191 || e >= 12544 && e <= 12548 || e >= 12590 && e <= 12591 || e >= 64218 && e <= 64255 || e >= 55292 && e <= 55295 || e >= 40908 && e <= 40959 || e >= 43389 && e <= 43391 || e >= 12800 && e <= 13055 || e >= 13056 && e <= 13183 || e >= 13184 && e <= 13311 || e === 12592 || e === 12687 || e === 12448 || e === 12352 || e === 12294 || e === 12348 ? !0 : !1;
+}, enyo.g11n.Char.isIdeo = function(t) {
+var n;
+return !t || t.length < 1 ? !1 : (n = t.charCodeAt(0), enyo.g11n.Char._isIdeoLetter(n) || enyo.g11n.Char._isIdeoOther(n));
+}, enyo.g11n.Char.isPunct = function(t) {
+var n, r;
+return !t || t.length < 1 ? !1 : (n = enyo.g11n.Utils.getNonLocaleFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/character_data/chartype.punct.json"
+}), r = n && t.charAt(0) in n, enyo.g11n.Utils.releaseAllJsonFiles(), r);
+}, enyo.g11n.Char._space = {
+9: 1,
+10: 1,
+11: 1,
+12: 1,
+13: 1,
+32: 1,
+133: 1,
+160: 1,
+5760: 1,
+6158: 1,
+8192: 1,
+8193: 1,
+8194: 1,
+8195: 1,
+8196: 1,
+8197: 1,
+8198: 1,
+8199: 1,
+8200: 1,
+8201: 1,
+8202: 1,
+8232: 1,
+8233: 1,
+8239: 1,
+8287: 1,
+12288: 1
+}, enyo.g11n.Char.isSpace = function(t) {
+var n;
+return !t || t.length < 1 ? !1 : (n = t.charCodeAt(0), n in enyo.g11n.Char._space);
+}, enyo.g11n.Char.toUpper = function(t, n) {
+var r;
+if (!t) return undefined;
+n || (n = enyo.g11n.currentLocale()), r = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/character_data",
+locale: n
+});
+if (!r || !r.upperMap) r = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/character_data",
+locale: new enyo.g11n.Locale("en")
+});
+return r && r.upperMap !== undefined ? enyo.g11n.Char._strTrans(t, r.upperMap) : (enyo.g11n.Utils.releaseAllJsonFiles(), t);
+}, enyo.g11n.Char.isLetter = function(t) {
+var n, r, i, s;
+return !t || t.length < 1 ? !1 : (n = t.charAt(0), r = t.charCodeAt(0), i = enyo.g11n.Utils.getNonLocaleFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/character_data/chartype.letter.json"
+}), s = i && n in i || enyo.g11n.Char._isIdeoLetter(r), enyo.g11n.Utils.releaseAllJsonFiles(), s);
+}, enyo.g11n.Char.getIndexChars = function(t) {
+var n, r, i, s, o = [];
+t ? typeof t == "string" ? r = new enyo.g11n.Locale(t) : r = t : r = enyo.g11n.currentLocale(), enyo.g11n.Char._resources || (enyo.g11n.Char._resources = {}), enyo.g11n.Char._resources[r.locale] || (enyo.g11n.Char._resources[r.locale] = new enyo.g11n.Resources({
+root: enyo.g11n.Utils._getEnyoRoot() + "/base",
+locale: r
+})), i = enyo.g11n.Char._resources[r.locale], n = enyo.g11n.Char._resources[r.locale].$L({
+key: "indexChars",
+value: "ABCDEFGHIJKLMNOPQRSTUVWXYZ#"
+});
+for (s = 0; s < n.length; s++) o.push(n[s]);
+return o;
+}, enyo.g11n.Char.getBaseString = function(t, n) {
+var r, i;
+if (!t) return undefined;
+n ? typeof n == "string" ? i = new enyo.g11n.Locale(n) : i = n : i = enyo.g11n.currentLocale(), r = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/character_data",
+locale: i
+});
+if (!r || enyo.g11n.Char._objectIsEmpty(r)) r = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/character_data",
+locale: new enyo.g11n.Locale("en")
+});
+return r && r.baseChars !== undefined && (t = enyo.g11n.Char._strTrans(t, r.baseChars)), enyo.g11n.Utils.releaseAllJsonFiles(), t;
+};
+
+// javascript/timezone.js
+
+enyo.g11n._TZ = enyo.g11n._TZ || {}, enyo.g11n.TzFmt = function(e) {
+return this.setTZ(), e !== undefined && e.TZ !== undefined && this.setCurrentTimeZone(e.TZ), enyo.g11n.Utils.releaseAllJsonFiles(), this;
+}, enyo.g11n.TzFmt.prototype = {
+toString: function() {
+return this.TZ !== undefined ? this.TZ : this._TZ;
+},
+setTZ: function() {
+var e = (new Date).toString(), t = enyo.indexOf("(", e), n = enyo.indexOf(")", e), r = e.slice(t + 1, n);
+r !== undefined ? this.setCurrentTimeZone(r) : this.setDefaultTimeZone();
+},
+getCurrentTimeZone: function() {
+return this.TZ !== undefined ? this.TZ : this._TZ !== undefined ? this._TZ : "unknown";
+},
+setCurrentTimeZone: function(e) {
+this._TZ = e, this.TZ = e;
+},
+setDefaultTimeZone: function() {
+var e = (new Date).toString().match(/\(([A-Z]+)\)/);
+this._TZ = e && e[1] || "PST";
+}
+};
+
+// javascript/datetime.js
+
+enyo.g11n.DateFmt = function(e) {
+var t, n, r, i, s;
+s = this, s._normalizedComponents = {
+date: {
+dm: "DM",
+md: "DM",
+my: "MY",
+ym: "MY",
+d: "D",
+dmy: "",
+dym: "",
+mdy: "",
+myd: "",
+ydm: "",
+ymd: ""
+},
+time: {
+az: "AZ",
+za: "AZ",
+a: "A",
+z: "Z",
+"": ""
+},
+timeLength: {
+"short": "small",
+medium: "small",
+"long": "big",
+full: "big"
+}
+}, s._normalizeDateTimeFormatComponents = function(e) {
+var t = e.dateComponents, n = e.timeComponents, r, i, o, u = e.time;
+return e.date && t && (r = s._normalizedComponents.date[t], r === undefined && (enyo.log("date component error: '" + t + "'"), r = "")), u && n !== undefined && (o = s._normalizedComponents.timeLength[u], o === undefined && (enyo.log("time format error: " + u), o = "small"), i = s._normalizedComponents.time[n], i === undefined && enyo.log("time component error: '" + n + "'")), e.dateComponents = r, e.timeComponents = i, e;
+}, s._finalDateTimeFormat = function(e, t, n) {
+var r = s.dateTimeFormatHash.dateTimeFormat || s.defaultFormats.dateTimeFormat;
+return e && t ? s._buildDateTimeFormat(r, "dateTime", {
+TIME: t,
+DATE: e
+}) : t || e || "M/d/yy h:mm a";
+}, s._buildDateTimeFormat = function(e, t, n) {
+var r, i, o = [], u = s._getTokenizedFormat(e, t), a;
+for (r = 0, i = u.length; r < i && u[r] !== undefined; ++r) a = n[u[r]], a ? o.push(a) : o.push(u[r]);
+return o.join("");
+}, s._getDateFormat = function(e, t) {
+var n = s._formatFetch(e, t.dateComponents, "Date");
+if (e !== "full" && t.weekday) {
+var r = s._formatFetch(t.weekday === !0 ? e : t.weekday, "", "Weekday");
+n = s._buildDateTimeFormat(s.dateTimeFormatHash.weekDateFormat || s.defaultFormats.weekDateFormat, "weekDate", {
+WEEK: r,
+DATE: n
+});
+}
+return n;
+}, s._getTimeFormat = function(e, t) {
+var n = s._formatFetch(e, "", s.twelveHourFormat ? "Time12" : "Time24");
+if (t.timeComponents) {
+var r = "time" + t.timeComponents, i = r + "Format";
+return s._buildDateTimeFormat(s.dateTimeFormatHash[i] || s.defaultFormats[i], r, {
+TIME: n,
+AM: "a",
+ZONE: "zzz"
+});
+}
+return n;
+}, s.ParserChunks = {
+full: "('[^']+'|y{2,4}|M{1,4}|d{1,2}|z{1,3}|a|h{1,2}|H{1,2}|k{1,2}|K{1,2}|E{1,4}|m{1,2}|s{1,2}|[^A-Za-z']+)?",
+dateTime: "(DATE|TIME|[^A-Za-z]+|'[^']+')?",
+weekDate: "(DATE|WEEK|[^A-Za-z]+|'[^']+')?",
+timeA: "(TIME|AM|[^A-Za-z]+|'[^']+')?",
+timeZ: "(TIME|ZONE|[^A-Za-z]+|'[^']+')?",
+timeAZ: "(TIME|AM|ZONE|[^A-Za-z]+|'[^']+')?"
+}, s._getTokenizedFormat = function(e, t) {
+var n = t && s.ParserChunks[t] || s.ParserChunks.full, r = e.length, i = [], o, u, a = new RegExp(n, "g");
+while (r > 0) {
+o = a.exec(e)[0], u = o.length;
+if (u === 0) return [];
+i.push(o), r -= u;
+}
+return i;
+}, s._formatFetch = function(e, t, n, r) {
+switch (e) {
+case "short":
+case "medium":
+case "long":
+case "full":
+case "small":
+case "big":
+case "default":
+return s.dateTimeFormatHash[e + (t || "") + n];
+default:
+return e;
+}
+}, s._dayOffset = function(e, t) {
+var n;
+return t = s._roundToMidnight(t), e = s._roundToMidnight(e), n = (e.getTime() - t.getTime()) / 864e5, n;
+}, s._roundToMidnight = function(e) {
+var t = e.getTime(), n = new Date;
+return n.setTime(t), n.setHours(0), n.setMinutes(0), n.setSeconds(0), n.setMilliseconds(0), n;
+}, s.inputParams = e, typeof e == "undefined" || !e.locale ? t = enyo.g11n.formatLocale() : typeof e.locale == "string" ? t = new enyo.g11n.Locale(e.locale) : t = e.locale, t.language || t.useDefaultLang(), this.locale = t, typeof e == "string" ? s.formatType = e : typeof e == "undefined" ? (e = {
+format: "short"
+}, s.formatType = e.format) : s.formatType = e.format, !s.formatType && !e.time && !e.date && (e ? e.format = "short" : e = {
+format: "short"
+}, s.formatType = "short"), s.dateTimeHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/datetime_data",
+locale: t,
+type: "language"
+}), s.dateTimeHash || (s.dateTimeHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/datetime_data",
+locale: new enyo.g11n.Locale("en_us")
+})), s.dateTimeFormatHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/formats",
+locale: t,
+type: "region"
+}), s.dateTimeFormatHash || (s.dateTimeFormatHash = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/formats",
+locale: new enyo.g11n.Locale("en_us"),
+type: "region"
+})), s.rb = new enyo.g11n.Resources({
+root: enyo.g11n.Utils._getEnyoRoot() + "/base",
+locale: t
+}), typeof e == "undefined" || typeof e.twelveHourFormat == "undefined" ? s.twelveHourFormat = s.dateTimeFormatHash.is12HourDefault : s.twelveHourFormat = e.twelveHourFormat;
+if (s.formatType) switch (s.formatType) {
+case "short":
+case "medium":
+case "long":
+case "full":
+case "default":
+s.partsLength = s.formatType, i = s._finalDateTimeFormat(s._getDateFormat(s.formatType, e), s._getTimeFormat(s.formatType, e), e);
+break;
+default:
+i = s.formatType;
+} else e = s._normalizeDateTimeFormatComponents(e), e.time && (r = s._getTimeFormat(e.time, e), s.partsLength = e.time), e.date && (n = s._getDateFormat(e.date, e), s.partsLength = e.date), i = s._finalDateTimeFormat(n, r, e);
+s.tokenized = s._getTokenizedFormat(i), s.partsLength || (s.partsLength = "full");
+}, enyo.g11n.DateFmt.prototype.toString = function() {
+return this.tokenized.join("");
+}, enyo.g11n.DateFmt.prototype.isAmPm = function() {
+return this.twelveHourFormat;
+}, enyo.g11n.DateFmt.prototype.isAmPmDefault = function() {
+return this.dateTimeFormatHash.is12HourDefault;
+}, enyo.g11n.DateFmt.prototype.getFirstDayOfWeek = function() {
+return this.dateTimeFormatHash.firstDayOfWeek;
+}, enyo.g11n.DateFmt.prototype._format = function(e, t) {
+var n = this, r, i = [], s, o, u, a, f, l, c, h;
+c = n.dateTimeHash;
+for (f = 0, l = t.length; f < l && t[f] !== undefined; f++) {
+switch (t[f]) {
+case "yy":
+s = "", i.push((e.getFullYear() + "").substring(2));
+break;
+case "yyyy":
+s = "", i.push(e.getFullYear());
+break;
+case "MMMM":
+s = "long", o = "month", u = e.getMonth();
+break;
+case "MMM":
+s = "medium", o = "month", u = e.getMonth();
+break;
+case "MM":
+s = "short", o = "month", u = e.getMonth();
+break;
+case "M":
+s = "single", o = "month", u = e.getMonth();
+break;
+case "dd":
+s = "short", o = "date", u = e.getDate() - 1;
+break;
+case "d":
+s = "single", o = "date", u = e.getDate() - 1;
+break;
+case "zzz":
+s = "", typeof n.timezoneFmt == "undefined" && (typeof n.inputParams == "undefined" || typeof n.inputParams.TZ == "undefined" ? n.timezoneFmt = new enyo.g11n.TzFmt : n.timezoneFmt = new enyo.g11n.TzFmt(n.inputParams)), a = n.timezoneFmt.getCurrentTimeZone(), i.push(a);
+break;
+case "a":
+s = "", e.getHours() > 11 ? i.push(c.pm) : i.push(c.am);
+break;
+case "K":
+s = "", i.push(e.getHours() % 12);
+break;
+case "KK":
+s = "", r = e.getHours() % 12, i.push(r < 10 ? "0" + ("" + r) : r);
+break;
+case "h":
+s = "", r = e.getHours() % 12, i.push(r === 0 ? 12 : r);
+break;
+case "hh":
+s = "", r = e.getHours() % 12, i.push(r === 0 ? 12 : r < 10 ? "0" + ("" + r) : r);
+break;
+case "H":
+s = "", i.push(e.getHours());
+break;
+case "HH":
+s = "", r = e.getHours(), i.push(r < 10 ? "0" + ("" + r) : r);
+break;
+case "k":
+s = "", r = e.getHours() % 12, i.push(r === 0 ? 12 : r);
+break;
+case "kk":
+s = "", r = e.getHours() % 12, i.push(r === 0 ? 12 : r < 10 ? "0" + ("" + r) : r);
+break;
+case "EEEE":
+s = "long", o = "day", u = e.getDay();
+break;
+case "EEE":
+s = "medium", o = "day", u = e.getDay();
+break;
+case "EE":
+s = "short", o = "day", u = e.getDay();
+break;
+case "E":
+s = "single", o = "day", u = e.getDay();
+break;
+case "mm":
+case "m":
+s = "";
+var p = e.getMinutes();
+i.push(p < 10 ? "0" + ("" + p) : p);
+break;
+case "ss":
+case "s":
+s = "";
+var d = e.getSeconds();
+i.push(d < 10 ? "0" + ("" + d) : d);
+break;
+default:
+h = /'([A-Za-z]+)'/.exec(t[f]), s = "", h ? i.push(h[1]) : i.push(t[f]);
+}
+s && i.push(c[s][o][u]);
+}
+return i.join("");
+}, enyo.g11n.DateFmt.prototype.format = function(e) {
+var t = this;
+return typeof e != "object" || t.tokenized === null ? (enyo.warn("DateFmt.format: no date to format or no format loaded"), undefined) : this._format(e, t.tokenized);
+}, enyo.g11n.DateFmt.prototype.formatRelativeDate = function(e, t) {
+var n, r, i, s, o = this;
+if (typeof e != "object") return undefined;
+typeof t == "undefined" ? (r = !1, n = new Date) : (typeof t.referenceDate != "undefined" ? n = t.referenceDate : n = new Date, typeof t.verbosity != "undefined" ? r = t.verbosity : r = !1), s = o._dayOffset(n, e);
+switch (s) {
+case 0:
+return o.dateTimeHash.relative.today;
+case 1:
+return o.dateTimeHash.relative.yesterday;
+case -1:
+return o.dateTimeHash.relative.tomorrow;
+default:
+if (s < 7) return o.dateTimeHash.long.day[e.getDay()];
+if (s < 30) {
+if (r) {
+i = new enyo.g11n.Template(o.dateTimeHash.relative.thisMonth);
+var u = Math.floor(s / 7);
+return i.formatChoice(u, {
+num: u
+});
+}
+return o.format(e);
+}
+if (s < 365) {
+if (r) {
+i = new enyo.g11n.Template(o.dateTimeHash.relative.thisYear);
+var a = Math.floor(s / 30);
+return i.formatChoice(a, {
+num: a
+});
+}
+return o.format(e);
+}
+return o.format(e);
+}
+}, enyo.g11n.DateFmt.prototype.formatRange = function(e, t) {
+var n, r, i, s, o, u, a, f, l = this.partsLength || "medium", c = this.dateTimeHash, h = this.dateTimeFormatHash;
+return !e && !t ? "" : !e || !t ? this.format(e || t) : (t.getTime() < e.getTime() && (n = t, t = e, e = n), a = new Date(e.getTime()), a.setHours(0), a.setMinutes(0), a.setSeconds(0), a.setMilliseconds(0), f = new Date(t.getTime()), f.setHours(0), f.setMinutes(0), f.setSeconds(0), f.setMilliseconds(0), f.getTime() - a.getTime() === 864e5 ? (s = "shortTime" + (this.twelveHourFormat ? "12" : "24"), r = this._getTokenizedFormat(h[s]), s = l + "Date", i = this._getTokenizedFormat(h[s]), u = new enyo.g11n.Template(this.rb.$L({
+key: "dateRangeConsecutiveDays",
+value: "#{startDate} #{startTime} - #{endDate} #{endTime}"
+})), u.evaluate({
+startTime: this._format(e, r),
+endTime: this._format(t, r),
+startDate: this._format(e, i),
+endDate: this._format(t, i)
+})) : e.getYear() === t.getYear() ? (o = l === "short" || l === "single" ? (e.getFullYear() + "").substring(2) : e.getFullYear(), e.getMonth() === t.getMonth() ? e.getDate() === t.getDate() ? (s = "shortTime" + (this.twelveHourFormat ? "12" : "24"), r = this._getTokenizedFormat(h[s]), s = l + "Date", i = this._getTokenizedFormat(h[s]), u = new enyo.g11n.Template(this.rb.$L({
+key: "dateRangeWithinDay",
+value: "#{startTime}-#{endTime}, #{date}"
+})), u.evaluate({
+startTime: this._format(e, r),
+endTime: this._format(t, r),
+date: this._format(e, i)
+})) : (s = l + "DDate", i = this._getTokenizedFormat(h[s]), u = new enyo.g11n.Template(this.rb.$L({
+key: "dateRangeWithinMonth",
+value: "#{month} #{startDate}-#{endDate}, #{year}"
+})), u.evaluate({
+month: c[l].month[e.getMonth()],
+startDate: this._format(e, i),
+endDate: this._format(t, i),
+year: o
+})) : (l === "full" ? l = "long" : l === "single" && (l = "short"), s = l + "DMDate", i = this._getTokenizedFormat(h[s]), u = new enyo.g11n.Template(this.rb.$L({
+key: "dateRangeWithinYear",
+value: "#{start} - #{end}, #{year}"
+})), u.evaluate({
+start: this._format(e, i),
+end: this._format(t, i),
+year: o
+}))) : t.getYear() - e.getYear() < 2 ? (s = l + "Date", i = this._getTokenizedFormat(h[s]), u = new enyo.g11n.Template(this.rb.$L({
+key: "dateRangeWithinConsecutiveYears",
+value: "#{start} - #{end}"
+})), u.evaluate({
+start: this._format(e, i),
+end: this._format(t, i)
+})) : (l === "full" ? l = "long" : l === "single" && (l = "short"), s = l + "MYDate", i = this._getTokenizedFormat(h[s]), u = new enyo.g11n.Template(this.rb.$L({
+key: "dateRangeMultipleYears",
+value: "#{startMonthYear} - #{endMonthYear}"
+})), u.evaluate({
+startMonthYear: this._format(e, i),
+endMonthYear: this._format(t, i)
+})));
+};
+
+// javascript/numberfmt.js
+
+enyo.g11n.NumberFmt = function(e) {
+var t, n, r, i, s, o, u;
+typeof e == "number" ? this.fractionDigits = e : e && typeof e.fractionDigits == "number" && (this.fractionDigits = e.fractionDigits), !e || !e.locale ? this.locale = enyo.g11n.formatLocale() : typeof e.locale == "string" ? this.locale = new enyo.g11n.Locale(e.locale) : this.locale = e.locale, this.style = e && e.style || "number", t = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/formats",
+locale: this.locale,
+type: "region"
+}), this.style === "currency" && (r = e && e.currency || t && t.currency && t.currency.name, r ? (r = r.toUpperCase(), this.currencyStyle = e && e.currencyStyle === "iso" ? "iso" : "common", n = enyo.g11n.Utils.getNonLocaleFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/number_data/iso4217.json"
+}), n ? (i = n[r], i || (s = new enyo.g11n.Locale(r), u = enyo.g11n.Utils.getJsonFile({
+root: enyo.g11n.Utils._getEnyoRoot(),
+path: "base/formats",
+locale: s,
+type: "region"
+}), u && (r = u.currency && u.currency.name, i = n[r])), i || (r = t && t.currency && t.currency.name, i = n[r]), i ? (this.sign = this.currencyStyle !== "iso" ? i.sign : r, this.fractionDigits = e && typeof e.fractionDigits == "number" ? e.fractionDigits : i.digits) : this.style = "number") : (r = t && t.currency && t.currency.name, this.sign = r)) : (r = t && t.currency && t.currency.name, this.sign = r), r ? (o = t && t.currency && t.currency[this.currencyStyle] || "#{sign} #{amt}", this.currencyTemplate = new enyo.g11n.Template(o)) : this.style = "number"), t ? (this.decimal = t.numberDecimal || ".", this.divider = t.numberDivider || ",", t.dividerIndex ? t.dividerIndex === 4 ? this.numberGroupRegex = /(\d+)(\d{4})/ : this.numberGroupRegex = /(\d+)(\d{3})/ : this.numberGroupRegex = /(\d+)(\d{3})/, this.percentageSpace = t.percentageSpace) : (this.decimal = ".", this.divider = ",", this.numberGroupRegex = /(\d+)(\d{3})/, this.percentageSpace = !1), this.numberGroupRegex.compile(this.numberGroupRegex), enyo.g11n.Utils.releaseAllJsonFiles();
+}, enyo.g11n.NumberFmt.prototype.format = function(e) {
+try {
+var t, n, r, i;
+typeof e == "string" && (e = parseFloat(e));
+if (isNaN(e)) return undefined;
+typeof this.fractionDigits != "undefined" ? t = e.toFixed(this.fractionDigits) : t = e.toString(), n = t.split("."), r = n[0];
+while (this.divider && this.numberGroupRegex.test(r)) r = r.replace(this.numberGroupRegex, "$1" + this.divider + "$2");
+return n[0] = r, i = n.join(this.decimal), this.style === "currency" && this.currencyTemplate ? i = this.currencyTemplate.evaluate({
+amt: i,
+sign: this.sign
+}) : this.style === "percent" && (i += this.percentageSpace ? " %" : "%"), i;
+} catch (s) {
+return enyo.log("formatNumber error : " + s), (e || "0") + "." + (this.fractionDigits || "");
+}
+};
+
+// javascript/duration.js
+
+enyo.g11n.DurationFmt = function(e) {
+typeof e == "undefined" ? (this.locale = enyo.g11n.formatLocale(), this.style = "short") : (e.locale ? typeof e.locale == "string" ? this.locale = new enyo.g11n.Locale(e.locale) : this.locale = e.locale : this.locale = enyo.g11n.formatLocale(), e.style ? (this.style = e.style, this.style !== "short" && this.style !== "medium" && this.style !== "long" && this.style !== "full" && (this.style = "short")) : this.style = "short"), this.rb = new enyo.g11n.Resources({
+root: enyo.g11n.Utils._getEnyoRoot() + "/base",
+locale: this.locale
+}), this.style === "short" ? this.parts = {
+years: new enyo.g11n.Template(this.rb.$L({
+key: "yearsFormatShort",
+value: "##{num}y"
+})),
+months: new enyo.g11n.Template(this.rb.$L({
+key: "monthsFormatShort",
+value: "##{num}m"
+})),
+weeks: new enyo.g11n.Template(this.rb.$L({
+key: "weeksFormatShort",
+value: "##{num}w"
+})),
+days: new enyo.g11n.Template(this.rb.$L({
+key: "daysFormatShort",
+value: "##{num}d"
+})),
+hours: new enyo.g11n.Template(this.rb.$L({
+key: "hoursFormatShort",
+value: "##{num}"
+})),
+minutes: new enyo.g11n.Template(this.rb.$L({
+key: "minutesFormatShort",
+value: "##{num}"
+})),
+seconds: new enyo.g11n.Template(this.rb.$L({
+key: "secondsFormatShort",
+value: "##{num}"
+})),
+separator: this.rb.$L({
+key: "separatorShort",
+value: " "
+}),
+dateTimeSeparator: this.rb.$L({
+key: "dateTimeSeparatorShort",
+value: " "
+}),
+longTimeFormat: new enyo.g11n.Template(this.rb.$L({
+key: "longTimeFormatShort",
+value: "#{hours}:#{minutes}:#{seconds}"
+})),
+shortTimeFormat: new enyo.g11n.Template(this.rb.$L({
+key: "shortTimeFormatShort",
+value: "#{minutes}:#{seconds}"
+})),
+finalSeparator: ""
+} : this.style === "medium" ? this.parts = {
+years: new enyo.g11n.Template(this.rb.$L({
+key: "yearsFormatMedium",
+value: "##{num} yr"
+})),
+months: new enyo.g11n.Template(this.rb.$L({
+key: "monthsFormatMedium",
+value: "##{num} mo"
+})),
+weeks: new enyo.g11n.Template(this.rb.$L({
+key: "weeksFormatMedium",
+value: "##{num} wk"
+})),
+days: new enyo.g11n.Template(this.rb.$L({
+key: "daysFormatMedium",
+value: "##{num} dy"
+})),
+hours: new enyo.g11n.Template(this.rb.$L({
+key: "hoursFormatMedium",
+value: "##{num}"
+})),
+minutes: new enyo.g11n.Template(this.rb.$L({
+key: "minutesFormatMedium",
+value: "##{num}"
+})),
+seconds: new enyo.g11n.Template(this.rb.$L({
+key: "secondsFormatMedium",
+value: "##{num}"
+})),
+separator: this.rb.$L({
+key: "separatorMedium",
+value: " "
+}),
+dateTimeSeparator: this.rb.$L({
+key: "dateTimeSeparatorMedium",
+value: " "
+}),
+longTimeFormat: new enyo.g11n.Template(this.rb.$L({
+key: "longTimeFormatMedium",
+value: "#{hours}:#{minutes}:#{seconds}"
+})),
+shortTimeFormat: new enyo.g11n.Template(this.rb.$L({
+key: "shortTimeFormatMedium",
+value: "#{minutes}:#{seconds}"
+})),
+finalSeparator: ""
+} : this.style === "long" ? this.parts = {
+years: new enyo.g11n.Template(this.rb.$L({
+key: "yearsFormatLong",
+value: "1#1 yr|1>##{num} yrs"
+})),
+months: new enyo.g11n.Template(this.rb.$L({
+key: "monthsFormatLong",
+value: "1#1 mon|1>##{num} mos"
+})),
+weeks: new enyo.g11n.Template(this.rb.$L({
+key: "weeksFormatLong",
+value: "1#1 wk|1>##{num} wks"
+})),
+days: new enyo.g11n.Template(this.rb.$L({
+key: "daysFormatLong",
+value: "1#1 day|1>##{num} dys"
+})),
+hours: new enyo.g11n.Template(this.rb.$L({
+key: "hoursFormatLong",
+value: "0#|1#1 hr|1>##{num} hrs"
+})),
+minutes: new enyo.g11n.Template(this.rb.$L({
+key: "minutesFormatLong",
+value: "0#|1#1 min|1>##{num} min"
+})),
+seconds: new enyo.g11n.Template(this.rb.$L({
+key: "secondsFormatLong",
+value: "0#|1#1 sec|1>##{num} sec"
+})),
+separator: this.rb.$L({
+key: "separatorLong",
+value: " "
+}),
+dateTimeSeparator: this.rb.$L({
+key: "dateTimeSeparatorLong",
+value: " "
+}),
+longTimeFormat: "",
+shortTimeFormat: "",
+finalSeparator: ""
+} : this.style === "full" && (this.parts = {
+years: new enyo.g11n.Template(this.rb.$L({
+key: "yearsFormatFull",
+value: "1#1 year|1>##{num} years"
+})),
+months: new enyo.g11n.Template(this.rb.$L({
+key: "monthsFormatFull",
+value: "1#1 month|1>##{num} months"
+})),
+weeks: new enyo.g11n.Template(this.rb.$L({
+key: "weeksFormatFull",
+value: "1#1 week|1>##{num} weeks"
+})),
+days: new enyo.g11n.Template(this.rb.$L({
+key: "daysFormatFull",
+value: "1#1 day|1>##{num} days"
+})),
+hours: new enyo.g11n.Template(this.rb.$L({
+key: "hoursFormatFull",
+value: "0#|1#1 hour|1>##{num} hours"
+})),
+minutes: new enyo.g11n.Template(this.rb.$L({
+key: "minutesFormatFull",
+value: "0#|1#1 minute|1>##{num} minutes"
+})),
+seconds: new enyo.g11n.Template(this.rb.$L({
+key: "secondsFormatFull",
+value: "0#|1#1 second|1>##{num} seconds"
+})),
+separator: this.rb.$L({
+key: "separatorFull",
+value: ", "
+}),
+dateTimeSeparator: this.rb.$L({
+key: "dateTimeSeparatorFull",
+value: ", "
+}),
+longTimeFormat: "",
+shortTimeFormat: "",
+finalSeparator: this.rb.$L({
+key: "finalSeparatorFull",
+value: " and "
+})
+}), this.dateParts = [ "years", "months", "weeks", "days" ], this.timeParts = [ "hours", "minutes", "seconds" ];
+}, enyo.g11n.DurationFmt.prototype.format = function(e) {
+var t = [], n = [], r, i, s, o;
+if (!e || enyo.g11n.Char._objectIsEmpty(e)) return "";
+for (i = 0; i < this.dateParts.length; i++) s = e[this.dateParts[i]] || 0, s > 0 && (o = this.parts[this.dateParts[i]].formatChoice(s, {
+num: s
+}), o && o.length > 0 && (t.length > 0 && t.push(this.parts.separator), t.push(o)));
+if (this.style === "long" || this.style === "full") for (i = 0; i < this.timeParts.length; i++) s = e[this.timeParts[i]] || 0, s > 0 && (o = this.parts[this.timeParts[i]].formatChoice(s, {
+num: s
+}), o && o.length > 0 && (n.length > 0 && n.push(this.parts.separator), n.push(o))); else {
+var u = {}, a = e.hours ? this.parts.longTimeFormat : this.parts.shortTimeFormat;
+for (i = 0; i < this.timeParts.length; i++) {
+s = e[this.timeParts[i]] || 0;
+if (s < 10) switch (this.timeParts[i]) {
+case "minutes":
+e.hours && (s = "0" + s);
+break;
+case "seconds":
+s = "0" + s;
+break;
+case "hours":
+}
+o = this.parts[this.timeParts[i]].formatChoice(s, {
+num: s
+}), o && o.length > 0 && (u[this.timeParts[i]] = o);
+}
+n.push(a.evaluate(u));
+}
+r = t, r.length > 0 && n.length > 0 && r.push(this.parts.dateTimeSeparator);
+for (i = 0; i < n.length; i++) r.push(n[i]);
+return r.length > 2 && this.style === "full" && (r[r.length - 2] = this.parts.finalSeparator), r.join("") || "";
+};
 
 // FittableLayout.js
 
@@ -193,13 +1246,18 @@ bottomUp: !1,
 noSelect: !1,
 multiSelect: !1,
 toggleSelected: !1,
-fixedHeight: !1
+fixedHeight: !1,
+reorderable: !1
 },
 events: {
-onSetupItem: ""
+onSetupItem: "",
+onReorder: ""
 },
 handlers: {
-onAnimateFinish: "animateFinish"
+onAnimateFinish: "animateFinish",
+ondrag: "drag",
+onup: "dragfinish",
+onholdpulse: "holdpulse"
 },
 rowHeight: 0,
 listTools: [ {
@@ -221,16 +1279,56 @@ classes: "enyo-list-page"
 name: "page1",
 allowHtml: !0,
 classes: "enyo-list-page"
+}, {
+name: "reorderContainer",
+classes: "list-reorder-container"
+}, {
+name: "placeholder",
+classes: "listPlaceholder",
+style: "height:0px;"
+}, {
+name: "pinnedPlaceholder",
+classes: "pinned-list-placeholder",
+components: [ {
+name: "pinnedPlaceholderContents",
+allowHtml: !0
+}, {
+name: "testButton",
+kind: "enyo.Button",
+content: "Drop",
+ontap: "dropPinnedRow"
+} ]
 } ]
 } ],
+initHoldCounter: 3,
+holdCounter: 3,
+holding: !1,
+draggingRowIndex: -1,
+dragToScrollThreshold: .1,
+prevScrollTop: 0,
+autoScrollTimeoutMS: 20,
+autoScrollTimeout: null,
+pinnedReorderMode: !1,
+initialPinPosition: -1,
+itemMoved: !1,
+currentPage: null,
 create: function() {
-this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged();
+this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged(), this.reorderableChanged();
 },
 createStrategy: function() {
 this.controlParentName = "strategy", this.inherited(arguments), this.createChrome(this.listTools), this.controlParentName = "client", this.discoverControlParent();
 },
 rendered: function() {
 this.inherited(arguments), this.$.generator.node = this.$.port.hasNode(), this.$.generator.generated = !0, this.reset();
+},
+initComponents: function() {
+this.inherited(arguments), this.hideReorderableContainer(), this.hidePinnedPlaceholderContainer();
+},
+hideReorderableContainer: function() {
+this.$.reorderContainer.setShowing(!1);
+},
+hidePinnedPlaceholderContainer: function() {
+this.$.pinnedPlaceholder.setShowing(!1);
 },
 resizeHandler: function() {
 this.inherited(arguments), this.refresh();
@@ -250,15 +1348,40 @@ this.$.generator.setToggleSelected(this.toggleSelected);
 countChanged: function() {
 this.hasNode() && this.updateMetrics();
 },
+reorderableChanged: function() {
+this.reorderable && !this.fixedHeight && (enyo.log("Lists without a fixed row height cannont be reorderable!"), this.reorderable = !1);
+},
 updateMetrics: function() {
 this.defaultPageHeight = this.rowsPerPage * (this.rowHeight || 100), this.pageCount = Math.ceil(this.count / this.rowsPerPage), this.portSize = 0;
 for (var e = 0; e < this.pageCount; e++) this.portSize += this.getPageHeight(e);
 this.adjustPortSize();
 },
+holdpulse: function(e, t) {
+if (!this.getReorderable() || this.holding) return;
+if (this.holdCounter <= 0) {
+this.resetHoldCounter(), this.hold(e, t);
+return;
+}
+this.holdCounter--;
+},
+resetHoldCounter: function() {
+this.holdCounter = this.initHoldCounter;
+},
+hold: function(e, t) {
+t.preventDefault();
+if (this.shouldDoReorderHold(e, t)) return this.holding = !0, this.reorderHold(t), !1;
+},
+drag: function(e, t) {
+t.preventDefault();
+if (this.shouldDoReorderDrag(t)) return this.reorderDrag(t), !0;
+},
+dragfinish: function(e, t) {
+this.getReorderable() && (this.resetHoldCounter(), this.finishReordering(e, t));
+},
 generatePage: function(e, t) {
 this.page = e;
 var n = this.$.generator.rowOffset = this.rowsPerPage * this.page, r = this.$.generator.count = Math.min(this.count - n, this.rowsPerPage), i = this.$.generator.generateChildHtml();
-t.setContent(i);
+t.setContent(i), this.getReorderable() && this.draggingRowIndex > -1 && this.hideReorderingRow();
 var s = t.getBounds().height;
 !this.rowHeight && s > 0 && (this.rowHeight = Math.floor(s / r), this.updateMetrics());
 if (!this.fixedHeight) {
@@ -318,7 +1441,7 @@ this.pageHeights = [], this.rowHeight = 0, this.updateMetrics();
 },
 scroll: function(e, t) {
 var n = this.inherited(arguments);
-return this.update(this.getScrollTop()), n;
+return this.update(this.getScrollTop()), this.shouldDoPinnedReorderScroll() && this.reorderScroll(e, t), n;
 },
 scrollToBottom: function() {
 this.update(this.getScrollBounds().maxTop), this.inherited(arguments);
@@ -387,6 +1510,282 @@ return this.twiddle(), !0;
 twiddle: function() {
 var e = this.getStrategy();
 enyo.call(e, "twiddle");
+},
+shouldDoReorderHold: function(e, t) {
+return !this.getReorderable() || t.rowIndex < 0 || this.pinnedReorderMode || e !== this.$.strategy ? !1 : !0;
+},
+reorderHold: function(e) {
+this.$.strategy.listReordering = !0, this.setupReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = Math.floor(e.rowIndex / this.rowsPerPage), this.currentPage = this.currentPageNumber % 2, this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlacholder(e.rowIndex);
+},
+setupReorderContainer: function(e) {
+this.setItemPosition(this.$.reorderContainer, e.rowIndex), this.setItemBounds(this.$.reorderContainer, e.rowIndex), this.appendNodeToReorderContainer(this.cloneRowNode(e.rowIndex)), this.$.reorderContainer.setShowing(!0), this.centerReorderContainerOnPointer(e);
+},
+appendNodeToReorderContainer: function(e) {
+this.$.reorderContainer.createComponent({
+allowHtml: !0,
+content: e.innerHTML
+}).render();
+},
+centerReorderContainerOnPointer: function(e) {
+var t = this.getNodePosition(this.hasNode()), n = e.pageX - t.left - parseInt(this.$.reorderContainer.domStyles.width, 10) / 2, r = e.pageY - t.top + this.getScrollTop() - parseInt(this.$.reorderContainer.domStyles.height, 10) / 2;
+this.positionReorderContainer(n, r);
+},
+positionReorderContainer: function(e, t) {
+this.$.reorderContainer.addClass("animatedTopAndLeft"), this.$.reorderContainer.addStyles("left:" + e + "px;top:" + t + "px;"), this.setPositionReorderContainerTimeout();
+},
+setPositionReorderContainerTimeout: function() {
+var e = this;
+this.clearPositionReorderContainerTimeout(), this.positionReorderContainerTimeout = setTimeout(function() {
+e.$.reorderContainer.removeClass("animatedTopAndLeft"), e.clearPositionReorderContainerTimeout();
+}, 100);
+},
+clearPositionReorderContainerTimeout: function() {
+this.positionReorderContainerTimeout && (clearTimeout(this.positionReorderContainerTimeout), this.positionReorderContainerTimeout = null);
+},
+shouldDoReorderDrag: function(e) {
+return !this.getReorderable() || this.draggingRowIndex < 0 || this.pinnedReorderMode ? !1 : !0;
+},
+reorderDrag: function(e) {
+this.positionReorderNode(e), this.checkForAutoScroll(e);
+var t = this.getRowIndexFromCoordinate(e.pageY);
+t != this.placeholderRowIndex && this.movePlaceholderToIndex(t);
+},
+positionReorderNode: function(e) {
+var t = this.$.reorderContainer.hasNode().style, n = parseInt(t.left, 10) + e.ddx, r = this.getScrollTop() - this.prevScrollTop, i = parseInt(t.top, 10) + parseInt(e.ddy, 10) + r;
+this.$.reorderContainer.addStyles("top: " + i + "px ; left: " + n + "px"), this.prevScrollTop = this.getScrollTop();
+},
+checkForAutoScroll: function(e) {
+var t = this.getNodePosition(this.hasNode()), n = this.getBounds(), r;
+e.pageY - t.top < n.height * this.dragToScrollThreshold ? (r = 100 * (1 - (e.pageY - t.top) / (n.height * this.dragToScrollThreshold)), this.scrollDistance = -1 * r) : e.pageY - t.top > n.height * (1 - this.dragToScrollThreshold) ? (r = 100 * ((e.pageY - t.top - n.height * (1 - this.dragToScrollThreshold)) / (n.height - n.height * (1 - this.dragToScrollThreshold))), this.scrollDistance = 1 * r) : this.scrollDistance = 0, this.scrollDistance === 0 ? this.stopAutoScrolling() : this.autoScrollTimeout || this.startAutoScrolling();
+},
+stopAutoScrolling: function() {
+this.autoScrollTimeout && (clearTimeout(this.autoScrollTimeout), this.autoScrollTimeout = null);
+},
+startAutoScrolling: function() {
+this.autoScrollTimeout = setTimeout(enyo.bind(this, this.autoScroll), this.autoScrollTimeoutMS);
+},
+autoScroll: function() {
+this.scrollDistance === 0 ? this.stopAutoScrolling() : this.autoScrollTimeout || this.startAutoScrolling(), this.setScrollPosition(this.getScrollPosition() + this.scrollDistance), this.positionReorderNode({
+ddx: 0,
+ddy: 0
+}), this.startAutoScrolling();
+},
+movePlaceholderToIndex: function(e) {
+var t = this.$.generator.fetchRowNode(e);
+if (!t) {
+enyo.log("No node - " + e);
+return;
+}
+var n = e > this.draggingRowIndex ? e + 1 : e, r = Math.floor(n / this.rowsPerPage), i = r % 2;
+r >= this.pageCount && (r = this.currentPageNumber, i = this.currentPage), this.currentPage == i ? this.$["page" + this.currentPage].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n)) : (this.updatePageHeights(r), this.updatePagePositions(r, i), this.$["page" + i].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n))), this.placeholderRowIndex = e, this.currentPageNumber = r, this.currentPage = i, this.itemMoved = !0;
+},
+finishReordering: function(e, t) {
+if (this.draggingRowIndex < 0 || this.pinnedReorderMode) return;
+var n = this;
+return this.stopAutoScrolling(), this.$.strategy.listReordering = !1, this.moveReorderedContainerToDroppedPosition(t), setTimeout(function() {
+n.completeFinishReordering(t);
+}, 100), t.preventDefault(), !0;
+},
+moveReorderedContainerToDroppedPosition: function() {
+var e = this.getRelativeOffset(this.placeholderNode, this.hasNode());
+this.positionReorderContainer(e.left, e.top);
+},
+completeFinishReordering: function(e) {
+this.removePlaceholderNode();
+if (this.draggingRowIndex == this.placeholderRowIndex) {
+if (!this.itemMoved) {
+this.beginPinnedReorder(e);
+return;
+}
+this.dropReorderedRow(e);
+}
+this.dropReorderedRow(e), this.reorderRows(e), this.resetReorderState();
+},
+beginPinnedReorder: function(e) {
+this.emptyAndHideReorderContainer(), this.setupPinnedPlaceholder(), this.pinnedReorderMode = !0, this.initialPinPosition = e.pageY;
+},
+emptyAndHideReorderContainer: function() {
+this.$.reorderContainer.destroyComponents(), this.$.reorderContainer.setShowing(!1);
+},
+setupPinnedPlaceholder: function() {
+this.$.pinnedPlaceholderContents.setContent(this.cloneRowNode(this.draggingRowIndex).innerHTML), this.showNode(this.hiddenNode), this.setItemBounds(this.$.pinnedPlaceholder, this.draggingRowIndex), this.hideNode(this.hiddenNode), this.$["page" + this.currentPage].hasNode().insertBefore(this.$.pinnedPlaceholder.hasNode(), this.$.generator.fetchRowNode(this.draggingRowIndex)), this.$.pinnedPlaceholder.setShowing(!0);
+},
+dropReorderedRow: function(e) {
+this.emptyAndHideReorderContainer(), this.positionReorderedNode();
+},
+reorderRows: function(e) {
+this.doReorder(this.makeReorderEvent(e)), this.fixPageHeightsAndPortSize(), this.updateListIndices();
+},
+makeReorderEvent: function(e) {
+return e.reorderFrom = this.draggingRowIndex, e.reorderTo = this.placeholderRowIndex, e;
+},
+fixPageHeightsAndPortSize: function() {
+this.currentPageNumber != this.initialPageNumber && (this.correctPageHeights(), this.adjustPortSize());
+},
+positionReorderedNode: function() {
+var e = this.placeholderRowIndex > this.draggingRowIndex ? this.placeholderRowIndex + 1 : this.placeholderRowIndex, t = this.$.generator.fetchRowNode(e);
+this.$["page" + this.currentPage].hasNode().insertBefore(this.hiddenNode, t), this.showNode(this.hiddenNode);
+},
+resetReorderState: function() {
+this.draggingRowIndex = this.placeholderRowIndex = -1, this.holding = !1;
+},
+updateListIndices: function() {
+if (this.shouldDoRefresh()) {
+this.refresh(), this.draggingRowIndex < this.placeholderRowIndex && this.setScrollPosition(this.getScrollPosition() - this.rowHeight);
+return;
+}
+var e = Math.min(this.draggingRowIndex, this.placeholderRowIndex), t = Math.max(this.draggingRowIndex, this.placeholderRowIndex), n = this.draggingRowIndex - this.placeholderRowIndex > 0 ? 1 : -1, r, i, s, o;
+if (n === 1) {
+r = this.$.generator.fetchRowNode(this.draggingRowIndex), r.setAttribute("data-enyo-index", "reordered");
+for (i = t - 1, s = t; i >= e; i--) {
+r = this.$.generator.fetchRowNode(i);
+if (!r) {
+enyo.log("No node - " + i);
+continue;
+}
+o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o + 1, r.setAttribute("data-enyo-index", s);
+}
+r = document.querySelectorAll('[data-enyo-index="reordered"]')[0], r.setAttribute("data-enyo-index", this.placeholderRowIndex);
+} else {
+r = this.$.generator.fetchRowNode(this.draggingRowIndex), r.setAttribute("data-enyo-index", this.placeholderRowIndex);
+for (i = e + 1, s = e; i <= t; i++) {
+r = this.$.generator.fetchRowNode(i);
+if (!r) {
+enyo.log("No node - " + i);
+continue;
+}
+o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o - 1, r.setAttribute("data-enyo-index", s);
+}
+}
+},
+shouldDoRefresh: function() {
+return Math.abs(this.initialPageNumber - this.currentPageNumber) > 1;
+},
+getNodeStyle: function(e) {
+var t = this.$.generator.fetchRowNode(e);
+if (!t) {
+enyo.log("No node - " + e);
+return;
+}
+var n = this.getRelativeOffset(t, this.hasNode()), r = this.getDimensions(t);
+return {
+h: parseInt(r.height, 10),
+w: parseInt(r.width, 10),
+left: parseInt(n.left, 10),
+top: parseInt(n.top, 10)
+};
+},
+getRelativeOffset: function(e, t) {
+var n = {
+top: 0,
+left: 0
+};
+if (e !== t && e.parentNode) do n.top += e.offsetTop || 0, n.left += e.offsetLeft || 0, e = e.offsetParent; while (e && e !== t);
+return n;
+},
+getDimensions: function(e) {
+var t = getComputedStyle(e, null);
+return {
+height: t.getPropertyValue("height"),
+width: t.getPropertyValue("width")
+};
+},
+movePinnedRow: function(e) {
+var t = this.$.generator.fetchRowNode(e);
+if (!t) {
+enyo.log("No node - " + e);
+return;
+}
+var n = Math.floor(e / this.rowsPerPage), r = n % 2;
+n >= this.pageCount && (n = this.currentPageNumber, r = this.currentPage), this.currentPage == r ? this.$["page" + this.currentPage].hasNode().insertBefore(this.$.pinnedPlaceholder.hasNode(), t) : (this.updatePageHeights(n), this.updatePagePositions(n, r), this.$["page" + r].hasNode().insertBefore(this.$.pinnedPlaceholder.hasNode(), t)), this.placeholderRowIndex = e > this.draggingRowIndex ? e - 1 : e, this.currentPageNumber = n, this.currentPage = r;
+},
+replaceNodeWithPlacholder: function(e) {
+var t = this.$.generator.fetchRowNode(e);
+if (!t) {
+enyo.log("No node - " + e);
+return;
+}
+this.placeholderNode = this.createPlaceholderNode(t), this.hiddenNode = this.hideNode(t), this.$["page" + this.currentPage].hasNode().insertBefore(this.placeholderNode, this.hiddenNode);
+},
+createPlaceholderNode: function(e) {
+var t = this.$.placeholder.hasNode().cloneNode(!0), n = this.getDimensions(e);
+return t.style.height = n.height, t.style.width = n.width, t;
+},
+removePlaceholderNode: function() {
+this.removeNode(this.placeholderNode), this.placeholderNode = null;
+},
+removeHiddenNode: function() {
+this.removeNode(this.hiddenNode), this.hiddenNode = null;
+},
+removeNode: function(e) {
+if (!e || !e.parentNode) return;
+e.parentNode.removeChild(e);
+},
+updatePageHeights: function(e) {
+this.pageHeights[this.currentPageNumber] = this.getPageHeight(this.currentPageNumber) - this.rowHeight, this.pageHeights[e] = this.getPageHeight(e) + this.rowHeight;
+},
+updatePagePositions: function(e, t) {
+this.positionPage(this.currentPageNumber, this.$["page" + this.currentPage]), this.positionPage(e, this.$["page" + t]);
+},
+correctPageHeights: function() {
+var e = this.currentPage == 1 ? 0 : 1, t, n;
+this.initialPageNumber < this.currentPageNumber ? (t = this.$["page" + this.currentPage].hasNode().firstChild, this.$["page" + e].hasNode().appendChild(t)) : (t = this.$["page" + this.currentPage].hasNode().lastChild, n = this.$["page" + e].hasNode().firstChild, this.$["page" + e].hasNode().insertBefore(t, n)), this.pageHeights[this.initialPageNumber] = this.getPageHeight(this.initialPageNumber) + this.rowHeight, this.pageHeights[this.currentPageNumber] = this.getPageHeight(this.currentPageNumber) - this.rowHeight, this.updatePagePositions(this.initialPageNumber, e);
+},
+hideNode: function(e) {
+return e.style.display = "none", e;
+},
+showNode: function(e) {
+return e.style.display = "block", e;
+},
+dropPinnedRow: function(e, t) {
+this.dropReorderedRow(t), this.pinnedReorderMode = !1, this.$.pinnedPlaceholder.setShowing(!1), this.draggingRowIndex != this.placeholderRowIndex && this.reorderRows(t), this.resetReorderState();
+},
+getRowIndexFromCoordinate: function(e) {
+var t = this.getScrollTop() + e - this.getNodePosition(this.hasNode()).top;
+return Math.floor(t / this.rowHeight);
+},
+getIndexPosition: function(e) {
+return this.getNodePosition(this.$.generator.fetchRowNode(e));
+},
+getNodePosition: function(e) {
+var t = e, n = 0, r = 0;
+while (e && e.offsetParent) n += e.offsetTop, r += e.offsetLeft, e = e.offsetParent;
+e = t;
+var i = enyo.dom.getCssTransformProp();
+while (e && e.getAttribute) {
+var s = enyo.dom.getComputedStyleValue(e, i);
+if (s && s != "none") {
+var o = s.lastIndexOf(","), u = s.lastIndexOf(",", o - 1);
+o >= 0 && u >= 0 && (n += parseFloat(s.substr(o + 1, s.length - o)), r += parseFloat(s.substr(u + 1, o - u)));
+}
+e = e.parentNode;
+}
+return {
+top: n,
+left: r
+};
+},
+cloneRowNode: function(e) {
+return this.$.generator.fetchRowNode(e).cloneNode(!0);
+},
+setItemPosition: function(e, t) {
+var n = this.getNodeStyle(t), r = "top:" + n.top + "px; left:" + n.left + "px;";
+e.addStyles(r);
+},
+setItemBounds: function(e, t) {
+var n = this.getNodeStyle(t), r = "width:" + n.w + "px; height:" + n.h + "px;";
+e.addStyles(r);
+},
+shouldDoPinnedReorderScroll: function() {
+return !this.getReorderable() || !this.pinnedReorderMode ? !1 : !0;
+},
+reorderScroll: function(e, t) {
+var n = this.getRowIndexFromCoordinate(this.initialPinPosition);
+n != this.placeholderRowIndex && this.movePinnedRow(n);
+},
+hideReorderingRow: function() {
+var e = document.querySelectorAll('[data-enyo-index="' + this.draggingRowIndex + '"]')[0];
+e && (this.hiddenNode = this.hideNode(e));
 }
 });
 
@@ -445,7 +1844,7 @@ this.firedPullStart = !1, this.firedPull = !1, this.firedPullCancel = !1;
 scroll: function(e, t) {
 var n = this.inherited(arguments);
 this.completingPull && this.pully.setShowing(!1);
-var r = this.getStrategy().$.scrollMath, i = r.y;
+var r = this.getStrategy().$.scrollMath || this.getStrategy(), i = -1 * this.getScrollTop();
 return r.isInOverScroll() && i > 0 && (enyo.dom.transformValue(this.$.pulldown, this.translation, "0," + i + "px" + (this.accel ? ",0" : "")), this.firedPullStart || (this.firedPullStart = !0, this.pullStart(), this.pullHeight = this.$.pulldown.getBounds().height), i > this.pullHeight && !this.firedPull && (this.firedPull = !0, this.firedPullCancel = !1, this.pull()), this.firedPull && !this.firedPullCancel && i < this.pullHeight && (this.firedPullCancel = !0, this.firedPull = !1, this.pullCancel())), n;
 },
 scrollStopHandler: function() {
@@ -453,12 +1852,14 @@ this.completingPull && (this.completingPull = !1, this.doPullComplete());
 },
 dragfinish: function() {
 if (this.firedPull) {
-var e = this.getStrategy().$.scrollMath;
-e.setScrollY(e.y - this.pullHeight), this.pullRelease();
+var e = this.getStrategy().$.scrollMath || this.getStrategy();
+e.setScrollY(-1 * this.getScrollTop() - this.pullHeight), this.pullRelease();
 }
 },
 completePull: function() {
-this.completingPull = !0, this.$.strategy.$.scrollMath.setScrollY(this.pullHeight), this.$.strategy.$.scrollMath.start();
+this.completingPull = !0;
+var e = this.getStrategy().$.scrollMath || this.getStrategy();
+e.setScrollY(this.pullHeight), e.start();
 },
 pullStart: function() {
 this.setPulling(), this.pully.setShowing(!1), this.$.puller.setShowing(!0), this.doPullStart();
@@ -518,7 +1919,7 @@ components: [ {
 name: "aboveClient"
 }, {
 name: "generator",
-kind: "enyo.FlyweightRepeater",
+kind: "FlyweightRepeater",
 canGenerate: !1,
 components: [ {
 tag: null,
@@ -534,6 +1935,25 @@ allowHtml: !0,
 classes: "enyo-list-page"
 }, {
 name: "belowClient"
+}, {
+name: "reorderContainer",
+classes: "list-reorder-container"
+}, {
+name: "placeholder",
+classes: "listPlaceholder",
+style: "height:0px;"
+}, {
+name: "pinnedPlaceholder",
+classes: "pinned-list-placeholder",
+components: [ {
+name: "pinnedPlaceholderContents",
+allowHtml: !0
+}, {
+name: "testButton",
+kind: "enyo.Button",
+content: "Drop",
+ontap: "dropPinnedRow"
+} ]
 } ]
 } ],
 aboveComponents: null,
@@ -819,7 +2239,7 @@ return this.controlsIndex = t, i;
 statics: {
 positionControl: function(e, t, n) {
 var r = n || "px";
-if (!this.updating) if (enyo.dom.canTransform() && !enyo.platform.android) {
+if (!this.updating) if (enyo.dom.canTransform() && !enyo.platform.android && enyo.platform.ie !== 10) {
 var i = t.left, s = t.top;
 i = enyo.isString(i) ? i : i && i + r, s = enyo.isString(s) ? s : s && s + r, enyo.dom.transform(e, {
 translateX: i || null,
@@ -973,17 +2393,23 @@ this.inherited(arguments);
 enyo.kind({
 name: "enyo.CollapsingArranger",
 kind: "CarouselArranger",
+peekWidth: 0,
 size: function() {
 this.clearLastSize(), this.inherited(arguments);
 },
 clearLastSize: function() {
 for (var e = 0, t = this.container.getPanels(), n; n = t[e]; e++) n._fit && e != t.length - 1 && (n.applyStyle("width", null), n._fit = null);
 },
+constructor: function() {
+this.inherited(arguments), this.peekWidth = this.container.peekWidth != null ? this.container.peekWidth : this.peekWidth;
+},
 arrange: function(e, t) {
 var n = this.container.getPanels();
-for (var r = 0, i = this.containerPadding.left, s, o; o = n[r]; r++) this.arrangeControl(o, {
-left: i
-}), r >= t && (i += o.width + o.marginWidth), r == n.length - 1 && t < 0 && this.arrangeControl(o, {
+for (var r = 0, i = this.containerPadding.left, s, o, u = 0; o = n[r]; r++) o.getShowing() ? (this.arrangeControl(o, {
+left: i + u * this.peekWidth
+}), r >= t && (i += o.width + o.marginWidth - this.peekWidth), u++) : (this.arrangeControl(o, {
+left: i + u
+}), r >= t && (i += o.width + o.marginWidth)), r == n.length - 1 && t < 0 && this.arrangeControl(o, {
 left: i - t
 });
 },
@@ -1134,6 +2560,71 @@ top: null
 }), n.applyStyle("left", null), n.applyStyle("top", null), n.applyStyle("height", null), n.applyStyle("width", null);
 this.inherited(arguments);
 }
+}), enyo.kind({
+name: "enyo.DockRightArranger",
+kind: "Arranger",
+basePanel: !1,
+size: function() {
+var e = this.container.getPanels(), t = this.containerPadding = this.container.hasNode() ? enyo.dom.calcPaddingExtents(this.container.node) : {}, n = this.containerBounds, r, i, s;
+n.width -= t.left + t.right;
+var o = n.width, u = e.length;
+this.container.transitionPositions = {};
+for (r = 0; s = e[r]; r++) s.width = r === 0 && this.container.basePanel ? o : s.getBounds().width;
+for (r = 0; s = e[r]; r++) {
+r === 0 && this.container.basePanel && s.setBounds({
+width: o
+}), s.setBounds({
+top: t.top,
+bottom: t.bottom
+});
+for (j = 0; s = e[j]; j++) {
+var a;
+if (r === 0 && this.container.basePanel) a = 0; else if (j < r) a = o; else {
+if (r !== j) break;
+a = o - e[r].width;
+}
+this.container.transitionPositions[r + "." + j] = a;
+}
+if (j < u) {
+var f = !1;
+for (k = r + 1; k < u; k++) {
+var l = 0;
+if (f) l = 0; else if (e[r].width + e[k].width > o) l = 0, f = !0; else {
+l = e[r].width;
+for (i = r; i < k; i++) {
+if (!(l + e[i + 1].width < o)) {
+l = o;
+break;
+}
+l += e[i + 1].width;
+}
+l = o - l;
+}
+this.container.transitionPositions[r + "." + k] = l;
+}
+}
+}
+},
+arrange: function(e, t) {
+var n, r, i = this.container.getPanels(), s = this.container.clamp(t);
+for (n = 0; r = i[n]; n++) {
+var o = this.container.transitionPositions[n + "." + s];
+this.arrangeControl(r, {
+left: o
+});
+}
+},
+calcArrangementDifference: function(e, t, n, r) {
+return this.containerBounds.width;
+},
+destroy: function() {
+var e = this.container.getPanels();
+for (var t = 0, n; n = e[t]; t++) enyo.Arranger.positionControl(n, {
+left: null,
+top: null
+}), n.applyStyle("top", null), n.applyStyle("bottom", null), n.applyStyle("left", null), n.applyStyle("width", null);
+this.inherited(arguments);
+}
 });
 
 // Panels.js
@@ -1180,8 +2671,11 @@ this.setLayoutKind(this.arrangerKind);
 narrowFitChanged: function() {
 this.addRemoveClass("enyo-panels-fit-narrow", this.narrowFit);
 },
+destroy: function() {
+this.destroying = !0, this.inherited(arguments);
+},
 removeControl: function(e) {
-this.inherited(arguments), this.controls.length > 0 && this.isPanel(e) && (this.setIndex(Math.max(this.index - 1, 0)), this.flow(), this.reflow());
+this.inherited(arguments), this.destroying && this.controls.length > 0 && this.isPanel(e) && (this.setIndex(Math.max(this.index - 1, 0)), this.flow(), this.reflow());
 },
 isPanel: function() {
 return !0;
@@ -1456,6 +2950,57 @@ this.$.client && (this.expanded ? this._expand() : this._collapse());
 }
 });
 
+// ImageViewPin.js
+
+enyo.kind({
+name: "enyo.ImageViewPin",
+kind: "enyo.Control",
+published: {
+highlightAnchorPoint: !1,
+anchor: {
+top: 0,
+left: 0
+},
+position: {
+top: 0,
+left: 0
+}
+},
+style: "position:absolute;z-index:1000;width:0px;height:0px;",
+handlers: {
+onPositionPin: "reAnchor"
+},
+create: function() {
+this.inherited(arguments), this.styleClientControls(), this.positionClientControls(), this.highlightAnchorPointChanged(), this.anchorChanged();
+},
+styleClientControls: function() {
+var e = this.getClientControls();
+for (var t = 0; t < e.length; t++) e[t].applyStyle("position", "absolute");
+},
+positionClientControls: function() {
+var e = this.getClientControls();
+for (var t = 0; t < e.length; t++) for (p in this.position) e[t].applyStyle(p, this.position[p] + "px");
+},
+highlightAnchorPointChanged: function() {
+this.highlightAnchorPoint ? this.addClass("pinDebug") : this.removeClass("pinDebug");
+},
+anchorChanged: function() {
+var e = null, t = null;
+for (t in this.anchor) {
+e = this.anchor[t].toString().match(/^(\d+(?:\.\d+)?)(.*)$/);
+if (!e) continue;
+this.anchor[t + "Coords"] = {
+value: e[1],
+units: e[2] || "px"
+};
+}
+},
+reAnchor: function(e, t) {
+var n = t.scale, r = t.bounds, i = this.anchor.right ? this.anchor.rightCoords.units == "px" ? r.width + r.x - this.anchor.rightCoords.value * n : r.width * (100 - this.anchor.rightCoords.value) / 100 + r.x : this.anchor.leftCoords.units == "px" ? this.anchor.leftCoords.value * n + r.x : r.width * this.anchor.leftCoords.value / 100 + r.x, s = this.anchor.bottom ? this.anchor.bottomCoords.units == "px" ? r.height + r.y - this.anchor.bottomCoords.value * n : r.height * (100 - this.anchor.bottomCoords.value) / 100 + r.y : this.anchor.topCoords.units == "px" ? this.anchor.topCoords.value * n + r.y : r.height * this.anchor.topCoords.value / 100 + r.y;
+this.applyStyle("left", i + "px"), this.applyStyle("top", s + "px");
+}
+});
+
 // ImageView.js
 
 enyo.kind({
@@ -1499,7 +3044,7 @@ ondown: "down"
 } ]
 } ],
 create: function() {
-this.inherited(arguments), this.canTransform = enyo.dom.canTransform(), this.canTransform || this.$.image.applyStyle("position", "relative"), this.canAccelerate = enyo.dom.canAccelerate(), this.bufferImage = new Image, this.bufferImage.onload = enyo.bind(this, "imageLoaded"), this.bufferImage.onerror = enyo.bind(this, "imageError"), this.srcChanged(), this.getStrategy().setDragDuringGesture(!1);
+this.inherited(arguments), this.canTransform = enyo.dom.canTransform(), this.canTransform || this.$.image.applyStyle("position", "relative"), this.canAccelerate = enyo.dom.canAccelerate(), this.bufferImage = new Image, this.bufferImage.onload = enyo.bind(this, "imageLoaded"), this.bufferImage.onerror = enyo.bind(this, "imageError"), this.srcChanged(), this.getStrategy().setDragDuringGesture(!1), this.getStrategy().$.scrollMath && this.getStrategy().$.scrollMath.start();
 },
 down: function(e, t) {
 t.preventDefault();
@@ -1520,7 +3065,7 @@ srcChanged: function() {
 this.src && this.src.length > 0 && this.bufferImage && this.src != this.bufferImage.src && (this.bufferImage.src = this.src);
 },
 imageLoaded: function(e) {
-this.originalWidth = this.bufferImage.width, this.originalHeight = this.bufferImage.height, this.scaleChanged(), this.$.image.setSrc(this.bufferImage.src), enyo.dom.transformValue(this.getStrategy().$.client, "translate3d", "0px, 0px, 0");
+this.originalWidth = this.bufferImage.width, this.originalHeight = this.bufferImage.height, this.scaleChanged(), this.$.image.setSrc(this.bufferImage.src), enyo.dom.transformValue(this.getStrategy().$.client, "translate3d", "0px, 0px, 0"), this.positionClientControls(this.scale);
 },
 resizeHandler: function() {
 this.inherited(arguments), this.$.image.src && this.scaleChanged();
@@ -1575,7 +3120,7 @@ height: this.imageBounds.height + "px",
 left: this.imageBounds.left + "px",
 top: this.imageBounds.top + "px"
 });
-this.setScrollLeft(n), this.setScrollTop(r);
+this.setScrollLeft(n), this.setScrollTop(r), this.positionClientControls(e);
 },
 limitScale: function(e) {
 return this.disableZoom ? e = this.scale : e > this.maxScale ? e = this.maxScale : e < this.minScale && (e = this.minScale), e;
@@ -1639,6 +3184,12 @@ zoomAnimationEnd: function(e, t) {
 this.doZoom({
 scale: this.scale
 }), this.$.animator.ratioLock = undefined;
+},
+positionClientControls: function(e) {
+this.waterfallDown("onPositionPin", {
+scale: e,
+bounds: this.imageBounds
+});
 }
 });
 
@@ -1768,15 +3319,12 @@ classes: "onyx-checkbox",
 kind: enyo.Checkbox,
 tag: "div",
 handlers: {
-ondown: "downHandler",
 onclick: ""
 },
-downHandler: function(e, t) {
-return this.disabled || (this.setChecked(!this.getChecked()), this.bubble("onchange")), !0;
-},
 tap: function(e, t) {
-return !this.disabled;
-}
+return this.disabled || (this.setChecked(!this.getChecked()), this.bubble("onchange")), !this.disabled;
+},
+dragstart: function() {}
 });
 
 // Drawer.js
@@ -1835,6 +3383,7 @@ this.container && this.container.resized();
 },
 animatorEnd: function() {
 if (!this.open) this.$.client.hide(); else {
+this.$.client.domCssText = enyo.Control.domStylesToCssText(this.$.client.domStyles);
 var e = this.orient == "v", t = e ? "height" : "width", n = e ? "top" : "left", r = this.$.client.hasNode();
 r && (r.style[n] = this.$.client.domStyles[n] = null), this.node && (this.node.style[t] = this.domStyles[t] = null);
 }
@@ -2142,7 +3691,7 @@ width: s
 },
 adjustPosition: function() {
 if (this.showing && this.hasNode()) {
-this.scrolling && !this.showOnTop ? this.getScroller().setMaxHeight(this.maxHeight + "px") : enyo.nop, this.removeClass("onyx-menu-up"), this.floating ? enyo.noop : this.applyPosition({
+this.scrolling && !this.showOnTop ? this.getScroller().setMaxHeight(this.maxHeight + "px") : enyo.nop, this.removeClass("onyx-menu-up"), this.floating ? enyo.nop : this.applyPosition({
 left: "auto"
 });
 var e = this.node.getBoundingClientRect(), t = e.height === undefined ? e.bottom - e.top : e.height, n = window.innerHeight === undefined ? document.documentElement.clientHeight : window.innerHeight, r = window.innerWidth === undefined ? document.documentElement.clientWidth : window.innerWidth;
@@ -2194,6 +3743,9 @@ onSelect: ""
 },
 classes: "onyx-menu-item",
 tag: "div",
+create: function() {
+this.inherited(arguments), this.active && this.bubble("onActivate");
+},
 tap: function(e) {
 this.inherited(arguments), this.bubble("onRequestHideMenu"), this.doSelect({
 selected: this,
@@ -2226,7 +3778,7 @@ handlers: {
 onChange: "change"
 },
 change: function(e, t) {
-this.setContent(t.content);
+t.content !== undefined && this.setContent(t.content);
 }
 });
 
@@ -2298,7 +3850,7 @@ ontap: "itemTap"
 } ],
 scrollerName: "scroller",
 initComponents: function() {
-this.controlParentName = "flyweight", this.inherited(arguments);
+this.controlParentName = "flyweight", this.inherited(arguments), this.$.flyweight.$.client.children[0].setActive(!0);
 },
 create: function() {
 this.inherited(arguments), this.countChanged();
@@ -2343,7 +3895,7 @@ name: "onyx.DatePicker",
 classes: "onyx-toolbar-inline",
 published: {
 disabled: !1,
-locale: null,
+locale: "en_us",
 dayHidden: !1,
 monthHidden: !1,
 yearHidden: !1,
@@ -2355,36 +3907,25 @@ events: {
 onSelect: ""
 },
 create: function() {
-this.inherited(arguments);
-if (!this.locale) try {
-this.locale = enyo.g11n.currentLocale().getLocale();
-} catch (e) {
-this.locale = "en_us";
-}
-this.initDefaults();
+this.inherited(arguments), enyo.g11n && (this.locale = enyo.g11n.currentLocale().getLocale()), this.initDefaults();
 },
 initDefaults: function() {
-var e;
-try {
-this._tf = new enyo.g11n.Fmts({
+var e = [ "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" ];
+enyo.g11n && (this._tf = new enyo.g11n.Fmts({
 locale: this.locale
-}), e = this._tf.getMonthFields();
-} catch (t) {
-e = [ "Jan", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" ];
-}
-this.setupPickers(this._tf ? this._tf.getDateFieldOrder() : "mdy"), this.dayHiddenChanged(), this.monthHiddenChanged(), this.yearHiddenChanged();
-var n = this.value = this.value || new Date;
-for (var r = 0, i; i = e[r]; r++) this.$.monthPicker.createComponent({
-content: i,
-value: r,
-active: r == n.getMonth()
-});
-var s = n.getFullYear();
-this.$.yearPicker.setSelected(s - this.minYear), this.$.year.setContent(s);
-for (r = 1; r <= this.monthLength(n.getYear(), n.getMonth()); r++) this.$.dayPicker.createComponent({
+}), e = this._tf.getMonthFields()), this.setupPickers(this._tf ? this._tf.getDateFieldOrder() : "mdy"), this.dayHiddenChanged(), this.monthHiddenChanged(), this.yearHiddenChanged();
+var t = this.value = this.value || new Date;
+for (var n = 0, r; r = e[n]; n++) this.$.monthPicker.createComponent({
 content: r,
-value: r,
-active: r == n.getDate()
+value: n,
+active: n == t.getMonth()
+});
+var i = t.getFullYear();
+this.$.yearPicker.setSelected(i - this.minYear), this.$.year.setContent(i);
+for (n = 1; n <= this.monthLength(t.getYear(), t.getMonth()); n++) this.$.dayPicker.createComponent({
+content: n,
+value: n,
+active: n == t.getDate()
 });
 },
 monthLength: function(e, t) {
@@ -2481,7 +4022,7 @@ valueChanged: function() {
 this.refresh();
 },
 disabledChanged: function() {
-this.yearPickerButton.setDisabled(this.disabled), this.monthPickerButton.setDisabled(this.disabled), this.dayPickerButton.setDisabled(this.disabled);
+this.$.yearPickerButton.setDisabled(this.disabled), this.$.monthPickerButton.setDisabled(this.disabled), this.$.dayPickerButton.setDisabled(this.disabled);
 },
 updateDay: function(e, t) {
 var n = this.calcDate(this.value.getFullYear(), this.value.getMonth(), t.selected.value);
@@ -2522,7 +4063,7 @@ name: "onyx.TimePicker",
 classes: "onyx-toolbar-inline",
 published: {
 disabled: !1,
-locale: null,
+locale: "en_us",
 is24HrMode: null,
 value: null
 },
@@ -2530,44 +4071,33 @@ events: {
 onSelect: ""
 },
 create: function() {
-this.inherited(arguments);
-if (!this.locale) try {
-this.locale = enyo.g11n.currentLocale().getLocale();
-} catch (e) {
-this.locale = "en_us";
-}
-this.initDefaults();
+this.inherited(arguments), enyo.g11n && (this.locale = enyo.g11n.currentLocale().getLocale()), this.initDefaults();
 },
 initDefaults: function() {
-var e, t;
-try {
-this._tf = new enyo.g11n.Fmts({
+var e = "AM", t = "PM";
+this.is24HrMode == null && (this.is24HrMode = !1), enyo.g11n && (this._tf = new enyo.g11n.Fmts({
 locale: this.locale
-}), e = this._tf.getAmCaption(), t = this._tf.getPmCaption(), this.is24HrMode == null && (this.is24HrMode = !this._tf.isAmPm());
-} catch (n) {
-e = "AM", t = "PM", this.is24HrMode = !1;
-}
-this.setupPickers(this._tf ? this._tf.getTimeFieldOrder() : "hma");
-var r = this.value = this.value || new Date, i;
+}), e = this._tf.getAmCaption(), t = this._tf.getPmCaption(), this.is24HrMode == null && (this.is24HrMode = !this._tf.isAmPm())), this.setupPickers(this._tf ? this._tf.getTimeFieldOrder() : "hma");
+var n = this.value = this.value || new Date, r;
 if (!this.is24HrMode) {
-var s = r.getHours();
-s = s === 0 ? 12 : s;
-for (i = 1; i <= 12; i++) this.$.hourPicker.createComponent({
-content: i,
-value: i,
-active: i == (s > 12 ? s % 12 : s)
+var i = n.getHours();
+i = i === 0 ? 12 : i;
+for (r = 1; r <= 12; r++) this.$.hourPicker.createComponent({
+content: r,
+value: r,
+active: r == (i > 12 ? i % 12 : i)
 });
-} else for (i = 0; i < 24; i++) this.$.hourPicker.createComponent({
-content: i,
-value: i,
-active: i == r.getHours()
+} else for (r = 0; r < 24; r++) this.$.hourPicker.createComponent({
+content: r,
+value: r,
+active: r == n.getHours()
 });
-for (i = 0; i <= 59; i++) this.$.minutePicker.createComponent({
-content: i < 10 ? "0" + i : i,
-value: i,
-active: i == r.getMinutes()
+for (r = 0; r <= 59; r++) this.$.minutePicker.createComponent({
+content: r < 10 ? "0" + r : r,
+value: r,
+active: r == n.getMinutes()
 });
-r.getHours() >= 12 ? this.$.ampmPicker.createComponents([ {
+n.getHours() >= 12 ? this.$.ampmPicker.createComponents([ {
 content: e
 }, {
 content: t,
@@ -2914,7 +4444,8 @@ min: 0,
 max: 100,
 barClasses: "",
 showStripes: !0,
-animateStripes: !0
+animateStripes: !0,
+increment: 0
 },
 events: {
 onAnimateProgressFinish: ""
@@ -2944,6 +4475,9 @@ progressChanged: function() {
 this.progress = this.clampValue(this.min, this.max, this.progress);
 var e = this.calcPercent(this.progress);
 this.updateBarPosition(e);
+},
+calcIncrement: function(e) {
+return Math.round(e / this.increment) * this.increment;
 },
 clampValue: function(e, t, n) {
 return Math.max(e, Math.min(n, t));
@@ -3118,7 +4652,7 @@ if (t.horizontal) return t.preventDefault(), this.dragging = !0, !0;
 drag: function(e, t) {
 if (this.dragging) {
 var n = this.calcKnobPosition(t);
-return this.setValue(n), this.doChanging({
+return n = this.increment ? this.calcIncrement(n) : n, this.setValue(n), this.doChanging({
 value: this.value
 }), !0;
 }
@@ -3131,7 +4665,7 @@ value: this.value
 tap: function(e, t) {
 if (this.tappable) {
 var n = this.calcKnobPosition(t);
-return this.tapped = !0, this.animateTo(n), !0;
+return n = this.increment ? this.calcIncrement(n) : n, this.tapped = !0, this.animateTo(n), !0;
 }
 },
 animateTo: function(e) {
@@ -3162,7 +4696,6 @@ rangeMin: 0,
 rangeMax: 100,
 rangeStart: 0,
 rangeEnd: 100,
-increment: 0,
 beginValue: 0,
 endValue: 0
 },
@@ -3236,9 +4769,6 @@ var e = this.calcKnobPercent(this.rangeStart), t = this.calcKnobPercent(this.ran
 this.$.bar.applyStyle("left", e + "%"), this.$.bar.applyStyle("width", t + "%");
 }
 },
-calcIncrement: function(e) {
-return Math.ceil(e / this.increment) * this.increment;
-},
 calcRangeRatio: function(e) {
 return e / 100 * (this.rangeMax - this.rangeMin) + this.rangeMin - this.increment / 2;
 },
@@ -3255,16 +4785,16 @@ drag: function(e, t) {
 if (this.dragging) {
 var n = this.calcKnobPosition(t);
 if (e.name === "startKnob" && n >= 0) {
-if (n <= this.endValue && t.xDirection === -1 || n <= this.endValue) {
+if (!(n <= this.endValue && t.xDirection === -1 || n <= this.endValue)) return this.drag(this.$.endKnob, t);
 this.setBeginValue(n);
-var r = this.calcRangeRatio(this.beginValue), i = this.increment ? this.calcIncrement(r) : r, s = this.calcKnobPercent(i);
+var r = this.calcRangeRatio(this.beginValue), i = this.increment ? this.calcIncrement(r + .5 * this.increment) : r, s = this.calcKnobPercent(i);
 this.updateKnobPosition(s, this.$.startKnob), this.setRangeStart(i), this.doChanging({
 value: i
 });
-}
-} else if (e.name === "endKnob" && n <= 100) if (n >= this.beginValue && t.xDirection === 1 || n >= this.beginValue) {
+} else if (e.name === "endKnob" && n <= 100) {
+if (!(n >= this.beginValue && t.xDirection === 1 || n >= this.beginValue)) return this.drag(this.$.startKnob, t);
 this.setEndValue(n);
-var r = this.calcRangeRatio(this.endValue), i = this.increment ? this.calcIncrement(r) : r, s = this.calcKnobPercent(i);
+var r = this.calcRangeRatio(this.endValue), i = this.increment ? this.calcIncrement(r + .5 * this.increment) : r, s = this.calcKnobPercent(i);
 this.updateKnobPosition(s, this.$.endKnob), this.setRangeEnd(i), this.doChanging({
 value: i
 });
@@ -3471,315 +5001,590 @@ c.toolbarIndex === undefined && (c.toolbarIndex = t);
 }
 });
 
-// $lib/canvas-spinner/heartcode_canvas.js
-
-(function(e) {
-var t = function(e, t) {
-typeof t == "undefined" && (t = {}), this.init(e, t);
-}, n = t.prototype, r, i = [ "canvas", "vml" ], s = [ "oval", "spiral", "square", "rect", "roundRect" ], o = /^\#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/, u = navigator.appVersion.indexOf("MSIE") !== -1 && parseFloat(navigator.appVersion.split("MSIE")[1]) === 8 ? !0 : !1, a = !!document.createElement("canvas").getContext, f = !0, l = function(e, t, n) {
-var e = document.createElement(e), r;
-for (r in n) e[r] = n[r];
-return typeof t != "undefined" && t.appendChild(e), e;
-}, c = function(e, t) {
-for (var n in t) e.style[n] = t[n];
-return e;
-}, h = function(e, t) {
-for (var n in t) e.setAttribute(n, t[n]);
-return e;
-}, p = function(e, t, n, r) {
-e.save(), e.translate(t, n), e.rotate(r), e.translate(-t, -n), e.beginPath();
-};
-n.init = function(e, n) {
-typeof n.safeVML == "boolean" && (f = n.safeVML);
-try {
-this.mum = document.getElementById(e) !== void 0 ? document.getElementById(e) : document.body;
-} catch (s) {
-this.mum = document.body;
-}
-n.id = typeof n.id != "undefined" ? n.id : "canvasLoader", this.cont = l("div", this.mum, {
-id: n.id
-});
-if (a) r = i[0], this.can = l("canvas", this.cont), this.con = this.can.getContext("2d"), this.cCan = c(l("canvas", this.cont), {
-display: "none"
-}), this.cCon = this.cCan.getContext("2d"); else {
-r = i[1];
-if (typeof t.vmlSheet == "undefined") {
-document.getElementsByTagName("head")[0].appendChild(l("style")), t.vmlSheet = document.styleSheets[document.styleSheets.length - 1];
-var o = [ "group", "oval", "roundrect", "fill" ], u;
-for (u in o) t.vmlSheet.addRule(o[u], "behavior:url(#default#VML); position:absolute;");
-}
-this.vml = l("group", this.cont);
-}
-this.setColor(this.color), this.draw(), c(this.cont, {
-display: "none"
-});
-}, n.cont = {}, n.can = {}, n.con = {}, n.cCan = {}, n.cCon = {}, n.timer = {}, n.activeId = 0, n.diameter = 40, n.setDiameter = function(e) {
-this.diameter = Math.round(Math.abs(e)), this.redraw();
-}, n.getDiameter = function() {
-return this.diameter;
-}, n.cRGB = {}, n.color = "#000000", n.setColor = function(e) {
-this.color = o.test(e) ? e : "#000000", this.cRGB = this.getRGB(this.color), this.redraw();
-}, n.getColor = function() {
-return this.color;
-}, n.shape = s[0], n.setShape = function(e) {
-for (var t in s) if (e === s[t]) {
-this.shape = e, this.redraw();
-break;
-}
-}, n.getShape = function() {
-return this.shape;
-}, n.density = 40, n.setDensity = function(e) {
-this.density = f && r === i[1] ? Math.round(Math.abs(e)) <= 40 ? Math.round(Math.abs(e)) : 40 : Math.round(Math.abs(e)), this.density > 360 && (this.density = 360), this.activeId = 0, this.redraw();
-}, n.getDensity = function() {
-return this.density;
-}, n.range = 1.3, n.setRange = function(e) {
-this.range = Math.abs(e), this.redraw();
-}, n.getRange = function() {
-return this.range;
-}, n.speed = 2, n.setSpeed = function(e) {
-this.speed = Math.round(Math.abs(e));
-}, n.getSpeed = function() {
-return this.speed;
-}, n.fps = 24, n.setFPS = function(e) {
-this.fps = Math.round(Math.abs(e)), this.reset();
-}, n.getFPS = function() {
-return this.fps;
-}, n.getRGB = function(e) {
-return e = e.charAt(0) === "#" ? e.substring(1, 7) : e, {
-r: parseInt(e.substring(0, 2), 16),
-g: parseInt(e.substring(2, 4), 16),
-b: parseInt(e.substring(4, 6), 16)
-};
-}, n.draw = function() {
-var e = 0, t, n, o, a, f, d, g, y = this.density, b = Math.round(y * this.range), w, E, S = 0;
-E = this.cCon;
-var x = this.diameter;
-if (r === i[0]) {
-E.clearRect(0, 0, 1e3, 1e3), h(this.can, {
-width: x,
-height: x
-});
-for (h(this.cCan, {
-width: x,
-height: x
-}); e < y; ) {
-w = e <= b ? 1 - 1 / b * e : w = 0, d = 270 - 360 / y * e, g = d / 180 * Math.PI, E.fillStyle = "rgba(" + this.cRGB.r + "," + this.cRGB.g + "," + this.cRGB.b + "," + w.toString() + ")";
-switch (this.shape) {
-case s[0]:
-case s[1]:
-t = x * .07, a = x * .47 + Math.cos(g) * (x * .47 - t) - x * .47, f = x * .47 + Math.sin(g) * (x * .47 - t) - x * .47, E.beginPath(), this.shape === s[1] ? E.arc(x * .5 + a, x * .5 + f, t * w, 0, Math.PI * 2, !1) : E.arc(x * .5 + a, x * .5 + f, t, 0, Math.PI * 2, !1);
-break;
-case s[2]:
-t = x * .12, a = Math.cos(g) * (x * .47 - t) + x * .5, f = Math.sin(g) * (x * .47 - t) + x * .5, p(E, a, f, g), E.fillRect(a, f - t * .5, t, t);
-break;
-case s[3]:
-case s[4]:
-n = x * .3, o = n * .27, a = Math.cos(g) * (o + (x - o) * .13) + x * .5, f = Math.sin(g) * (o + (x - o) * .13) + x * .5, p(E, a, f, g), this.shape === s[3] ? E.fillRect(a, f - o * .5, n, o) : (t = o * .55, E.moveTo(a + t, f - o * .5), E.lineTo(a + n - t, f - o * .5), E.quadraticCurveTo(a + n, f - o * .5, a + n, f - o * .5 + t), E.lineTo(a + n, f - o * .5 + o - t), E.quadraticCurveTo(a + n, f - o * .5 + o, a + n - t, f - o * .5 + o), E.lineTo(a + t, f - o * .5 + o), E.quadraticCurveTo(a, f - o * .5 + o, a, f - o * .5 + o - t), E.lineTo(a, f - o * .5 + t), E.quadraticCurveTo(a, f - o * .5, a + t, f - o * .5));
-}
-E.closePath(), E.fill(), E.restore(), ++e;
-}
-} else {
-c(this.cont, {
-width: x,
-height: x
-}), c(this.vml, {
-width: x,
-height: x
-});
-switch (this.shape) {
-case s[0]:
-case s[1]:
-g = "oval", t = 140;
-break;
-case s[2]:
-g = "roundrect", t = 120;
-break;
-case s[3]:
-case s[4]:
-g = "roundrect", t = 300;
-}
-n = o = t, a = 500 - o;
-for (f = -o * .5; e < y; ) {
-w = e <= b ? 1 - 1 / b * e : w = 0, d = 270 - 360 / y * e;
-switch (this.shape) {
-case s[1]:
-n = o = t * w, a = 500 - t * .5 - t * w * .5, f = (t - t * w) * .5;
-break;
-case s[0]:
-case s[2]:
-u && (f = 0, this.shape === s[2] && (a = 500 - o * .5));
-break;
-case s[3]:
-case s[4]:
-n = t * .95, o = n * .28, u ? (a = 0, f = 500 - o * .5) : (a = 500 - n, f = -o * .5), S = this.shape === s[4] ? .6 : 0;
-}
-E = h(c(l("group", this.vml), {
-width: 1e3,
-height: 1e3,
-rotation: d
-}), {
-coordsize: "1000,1000",
-coordorigin: "-500,-500"
-}), E = c(l(g, E, {
-stroked: !1,
-arcSize: S
-}), {
-width: n,
-height: o,
-top: f,
-left: a
-}), l("fill", E, {
-color: this.color,
-opacity: w
-}), ++e;
-}
-}
-this.tick(!0);
-}, n.clean = function() {
-if (r === i[0]) this.con.clearRect(0, 0, 1e3, 1e3); else {
-var e = this.vml;
-if (e.hasChildNodes()) for (; e.childNodes.length >= 1; ) e.removeChild(e.firstChild);
-}
-}, n.redraw = function() {
-this.clean(), this.draw();
-}, n.reset = function() {
-typeof this.timer == "number" && (this.hide(), this.show());
-}, n.tick = function(e) {
-var t = this.con, n = this.diameter;
-e || (this.activeId += 360 / this.density * this.speed), r === i[0] ? (t.clearRect(0, 0, n, n), p(t, n * .5, n * .5, this.activeId / 180 * Math.PI), t.drawImage(this.cCan, 0, 0, n, n), t.restore()) : (this.activeId >= 360 && (this.activeId -= 360), c(this.vml, {
-rotation: this.activeId
-}));
-}, n.show = function() {
-if (typeof this.timer != "number") {
-var e = this;
-this.timer = self.setInterval(function() {
-e.tick();
-}, Math.round(1e3 / this.fps)), c(this.cont, {
-display: "block"
-});
-}
-}, n.hide = function() {
-typeof this.timer == "number" && (clearInterval(this.timer), delete this.timer, c(this.cont, {
-display: "none"
-}));
-}, n.kill = function() {
-var e = this.cont;
-typeof this.timer == "number" && this.hide(), r === i[0] ? (e.removeChild(this.can), e.removeChild(this.cCan)) : e.removeChild(this.vml);
-for (var t in this) delete this[t];
-}, e.CanvasLoader = t;
-})(window);
-
-// $lib/canvas-spinner/canvasSpinner.js
+// IntegerPicker.js
 
 enyo.kind({
-name: "jmtk.Spinner",
-kind: "enyo.Control",
+name: "onyx.IntegerPicker",
+kind: "onyx.Picker",
 published: {
-color: "#000000",
-shape: "oval",
-diameter: "90",
-density: "85",
-range: "1",
-speed: "2.5",
-fps: "30"
+value: 0,
+min: 0,
+max: 9
 },
-rendered: function() {
-this.cl = new CanvasLoader(this.hasNode().id), this.colorChanged(), this.shapeChanged(), this.diameterChanged(), this.densityChanged(), this.rangeChanged(), this.speedChanged(), this.fpsChanged(), this.show();
+create: function() {
+this.inherited(arguments), this.rangeChanged();
 },
-show: function() {
-this.cl.show(), this.inherited(arguments);
+minChanged: function() {
+this.destroyClientControls(), this.rangeChanged(), this.render();
 },
-hide: function() {
-this.cl.hide(), this.inherited(arguments);
-},
-colorChanged: function() {
-this.cl.setColor(this.color);
-},
-shapeChanged: function() {
-this.cl.setShape(this.shape);
-},
-diameterChanged: function() {
-this.cl.setDiameter(this.diameter);
-},
-densityChanged: function() {
-this.cl.setDensity(this.density);
+maxChanged: function() {
+this.destroyClientControls(), this.rangeChanged(), this.render();
 },
 rangeChanged: function() {
-this.cl.setRange(this.range);
+for (var e = this.min; e <= this.max; e++) this.createComponent({
+content: e,
+active: e === this.value ? !0 : !1
+});
 },
-speedChanged: function() {
-this.cl.setSpeed(this.speed);
+valueChanged: function(e) {
+var t = this.getClientControls(), n = t.length;
+this.value = this.value >= this.min && this.value <= this.max ? this.value : this.min;
+for (var r = 0; r < n; r++) if (this.value === parseInt(t[r].content)) {
+this.setSelected(t[r]);
+break;
+}
 },
-fpsChanged: function() {
-this.cl.setFPS(this.fps);
+selectedChanged: function(e) {
+e && e.removeClass("selected"), this.selected && (this.selected.addClass("selected"), this.doChange({
+selected: this.selected,
+content: this.selected.content
+})), this.value = parseInt(this.selected.content);
 }
 });
 
-// $lib/date.format.js
+// ContextualPopup.js
 
-var dateFormat = function() {
-var e = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g, t = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g, n = /[^-+\dA-Z]/g, r = function(e, t) {
-e = String(e), t = t || 2;
-while (e.length < t) e = "0" + e;
-return e;
-};
-return function(i, s, o) {
-var u = dateFormat;
-arguments.length == 1 && Object.prototype.toString.call(i) == "[object String]" && !/\d/.test(i) && (s = i, i = undefined), i = i ? new Date(i) : new Date;
-if (isNaN(i)) throw SyntaxError("invalid date");
-s = String(u.masks[s] || s || u.masks["default"]), s.slice(0, 4) == "UTC:" && (s = s.slice(4), o = !0);
-var a = o ? "getUTC" : "get", f = i[a + "Date"](), l = i[a + "Day"](), c = i[a + "Month"](), h = i[a + "FullYear"](), p = i[a + "Hours"](), d = i[a + "Minutes"](), v = i[a + "Seconds"](), m = i[a + "Milliseconds"](), g = o ? 0 : i.getTimezoneOffset(), y = {
-d: f,
-dd: r(f),
-ddd: u.i18n.dayNames[l],
-dddd: u.i18n.dayNames[l + 7],
-m: c + 1,
-mm: r(c + 1),
-mmm: u.i18n.monthNames[c],
-mmmm: u.i18n.monthNames[c + 12],
-yy: String(h).slice(2),
-yyyy: h,
-h: p % 12 || 12,
-hh: r(p % 12 || 12),
-H: p,
-HH: r(p),
-M: d,
-MM: r(d),
-s: v,
-ss: r(v),
-l: r(m, 3),
-L: r(m > 99 ? Math.round(m / 10) : m),
-t: p < 12 ? "a" : "p",
-tt: p < 12 ? "am" : "pm",
-T: p < 12 ? "A" : "P",
-TT: p < 12 ? "AM" : "PM",
-Z: o ? "UTC" : (String(i).match(t) || [ "" ]).pop().replace(n, ""),
-o: (g > 0 ? "-" : "+") + r(Math.floor(Math.abs(g) / 60) * 100 + Math.abs(g) % 60, 4),
-S: [ "th", "st", "nd", "rd" ][f % 10 > 3 ? 0 : (f % 100 - f % 10 != 10) * f % 10]
-};
-return s.replace(e, function(e) {
-return e in y ? y[e] : e.slice(1, e.length - 1);
+enyo.kind({
+name: "onyx.ContextualPopup",
+kind: "enyo.Popup",
+modal: !0,
+autoDismiss: !0,
+floating: !1,
+classes: "onyx-contextual-popup enyo-unselectable",
+published: {
+maxHeight: 100,
+scrolling: !0,
+title: undefined,
+actionButtons: []
+},
+vertFlushMargin: 100,
+horizFlushMargin: 120,
+widePopup: 200,
+longPopup: 200,
+horizBuffer: 16,
+events: {
+onTap: ""
+},
+handlers: {
+onActivate: "itemActivated",
+onRequestShowMenu: "requestShow",
+onRequestHideMenu: "requestHide"
+},
+components: [ {
+name: "title",
+classes: "onyx-contextual-popup-title"
+}, {
+classes: "onyx-contextual-popup-scroller",
+components: [ {
+name: "client",
+kind: "enyo.Scroller",
+vertical: "auto",
+classes: "enyo-unselectable",
+thumb: !1,
+strategyKind: "TouchScrollStrategy"
+} ]
+}, {
+name: "actionButtons",
+classes: "onyx-contextual-popup-action-buttons"
+} ],
+scrollerName: "client",
+create: function() {
+this.inherited(arguments), this.maxHeightChanged(), this.titleChanged(), this.actionButtonsChanged();
+},
+getScroller: function() {
+return this.$[this.scrollerName];
+},
+titleChanged: function() {
+this.$.title.setContent(this.title);
+},
+actionButtonsChanged: function() {
+for (var e = 0; e < this.actionButtons.length; e++) this.$.actionButtons.createComponent({
+kind: "onyx.Button",
+content: this.actionButtons[e].content,
+classes: this.actionButtons[e].classes + " onyx-contextual-popup-action-button",
+name: this.actionButtons[e].name ? this.actionButtons[e].name : "ActionButton" + e,
+index: e,
+tap: enyo.bind(this, this.tapHandler)
 });
+},
+tapHandler: function(e, t) {
+return t.actionButton = !0, t.popup = this, this.bubble("ontap", t), !0;
+},
+maxHeightChanged: function() {
+this.scrolling ? this.getScroller().setMaxHeight(this.maxHeight + "px") : enyo.nop;
+},
+itemActivated: function(e, t) {
+return t.originator.setActive(!1), !0;
+},
+showingChanged: function() {
+this.inherited(arguments), this.scrolling ? this.getScroller().setShowing(this.showing) : enyo.nop, this.adjustPosition();
+},
+requestShow: function(e, t) {
+var n = t.activator.hasNode();
+return n && (this.activatorOffset = this.getPageOffset(n)), this.show(), !0;
+},
+applyPosition: function(e) {
+var t = "";
+for (n in e) t += n + ":" + e[n] + (isNaN(e[n]) ? "; " : "px; ");
+this.addStyles(t);
+},
+getPageOffset: function(e) {
+var t = e.getBoundingClientRect(), n = window.pageYOffset === undefined ? document.documentElement.scrollTop : window.pageYOffset, r = window.pageXOffset === undefined ? document.documentElement.scrollLeft : window.pageXOffset, i = t.height === undefined ? t.bottom - t.top : t.height, s = t.width === undefined ? t.right - t.left : t.width;
+return {
+top: t.top + n,
+left: t.left + r,
+height: i,
+width: s
 };
-}();
+},
+adjustPosition: function() {
+if (this.showing && this.hasNode()) {
+this.resetPositioning();
+var e = this.getViewWidth(), t = this.getViewHeight(), n = this.vertFlushMargin, r = t - this.vertFlushMargin, i = this.horizFlushMargin, s = e - this.horizFlushMargin;
+if (this.activatorOffset.top + this.activatorOffset.height < n || this.activatorOffset.top > r) {
+if (this.applyVerticalFlushPositioning(i, s)) return;
+if (this.applyHorizontalFlushPositioning(i, s)) return;
+if (this.applyVerticalPositioning()) return;
+} else if (this.activatorOffset.left + this.activatorOffset.width < i || this.activatorOffset.left > s) if (this.applyHorizontalPositioning()) return;
+var o = this.node.getBoundingClientRect(), u = o.height === undefined ? o.bottom - o.top : o.height;
+if (o.width > this.widePopup) {
+if (this.applyVerticalPositioning()) return;
+} else if (u > this.longPopup && this.applyHorizontalPositioning()) return;
+if (this.applyVerticalPositioning()) return;
+if (this.applyHorizontalPositioning()) return;
+}
+},
+initVerticalPositioning: function() {
+this.resetPositioning(), this.addClass("vertical");
+var e = this.node.getBoundingClientRect(), t = e.height === undefined ? e.bottom - e.top : e.height, n = this.getViewHeight();
+return this.floating ? this.activatorOffset.top < n / 2 ? (this.applyPosition({
+top: this.activatorOffset.top + this.activatorOffset.height,
+bottom: "auto"
+}), this.addClass("below")) : (this.applyPosition({
+top: this.activatorOffset.top - e.height,
+bottom: "auto"
+}), this.addClass("above")) : e.top + t > n && n - e.bottom < e.top - t ? this.addClass("above") : this.addClass("below"), e = this.node.getBoundingClientRect(), e.top + t > n || e.top < 0 ? !1 : !0;
+},
+applyVerticalPositioning: function() {
+if (!this.initVerticalPositioning()) return !1;
+var e = this.node.getBoundingClientRect(), t = this.getViewWidth();
+if (this.floating) {
+var n = this.activatorOffset.left + this.activatorOffset.width / 2 - e.width / 2;
+n + e.width > t ? (this.applyPosition({
+left: this.activatorOffset.left + this.activatorOffset.width - e.width
+}), this.addClass("left")) : n < 0 ? (this.applyPosition({
+left: this.activatorOffset.left
+}), this.addClass("right")) : this.applyPosition({
+left: n
+});
+} else {
+var r = this.activatorOffset.left + this.activatorOffset.width / 2 - e.left - e.width / 2;
+e.right + r > t ? (this.applyPosition({
+left: -(e.right - (this.activatorOffset.left + this.activatorOffset.width))
+}), this.addRemoveClass("left", !0)) : e.left + r < 0 ? this.addRemoveClass("right", !0) : this.applyPosition({
+left: r
+});
+}
+return !0;
+},
+applyVerticalFlushPositioning: function(e, t) {
+if (!this.initVerticalPositioning()) return !1;
+var n = this.node.getBoundingClientRect(), r = this.getViewWidth();
+return this.activatorOffset.left + this.activatorOffset.width < e ? (this.activatorOffset.left < this.horizBuffer && this.applyPosition({
+left: -n.left + this.horizBuffer
+}), this.addClass("right"), this.addClass("corner"), !0) : this.activatorOffset.left > t ? (this.activatorOffset.left + this.activatorOffset.width > r - this.horizBuffer ? this.applyPosition({
+left: r - n.right - this.horizBuffer
+}) : this.applyPosition({
+left: -(n.right - (this.activatorOffset.left + this.activatorOffset.width))
+}), this.addClass("left"), this.addClass("corner"), !0) : !1;
+},
+initHorizontalPositioning: function() {
+this.resetPositioning();
+var e = this.node.getBoundingClientRect(), t = this.getViewWidth();
+return this.floating ? this.activatorOffset.left + this.activatorOffset.width < t / 2 ? (this.applyPosition({
+left: this.activatorOffset.left + this.activatorOffset.width
+}), this.addRemoveClass("left", !0)) : (this.applyPosition({
+left: this.activatorOffset.left - e.width
+}), this.addRemoveClass("right", !0)) : this.activatorOffset.left - e.width > 0 ? (this.applyPosition({
+left: this.activatorOffset.left - e.left - e.width
+}), this.addRemoveClass("right", !0)) : (this.applyPosition({
+left: this.activatorOffset.width
+}), this.addRemoveClass("left", !0)), e = this.node.getBoundingClientRect(), e.left < 0 || e.left + e.width > t ? !1 : !0;
+},
+applyHorizontalPositioning: function() {
+if (!this.initHorizontalPositioning()) return !1;
+var e = this.node.getBoundingClientRect(), t = this.getViewHeight(), n = this.activatorOffset.top + this.activatorOffset.height / 2;
+return this.floating ? n >= t / 2 - .05 * t && n <= t / 2 + .05 * t ? this.applyPosition({
+top: this.activatorOffset.top + this.activatorOffset.height / 2 - e.height / 2,
+bottom: "auto"
+}) : this.activatorOffset.top + this.activatorOffset.height < t / 2 ? (this.applyPosition({
+top: this.activatorOffset.top - this.activatorOffset.height,
+bottom: "auto"
+}), this.addRemoveClass("high", !0)) : (this.applyPosition({
+top: this.activatorOffset.top - e.height + this.activatorOffset.height * 2,
+bottom: "auto"
+}), this.addRemoveClass("low", !0)) : n >= t / 2 - .05 * t && n <= t / 2 + .05 * t ? this.applyPosition({
+top: (this.activatorOffset.height - e.height) / 2
+}) : this.activatorOffset.top + this.activatorOffset.height < t / 2 ? (this.applyPosition({
+top: -this.activatorOffset.height
+}), this.addRemoveClass("high", !0)) : (this.applyPosition({
+top: e.top - e.height - this.activatorOffset.top + this.activatorOffset.height
+}), this.addRemoveClass("low", !0)), !0;
+},
+applyHorizontalFlushPositioning: function(e, t) {
+if (!this.initHorizontalPositioning()) return !1;
+var n = this.node.getBoundingClientRect(), r = this.getViewWidth();
+return this.floating ? this.activatorOffset.top < innerHeight / 2 ? (this.applyPosition({
+top: this.activatorOffset.top
+}), this.addRemoveClass("high", !0)) : (this.applyPosition({
+top: this.activatorOffset.top + this.activatorOffset.height - n.height
+}), this.addRemoveClass("low", !0)) : n.top + n.height > innerHeight && innerHeight - n.bottom < n.top - n.height ? (this.applyPosition({
+top: n.top - n.height - this.activatorOffset.top - this.activatorOffset.height / 4
+}), this.addRemoveClass("low", !0)) : (this.applyPosition({
+top: this.activatorOffset.height / 4
+}), this.addRemoveClass("high", !0)), this.activatorOffset.left + this.activatorOffset.width < e ? (this.addClass("left"), this.addClass("corner"), !0) : this.activatorOffset.left > t ? (this.addClass("right"), this.addClass("corner"), !0) : !1;
+},
+getViewHeight: function() {
+return window.innerHeight === undefined ? document.documentElement.clientHeight : window.innerHeight;
+},
+getViewWidth: function() {
+return window.innerWidth === undefined ? document.documentElement.clientWidth : window.innerWidth;
+},
+resetPositioning: function() {
+this.removeClass("right"), this.removeClass("left"), this.removeClass("high"), this.removeClass("low"), this.removeClass("corner"), this.removeClass("below"), this.removeClass("above"), this.removeClass("vertical"), this.applyPosition({
+left: "auto"
+}), this.applyPosition({
+top: "auto"
+});
+},
+resizeHandler: function() {
+this.inherited(arguments), this.adjustPosition();
+},
+requestHide: function() {
+this.setShowing(!1);
+}
+});
 
-dateFormat.masks = {
-"default": "ddd mmm dd yyyy HH:MM:ss",
-shortDate: "m/d/yy",
-mediumDate: "mmm d, yyyy",
-longDate: "mmmm d, yyyy",
-fullDate: "dddd, mmmm d, yyyy",
-shortTime: "h:MM TT",
-mediumTime: "h:MM:ss TT",
-longTime: "h:MM:ss TT Z",
-isoDate: "yyyy-mm-dd",
-isoTime: "HH:MM:ss",
-isoDateTime: "yyyy-mm-dd'T'HH:MM:ss",
-isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
-}, dateFormat.i18n = {
-dayNames: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ],
-monthNames: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]
+// $lib/database.js
+
+enyo.kind({
+name: "GTS.database",
+kind: enyo.Component,
+published: {
+database: "",
+version: "1",
+estimatedSize: null,
+debug: !1
+},
+db: undefined,
+dbVersion: null,
+lastInsertRowId: 0,
+constructor: function() {
+this.inherited(arguments), this.bound = {
+setSchema: enyo.bind(this, this.setSchema),
+insertData: enyo.bind(this, this.insertData),
+_errorHandler: enyo.bind(this, this._errorHandler)
 };
+},
+create: function() {
+this.inherited(arguments);
+if (this.database === "") return enyo.error("Database: you must define a name for your database when instantiating the kind using the `database` property."), null;
+this.database.indexOf("ext:") !== 0 && enyo.warn("Database: you are working with an internal database, which will limit its size to 1 MB. Prepend `ext:` to your database name to remove this restriction."), this.db = window.openDatabase(this.database, this.version, this.name, this.estimatedSize);
+if (!this.db) return enyo.error("Database: failed to open database named " + this.database), null;
+this.dbVersion = this.db.version;
+},
+getVersion: function() {
+return this.dbVersion;
+},
+lastInsertId: function() {
+return this.lastInsertRowId;
+},
+close: function() {
+this.db.close();
+},
+query: function(e, t) {
+if (!this.db) {
+this._db_lost();
+return;
+}
+t = typeof t != "undefined" ? t : {}, enyo.isString(e) || (t.values = e.values, e = e.sql), t = this._getOptions(t, {
+values: []
+}), e = e.replace(/^\s+|\s+$/g, ""), e.lastIndexOf(";") !== e.length - 1 && (e += ";");
+var n = this;
+this.db.transaction(function(r) {
+n.debug && enyo.log(e, " ==> ", t.values), r.executeSql(e, t.values, function(e, r) {
+try {
+n.lastInsertRowId = r.insertId;
+} catch (i) {}
+t.onSuccess && t.onSuccess(n._convertResultSet(r));
+}, t.onError);
+});
+},
+queries: function(e, t) {
+if (!this.db) {
+this._db_lost();
+return;
+}
+t = typeof t != "undefined" ? t : {}, t = this._getOptions(t);
+var n = this.debug;
+this.db.transaction(function(r) {
+var i = e.length, s = null, o = "", u = [];
+for (var a = 0; a < i; a++) s = e[a], enyo.isString(s) ? (o = s, u = []) : (o = s.sql, u = s.values), n && enyo.log(o, " ==> ", u), a === i - 1 ? r.executeSql(o, u, t.onSuccess) : r.executeSql(o, u);
+}, t.onError);
+},
+setSchema: function(e, t) {
+enyo.isArray(e) || (e = [ e ]), t = typeof t != "undefined" ? t : {}, t = this._getOptions(t);
+var n = [], r = [], i = e.length, s = null;
+for (var o = 0; o < i; o++) s = e[o], enyo.isString(s) ? n.push(s) : (typeof s.columns != "undefined" && n.push(this.getCreateTable(s.table, s.columns)), typeof s.data != "undefined" && r.push({
+table: s.table,
+data: s.data
+}));
+if (r.length > 0) {
+var u = enyo.bind(this, this.insertData, r, t);
+this.queries(n, {
+onSuccess: u,
+onError: t.onError
+});
+} else this.queries(n, t);
+},
+insertData: function(e, t) {
+enyo.isArray(e) || (e = [ e ]), t = typeof t != "undefined" ? t : {}, t = this._getOptions(t);
+var n = [], r = e.length, i = null, s, o, u = 0, a = null;
+for (s = 0; s < r; s++) {
+i = e[s];
+if (typeof i.data != "undefined") {
+var f = i.table, l = null;
+enyo.isArray(i.data) ? l = i.data : l = [ i.data ], u = l.length;
+for (o = 0; o < u; o++) a = l[o], n.push(this.getInsert(f, a));
+}
+}
+this.queries(n, t);
+},
+getInsert: function(e, t) {
+var n = "INSERT INTO " + e + " ( ";
+return this._getInsertReplaceSub(n, t);
+},
+getReplace: function(e, t) {
+var n = "INSERT OR REPLACE INTO " + e + " ( ";
+return this._getInsertReplaceSub(n, t);
+},
+_getInsertReplaceSub: function(e, t) {
+var n = " VALUES ( ", r = [];
+for (var i in t) enyo.isArray(t[i]) && t[i][1] === !0 ? (e += i, n += t[i][0]) : (r.push(t[i]), e += i, n += "?"), e += ", ", n += ", ";
+return e = e.substr(0, e.length - 2) + " )", n = n.substr(0, n.length - 2) + " )", e += n, new GTS.databaseQuery({
+sql: e,
+values: r
+});
+},
+getSelect: function(e, t, n, r, i, s) {
+var o = "SELECT ", u = [], a = "";
+if (enyo.isString(t)) a = t; else if (enyo.isArray(t)) {
+var f = t.length;
+a = [];
+for (var l = 0; l < f; l++) a.push(t[l]);
+a = a.join(", ");
+}
+o += (a.length > 0 ? a : "*") + " FROM " + e;
+var c = [];
+for (var h in n) c.push(h + " = ?"), u.push(n[h]);
+return c.length > 0 && (o += " WHERE " + c.join(" AND ")), enyo.isArray(r) && r.length > 0 ? o += " ORDER BY " + r.join(", ") : enyo.isString(r) && r.length > 0 && (o += " ORDER BY " + r), i = parseInt(i), isNaN(i) || (o += " LIMIT ?", u.push(i)), i = parseInt(s), isNaN(s) || (o += " OFFSET ?", u.push(s)), new GTS.databaseQuery({
+sql: o,
+values: u
+});
+},
+getUpdate: function(e, t, n) {
+var r = "UPDATE " + e + " SET ", i = [], s = [];
+for (var o in t) s.push(o + " = ?"), i.push(t[o]);
+r += s.join(", ");
+var u = [];
+for (var o in n) u.push(o + " = ?"), i.push(n[o]);
+return u.length > 0 && (r += " WHERE " + u.join(" AND ")), new GTS.databaseQuery({
+sql: r,
+values: i
+});
+},
+getDelete: function(e, t) {
+var n = "DELETE FROM " + e + " WHERE ", r = [], i = [];
+for (var s in t) i.push(s + " = ?"), r.push(t[s]);
+return n += i.join(" AND "), new GTS.databaseQuery({
+sql: n,
+values: r
+});
+},
+getCreateTable: function(e, t, n) {
+n = typeof n != "undefined" ? n : !0;
+var r = "CREATE TABLE ";
+n && (r += "IF NOT EXISTS "), r += e + " ( ";
+var i = t.length, s = null, o = [], u = "";
+for (var a = 0; a < i; a++) s = t[a], u = s.column + " " + s.type, s.constraints && (u += " " + s.constraints.join(" ")), o.push(u);
+return r += o.join(", ") + " )", r;
+},
+getDropTable: function(e) {
+return "DROP TABLE IF EXISTS " + e;
+},
+_versionChanged: function(e, t) {
+this.dbVersion = e, t();
+},
+_getOptions: function(e, t) {
+var n = {
+onSuccess: this._emptyFunction,
+onError: this.bound._errorHandler
+};
+return typeof t != "undefined" && (n = enyo.mixin(n, t)), typeof e == "undefined" && (e = {}), enyo.mixin(n, e), enyo.isFunction(e.onError) && (n.onError = enyo.bind(this, function() {
+this.bound._errorHandler.apply(this, arguments), e.onError.apply(null, arguments);
+})), n;
+},
+_emptyFunction: function() {},
+_convertResultSet: function(e) {
+var t = [];
+if (e.rows) for (var n = 0; n < e.rows.length; n++) t.push(e.rows.item(n));
+return t;
+},
+_errorHandler: function(e, t) {
+typeof t == "undefined" && (t = e);
+var n = "Database error ( " + t.code + " ): " + t.message;
+enyo.error(n), Checkbook.globals.criticalError && (enyo.isString(t.message) && t.message.toLowerCase().match("read only database") ? Checkbook.globals.criticalError.load(null, "Warning! Your database has become read only. " + enyo.fetchAppInfo().title + " is unable to modify it in any way. Consult your operating system user's manual on how to remove the read only status from a file. For additional help, please <a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " - read only issue'>contact " + enyo.fetchAppInfo().vendor + "</a>.", null) : enyo.isString(t.message) && t.message.toLowerCase().match("disk i/o error") ? Checkbook.globals.criticalError.load(null, "Warning! Your database has become locked. Please restart " + enyo.fetchAppInfo().title + ". This usually occurs if " + enyo.fetchAppInfo().title + " is running while your device was put in USB mode. For additional help, please <a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " - disk i/o issue'>contact " + enyo.fetchAppInfo().vendor + "</a>.", null) : Checkbook.globals.criticalError.load(null, n, null));
+},
+_db_lost: function() {
+enyo.error("Database: connection has been closed or lost; cannot execute SQL");
+}
+}), GTS.databaseQuery = function(e) {
+this.sql = typeof e.sql != "undefined" ? e.sql : "", this.values = typeof e.values != "undefined" ? e.values : [];
+};
+
+// $lib/gdata.js
+
+enyo.kind({
+name: "GTS.gdata",
+published: {
+authKey: "",
+acctType: "HOSTED_OR_GOOGLE",
+appName: "",
+version: "3.0"
+},
+xmlToJson: function(e) {
+var t = {};
+if (e.nodeType == 1) {
+if (e.attributes.length > 0) {
+t["@attributes"] = {};
+for (var n = 0; n < e.attributes.length; n++) {
+var r = e.attributes.item(n);
+t["@attributes"][r.nodeName] = r.nodeValue;
+}
+}
+} else e.nodeType == 3 && (t = e.nodeValue);
+if (e.hasChildNodes()) for (var i = 0; i < e.childNodes.length; i++) {
+var s = e.childNodes.item(i), o = s.nodeName;
+if (typeof t[o] == "undefined") t[o] = this.xmlToJson(s); else {
+if (typeof t[o].length == "undefined") {
+var u = t[o];
+t[o] = [], t[o].push(u);
+}
+t[o].push(this.xmlToJson(s));
+}
+}
+return t;
+},
+getSheetSummary: function(e, t) {
+typeof e == "undefined" && t.onError("No sheet key defined.");
+var n = this, r = (new enyo.Ajax({
+url: "https://spreadsheets.google.com/feeds/worksheets/" + e + "/private/full",
+method: "GET",
+handleAs: "xml",
+headers: {
+"GData-Version": this.version,
+Authorization: this.authKey
+}
+})).go().response(function(e, r) {
+var i = n.xmlToJson(r);
+t.onSuccess(e, i);
+}).error(enyo.bind(this, this.generalFailure, t.onError));
+},
+getSheetData: function(e, t, n, r, i) {
+var s = this, o = (new enyo.Ajax({
+url: "https://spreadsheets.google.com/feeds/list/" + e + "/" + t + "/private/full?start-index=" + n + "&max-results=" + r,
+method: "GET",
+handleAs: "xml",
+headers: {
+"GData-Version": this.version,
+Authorization: this.authKey
+}
+})).go().response(function(e, t) {
+var n = s.xmlToJson(t);
+i.onSuccess(e, n);
+}).error(enyo.bind(this, this.generalFailure, i.onError));
+},
+generalFailure: function(e, t, n) {
+var r = "";
+n && n === "timeout" ? r = "The request timed out. Please check your network connection and try again." : typeof t.responseText != "undefined" ? t.responseText.match("Error=BadAuthentication") ? r = "Did you enter your username and password correctly?" : t.responseText.match("Error=CaptchaRequired") ? r = "Google is requesting that you complete a CAPTCHA Challenge. Please go to <a href='https://www.google.com/accounts/DisplayUnlockCaptcha'>https://www.google.com/accounts/DisplayUnlockCaptcha</a> to complete it." : t.responseText.match("Error=NotVerified") ? r = "The account email address has not been verified. You will need to access your Google account directly to resolve the issue before logging in using a non-Google application." : t.responseText.match("Error=TermsNotAgreed") ? r = "You have not agreed to Google's terms. You will need to access your Google account directly to resolve the issue before logging in using a non-Google application." : t.responseText.match("Error=AccountDeleted") ? r = "The user account has been deleted and is therefore unable to log in." : t.responseText.match("Error=AccountDisabled") ? r = "The user account has been disabled. Please contact Google." : t.responseText.match("Error=ServiceDisabled") ? r = "Your access to the specified service has been disabled. (Your account may still be valid.)" : t.responseText.match("Error=ServiceUnavailable") ? r = "The service is not available; try again later." : t.responseText.match("Error=Unknown") ? r = "Unknown Error. Did you enter your username and password correctly?" : r = "There has been an error: " + t.responseText : r = "An unknown error occurred.", e && typeof e == "function" && e(r);
+}
+});
+
+// $lib/utils.js
+
+function prepAmount(e) {
+return Math.round(e * 100) / 100;
+}
+
+function formatAmount(e) {
+e = parseFloat(e);
+if (!e || isNaN(e)) e = 0;
+return e.formatCurrency(2, "$", ".", ",");
+}
+
+function deformatAmount(e) {
+e = GTS.String.trim(e);
+if (!e) return 0;
+if (isNaN(e)) {
+var t = e[0] === "(" && e[e.length - 1] === ")";
+e = GTS.String.trim(e.replace(/[^0-9\s,'".-]*/g, ""));
+var n = e.length;
+if (n <= 0) return 0;
+var r = 3, i = e.length - 1;
+while (r--) if (e[i - r] && e[i - r] !== "-" && isNaN(e[i - r])) {
+n = i - r;
+break;
+}
+var s = e.slice(0, n), o = e.slice(n);
+e = (t || s[0] == "-" ? "-" : "") + s.replace(/[^0-9]*/g, "") + "." + o.replace(/[^0-9]*/g, "");
+}
+return e == "" || isNaN(e) ? 0 : parseFloat(e);
+}
+
+function createImageObject(e) {
+var t = document.createElement("img");
+return t.setAttribute("src", e), t;
+}
+
+function imgToGrey(e) {
+var t = createImageObject(e), n = document.createElement("canvas"), r = n.getContext("2d");
+n.width = t.width, n.height = t.height, r.drawImage(t, 0, 0);
+var i = r.getImageData(0, 0, t.width, t.height);
+for (var s = 0; s < i.height; s++) for (var o = 0; o < i.width; o++) {
+var u = s * 4 * i.width + o * 4, a = (i.data[u] + i.data[u + 1] + i.data[u + 2]) / 3;
+i.data[u] = a, i.data[u + 1] = a, i.data[u + 2] = a;
+}
+return r.putImageData(i, 0, 0, 0, 0, i.width, i.height), n.toDataURL();
+}
+
+enyo.isFunction(enyo.fetchAppInfo) || (enyo.isFunction(enyo.g11n.Utils._fetchAppRootPath) ? enyo.fetchAppInfo = function() {
+if (!enyo._applicationInformation) try {
+var e = enyo.g11n.Utils._fetchAppRootPath() + "appinfo.json";
+enyo._applicationInformation = JSON.parse(enyo.xhr.request({
+url: e,
+sync: !0
+}).responseText);
+} catch (t) {
+enyo._applicationInformation = {
+error: "Error in fetching application information."
+}, enyo.error("enyo.fetchAppInfo(): couldn't fetch app info", t);
+}
+return enyo._applicationInformation;
+} : enyo.fetchAppInfo = function() {
+return {
+error: "enyo.g11n.Utils._fetchAppRootPath does not exist. Please make sure you are using the enyo.g11n library in this application."
+};
+});
 
 // $lib/aes.js
 
@@ -4213,8 +6018,18 @@ return this[e] = this[t], this[t] = n, this;
 // Date.js
 
 Date.prototype.format = function(e, t) {
-var n = "";
-return e == "special" ? n = "yyyy-MM-dd HH:mm:ss" : typeof e == "undefined" ? n = dateFormat.masks.mediumDate + " " + dateFormat.masks.shortTime : enyo.isString(e) || (typeof e["date"] == "undefined" ? e.date = "mediumDate" : typeof e["time"] == "undefined" && (e.time = "shortTime"), n = (dateFormat.masks.hasOwnProperty(e.date) ? dateFormat.masks[e.date] : e.date) + " " + (dateFormat.masks.hasOwnProperty(e.time) ? dateFormat.masks[e.time] : e.time)), dateFormat(this, n, t);
+if (enyo.g11n) {
+e == "special" ? e = {
+date: "yyyy-MM-dd",
+time: "HH:mm:ss"
+} : typeof e == "undefined" ? e = {
+date: "medium",
+time: "short"
+} : enyo.isString(e) || (typeof e["date"] == "undefined" ? e.date = "medium" : typeof e["time"] == "undefined" && (e.time = "short"));
+var n = new enyo.g11n.DateFmt(e);
+return n.format(this);
+}
+return "";
 }, Date.format = function(e) {
 return (new Date).format(e);
 }, Date.prototype.setStartOfMonth = function() {
@@ -4287,24 +6102,40 @@ return i + t + (u ? o.substr(0, u) + r : "") + o.substr(u).replace(/(\d{3})(?=\d
 
 // Object.js
 
-Object.numericValues = function(e) {
-return Object.values(e).select(Object.isNumber);
-}, Object.validNumber = function(e) {
+enyo.singleton({
+name: "GTS.Object",
+kind: "enyo.Component",
+numericValues: function(e) {
+return Object.values(e).select(this.isNumber);
+},
+validNumber: function(e) {
 return this.isNumber(e) && !isNaN(parseFloat(e)) && isFinite(e);
-}, Object.swap = function(e, t, n) {
+},
+swap: function(e, t, n) {
 var r = e[t];
 return e[t] = e[n], e[n] = r, e;
-}, Object.isFunction = function(e) {
+},
+size: function(e) {
+var t = 0, n;
+for (n in e) e.hasOwnProperty(n) && t++;
+return t;
+},
+isFunction: function(e) {
 return enyo.isFunction ? enyo.isFunction(e) : Object.prototype.toString.call(e) === "[object Function]";
-}, Object.isString = function(e) {
+},
+isString: function(e) {
 return enyo.isString ? enyo.isString(e) : Object.prototype.toString.call(e) === "[object String]";
-}, Object.isNumber = function(e) {
+},
+isNumber: function(e) {
 return Object.prototype.toString.call(e) === "[object Number]";
-}, Object.isDate = function(e) {
+},
+isDate: function(e) {
 return Object.prototype.toString.call(e) === "[object Date]";
-}, Object.isUndefined = function(e) {
-return typeof object == "undefined";
-};
+},
+isUndefined: function(e) {
+return typeof e == "undefined";
+}
+});
 
 // String.js
 
@@ -4313,7 +6144,7 @@ name: "GTS.String",
 kind: "enyo.Component",
 published: {
 dirtyItem: [ "&", "<", ">", '"', "`", "'", "\n" ],
-cleanItem: [ "&amp;", "$lt;", "&gt;", "&quot;", "'", "'", " " ]
+cleanItem: [ "&amp;", "$lt;", "&gt;", "&quot;", "'", "'", "&crarr;" ]
 },
 stripHTML: function(e) {
 return e.replace(/<\S[^><]*>/g, "");
@@ -4553,56 +6384,30 @@ typeof gapi.client[e] == "undefined" ? gapi.client.load(e, "v" + t, n.onSuccess)
 
 enyo.kind({
 name: "GTS.LazyList",
-kind: "enyo.List",
+kind: "enyo.AroundList",
 lastLazyLoad: 0,
+published: {
+pageSize: 50
+},
 events: {
 onAcquirePage: ""
 },
-listTools: [ {
-name: "port",
-classes: "enyo-list-port enyo-border-box",
-components: [ {
-name: "generator",
-kind: "FlyweightRepeater",
-canGenerate: !1,
-components: [ {
-tag: null,
-name: "client"
-} ]
-}, {
-name: "page0",
-allowHtml: !0,
-classes: "enyo-list-page"
-}, {
-name: "page1",
-allowHtml: !0,
-classes: "enyo-list-page"
-} ]
-}, {
-name: "lazyFeedback",
-classes: "enyo-lazy-feedback"
-} ],
 scroll: function(e, t) {
 var n = this.getStrategy().$.scrollMath;
-if (n.isInOverScroll() && n.y < 0 || n.y < n.bottomBoundary + this.$.lazyFeedback.hasNode().offsetHeight) if (this.lastLazyLoad < this.pageCount) {
-this.lastLazyLoad = this.pageCount;
-var r = this.doAcquirePage({
-page: this.lastLazyLoad
-});
-this.$.lazyFeedback.addRemoveClass("enyo-loading", r), this.$.lazyFeedback.addRemoveClass("enyo-eol", !r);
-}
-return this.inherited(arguments);
+return (n.isInOverScroll() && n.y < 0 || n.y < n.bottomBoundary + this.$.belowClient.hasNode().offsetHeight) && this.lastLazyLoad < this.pageCount && (this.lastLazyLoad = this.pageCount, this._requestData()), this.inherited(arguments);
 },
 lazyLoad: function() {
-this.lastLazyLoad = 0, this.doAcquirePage({
-page: this.lastLazyLoad
-});
+this.lastLazyLoad = 0, this._requestData();
 },
-refresh: function() {
-this.$.lazyFeedback.removeClass("enyo-loading"), this.$.lazyFeedback.addRemoveClass("enyo-eol", this.$.lazyFeedback.hasClass("enyo-eol")), this.inherited(arguments);
+_requestData: function() {
+var e = this.doAcquirePage({
+page: this.lastLazyLoad,
+pageSize: this.pageSize
+});
+this.log(e, new Date);
 },
 reset: function() {
-this.$.lazyFeedback.removeClass("enyo-loading"), this.$.lazyFeedback.removeClass("enyo-eol"), this.inherited(arguments);
+this.inherited(arguments);
 }
 });
 
@@ -4768,6 +6573,40 @@ return this.$["switch"].getValue();
 }
 });
 
+// Divider.js
+
+enyo.kind({
+name: "GTS.Divider",
+classes: "gts-Divider",
+published: {
+content: ""
+},
+components: [ {
+name: "base",
+kind: "enyo.FittableColumns",
+noStretch: !0,
+classes: "base-bar",
+components: [ {
+classes: "end-cap bar"
+}, {
+name: "caption",
+classes: "caption"
+}, {
+classes: "bar",
+fit: !0
+} ]
+} ],
+rendered: function() {
+this.inherited(arguments), this.contentChanged();
+},
+reflow: function() {
+this.$.base.reflow();
+},
+contentChanged: function() {
+this.$.caption.setContent(this.content), this.$.caption.applyStyle("display", this.content ? "" : "none"), this.reflow();
+}
+});
+
 // DividerDrawer.js
 
 enyo.kind({
@@ -4815,10 +6654,13 @@ openChanged: function() {
 this.$["switch"].value = this.open, this.$.client.setOpen(this.$["switch"].value), this.$["switch"].addRemoveClass("checked", this.$["switch"].value), this.reflow();
 },
 captionChanged: function() {
-this.$.caption.setContent(this.caption), this.$.caption.applyStyle("display", this.caption ? "" : "none");
+this.$.caption.setContent(this.caption), this.$.caption.applyStyle("display", this.caption ? "" : "none"), this.reflow();
 },
 toggleOpen: function(e, t) {
-return this.open = !this.$["switch"].value, this.$["switch"].value = this.open, this.openChanged(), !0;
+return this.open = !this.$["switch"].value, this.$["switch"].value = this.open, this.openChanged(), this.doChange(this, {
+caption: this.getCaption(),
+open: this.getOpen()
+}), !0;
 }
 });
 
@@ -4882,12 +6724,14 @@ kind: "enyo.Control",
 classes: "gts-calendar",
 published: {
 value: null,
+locale: "",
+disabled: !1,
 viewDate: null,
-dowFormat: "ddd",
-monthFormat: "mmmm yyyy"
+dowFormat: "medium",
+monthFormat: "MMMM yyyy"
 },
 events: {
-onChange: ""
+onSelect: ""
 },
 components: [ {
 kind: "FittableColumns",
@@ -4906,7 +6750,7 @@ content: ">>",
 ontap: "monthForward"
 } ]
 }, {
-kind: "FittableColumns",
+classes: "date-row day-of-week",
 components: [ {
 name: "sunday",
 content: "Sun",
@@ -4937,7 +6781,7 @@ content: "Sat",
 classes: "week-label"
 } ]
 }, {
-kind: "FittableColumns",
+classes: "date-row",
 components: [ {
 name: "row0col0",
 kind: "onyx.Button",
@@ -4968,7 +6812,7 @@ kind: "onyx.Button",
 ontap: "dateHandler"
 } ]
 }, {
-kind: "FittableColumns",
+classes: "date-row",
 components: [ {
 name: "row1col0",
 kind: "onyx.Button",
@@ -4999,7 +6843,7 @@ kind: "onyx.Button",
 ontap: "dateHandler"
 } ]
 }, {
-kind: "FittableColumns",
+classes: "date-row",
 components: [ {
 name: "row2col0",
 kind: "onyx.Button",
@@ -5030,7 +6874,7 @@ kind: "onyx.Button",
 ontap: "dateHandler"
 } ]
 }, {
-kind: "FittableColumns",
+classes: "date-row",
 components: [ {
 name: "row3col0",
 kind: "onyx.Button",
@@ -5061,7 +6905,7 @@ kind: "onyx.Button",
 ontap: "dateHandler"
 } ]
 }, {
-kind: "FittableColumns",
+classes: "date-row",
 components: [ {
 name: "row4col0",
 kind: "onyx.Button",
@@ -5092,7 +6936,7 @@ kind: "onyx.Button",
 ontap: "dateHandler"
 } ]
 }, {
-kind: "FittableColumns",
+classes: "date-row",
 components: [ {
 name: "row5col0",
 kind: "onyx.Button",
@@ -5134,17 +6978,29 @@ content: "Today",
 ontap: "resetDate"
 } ]
 } ],
-constructor: function() {
-this.inherited(arguments), this.viewDate = this.viewDate || new Date, this.value = this.value || new Date;
+create: function() {
+this.inherited(arguments), enyo.g11n && this.locale == "" && (this.locale = enyo.g11n.currentLocale().getLocale()), this.value = this.value || new Date, this.viewDate = this.viewDate || new Date, this.localeChanged();
+},
+localeChanged: function() {
+this.days = {
+weekstart: 0,
+"short": [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" ],
+full: [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ]
+};
+if (enyo.g11n) {
+var e = new enyo.g11n.Fmts({
+locale: new enyo.g11n.Locale(this.locale)
+});
+this.days = {
+weekstart: e.getFirstDayOfWeek(),
+medium: e.dateTimeHash.medium.day,
+"long": e.dateTimeHash.long.day
+};
+}
+this.$.sunday.setContent(this.days[this.dowFormat][0]), this.$.monday.setContent(this.days[this.dowFormat][1]), this.$.tuesday.setContent(this.days[this.dowFormat][2]), this.$.wednesday.setContent(this.days[this.dowFormat][3]), this.$.thursday.setContent(this.days[this.dowFormat][4]), this.$.friday.setContent(this.days[this.dowFormat][5]), this.$.saturday.setContent(this.days[this.dowFormat][6]);
 },
 rendered: function() {
-this.inherited(arguments);
-if (dateFormat) {
-var e = new Date(2011, 4, 1);
-this.$.sunday.setContent(dateFormat(e, this.dowFormat)), e.setDate(e.getDate() + 1), this.$.monday.setContent(dateFormat(e, this.dowFormat)), e.setDate(e.getDate() + 1), this.$.tuesday.setContent(dateFormat(e, this.dowFormat)), e.setDate(e.getDate() + 1), this.$.wednesday.setContent(dateFormat(e, this.dowFormat)), e.setDate(e.getDate() + 1), this.$.thursday.setContent(dateFormat(e, this.dowFormat)), e.setDate(e.getDate() + 1), this.$.friday.setContent(dateFormat(e, this.dowFormat)), e.setDate(e.getDate() + 1), this.$.saturday.setContent(dateFormat(e, this.dowFormat));
-}
-var t = Math.round(10 * this.getBounds().width / 7) / 10;
-this.$.sunday.applyStyle("width", t + "px"), this.$.monday.applyStyle("width", t + "px"), this.$.tuesday.applyStyle("width", t + "px"), this.$.wednesday.applyStyle("width", t + "px"), this.$.thursday.applyStyle("width", t + "px"), this.$.friday.applyStyle("width", t + "px"), this.$.saturday.applyStyle("width", t + "px"), this.valueChanged();
+this.inherited(arguments), this.renderDoW(), this.valueChanged();
 },
 valueChanged: function() {
 if (Object.prototype.toString.call(this.value) !== "[object Date]" || isNaN(this.value.getTime())) this.value = new Date;
@@ -5153,14 +7009,24 @@ this.viewDate.setTime(this.value.getTime()), this.renderCalendar();
 viewDateChanged: function() {
 this.renderCalendar();
 },
+renderDoW: function() {
+enyo.job("renderDoW", enyo.bind(this, "_renderDoW"), 100);
+},
+_renderDoW: function() {
+var e = Math.round(10 * this.getBounds().width / 7) / 10;
+this.$.sunday.applyStyle("width", e + "px"), this.$.monday.applyStyle("width", e + "px"), this.$.tuesday.applyStyle("width", e + "px"), this.$.wednesday.applyStyle("width", e + "px"), this.$.thursday.applyStyle("width", e + "px"), this.$.friday.applyStyle("width", e + "px"), this.$.saturday.applyStyle("width", e + "px");
+},
 renderCalendar: function() {
+enyo.job("renderCalendar", enyo.bind(this, "_renderCalendar"), 100);
+},
+_renderCalendar: function() {
 var e = Math.round(10 * this.getBounds().width / 7) / 10, t = new Date;
 this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1);
 var n = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 0), r = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 1);
 n.setDate(n.getDate() - r.getDay() + 1), n.getTime() === r.getTime() && n.setDate(n.getDate() - 7);
 var i = 0, s;
 while (i < 6) n.getDate() === this.value.getDate() && n.getMonth() === this.value.getMonth() && n.getFullYear() === this.value.getFullYear() ? s = "onyx-blue" : n.getDate() === t.getDate() && n.getMonth() === t.getMonth() && n.getFullYear() === t.getFullYear() ? s = "onyx-affirmative" : n.getMonth() !== r.getMonth() ? s = "onyx-dark" : s = "", this.$["row" + i + "col" + n.getDay()].applyStyle("width", e + "px"), this.$["row" + i + "col" + n.getDay()].removeClass("onyx-affirmative"), this.$["row" + i + "col" + n.getDay()].removeClass("onyx-blue"), this.$["row" + i + "col" + n.getDay()].removeClass("onyx-dark"), this.$["row" + i + "col" + n.getDay()].addClass(s), this.$["row" + i + "col" + n.getDay()].setContent(n.getDate()), this.$["row" + i + "col" + n.getDay()].ts = n.getTime(), n.setDate(n.getDate() + 1), n.getDay() === 0 && i < 6 && i++;
-dateFormat ? this.$.monthLabel.setContent(dateFormat(r, this.monthFormat)) : this.$.monthLabel.setContent(this.getMonthString(r.getMonth()));
+this.$.monthLabel.setContent(r.format(this.monthFormat));
 },
 monthBack: function() {
 this.viewDate.setMonth(this.viewDate.getMonth() - 1), this.renderCalendar();
@@ -5169,17 +7035,15 @@ monthForward: function() {
 this.viewDate.setMonth(this.viewDate.getMonth() + 1), this.renderCalendar();
 },
 resetDate: function() {
-this.viewDate = new Date, this.value = new Date, this.renderCalendar(), this.doChange(this.value);
+this.viewDate = new Date, this.value = new Date, this.renderCalendar(), this.doSelect({
+date: this.value
+});
 },
 dateHandler: function(e, t) {
 var n = new Date;
-n.setTime(e.ts), this.value.setDate(n.getDate()), this.value.setMonth(n.getMonth()), this.value.setFullYear(n.getFullYear()), this.value.getMonth() != this.viewDate.getMonth() && (this.viewDate = new Date(this.value.getFullYear(), this.value.getMonth(), 1)), this.doChange(this.value), this.renderCalendar();
-},
-getMonthString: function(e) {
-return [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ][e];
-},
-getDayString: function(e) {
-return [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ][e];
+n.setTime(e.ts), this.value.setFullYear(n.getFullYear()), this.value.setMonth(n.getMonth()), this.value.setDate(n.getDate()), this.value.getMonth() != this.viewDate.getMonth() && (this.viewDate = new Date(this.value.getFullYear(), this.value.getMonth(), 1)), this.doSelect({
+date: this.value
+}), this.renderCalendar();
 }
 });
 
@@ -5187,111 +7051,29 @@ return [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satu
 
 enyo.kind({
 name: "GTS.TimePicker",
+kind: "onyx.TimePicker",
 classes: "gts-timepicker",
-loaded: !1,
 published: {
-value: null,
 minuteInterval: 5,
-is24HrMode: !1,
-label: "Time"
+label: ""
 },
-events: {
-onChange: ""
-},
-components: [ {
+initDefaults: function() {
+this.createComponent({
 name: "label",
 classes: "label"
-}, {
-kind: "onyx.PickerDecorator",
-onChange: "pickerChanged",
-components: [ {}, {
-name: "hourPicker",
-kind: "onyx.Picker",
-components: [ {
-content: "Loading"
-} ]
-} ]
-}, {
-kind: "onyx.PickerDecorator",
-onChange: "pickerChanged",
-components: [ {}, {
-name: "minutePicker",
-kind: "onyx.Picker",
-components: [ {
-content: "Loading"
-} ]
-} ]
-}, {
-name: "segmentWrapper",
-kind: "onyx.PickerDecorator",
-onChange: "pickerChanged",
-components: [ {}, {
-name: "segmentPicker",
-kind: "onyx.Picker",
-components: [ {
-content: "AM",
-value: 0
-}, {
-content: "PM",
-value: 12
-} ]
-} ]
-} ],
-constructor: function() {
-this.inherited(arguments), this.value = this.value || new Date;
-},
-rendered: function() {
-this.inherited(arguments), this.minuteIntervalChanged(), this.is24HrModeChanged(), this.labelChanged(), this.loaded = !0;
+}), this.inherited(arguments), enyo.job("minuteIntervalChanged", enyo.bind(this, "minuteIntervalChanged"), 100), enyo.job("labelChanged", enyo.bind(this, "labelChanged"), 100);
 },
 minuteIntervalChanged: function() {
 this.$.minutePicker.destroyClientControls();
-var e = [];
-for (var t = 0; t < 60; t += this.minuteInterval) e.push({
-content: t > 9 ? t : "0" + t,
-value: t
+var e = Math.floor(this.value.getMinutes() / this.minuteInterval) * this.minuteInterval;
+for (var t = 0; t <= 59; t += this.minuteInterval) this.$.minutePicker.createComponent({
+content: t < 10 ? "0" + t : t,
+value: t,
+active: t == e
 });
-this.$.minutePicker.createComponents(e);
-},
-is24HrModeChanged: function() {
-this.$.segmentWrapper.setShowing(!this.is24HrMode), this.setupHour(), this.valueChanged();
-},
-setupHour: function(e, t) {
-var n = [];
-this.$.hourPicker.destroyClientControls();
-for (var r = this.is24HrMode ? 0 : 1; r <= (this.is24HrMode ? 23 : 12); r++) n.push({
-content: r > 9 ? r : "0" + r,
-value: r
-});
-this.$.hourPicker.createComponents(n);
 },
 labelChanged: function() {
-this.$.label.setContent(this.label), this.$.label.applyStyle("width", "100%"), enyo.asyncMethod(this.$.label, this.$.label.applyStyle, "width", null);
-},
-valueChanged: function() {
-if (Object.prototype.toString.call(this.value) !== "[object Date]" || isNaN(this.value.getTime())) this.value = new Date;
-var e = this.value.getHours(), t = Math.floor(this.value.getMinutes() / this.minuteInterval) * this.minuteInterval, n = (e >= 12) * 12;
-this.setItemSelected(this.$.hourPicker, this.is24HrMode ? e : e - n || 12), this.setItemSelected(this.$.minutePicker, t), this.setItemSelected(this.$.segmentPicker, n);
-},
-setItemSelected: function(e, t) {
-var n = e.getClientControls(), r;
-for (var i = 0; i < n.length; i++) {
-r = typeof n[i].value != "undefined" ? n[i].value : n[i].content;
-if (r == t) {
-e.setSelected(n[i]);
-break;
-}
-}
-},
-getItemSelected: function(e) {
-var t = e.getSelected();
-return typeof t.value != "undefined" ? t.value : t.content;
-},
-pickerChanged: function() {
-if (!this.loaded) return;
-var e = parseInt(this.getItemSelected(this.$.hourPicker)), t = parseInt(this.getItemSelected(this.$.minutePicker), 10), n = this.getItemSelected(this.$.segmentPicker);
-return e = this.is24HrMode ? e : e + (e == 12 ? -!n * 12 : n), this.setValue(new Date(this.value.getFullYear(), this.value.getMonth(), this.value.getDate(), e, t, this.value.getSeconds(), this.value.getMilliseconds())), this.doChange({
-value: this.value
-}), !0;
+this.$.label.setContent(this.label);
 }
 });
 
@@ -5547,9 +7329,10 @@ name: "GTS.AutoComplete",
 kind: "onyx.InputDecorator",
 classes: "gts-autocomplete",
 active: !1,
-values: "",
+searchValues: [],
 published: {
 enabled: !0,
+values: "",
 limit: 50,
 delay: 200,
 icon: "assets/search.png",
@@ -5590,23 +7373,25 @@ if (!this.enabled) return;
 this.inputField = this.inputField || t.originator, enyo.job(null, enyo.bind(this, "fireInputChanged"), this.delay);
 },
 fireInputChanged: function() {
-this.searchValue = this.inputField.getValue(), this.doInputChanged({
+var e = this.inputField.getValue();
+this.doInputChanged({
 value: this.inputField.getValue()
 });
-if (this.searchValue.length <= 0) {
+if (e.length <= 0) {
 this.waterfall("onRequestHideMenu", {
 activator: this
-});
+}), this.searchValues.slice(0, 0);
 return;
 }
-this.doDataRequested({
+this.searchValues.push(e), this.doDataRequested({
 value: this.inputField.getValue(),
-callback: enyo.bind(this, this.buildSuggestionList, this.searchValue)
+limit: this.limit
 });
 },
-buildSuggestionList: function(e, t) {
-if (this.searchValue !== e) return;
-this.values = t.slice(0, this.limit);
+valuesChanged: function() {
+var e = this.inputField.getValue(), t = this.searchValues.length;
+if (t <= 0 || this.searchValues.indexOf(e) != t - 1) return;
+this.searchValues.slice(0, 0), this.values = this.values.slice(0, this.limit);
 if (!this.values || this.values.length === 0) {
 this.waterfall("onRequestHideMenu", {
 activator: this
@@ -5622,7 +7407,7 @@ allowHtml: !0
 });
 this.$.options.createComponents(n), this.$.options.render(), this.waterfall("onRequestShowMenu", {
 activator: this
-}), this.log(this);
+});
 },
 itemSelected: function(e, t) {
 t.content && t.content.length > 0 && (t.content = this.dirtyString(t.content), this.inputField.setValue(t.content)), this.doValueSelected(enyo.mixin(t, {
@@ -5706,193 +7491,6 @@ preventEvent: function() {
 return !0;
 }
 });
-
-// database.js
-
-enyo.kind({
-name: "GTS.database",
-kind: enyo.Component,
-published: {
-database: "",
-version: "1",
-estimatedSize: null,
-debug: !1
-},
-db: undefined,
-dbVersion: null,
-lastInsertRowId: 0,
-constructor: function() {
-this.inherited(arguments), this.bound = {
-setSchema: enyo.bind(this, this.setSchema),
-insertData: enyo.bind(this, this.insertData),
-_errorHandler: enyo.bind(this, this._errorHandler)
-};
-},
-create: function() {
-this.inherited(arguments);
-if (this.database === "") return enyo.error("Database: you must define a name for your database when instantiating the kind using the `database` property."), null;
-this.database.indexOf("ext:") !== 0 && enyo.warn("Database: you are working with an internal database, which will limit its size to 1 MB. Prepend `ext:` to your database name to remove this restriction."), this.db = window.openDatabase(this.database, this.version, this.name, this.estimatedSize);
-if (!this.db) return enyo.error("Database: failed to open database named " + this.database), null;
-this.dbVersion = this.db.version;
-},
-getVersion: function() {
-return this.dbVersion;
-},
-lastInsertId: function() {
-return this.lastInsertRowId;
-},
-close: function() {
-this.db.close();
-},
-query: function(e, t) {
-if (!this.db) {
-this._db_lost();
-return;
-}
-t = typeof t != "undefined" ? t : {}, enyo.isString(e) || (t.values = e.values, e = e.sql), t = this._getOptions(t, {
-values: []
-}), e = e.replace(/^\s+|\s+$/g, ""), e.lastIndexOf(";") !== e.length - 1 && (e += ";");
-var n = this;
-this.db.transaction(function(r) {
-n.debug && enyo.log(e, " ==> ", t.values), r.executeSql(e, t.values, function(e, r) {
-try {
-n.lastInsertRowId = r.insertId;
-} catch (i) {}
-t.onSuccess && t.onSuccess(n._convertResultSet(r));
-}, t.onError);
-});
-},
-queries: function(e, t) {
-if (!this.db) {
-this._db_lost();
-return;
-}
-t = typeof t != "undefined" ? t : {}, t = this._getOptions(t);
-var n = this.debug;
-this.db.transaction(function(r) {
-var i = e.length, s = null, o = "", u = [];
-for (var a = 0; a < i; a++) s = e[a], enyo.isString(s) ? (o = s, u = []) : (o = s.sql, u = s.values), n && enyo.log(o, " ==> ", u), a === i - 1 ? r.executeSql(o, u, t.onSuccess) : r.executeSql(o, u);
-}, t.onError);
-},
-setSchema: function(e, t) {
-enyo.isArray(e) || (e = [ e ]), t = typeof t != "undefined" ? t : {}, t = this._getOptions(t);
-var n = [], r = [], i = e.length, s = null;
-for (var o = 0; o < i; o++) s = e[o], enyo.isString(s) ? n.push(s) : (typeof s.columns != "undefined" && n.push(this.getCreateTable(s.table, s.columns)), typeof s.data != "undefined" && r.push({
-table: s.table,
-data: s.data
-}));
-if (r.length > 0) {
-var u = enyo.bind(this, this.insertData, r, t);
-this.queries(n, {
-onSuccess: u,
-onError: t.onError
-});
-} else this.queries(n, t);
-},
-insertData: function(e, t) {
-enyo.isArray(e) || (e = [ e ]), t = typeof t != "undefined" ? t : {}, t = this._getOptions(t);
-var n = [], r = e.length, i = null, s, o, u = 0, a = null;
-for (s = 0; s < r; s++) {
-i = e[s];
-if (typeof i.data != "undefined") {
-var f = i.table, l = null;
-enyo.isArray(i.data) ? l = i.data : l = [ i.data ], u = l.length;
-for (o = 0; o < u; o++) a = l[o], n.push(this.getInsert(f, a));
-}
-}
-this.queries(n, t);
-},
-getInsert: function(e, t) {
-var n = "INSERT INTO " + e + " ( ";
-return this._getInsertReplaceSub(n, t);
-},
-getReplace: function(e, t) {
-var n = "INSERT OR REPLACE INTO " + e + " ( ";
-return this._getInsertReplaceSub(n, t);
-},
-_getInsertReplaceSub: function(e, t) {
-var n = " VALUES ( ", r = [];
-for (var i in t) enyo.isArray(t[i]) && t[i][1] === !0 ? (e += i, n += t[i][0]) : (r.push(t[i]), e += i, n += "?"), e += ", ", n += ", ";
-return e = e.substr(0, e.length - 2) + " )", n = n.substr(0, n.length - 2) + " )", e += n, new GTS.databaseQuery({
-sql: e,
-values: r
-});
-},
-getSelect: function(e, t, n, r, i, s) {
-var o = "SELECT ", u = [], a = "";
-if (enyo.isString(t)) a = t; else if (enyo.isArray(t)) {
-var f = t.length;
-a = [];
-for (var l = 0; l < f; l++) a.push(t[l]);
-a = a.join(", ");
-}
-o += (a.length > 0 ? a : "*") + " FROM " + e;
-var c = [];
-for (var h in n) c.push(h + " = ?"), u.push(n[h]);
-return c.length > 0 && (o += " WHERE " + c.join(" AND ")), enyo.isArray(r) && r.length > 0 ? o += " ORDER BY " + r.join(", ") : enyo.isString(r) && r.length > 0 && (o += " ORDER BY " + r), i = parseInt(i), isNaN(i) || (o += " LIMIT ?", u.push(i)), i = parseInt(s), isNaN(s) || (o += " OFFSET ?", u.push(s)), new GTS.databaseQuery({
-sql: o,
-values: u
-});
-},
-getUpdate: function(e, t, n) {
-var r = "UPDATE " + e + " SET ", i = [], s = [];
-for (var o in t) s.push(o + " = ?"), i.push(t[o]);
-r += s.join(", ");
-var u = [];
-for (var o in n) u.push(o + " = ?"), i.push(n[o]);
-return u.length > 0 && (r += " WHERE " + u.join(" AND ")), new GTS.databaseQuery({
-sql: r,
-values: i
-});
-},
-getDelete: function(e, t) {
-var n = "DELETE FROM " + e + " WHERE ", r = [], i = [];
-for (var s in t) i.push(s + " = ?"), r.push(t[s]);
-return n += i.join(" AND "), new GTS.databaseQuery({
-sql: n,
-values: r
-});
-},
-getCreateTable: function(e, t, n) {
-n = typeof n != "undefined" ? n : !0;
-var r = "CREATE TABLE ";
-n && (r += "IF NOT EXISTS "), r += e + " ( ";
-var i = t.length, s = null, o = [], u = "";
-for (var a = 0; a < i; a++) s = t[a], u = s.column + " " + s.type, s.constraints && (u += " " + s.constraints.join(" ")), o.push(u);
-return r += o.join(", ") + " )", r;
-},
-getDropTable: function(e) {
-return "DROP TABLE IF EXISTS " + e;
-},
-_versionChanged: function(e, t) {
-this.dbVersion = e, t();
-},
-_getOptions: function(e, t) {
-var n = {
-onSuccess: this._emptyFunction,
-onError: this.bound._errorHandler
-};
-return typeof t != "undefined" && (n = enyo.mixin(n, t)), typeof e == "undefined" && (e = {}), enyo.mixin(n, e), enyo.isFunction(e.onError) && (n.onError = enyo.bind(this, function() {
-this.bound._errorHandler.apply(this, arguments), e.onError.apply(null, arguments);
-})), n;
-},
-_emptyFunction: function() {},
-_convertResultSet: function(e) {
-var t = [];
-if (e.rows) for (var n = 0; n < e.rows.length; n++) t.push(e.rows.item(n));
-return t;
-},
-_errorHandler: function(e, t) {
-typeof t == "undefined" && (t = e);
-var n = "Database error ( " + t.code + " ): " + t.message;
-enyo.error(n), Checkbook.globals.criticalError && (enyo.isString(t.message) && t.message.toLowerCase().match("read only database") ? Checkbook.globals.criticalError.load(null, "Warning! Your database has become read only. " + enyo.fetchAppInfo().title + " is unable to modify it in any way. Consult your operating system user's manual on how to remove the read only status from a file. For additional help, please <a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " - read only issue'>contact " + enyo.fetchAppInfo().vendor + "</a>.", null) : enyo.isString(t.message) && t.message.toLowerCase().match("disk i/o error") ? Checkbook.globals.criticalError.load(null, "Warning! Your database has become locked. Please restart " + enyo.fetchAppInfo().title + ". This usually occurs if " + enyo.fetchAppInfo().title + " is running while your device was put in USB mode. For additional help, please <a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " - disk i/o issue'>contact " + enyo.fetchAppInfo().vendor + "</a>.", null) : Checkbook.globals.criticalError.load(null, n, null));
-},
-_db_lost: function() {
-enyo.error("Database: connection has been closed or lost; cannot execute SQL");
-}
-}), GTS.databaseQuery = function(e) {
-this.sql = typeof e.sql != "undefined" ? e.sql : "", this.values = typeof e.values != "undefined" ? e.values : [];
-};
 
 // defaultData.js
 
@@ -6493,74 +8091,6 @@ enyo.isFunction(t) && t("");
 }
 });
 
-// gdata.js
-
-enyo.kind({
-name: "GTS.gdata",
-published: {
-authKey: "",
-acctType: "HOSTED_OR_GOOGLE",
-appName: "",
-version: "3.0"
-},
-xmlToJson: function(e) {
-var t = {};
-if (e.nodeType == 1) {
-if (e.attributes.length > 0) {
-t["@attributes"] = {};
-for (var n = 0; n < e.attributes.length; n++) {
-var r = e.attributes.item(n);
-t["@attributes"][r.nodeName] = r.nodeValue;
-}
-}
-} else e.nodeType == 3 && (t = e.nodeValue);
-if (e.hasChildNodes()) for (var i = 0; i < e.childNodes.length; i++) {
-var s = e.childNodes.item(i), o = s.nodeName;
-if (typeof t[o] == "undefined") t[o] = this.xmlToJson(s); else {
-if (typeof t[o].length == "undefined") {
-var u = t[o];
-t[o] = [], t[o].push(u);
-}
-t[o].push(this.xmlToJson(s));
-}
-}
-return t;
-},
-getSheetSummary: function(e, t) {
-typeof e == "undefined" && t.onError("No sheet key defined.");
-var n = this, r = (new enyo.Ajax({
-url: "https://spreadsheets.google.com/feeds/worksheets/" + e + "/private/full",
-method: "GET",
-handleAs: "xml",
-headers: {
-"GData-Version": this.version,
-Authorization: this.authKey
-}
-})).go().response(function(e, r) {
-var i = n.xmlToJson(r);
-t.onSuccess(e, i);
-}).error(enyo.bind(this, this.generalFailure, t.onError));
-},
-getSheetData: function(e, t, n, r, i) {
-var s = this, o = (new enyo.Ajax({
-url: "https://spreadsheets.google.com/feeds/list/" + e + "/" + t + "/private/full?start-index=" + n + "&max-results=" + r,
-method: "GET",
-handleAs: "xml",
-headers: {
-"GData-Version": this.version,
-Authorization: this.authKey
-}
-})).go().response(function(e, t) {
-var n = s.xmlToJson(t);
-i.onSuccess(e, n);
-}).error(enyo.bind(this, this.generalFailure, i.onError));
-},
-generalFailure: function(e, t, n) {
-var r = "";
-n && n === "timeout" ? r = "The request timed out. Please check your network connection and try again." : typeof t.responseText != "undefined" ? t.responseText.match("Error=BadAuthentication") ? r = "Did you enter your username and password correctly?" : t.responseText.match("Error=CaptchaRequired") ? r = "Google is requesting that you complete a CAPTCHA Challenge. Please go to <a href='https://www.google.com/accounts/DisplayUnlockCaptcha'>https://www.google.com/accounts/DisplayUnlockCaptcha</a> to complete it." : t.responseText.match("Error=NotVerified") ? r = "The account email address has not been verified. You will need to access your Google account directly to resolve the issue before logging in using a non-Google application." : t.responseText.match("Error=TermsNotAgreed") ? r = "You have not agreed to Google's terms. You will need to access your Google account directly to resolve the issue before logging in using a non-Google application." : t.responseText.match("Error=AccountDeleted") ? r = "The user account has been deleted and is therefore unable to log in." : t.responseText.match("Error=AccountDisabled") ? r = "The user account has been disabled. Please contact Google." : t.responseText.match("Error=ServiceDisabled") ? r = "Your access to the specified service has been disabled. (Your account may still be valid.)" : t.responseText.match("Error=ServiceUnavailable") ? r = "The service is not available; try again later." : t.responseText.match("Error=Unknown") ? r = "Unknown Error. Did you enter your username and password correctly?" : r = "There has been an error: " + t.responseText : r = "An unknown error occurred.", e && typeof e == "function" && e(r);
-}
-});
-
 // login.js
 
 enyo.kind({
@@ -7056,53 +8586,6 @@ this.doFinish();
 }
 });
 
-// utils.js
-
-function prepAmount(e) {
-return Math.round(e * 100) / 100;
-}
-
-function formatAmount(e) {
-e = parseFloat(e);
-if (!e || isNaN(e)) e = 0;
-return e.formatCurrency(2, "$", ".", ",");
-}
-
-function deformatAmount(e) {
-e = GTS.String.trim(e);
-if (!e) return 0;
-if (isNaN(e)) {
-var t = e[0] === "(" && e[e.length - 1] === ")";
-e = GTS.String.trim(e.replace(/[^0-9\s,'".-]*/g, ""));
-var n = e.length;
-if (n <= 0) return 0;
-var r = 3, i = e.length - 1;
-while (r--) if (e[i - r] && e[i - r] !== "-" && isNaN(e[i - r])) {
-n = i - r;
-break;
-}
-var s = e.slice(0, n), o = e.slice(n);
-e = (t || s[0] == "-" ? "-" : "") + s.replace(/[^0-9]*/g, "") + "." + o.replace(/[^0-9]*/g, "");
-}
-return e == "" || isNaN(e) ? 0 : parseFloat(e);
-}
-
-function createImageObject(e) {
-var t = document.createElement("img");
-return t.setAttribute("src", e), t;
-}
-
-function imgToGrey(e) {
-var t = createImageObject(e), n = document.createElement("canvas"), r = n.getContext("2d");
-n.width = t.width, n.height = t.height, r.drawImage(t, 0, 0);
-var i = r.getImageData(0, 0, t.width, t.height);
-for (var s = 0; s < i.height; s++) for (var o = 0; o < i.width; o++) {
-var u = s * 4 * i.width + o * 4, a = (i.data[u] + i.data[u + 1] + i.data[u + 2]) / 3;
-i.data[u] = a, i.data[u + 1] = a, i.data[u + 2] = a;
-}
-return r.putImageData(i, 0, 0, 0, 0, i.width, i.height), n.toDataURL();
-}
-
 // checkbook.js
 
 enyo.kind({
@@ -7162,10 +8645,8 @@ classes: "onyx-menu-divider"
 showing: !1,
 content: "Report Bug (NYI)"
 }, {
-showing: !1,
 classes: "onyx-menu-divider"
 }, {
-showing: !1,
 content: "About",
 ontap: "showPopup",
 popup: "about"
@@ -7222,14 +8703,14 @@ this.inherited(arguments), this.$.splash.show(), (enyo.platform.android || enyo.
 },
 keyboardHandler: function(e, t) {
 if (!this.appReady) return;
-if (t.which === 18) return this.menuHandler(t);
-if (t.which === 27) return this.backHandler(t);
+if (t.which === 18) return this.menuHandler();
+if (t.which === 27) return this.backHandler();
 },
-menuHandler: function(e) {
+menuHandler: function() {
 if (!this.appReady) return;
 return this.paneStack.length <= 0 && this.$.appMenuButton.waterfall("ontap", "ontap", this), !0;
 },
-backHandler: function(e) {
+backHandler: function() {
 if (!this.appReady) return;
 if (this.paneStack.length > 0) this.$[this.paneStack[this.paneStack.length - 1]].doFinish(); else if (this.$.mainViews.getIndex() > 0) this.$.mainViews.previous(); else if (enyo.platform.android || enyo.platform.androidChrome) this.createComponent({
 name: "exitConfirmation",
@@ -7244,10 +8725,10 @@ onCancel: "exitConfirmationClose"
 return !0;
 },
 exitConfirmationClose: function() {
-this.$.exitConfirmation.destroy();
+this.$.exitConfirmation.hide(), this.$.exitConfirmation.destroy();
 },
 exitConfirmationHandler: function() {
-this.exitConfirmationClose(), this.log("exit app"), navigator.app.exitApp();
+this.exitConfirmationClose(), navigator.app.exitApp();
 },
 searchHandler: function(e) {
 if (!this.appReady) return;
@@ -7287,7 +8768,12 @@ account: e
 }
 }) : enyo.Signals.send("viewAccount", {
 account: e
-})), enyo.Signals.send("accountChanged"), (this.notificationType !== !0 || Checkbook.globals.prefs["updateCheckNotification"] != 1) && this.notificationType === !1 && (Checkbook.globals.criticalError.load("Welcome to Checkbook", "If you have any questions, visit <a href='http://glitchtechscience.com' target='_blank'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>glitchtechscience@gmail.com</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png")), this.appReady = !0;
+})), enyo.Signals.send("accountChanged");
+if (this.notificationType !== !0 || Checkbook.globals.prefs["updateCheckNotification"] != 1) if (this.notificationType === !1) {
+var t = enyo.fetchAppInfo();
+Checkbook.globals.criticalError.load("Welcome to " + t.title, "If you have any questions, visit <a href='" + t.vendorurl + "' target='_blank'>" + t.vendorurl + "</a> or email <a href='mailto:" + t.vendoremail + "?subject=" + t.title + " Support'>" + t.vendoremail + "</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png");
+}
+this.appReady = !0;
 },
 showPopup: function(e) {
 var t = this.$[e.popup];
@@ -7377,7 +8863,7 @@ onFinish: ""
 components: [ {
 name: "headerWrapper",
 kind: "onyx.Toolbar",
-layoutKind: "FittableColumnsLayout",
+noStretch: !0,
 classes: "transparent"
 }, {
 classes: "padding-std light",
@@ -7405,11 +8891,9 @@ checkDB: enyo.bind(this, this.checkDB)
 buildHeader: function() {
 this.headerBuilt || (this.$.headerWrapper.createComponents([ {
 name: "spinner",
-kind: "jmtk.Spinner",
-color: "#272D70",
-diameter: "30",
-shape: "spiral",
-style: "margin-right: 5px;"
+kind: "onyx.Spinner",
+classes: "size-half",
+style: "margin: 0 5px 0 0;"
 }, {
 name: "icon",
 kind: "Image",
@@ -7421,7 +8905,7 @@ name: "title",
 classes: "bold"
 } ], {
 owner: this
-}), this.$.headerWrapper.render(), this.headerBuilt = !0), this.checkSystem(), this.reflow();
+}), this.$.headerWrapper.render(), this.headerBuilt = !0), this.$.spinner.show(), this.checkSystem(), this.reflow();
 },
 checkSystem: function() {
 this.$.title.setContent("Loading Checkbook"), this.$.message.setContent("Preparing application."), this.$.splashProgress.animateProgressTo(5), Checkbook.globals || (Checkbook.globals = {}), Checkbook.globals.gts_db || (Checkbook.globals.gts_db = new GTS.database(dbArgs), this.log("Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created.")), Checkbook.globals.prefs || (Checkbook.globals.prefs = {}, this.log("creating prefs")), this.checkDB();
@@ -7434,7 +8918,7 @@ onError: enyo.bind(this, this.buildInitialDB)
 },
 checkDBSuccess: function(e) {
 var t = -1;
-e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer), this.log(t), this.versionCheck = 24, t == this.versionCheck ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), this.splashFinished()) : t >= 1 ? (this.log("DB out of date, preparing to update: " + t + " to " + this.versionCheck), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
+e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer), this.versionCheck = 25, t == this.versionCheck ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), this.splashFinished()) : t >= 1 ? (this.log("DB out of date, preparing to update: " + t + " to " + this.versionCheck), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
 },
 splashFinished: function() {
 this.log(), this.$.splashProgress.animateProgressTo(100), enyo.asyncMethod(this, this.doFinish);
@@ -7854,6 +9338,8 @@ gSheetUser: "depreciated",
 gSheetPass: ""
 }, {})), this.versionCheck = 24;
 case 24:
+t.push("ALTER TABLE accounts ADD COLUMN payeeField INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE transactions ADD COLUMN payee TEXT;"), this.versionCheck = 25;
+case 25:
 }
 t.push(Checkbook.globals.gts_db.getUpdate("prefs", {
 dbVer: this.versionCheck
@@ -8126,7 +9612,7 @@ dispColor: Checkbook.globals.prefs.dispColor
 },
 setupRow: function(e, t) {
 var n = t.index, r = t.item, i = e.accounts[n];
-if (i) return i.index = n, r.$.accountItem.addRemoveClass("maskedAccount", i.hidden === 1), i.hidden === 2 ? r.$.icon.setSrc(imgToGrey("assets/" + i.acctCategoryIcon)) : r.$.icon.setSrc("assets/" + i.acctCategoryIcon), r.$.iconLock.addRemoveClass("unlocked", i.acctLocked !== 1), r.$.name.setContent(i.acctName), !0;
+if (i) return r.$.catDivider.hide(), i.index = n, r.$.accountItem.addRemoveClass("maskedAccount", i.hidden === 1), i.hidden === 2 ? r.$.icon.setSrc(imgToGrey("assets/" + i.acctCategoryIcon)) : r.$.icon.setSrc("assets/" + i.acctCategoryIcon), r.$.iconLock.addRemoveClass("unlocked", i.acctLocked !== 1), r.$.name.setContent(i.acctName), !0;
 },
 buildDefaultAccountList: function(e) {
 e.unshift({
@@ -8448,6 +9934,7 @@ if (!e || typeof e == "undefined" || e.length <= 0) {
 this.$.progress.hide(), this.showErrorMessage(enyo.bind(this, this.closeImport), "No data available to be imported.");
 return;
 }
+if (typeof this.$["progress"] == "undefined") return;
 this.$.progress.setMessage("Processing spreadsheets..."), this.$.progress.setProgress(75), this.$.sheetListButton.setDisabled(!1), this.$.instructionsBar.hide(), this.$.sheetListBar.show(), this.$.instructions.hide(), this.$.sheetList.show(), this.allSheetsList = e, this.$.sheetList.setCount(this.allSheetsList.length), this.refreshLayout(), this.$.progress.hide();
 },
 setupRow: function(e, t) {
@@ -8574,15 +10061,15 @@ processDocDataFollower: function(e) {
 var t = enyo.isArray(e) ? e : [], n;
 for (var r = 0; r < t.length; r++) {
 n = {}, n.amount = deformatAmount(this.getNode(t[r], "gsx:amount"));
-if (Object.validNumber(n.amount)) {
-n.amount = parseFloat(n.amount), n.itemId = parseInt(this.getNode(t[r], "gsx:gtid")), Object.validNumber(n.itemId) || (n.itemId = ""), n.accountName = this.getNode(t[r], "gsx:account"), n.accountCat = this.getNode(t[r], "gsx:accountcat"), n.accountName === "" && (n.accountName = this.importItems[this.documentIndex].name), n.accountCat === "" && (n.accountCat = "Imported Account");
+if (GTS.Object.validNumber(n.amount)) {
+n.amount = parseFloat(n.amount), n.itemId = parseInt(this.getNode(t[r], "gsx:gtid")), GTS.Object.validNumber(n.itemId) || (n.itemId = ""), n.accountName = this.getNode(t[r], "gsx:account"), n.accountCat = this.getNode(t[r], "gsx:accountcat"), n.accountName === "" && (n.accountName = this.importItems[this.documentIndex].name), n.accountCat === "" && (n.accountCat = "Imported Account");
 if (typeof this.accountList[n.accountCat] == "undefined" || typeof this.accountList[n.accountCat][n.accountName] == "undefined") this.newAccounts.push({
 acctName: n.accountName,
 acctCategory: n.accountCat,
 acctNotes: ""
 }), this.addAccountListObject(-1, n.accountName, n.accountCat);
 n.linkedAccountName = this.getNode(t[r], "gsx:gtlinkedaccount"), n.linkedAccountCat = this.getNode(t[r], "gsx:gtlinkedaccountcat"), n.linkedRecord = parseInt(this.getNode(t[r], "gsx:gtlinkid"));
-if (Object.validNumber(n.linkedRecord)) {
+if (GTS.Object.validNumber(n.linkedRecord)) {
 n.linkedAccountName === "" && (n.linkedAccountName = this.importItems[this.documentIndex].name), n.linkedAccountCat === "" && (n.linkedAccountCat = "Imported Account");
 if (typeof this.accountList[n.linkedAccountCat] == "undefined" || typeof this.accountList[n.linkedAccountCat][n.linkedAccountName] == "undefined") this.newAccounts.push({
 acctName: n.linkedAccountName,
@@ -8590,7 +10077,7 @@ acctCategory: n.linkedAccountCat,
 acctNotes: ""
 }), this.addAccountListObject(-1, n.linkedAccountName, n.linkedAccountCat);
 } else n.linkedAccountName = "", n.linkedAccountCat = "", n.linkedRecord = "";
-n.cleared = this.getNode(t[r], "gsx:cleared").toLowerCase(), n["cleared"] == 0 || n["cleared"] == "no" || n["cleared"] == "not" || n["cleared"] == "false" || n["cleared"] == "" ? n.cleared = 0 : n.cleared = 1, n.date = Date.deformat(this.getNode(t[r], "gsx:date")), Object.validNumber(n.date) || (n.date = Date.parse(new Date)), n.category = this.getNode(t[r], "gsx:gtcat"), n.category === "" || n.category.toLowerCase() === "none" ? n.category = [ {
+n.cleared = this.getNode(t[r], "gsx:cleared").toLowerCase(), n["cleared"] == 0 || n["cleared"] == "no" || n["cleared"] == "not" || n["cleared"] == "false" || n["cleared"] == "" ? n.cleared = 0 : n.cleared = 1, n.date = Date.deformat(this.getNode(t[r], "gsx:date")), GTS.Object.validNumber(n.date) || (n.date = Date.parse(new Date)), n.category = this.getNode(t[r], "gsx:gtcat"), n.category === "" || n.category.toLowerCase() === "none" ? n.category = [ {
 category: "",
 category2: "",
 amount: ""
@@ -8598,7 +10085,7 @@ amount: ""
 category: n.category.split("|", 2)[0],
 category2: n.category.split("|", 2)[1],
 amount: ""
-} ], n.desc = this.getNode(t[r], "gsx:description"), n.desc = n.desc.length > 0 ? n.desc : "Transaction Description", n.checkNum = this.getNode(t[r], "gsx:checknum"), n.note = this.getNode(t[r], "gsx:note"), this.importItems[this.documentIndex].transactions.push(n);
+} ], n.desc = this.getNode(t[r], "gsx:description"), n.desc = n.desc.length > 0 ? n.desc : "Transaction Description", n.checkNum = this.getNode(t[r], "gsx:checknum"), n.note = this.getNode(t[r], "gsx:note"), n.payee = this.getNode(t[r], "gsx:payee"), this.importItems[this.documentIndex].transactions.push(n);
 }
 }
 this.updateDocDownloadProgress(t.length), this.importItems[this.documentIndex].limit + this.importItems[this.documentIndex].offset < this.importItems[this.documentIndex].totalResults ? this.downloadDocData(this.importItems[this.documentIndex].limit + this.importItems[this.documentIndex].offset, this.importItems[this.documentIndex].limit) : this.nextDocumentPage();
@@ -8626,7 +10113,7 @@ saveDocData: function(e, t) {
 var n = [], r = e + t;
 r >= this.importItems[this.documentIndex].transactions.length && (r = this.importItems[this.documentIndex].transactions.length);
 for (var i = e; i < r; i++) {
-this.importItems[this.documentIndex].transactions[i].account = this.accountList[this.importItems[this.documentIndex].transactions[i].accountCat][this.importItems[this.documentIndex].transactions[i].accountName], this.importItems[this.documentIndex].transactions[i].linkedRecord !== "" ? this.importItems[this.documentIndex].transactions[i].linkedAccount = this.accountList[this.importItems[this.documentIndex].transactions[i].linkedAccountCat][this.importItems[this.documentIndex].transactions[i].linkedAccountName] : delete this.importItems[this.documentIndex].transactions[i].linkedRecord, delete this.importItems[this.documentIndex].transactions[i].accountName, delete this.importItems[this.documentIndex].transactions[i].accountCat, delete this.importItems[this.documentIndex].transactions[i].linkedAccountName, delete this.importItems[this.documentIndex].transactions[i].linkedAccountCat, Object.validNumber(this.importItems[this.documentIndex].transactions[i].itemId) || delete this.importItems[this.documentIndex].transactions[i].itemId;
+this.importItems[this.documentIndex].transactions[i].account = this.accountList[this.importItems[this.documentIndex].transactions[i].accountCat][this.importItems[this.documentIndex].transactions[i].accountName], this.importItems[this.documentIndex].transactions[i].linkedRecord !== "" ? this.importItems[this.documentIndex].transactions[i].linkedAccount = this.accountList[this.importItems[this.documentIndex].transactions[i].linkedAccountCat][this.importItems[this.documentIndex].transactions[i].linkedAccountName] : delete this.importItems[this.documentIndex].transactions[i].linkedRecord, delete this.importItems[this.documentIndex].transactions[i].accountName, delete this.importItems[this.documentIndex].transactions[i].accountCat, delete this.importItems[this.documentIndex].transactions[i].linkedAccountName, delete this.importItems[this.documentIndex].transactions[i].linkedAccountCat, GTS.Object.validNumber(this.importItems[this.documentIndex].transactions[i].itemId) || delete this.importItems[this.documentIndex].transactions[i].itemId;
 var s = this.importItems[this.documentIndex].transactions[i].category, o = [];
 s.length > 1 && this.importItems[this.documentIndex].transactions[i].itemId ? o = Checkbook.globals.transactionManager.handleCategoryData(this.importItems[this.documentIndex].transactions[i]) : (this.importItems[this.documentIndex].transactions[i].category = s[0].category, this.importItems[this.documentIndex].transactions[i].category2 = s[0].category2), n.push(Checkbook.globals.gts_db.getReplace("transactions", this.importItems[this.documentIndex].transactions[i])), n = n.concat(o);
 }
@@ -8647,13 +10134,13 @@ checkErrorCount: function(e) {
 return e || (e = 3), this.errorCount >= 3 ? (this.error("Multiple sets of bad data from Google."), this.errorCount = 0, this.showErrorMessage(enyo.bind(this, this.fetchsheetList), "There has been an error: Multiple sets of bad data from Google. Please try again later."), !0) : !1;
 },
 fatalError: function(e) {
-this.showErrorMessage(enyo.bind(this, this.closeImport, !0), e);
+this.showErrorMessage(enyo.bind(this, this.closeImport, !1), e);
 },
 showErrorMessage: function(e, t) {
 this.onErrorClose = e, this.$.progress.hide(), this.$.errorMessage.show(), this.$.errorMessage.setMainMessage(t);
 },
 closeErrorMessage: function() {
-this.$.errorMessage.hide(), this.onErrorClose();
+return this.$.errorMessage.hide(), this.onErrorClose(), !0;
 },
 closeImport: function(e) {
 try {
@@ -8661,7 +10148,7 @@ enyo.windows.blockScreenTimeout(!1), this.log("Window: blockScreenTimeout: false
 } catch (t) {
 this.log("Window Error (End)", t);
 }
-this.$.instructionsButton.setDisabled(!1), this.$.instructionsBar.show(), this.$.sheetListBar.hide(), this.$.instructions.show(), this.$.sheetList.hide(), this.$.errorMessage.hide(), this.$.progress.hide(), this.doFinish({
+this.$.instructionsButton.setDisabled(!1), this.$.instructionsBar.show(), this.$.sheetListBar.hide(), this.$.instructions.show(), this.$.sheetList.hide(), this.$.errorMessage.hide(), this.$.progress.hide(), enyo.asyncMethod(this, this.doFinish, {
 success: e
 });
 }
@@ -8953,14 +10440,14 @@ this.log("Window Error (Start)", n);
 this.startNewSheet(e, 0);
 },
 startNewSheet: function(e, t) {
-this.$.progress.setTitle("Exporting " + e[t].name), this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Retrieving transactions"), this.$.progress.setProgress((t + 1) * 1 / 4 / e.length * 100), Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("transactions", [ "itemId", "linkedRecord", "amount", "checkNum", "cleared", "date", "desc", "note", ' ( CASE WHEN category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE category END ) AS category', " ( CASE WHEN category = '||~SPLIT~||' THEN 'PARSE_CATEGORY' ELSE category2 END ) AS category2", "IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountName", "IFNULL( ( SELECT accounts.acctCategory FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountCat", "IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.linkedAccount ), '' ) AS linkedAccountName", "IFNULL( ( SELECT accounts.acctCategory FROM accounts WHERE accounts.acctId = transactions.linkedAccount ), '' ) AS linkedAccountCat" ], {
+this.$.progress.setTitle("Exporting " + e[t].name), this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Retrieving transactions"), this.$.progress.setProgress((t + 1) * 1 / 4 / e.length * 100), Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("transactions", [ "itemId", "linkedRecord", "amount", "checkNum", "cleared", "date", "desc", "note", "payee", ' ( CASE WHEN category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE category END ) AS category', " ( CASE WHEN category = '||~SPLIT~||' THEN 'PARSE_CATEGORY' ELSE category2 END ) AS category2", "IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountName", "IFNULL( ( SELECT accounts.acctCategory FROM accounts WHERE accounts.acctId = transactions.account ), '' ) AS accountCat", "IFNULL( ( SELECT accounts.acctName FROM accounts WHERE accounts.acctId = transactions.linkedAccount ), '' ) AS linkedAccountName", "IFNULL( ( SELECT accounts.acctCategory FROM accounts WHERE accounts.acctId = transactions.linkedAccount ), '' ) AS linkedAccountCat" ], {
 account: e[t].acctId
 }, [ "date" ]), {
 onSuccess: enyo.bind(this, this.buildSheetContent, e, t, 0, 100, {
 accountId: e[t].acctId,
 accountName: e[t].name,
 accountCategory: e[t].cat,
-csv: "account,accountCat,date,amount,description,cleared,checkNum,note,gtId,gtCat,gtLinkId,gtLinkedAccount,gtLinkedAccountCat\n"
+csv: "account,accountCat,date,amount,description,cleared,checkNum,note,payee,gtId,gtCat,gtLinkId,gtLinkedAccount,gtLinkedAccountCat\n"
 })
 });
 },
@@ -8973,7 +10460,7 @@ var o = 0;
 n + r < s.length ? o = n + r : o = s.length, this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Processing account"), this.$.progress.setProgress((t + 1) * (2 + o / s.length) / 4 / e.length * 100);
 for (var u = n; u < o; u++) {
 var a = s[u];
-i.csv += '"' + GTS.String.cleanString(a.accountName) + '",' + '"' + GTS.String.cleanString(a.accountCat) + '",' + "\"'" + (new Date(parseInt(a.date))).format("special") + '",' + '"' + formatAmount(a.amount) + '",' + '"' + GTS.String.cleanString(a.desc) + '",' + '"' + (a["cleared"] == 1 ? "Yes" : "No") + '",' + '"' + GTS.String.cleanString(a.checkNum) + '",' + '"' + GTS.String.cleanString(a.note) + '",' + '"' + a.itemId + '",' + '"' + enyo.json.stringify(Checkbook.globals.transactionManager.parseCategoryDB(a.category, a.category2)).replace(/"/g, '""') + '",' + '"' + a.linkedRecord + '",' + '"' + GTS.String.cleanString(a.linkedAccountName) + '",' + '"' + GTS.String.cleanString(a.linkedAccountCat) + '"\n';
+i.csv += '"' + GTS.String.cleanString(a.accountName) + '",' + '"' + GTS.String.cleanString(a.accountCat) + '",' + "\"'" + (new Date(parseInt(a.date))).format("special") + '",' + '"' + formatAmount(a.amount) + '",' + '"' + GTS.String.cleanString(a.desc) + '",' + '"' + (a["cleared"] == 1 ? "Yes" : "No") + '",' + '"' + GTS.String.cleanString(a.checkNum) + '",' + '"' + GTS.String.cleanString(a.note) + '",' + '"' + GTS.String.cleanString(a.payee) + '",' + '"' + a.itemId + '",' + '"' + enyo.json.stringify(Checkbook.globals.transactionManager.parseCategoryDB(a.category, a.category2)).replace(/"/g, '""') + '",' + '"' + a.linkedRecord + '",' + '"' + GTS.String.cleanString(a.linkedAccountName) + '",' + '"' + GTS.String.cleanString(a.linkedAccountCat) + '"\n';
 }
 o < s.length ? enyo.asyncMethod(this, this.buildSheetContent, e, t, o, r, i, s) : this.uploadSheet(e, t, i);
 },
@@ -9008,6 +10495,12 @@ this.showErrorMessage(this.showAccountList, r);
 sheetComplete: function(e, t) {
 this.$.progress.setMessage("Account uploaded"), this.$.progress.setProgress((t + 1) * 4 / 4 / e.length * 100), t++, t < e.length ? this.startNewSheet(e, t) : (this.$.progress.hide(), this.$.errorMessage.setErrTitle("Export Complete"), this.showErrorMessage(enyo.bind(this, this.closeExport), e.length + " account" + (e.length > 1 ? "s" : "") + " exported."));
 },
+showErrorMessage: function(e, t) {
+this.onErrorClose = e, this.$.progress.hide(), this.$.errorMessage.show(), this.$.errorMessage.setMainMessage(t);
+},
+closeErrorMessage: function() {
+return this.$.errorMessage.hide(), this.onErrorClose(), !0;
+},
 closeExport: function() {
 try {
 enyo.windows.blockScreenTimeout(!1), this.log("Window: blockScreenTimeout: false");
@@ -9015,29 +10508,10 @@ enyo.windows.blockScreenTimeout(!1), this.log("Window: blockScreenTimeout: false
 this.log("Window Error (End)", e);
 }
 this.$.instructions.show(), this.$.instructionsBar.show(), this.$.instructionsButton.setDisabled(!1), this.$.accountList.hide(), this.$.accountListBar.hide(), this.$.errorMessage.hide(), this.$.progress.hide(), this.doFinish();
-},
-showErrorMessage: function(e, t) {
-this.onErrorClose = e, this.$.progress.hide(), this.$.errorMessage.show(), this.$.errorMessage.setMainMessage(t);
-},
-closeErrorMessage: function() {
-this.$.errorMessage.hide(), this.onErrorClose();
 }
 });
 
 // about.js
-
-var appInfo = {
-title: "Checkbook",
-id: "com.glitchtechscience.enyo.checkbook",
-version: "1.1.0",
-vendor: "GlitchTech Science",
-vendorurl: "http://www.glitchtechscience.com",
-vendoremail: "GlitchTechScience@gmail.com",
-copyright: "&copy; Copyright 2011 and forward GlitchTech Science. All rights reserved.",
-keywords: [ "Checkbook", "finance", "budget", "money", "cash" ],
-icon: "assets/icon_1.png",
-miniicon: "assets/icon_1_32x32.png"
-};
 
 enyo.kind({
 name: "Checkbook.about",
@@ -9052,37 +10526,30 @@ events: {
 onFinish: ""
 },
 components: [ {
-kind: "enyo.FittableColumns",
-noStretch: !0,
-classes: "text-middle margin-half-bottom",
+classes: "h-box box-align-center margin-half-bottom",
 components: [ {
 kind: "enyo.Image",
-src: appInfo.icon
+src: enyo.fetchAppInfo().icon
 }, {
-content: appInfo.title + " v" + appInfo.version,
+content: enyo.fetchAppInfo().title + " v" + enyo.fetchAppInfo().version,
 allowHtml: !0,
-fit: !0,
-classes: "padding-left biggest"
+classes: "box-flex-1 padding-left biggest"
 }, {
 kind: "onyx.Button",
 content: "X",
 ontap: "doFinish",
-classes: "onyx-blue small-padding"
+classes: "onyx-blue"
 } ]
 }, {
-kind: "enyo.FittableColumns",
-noStretch: !0,
-classes: "text-middle margin-half-top margin-half-bottom",
+classes: "h-box box-align-center margin-half-top margin-half-bottom",
 components: [ {
-content: "Thank you for using " + appInfo.title + " powered by"
+content: "Thank you for using " + enyo.fetchAppInfo().title + " powered by"
 }, {
 kind: "enyo.Image",
 src: "assets/enyo-logo.png"
 } ]
 }, {
-kind: "enyo.FittableColumns",
-noStretch: !0,
-classes: "text-middle margin-half-top",
+classes: "h-box box-align-center margin-half-top margin-half-bottom",
 components: [ {
 kind: "enyo.Image",
 src: "assets/application-web.png"
@@ -9092,52 +10559,40 @@ classes: "padding-left dark-link",
 allowHtml: !0
 } ]
 }, {
-kind: "enyo.FittableColumns",
-noStretch: !0,
-classes: "text-middle margin-half-top",
+classes: "h-box box-align-center margin-half-top margin-half-bottom",
 components: [ {
 kind: "enyo.Image",
 src: "assets/application-web.png"
 }, {
-content: "<a href='" + appInfo.vendorurl + "' target='_blank'>" + appInfo.vendor + " Website</a>",
+content: "<a href='" + enyo.fetchAppInfo().vendorurl + "' target='_blank'>" + enyo.fetchAppInfo().vendor + " Website</a>",
 classes: "padding-left dark-link",
 allowHtml: !0
 } ]
 }, {
-kind: "enyo.FittableColumns",
-noStretch: !0,
-classes: "text-middle margin-half-top",
+classes: "h-box box-align-center margin-half-top margin-half-bottom",
 components: [ {
 kind: "enyo.Image",
 src: "assets/twitter-icon.png"
 }, {
-content: "<a href='http://twitter.com/#!/glitchtech' target='_blank'>" + appInfo.vendor + " Twitter</a>",
+content: "<a href='http://twitter.com/#!/glitchtech' target='_blank'>" + enyo.fetchAppInfo().vendor + " Twitter</a>",
 classes: "padding-left dark-link",
 allowHtml: !0
 } ]
 }, {
-kind: "enyo.FittableColumns",
-noStretch: !0,
-classes: "text-middle margin-half-top",
+classes: "h-box box-align-center margin-half-top margin-half-bottom",
 components: [ {
 kind: "enyo.Image",
 src: "assets/application-email.png"
 }, {
-content: "<a href='mailto:" + appInfo.vendoremail + "?subject=" + appInfo.title + " Support' target='_blank'>Send Email</a>",
+content: "<a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " Support' target='_blank'>Send Email</a>",
 classes: "padding-left dark-link",
 allowHtml: !0
 } ]
 }, {
-content: appInfo.copyright,
+content: enyo.fetchAppInfo().copyright,
 allowHtml: !0,
 classes: "smaller margin-top"
-}, {
-kind: "Signals",
-onbackbutton: "backPopupHandler"
-} ],
-backPopupHandler: function(e) {
-return this.doFinish(), !0;
-}
+} ]
 });
 
 // manager.js
@@ -9175,7 +10630,7 @@ sect_order: [ "( SELECT IFNULL( MAX( sect_order ), 0 ) FROM accounts )", !0 ]
 }), this._prepareDataObject(e), this.$.cryptoSystem.encryptString(e.lockedCode, enyo.bind(this, this._createAccountFollower, e, t));
 },
 _createAccountFollower: function(e, t, n) {
-if (e["auto_savings"] == 0 || !Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
+if (e["auto_savings"] == 0 || !GTS.Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
 e["acctLocked"] == 0 || n == "" || !n ? (e.acctLocked = 0, e.lockedCode = "") : (e.acctLocked = 1, e.lockedCode = n);
 var r = [ Checkbook.globals.gts_db.getInsert("accounts", e) ];
 e.defaultAccount === 1 && r.unshift(Checkbook.globals.gts_db.getUpdate("accounts", {
@@ -9188,7 +10643,7 @@ updateAccount: function(e, t, n, r) {
 this._prepareDataObject(e), this.$.cryptoSystem.encryptString(e.lockedCode, enyo.bind(this, this._updateAccountFollower, e, t, n, r));
 },
 _updateAccountFollower: function(e, t, n, r, i) {
-if (e["auto_savings"] == 0 || !Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
+if (e["auto_savings"] == 0 || !GTS.Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
 e["acctLocked"] == 0 || i == "" || !i ? (e.acctLocked = 0, e.lockedCode = "") : n && (e.acctLocked = 1, e.lockedCode = i);
 var s = [ Checkbook.globals.gts_db.getUpdate("accounts", e, {
 acctId: t
@@ -9241,7 +10696,7 @@ acctId: e
 r >= 0 ? this.accountObject.defaultAccountIndex = r : this.updateAccountModTime(), Checkbook.globals.gts_db.queries(n, t);
 },
 fetchDefaultAccount: function(e) {
-this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && (Object.isNumber(this.accountObject.defaultAccountIndex) && this.accountObject.defaultAccountIndex >= 0 ? e.onSuccess(this.accountObject.accounts[this.accountObject.defaultAccountIndex]) : e.onSuccess()) : (e = this._getOptions(e), this.accountObject.processingQueue.push({
+this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && (GTS.Object.isNumber(this.accountObject.defaultAccountIndex) && this.accountObject.defaultAccountIndex >= 0 ? e.onSuccess(this.accountObject.accounts[this.accountObject.defaultAccountIndex]) : e.onSuccess()) : (e = this._getOptions(e), this.accountObject.processingQueue.push({
 source: "fetchDefaultAccount",
 func: enyo.bind(this, this.fetchDefaultAccount, e)
 }), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError)));
@@ -9273,13 +10728,13 @@ onError: t.onError
 });
 },
 fetchAccounts: function(e, t, n) {
-this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accounts.slice(Object.isNumber(n) ? n : 0, t)) : (e = this._getOptions(e), this.accountObject.processingQueue.push({
+this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accounts.slice(GTS.Object.isNumber(n) ? n : 0, t)) : (e = this._getOptions(e), this.accountObject.processingQueue.push({
 source: "fetchAccounts",
 func: enyo.bind(this, this.fetchAccounts, e, t, n)
 }), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError)));
 },
 fetchAccountsList: function(e, t, n) {
-this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accountsList.slice(Object.isNumber(n) ? n : 0, t)) : (this.accountObject.processingQueue.push({
+this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accountsList.slice(GTS.Object.isNumber(n) ? n : 0, t)) : (this.accountObject.processingQueue.push({
 source: "fetchAccountsList",
 func: enyo.bind(this, this.fetchAccountsList, e, t, n)
 }), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError)));
@@ -9305,7 +10760,7 @@ n[0] = r.balance0, n[1] = r.balance1, n[2] = r.balance2, n[3] = r.balance3, n[4]
 enyo.isFunction(e) && e(n);
 },
 _buildAccountObjects: function(e, t, n) {
-t = Object.isNumber(t) ? t : 100, n = Object.isNumber(n) ? n : 0, n <= 0 && (this.accountObject.defaultAccountIndex = -1, this.accountObject.idTable = [], this.accountObject.accounts = [], this.accountObject.accountsList = []);
+t = GTS.Object.isNumber(t) ? t : 100, n = GTS.Object.isNumber(n) ? n : 0, n <= 0 && (this.accountObject.defaultAccountIndex = -1, this.accountObject.idTable = [], this.accountObject.accounts = [], this.accountObject.accountsList = []);
 var r = new Date, i = Date.parse(r);
 r.setHours(23, 59, 59, 999), r = Date.parse(r);
 var s = new GTS.databaseQuery({
@@ -9400,7 +10855,7 @@ ontap: "accountTapped",
 onDelete: "accountDeleted",
 components: [ {
 name: "catDivider",
-showing: !1,
+kind: "GTS.Divider",
 ontap: "dividerTapped"
 }, {
 layoutKind: "",
@@ -9434,11 +10889,9 @@ classes: "onyx-scrim-translucent",
 showing: !0
 }, {
 name: "loadingSpinner",
-kind: "jmtk.Spinner",
-color: "#284907",
-diameter: "90",
-shape: "spiral",
-style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+kind: "onyx.Spinner",
+style: "size-double",
+style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 }, {
 kind: "Signals",
 accountChanged: "renderAccountList",
@@ -9480,7 +10933,7 @@ return;
 }
 if (typeof t["account"] != "undefined") {
 var n = t.account >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.account) : -1;
-n >= 0 && (typeof t.accountBal != "undefined" && t.accountBal.length > 0 ? this.accountBalanceChangedHandler(n, t.accountBal) : Checkbook.globals.accountManager.fetchAccountBalance(t.account, {
+n >= 0 && (typeof t.accountBal != "undefined" && GTS.Object.size(t.accountBal) > 0 ? this.accountBalanceChangedHandler(n, t.accountBal) : Checkbook.globals.accountManager.fetchAccountBalance(t.account, {
 onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, n)
 }));
 }
@@ -9498,6 +10951,7 @@ onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, r)
 }
 },
 accountBalanceChangedHandler: function(e, t) {
+this.log(arguments);
 if (typeof t == "undefined" || isNaN(e) || e < 0 || e >= this.accounts.length) return;
 this.accounts[e].balance0 = t.balance0, this.accounts[e].balance1 = t.balance1, this.accounts[e].balance2 = t.balance2, this.accounts[e].balance3 = t.balance3, this.renderRow(e);
 },
@@ -9587,7 +11041,9 @@ break;
 default:
 i.balance = 0;
 }
-return i.balance = prepAmount(i.balance), r.$.balance.setContent(formatAmount(i.balance)), r.$.balance.addRemoveClass("positiveBalance", i.balance > 0), r.$.balance.addRemoveClass("negativeBalance", i.balance < 0), r.$.balance.addRemoveClass("neutralBalance", i["balance"] == 0), r.$.note.setContent(i.acctNotes.replace(/\n/, "<br />")), Checkbook.globals.prefs.custom_sort !== 0 && Checkbook.globals.prefs.custom_sort !== 3 || !(i.index <= 0 || i.acctCategory !== this.accounts[i.index - 1].acctCategory) ? r.$.catDivider.hide() : (r.$.catDivider.show(), r.$.catDivider.setContent(i.acctCategory)), !0;
+i.balance = prepAmount(i.balance), r.$.balance.setContent(formatAmount(i.balance)), r.$.balance.addRemoveClass("positiveBalance", i.balance > 0), r.$.balance.addRemoveClass("negativeBalance", i.balance < 0), r.$.balance.addRemoveClass("neutralBalance", i["balance"] == 0), r.$.note.setContent(i.acctNotes.replace(/\n/, "<br />"));
+var o = (Checkbook.globals.prefs.custom_sort === 0 || Checkbook.globals.prefs.custom_sort === 3) && (i.index <= 0 || i.acctCategory !== this.accounts[i.index - 1].acctCategory);
+return r.$.catDivider.setContent(i.acctCategory), r.$.catDivider.canGenerate = o, !0;
 }
 }
 });
@@ -9645,16 +11101,17 @@ classes: "text-center",
 fit: !0,
 components: [ {
 name: "addAccountButton",
-kind: "onyx.Checkbox",
-onchange: "addAccount",
+kind: "onyx.IconButton",
+src: "assets/menu_icons/new.png",
+ontap: "addAccount",
 classes: "add"
 } ]
 }, {
 components: [ {
 name: "editModeToggle",
-kind: "onyx.Checkbox",
-onchange: "toggleLock",
-classes: "lock"
+kind: "onyx.ToggleIconButton",
+src: "assets/menu_icons/lock.png?1=2",
+ontap: "toggleLock"
 } ]
 } ]
 }, {
@@ -9732,7 +11189,7 @@ handleBalanceButton: function(e, t) {
 this.balanceView = t.value, this.$.entries.setBalanceView(this.balanceView), this.$.entries.refresh();
 },
 addAccount: function() {
-this.$.addAccountButton.getChecked() && !this.$.addAccountButton.getDisabled() && (this.$.addAccountButton.setDisabled(!0), enyo.Signals.send("modifyAccount", {
+this.$.addAccountButton.getDisabled() || (this.$.addAccountButton.setDisabled(!0), enyo.Signals.send("modifyAccount", {
 name: "newAccount",
 kind: "Checkbook.accounts.modify",
 acctId: -1,
@@ -9740,10 +11197,10 @@ onFinish: enyo.bind(this, this.addAccountComplete)
 }));
 },
 addAccountComplete: function(e, t) {
-this.$.addAccountButton.setChecked(!1), this.$.addAccountButton.setDisabled(!1), t.action === 1 && t.actionStatus === !0 && enyo.Signals.send("accountChanged");
+this.$.addAccountButton.setDisabled(!1), t.action === 1 && t.actionStatus === !0 && enyo.Signals.send("accountChanged");
 },
 toggleLock: function() {
-this.$.editModeToggle.getChecked() ? this.$.entries.setEditMode(!0) : this.$.entries.setEditMode(!1);
+this.$.editModeToggle.getActive() ? this.$.entries.setEditMode(!0) : this.$.entries.setEditMode(!1);
 }
 });
 
@@ -9976,14 +11433,6 @@ label: "Transfer to...",
 classes: "iconListSelector"
 } ]
 }, {
-name: "checkNumber",
-kind: "GTS.ToggleBar",
-classes: "bordered",
-label: "Add Check Number Field",
-sublabel: "Add a field to record the check number in the add/edit transaction screen.",
-onContent: "Yes",
-offContent: "No"
-}, {
 name: "expenseCategories",
 kind: "GTS.ToggleBar",
 classes: "bordered",
@@ -9992,6 +11441,23 @@ sublabel: "Add a field to record the expense category in the add/edit transactio
 onContent: "Yes",
 offContent: "No",
 value: !0
+}, {
+name: "checkNumber",
+kind: "GTS.ToggleBar",
+classes: "bordered",
+label: "Add Check Number Field",
+sublabel: "Add a field to record the check number in the add/edit transaction screen.",
+onContent: "Yes",
+offContent: "No"
+}, {
+name: "payeeField",
+kind: "GTS.ToggleBar",
+classes: "bordered",
+label: "Add Payee Field",
+sublabel: "Add a field to record the payee in the add/edit transaction screen.",
+onContent: "Yes",
+offContent: "No",
+value: !1
 }, {
 showing: !1,
 name: "hideCleared",
@@ -10052,11 +11518,9 @@ kind: "onyx.Scrim",
 classes: "onyx-scrim-translucent"
 }, {
 name: "loadingSpinner",
-kind: "jmtk.Spinner",
-color: "#284907",
-diameter: "90",
-shape: "spiral",
-style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+kind: "onyx.Spinner",
+classes: "size-double",
+style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 }, {
 name: "acctCategoryManager",
 kind: "Checkbook.accountCategory.manager"
@@ -10169,7 +11633,8 @@ enableCategories: 1,
 hide_cleared: 0,
 last_sync: "",
 auto_savings: 0,
-auto_savings_link: -1
+auto_savings_link: -1,
+payeeField: 0
 });
 },
 renderDisplayItems: function(e) {
@@ -10177,7 +11642,7 @@ if (!e || typeof e == "undefined") {
 this.doFinish(0);
 return;
 }
-this.$.accountName.setValue(e.acctName), this.$.accountCategory.setValue(e.acctCategory), this.$.accountNotes.setValue(e.acctNotes), this.$.freezeAccount.setValue(e.frozen === 1), this.$.pinLock.setValue(e.acctLocked === 1), this.$.pinCode.setValue(e.lockedCode), this.$.transactionSorting.setValue(e.sort), this.$.accountDisplay.setValue(e.hidden), this.$.balance.setValue(e.bal_view), this.$.defaultAccount.setValue(e.defaultAccount === 1), this.$.showTransTime.setValue(e.showTransTime === 1), this.$.showRunningBal.setValue(e.runningBalance === 1), this.$.hideTransNotes.setValue(e.hideNotes === 1), this.$.descriptionMultilineMode.setValue(e.transDescMultiLine === 1), this.$.autoComplete.setValue(e.useAutoComplete === 1), this.$.atmMode.setValue(e.atmEntry === 1), this.$.autoTransfer.setValue(e.auto_savings), this.$.autoTransferLink.setValue(e.auto_savings_link), this.$.checkNumber.setValue(e.checkField === 1), this.$.expenseCategories.setValue(e.enableCategories === 1), this.$.hideCleared.setValue(e.hide_cleared === 1), this.transactionSortingUpdateLabel(), this.accountDisplayUpdateLabel(), this.balanceUpdateLabel(), this.togglePINStatus(), this.toggleAutoTransferDrawer(), this.categoryChanged(), this.acctId < 0 && this.$.accountDeleteButton.hide(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.$.accountName.focus(), this.waterfall("onresize", "onresize", this);
+this.$.accountName.setValue(e.acctName), this.$.accountCategory.setValue(e.acctCategory), this.$.accountNotes.setValue(e.acctNotes), this.$.freezeAccount.setValue(e.frozen === 1), this.$.pinLock.setValue(e.acctLocked === 1), this.$.pinCode.setValue(e.lockedCode), this.$.transactionSorting.setValue(e.sort), this.$.accountDisplay.setValue(e.hidden), this.$.balance.setValue(e.bal_view), this.$.defaultAccount.setValue(e.defaultAccount === 1), this.$.showTransTime.setValue(e.showTransTime === 1), this.$.showRunningBal.setValue(e.runningBalance === 1), this.$.hideTransNotes.setValue(e.hideNotes === 1), this.$.descriptionMultilineMode.setValue(e.transDescMultiLine === 1), this.$.autoComplete.setValue(e.useAutoComplete === 1), this.$.atmMode.setValue(e.atmEntry === 1), this.$.autoTransfer.setValue(e.auto_savings), this.$.autoTransferLink.setValue(e.auto_savings_link), this.$.checkNumber.setValue(e.checkField === 1), this.$.expenseCategories.setValue(e.enableCategories === 1), this.$.payeeField.setValue(e.payeeField === 1), this.$.hideCleared.setValue(e.hide_cleared === 1), this.transactionSortingUpdateLabel(), this.accountDisplayUpdateLabel(), this.balanceUpdateLabel(), this.togglePINStatus(), this.toggleAutoTransferDrawer(), this.categoryChanged(), this.acctId < 0 && this.$.accountDeleteButton.hide(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.$.accountName.focus(), this.waterfall("onresize", "onresize", this);
 },
 saveAccount: function() {
 if (this.$.accountName.getValue().length <= 0) {
@@ -10205,6 +11670,7 @@ runningBalance: this.$.showRunningBal.getValue(),
 checkField: this.$.checkNumber.getValue(),
 hideNotes: this.$.hideTransNotes.getValue(),
 enableCategories: this.$.expenseCategories.getValue(),
+payeeField: this.$.payeeField.getValue(),
 hide_cleared: !1
 }, t = {
 onSuccess: enyo.bind(this, this.saveFinished)
@@ -10670,20 +12136,20 @@ enyo.isFunction(n.onError) && n.onError();
 generateInsertTransactionSQL: function(e, t) {
 var n = enyo.clone(e), r = n.autoTransfer, i = n.autoTransferLink, s = this._prepareData(n, t);
 s = s.concat(this._handleRepeatSystem(n, r, i)), s = s.concat(this.handleCategoryData(n)), s.push(Checkbook.globals.gts_db.getInsert("transactions", n));
-if (Object.validNumber(n.linkedRecord) && n.linkedRecord >= 0) {
+if (GTS.Object.validNumber(n.linkedRecord) && n.linkedRecord >= 0) {
 var o = enyo.clone(n);
-Object.swap(o, "linkedRecord", "itemId"), Object.swap(o, "linkedAccount", "account"), o.amount = -o.amount, s.push(Checkbook.globals.gts_db.getInsert("transactions", o));
+GTS.Object.swap(o, "linkedRecord", "itemId"), GTS.Object.swap(o, "linkedAccount", "account"), o.amount = -o.amount, s.push(Checkbook.globals.gts_db.getInsert("transactions", o));
 }
 return r > 0 && i >= 0 && (s = s.concat(this.createAutoTransfer(n, r, i))), s;
 },
 createAutoTransfer: function(e, t, n) {
 if (t <= 0 || n < 0) return [];
 var r = enyo.clone(e);
-Object.validNumber(r.linkedRecord) && r.linkedRecord >= 0 ? r.itemId += 2 : r.itemId += 1, t === 1 ? r.amount >= 0 ? r.amount = Math.round(Math.ceil(r.amount) * 100 - r.amount * 100) / 100 : r.amount = Math.round(Math.floor(r.amount) * 100 - r.amount * 100) / 100 : t === 2 ? r.amount >= 0 ? r.amount = 1 : r.amount = -1 : r.amount = 0;
+GTS.Object.validNumber(r.linkedRecord) && r.linkedRecord >= 0 ? r.itemId += 2 : r.itemId += 1, t === 1 ? r.amount >= 0 ? r.amount = Math.round(Math.ceil(r.amount) * 100 - r.amount * 100) / 100 : r.amount = Math.round(Math.floor(r.amount) * 100 - r.amount * 100) / 100 : t === 2 ? r.amount >= 0 ? r.amount = 1 : r.amount = -1 : r.amount = 0;
 if (r["amount"] == 0) return [];
-r.linkedAccount = n, r.linkedRecord = r.itemId + 1, r.note = r.desc, r.desc = "Auto Transfer", r.category = "Transfer", r.category2 = "Auto Transfer", delete r.checkNum;
+r.linkedAccount = n, r.linkedRecord = r.itemId + 1, r.note = r.desc, r.desc = "Auto Transfer", r.category = "Transfer", r.category2 = "Auto Transfer", delete r.checkNum, delete r.payee;
 var i = [];
-return i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), Object.swap(r, "linkedRecord", "itemId"), Object.swap(r, "linkedAccount", "account"), r.amount = -r.amount, i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), i;
+return i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), GTS.Object.swap(r, "linkedRecord", "itemId"), GTS.Object.swap(r, "linkedAccount", "account"), r.amount = -r.amount, i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), i;
 },
 updateTransaction: function(e, t, n) {
 Checkbook.globals.gts_db.query(new GTS.databaseQuery({
@@ -10703,9 +12169,9 @@ var i = this._prepareData(e, t);
 i = i.concat(this._handleRepeatSystem(e, -1)), i = i.concat(this.handleCategoryData(e)), i.push(Checkbook.globals.gts_db.getUpdate("transactions", e, {
 itemId: e.itemId
 }));
-if (Object.validNumber(e.linkedRecord)) {
+if (GTS.Object.validNumber(e.linkedRecord)) {
 var s = enyo.clone(e);
-Object.swap(s, "linkedRecord", "itemId"), Object.swap(s, "linkedAccount", "account"), s.amount = -s.amount, delete s.cleared, i.push(Checkbook.globals.gts_db.getUpdate("transactions", s, {
+GTS.Object.swap(s, "linkedRecord", "itemId"), GTS.Object.swap(s, "linkedAccount", "account"), s.amount = -s.amount, delete s.cleared, i.push(Checkbook.globals.gts_db.getUpdate("transactions", s, {
 itemId: s.itemId
 }));
 }
@@ -10719,7 +12185,7 @@ enyo.isFunction(n.onError) && n.onError();
 });
 },
 _prepareData: function(e, t) {
-return e.desc = e.desc === "" || e.desc === null ? "Description" : e.desc, e.cleared = e.cleared ? 1 : 0, e.amount = Object.isNumber(e.amount) ? 0 : Number(e.amount).toFixed(2).valueOf(), e.date = Date.parse(e.date), t == "transfer" ? e.amount_old !== "NOT_A_VALUE" && e.amount_old < 0 ? e.amount = -Math.abs(e.amount) : e.amount_old !== "NOT_A_VALUE" && e.amount_old >= 0 ? e.amount = Math.abs(e.amount) : (e.linkedRecord = e.itemId + 1, e.amount = -Math.abs(e.amount)) : t == "income" ? (e.amount = Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null) : (e.amount = -Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null), delete e.amount_old, delete e.autoTransfer, delete e.autoTransferLink, [];
+return e.desc = e.desc === "" || e.desc === null ? "Description" : e.desc, e.cleared = e.cleared ? 1 : 0, e.amount = GTS.Object.isNumber(e.amount) ? 0 : Number(e.amount).toFixed(2).valueOf(), e.date = Date.parse(e.date), t == "transfer" ? e.amount_old !== "NOT_A_VALUE" && e.amount_old < 0 ? e.amount = -Math.abs(e.amount) : e.amount_old !== "NOT_A_VALUE" && e.amount_old >= 0 ? e.amount = Math.abs(e.amount) : (e.linkedRecord = e.itemId + 1, e.amount = -Math.abs(e.amount)) : t == "income" ? (e.amount = Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null) : (e.amount = -Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null), delete e.amount_old, delete e.autoTransfer, delete e.autoTransferLink, [];
 },
 handleCategoryData: function(e) {
 var t = [];
@@ -10774,7 +12240,7 @@ rep_acctId: e.account,
 rep_linkedAcctId: e.linkedAccount,
 rep_autoTrsnLink: t > 0 && n >= 0 ? 1 : 0,
 last_sync: "",
-maxItemId: Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.itemId + 2 : e.itemId + 1,
+maxItemId: GTS.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.itemId + 2 : e.itemId + 1,
 autoTransfer: t,
 autoTransferLink: n
 };
@@ -10839,7 +12305,7 @@ category2: "",
 rObj: !1,
 autoTransfer: e[a]["rep_autoTrsnLink"] == 1 ? e[a].autoTransfer : 0,
 autoTransferLink: e[a]["rep_autoTrsnLink"] == 1 ? e[a].autoTransferLink : -1
-}, Object.validNumber(e[a].rep_linkedAcctId) && e[a].rep_linkedAcctId >= 0 ? u = "transfer" : e[a].rep_amount < 0 ? u = "expense" : u = "income", t = t.concat(this.generateInsertTransactionSQL(i, u)), o++, n += Object.validNumber(e[a].linkedAccount) && e[a].linkedAccount >= 0 ? 2 : 1;
+}, GTS.Object.validNumber(e[a].rep_linkedAcctId) && e[a].rep_linkedAcctId >= 0 ? u = "transfer" : e[a].rep_amount < 0 ? u = "expense" : u = "income", t = t.concat(this.generateInsertTransactionSQL(i, u)), o++, n += GTS.Object.validNumber(e[a].linkedAccount) && e[a].linkedAccount >= 0 ? 2 : 1;
 }
 t.push(Checkbook.globals.gts_db.getUpdate("repeats", {
 lastOccurrence: Date.parse(s),
@@ -10871,7 +12337,7 @@ values: [ e, e ]
 },
 fetchTransaction: function(e, t) {
 var n = new GTS.databaseQuery({
-sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE main.itemId = ? LIMIT 1;',
+sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE main.itemId = ? LIMIT 1;',
 values: [ e ]
 });
 Checkbook.globals.gts_db.query(n, {
@@ -10883,7 +12349,7 @@ onError: t.onError
 },
 fetchTransactions: function(e, t, n, r) {
 var i = new GTS.databaseQuery({
-sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE account = ? ORDER BY ' + e.sortQry,
+sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE account = ? ORDER BY ' + e.sortQry,
 values: [ e.acctId ]
 });
 n && (i.sql += " LIMIT ?", i.values.push(n)), r && (i.sql += " OFFSET ?", i.values.push(r)), Checkbook.globals.gts_db.query(i, {
@@ -10908,7 +12374,7 @@ onError: t.onError
 },
 searchTransactions: function(e, t, n, r, i, s) {
 var o = new GTS.databaseQuery({
-sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, ( SELECT accts.acctName FROM accounts accts WHERE accts.acctId = main.account ) AS acctName, ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) AS acctCategory,IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) ), \'icon_2.png\' ) AS acctCategoryIcon,  ( SELECT accts.showTransTime FROM accounts accts WHERE accts.acctId = main.account ) AS showTransTime, ( SELECT accts.enableCategories FROM accounts accts WHERE accts.acctId = main.account ) AS enableCategories, ( SELECT accts.checkField FROM accounts accts WHERE accts.acctId = main.account ) AS checkField, ( SELECT accts.hideNotes FROM accounts accts WHERE accts.acctId = main.account ) AS hideNotes, ( SELECT accts.frozen FROM accounts accts WHERE accts.acctId = main.account ) AS frozen, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE ' + e + " ORDER BY " + n,
+sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee, ( SELECT accts.acctName FROM accounts accts WHERE accts.acctId = main.account ) AS acctName, ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) AS acctCategory,IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) ), \'icon_2.png\' ) AS acctCategoryIcon,  ( SELECT accts.showTransTime FROM accounts accts WHERE accts.acctId = main.account ) AS showTransTime, ( SELECT accts.enableCategories FROM accounts accts WHERE accts.acctId = main.account ) AS enableCategories, ( SELECT accts.checkField FROM accounts accts WHERE accts.acctId = main.account ) AS checkField, ( SELECT accts.hideNotes FROM accounts accts WHERE accts.acctId = main.account ) AS hideNotes, ( SELECT accts.frozen FROM accounts accts WHERE accts.acctId = main.account ) AS frozen, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE ' + e + " ORDER BY " + n,
 values: enyo.clone(t)
 });
 i && (o.sql += " LIMIT ?", o.values.push(i)), s && (o.sql += " OFFSET ?", o.values.push(s)), Checkbook.globals.gts_db.query(o, r);
@@ -10947,7 +12413,7 @@ sortGroup: n.sortGroup
 enyo.isFunction(e.onSuccess) && e.onSuccess();
 },
 fetchMaxCheckNumber: function(e, t) {
-if (!Object.isNumber(e)) {
+if (!GTS.Object.isNumber(e)) {
 this.log("No account number specified."), enyo.isFunction(t.onError) && t.onError("No account specified");
 return;
 }
@@ -11045,18 +12511,21 @@ classes: "text-center",
 fit: !0,
 components: [ {
 name: "addIncomeButton",
-kind: "onyx.Checkbox",
-onchange: "addIncome",
+kind: "onyx.IconButton",
+src: "assets/menu_icons/income.png",
+ontap: "addIncome",
 classes: "income margin-half-left margin-half-right"
 }, {
 name: "addTransferButton",
-kind: "onyx.Checkbox",
-onchange: "addTransfer",
+kind: "onyx.IconButton",
+src: "assets/menu_icons/transfer.png",
+ontap: "addTransfer",
 classes: "transfer margin-half-left margin-half-right"
 }, {
 name: "addExpenseButton",
-kind: "onyx.Checkbox",
-onchange: "addExpense",
+kind: "onyx.IconButton",
+src: "assets/menu_icons/expense.png",
+ontap: "addExpense",
 classes: "expense margin-half-left margin-half-right"
 } ]
 }, {
@@ -11163,7 +12632,12 @@ onSuccess: enyo.bind(this, this.balanceChangedHandler, e)
 });
 return;
 }
-this.account.balance0 = prepAmount(t.balance0), this.account.balance1 = prepAmount(t.balance1), this.account.balance2 = prepAmount(t.balance2), this.account.balance3 = prepAmount(t.balance3), this.renderBalanceButton(), e["account"] == this.account["acctId"] ? e.accountBal = [ this.account.balance0, this.account.balance1, this.account.balance2, this.account.balance3 ] : e.accountBal = [];
+this.account.balance0 = prepAmount(t.balance0), this.account.balance1 = prepAmount(t.balance1), this.account.balance2 = prepAmount(t.balance2), this.account.balance3 = prepAmount(t.balance3), this.renderBalanceButton(), e["account"] == this.account["acctId"] ? e.accountBal = {
+balance0: this.account.balance0,
+balance1: this.account.balance1,
+balance2: this.account.balance2,
+balance3: this.account.balance3
+} : e.accountBal = {};
 if (typeof e.sendSignal != "undefined" && e.sendSignal === !1) return;
 enyo.Signals.send("accountBalanceChanged", {
 accounts: e
@@ -11227,7 +12701,7 @@ functionSelected: function(e, t) {
 this.log(t.selected);
 },
 newTransaction: function(e) {
-this.$["add" + e + "Button"].getChecked() && !(this.$.addIncomeButton.getDisabled() || this.$.addTransferButton.getDisabled() || this.$.addExpenseButton.getDisabled()) && (this.toggleCreateButtons(), enyo.Signals.send("modifyTransaction", {
+this.$.addIncomeButton.getDisabled() || this.$.addTransferButton.getDisabled() || this.$.addExpenseButton.getDisabled() || (this.toggleCreateButtons(), enyo.Signals.send("modifyTransaction", {
 name: "createTransaction",
 kind: "Checkbook.transactions.modify",
 accountObj: this.account,
@@ -11237,12 +12711,10 @@ onFinish: enyo.bind(this, this.addTransactionComplete)
 }));
 },
 addTransactionComplete: function(e, t) {
-this.toggleCreateButtons();
-var n = t.modifyStatus;
-delete t.modifyStatus, n === 1 && (this.balanceChangedHandler(t), this.account.itemCount++, this.$.entries.reloadSystem());
+this.toggleCreateButtons(), t.modifyStatus === 1 && (delete t.modifyStatus, this.balanceChangedHandler(t), this.account.itemCount++, this.$.entries.reloadSystem());
 },
 toggleCreateButtons: function() {
-this.$.addIncomeButton.getDisabled() ? (this.$.addIncomeButton.setChecked(!1), this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setChecked(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setChecked(!1), this.$.addExpenseButton.setDisabled(!1)) : (this.$.addIncomeButton.setChecked(!0), this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setChecked(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setChecked(!0), this.$.addExpenseButton.setDisabled(!0));
+this.$.addIncomeButton.getDisabled() ? (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1)) : (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0));
 }
 });
 
@@ -11255,9 +12727,11 @@ account: {},
 components: [ {
 name: "list",
 kind: "GTS.LazyList",
+fit: !0,
 classes: "checkbook-stamp enyo-fit",
 onSetupItem: "transactionBuildRow",
 onAcquirePage: "transactionFetchGroup",
+aboveComponents: [],
 components: [ {
 name: "transactionWrapper",
 kind: "onyx.Item",
@@ -11300,10 +12774,17 @@ allowHtml: !0
 name: "checkNum",
 classes: "smaller"
 }, {
+name: "payee",
+classes: "smaller"
+}, {
 name: "note",
 classes: "smaller",
 allowHtml: !0
 } ]
+} ],
+belowComponents: [ {
+content: "&nbsp;",
+allowHtml: !0
 } ]
 }, {
 name: "transactonMenu",
@@ -11412,17 +12893,17 @@ if (r) {
 this.$.transactionWrapper.addRemoveClass("alt-row", n % 2 === 0), this.$.transactionWrapper.addRemoveClass("norm-row", n % 2 !== 0), this.$.desc.setContent(r.desc);
 var i = new Date(parseInt(r.date));
 this.$.time.setContent(i.format({
-date: enyo.Panels.isScreenNarrow() ? "shortDate" : "longDate",
-time: this.account.showTransTime === 1 ? "shortTime" : ""
+date: enyo.Panels.isScreenNarrow() ? "short" : "long",
+time: this.account.showTransTime === 1 ? "short" : ""
 }));
 var s = new Date;
-this.account.showTransTime !== 1 && s.setHours(23, 59, 59, 999), this.$.transactionWrapper.addRemoveClass("futureTransaction", r.date > Date.parse(s)), this.$.amount.setContent(formatAmount(r.amount)), r.dispRunningBalance ? (this.$.runningBal.setContent(formatAmount(r.runningBalance)), this.$.runningBal.addRemoveClass("positiveBalance", r.runningBalance > 0), this.$.runningBal.addRemoveClass("negativeBalance", r.runningBalance < 0), this.$.runningBal.addRemoveClass("neutralBalance", r["runningBalance"] == 0), this.$.amount.setClassAttribute("")) : (this.$.runningBal.setContent(""), this.$.amount.addRemoveClass("positiveBalance", r.amount > 0), this.$.amount.addRemoveClass("negativeBalance", r.amount < 0), this.$.amount.addRemoveClass("neutralBalance", r["amount"] == 0)), this.$.cleared.addRemoveClass("checked", r.cleared === 1), this.account.enableCategories === 1 ? (this.$.category.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(r.category, r.category2, !0, "smaller"))) : this.$.category.hide(), this.$.checkNum.setContent(this.account.checkField === 1 && r.checkNum && r.checkNum !== "" ? "Check #" + r.checkNum : ""), this.$.note.setContent(this.account.hideNotes === 1 ? "" : r.note);
+this.account.showTransTime !== 1 && s.setHours(23, 59, 59, 999), this.$.transactionWrapper.addRemoveClass("futureTransaction", r.date > Date.parse(s)), this.$.amount.setContent(formatAmount(r.amount)), r.dispRunningBalance ? (this.$.runningBal.setContent(formatAmount(r.runningBalance)), this.$.runningBal.addRemoveClass("positiveBalance", r.runningBalance > 0), this.$.runningBal.addRemoveClass("negativeBalance", r.runningBalance < 0), this.$.runningBal.addRemoveClass("neutralBalance", r["runningBalance"] == 0), this.$.amount.setClassAttribute("")) : (this.$.runningBal.setContent(""), this.$.amount.addRemoveClass("positiveBalance", r.amount > 0), this.$.amount.addRemoveClass("negativeBalance", r.amount < 0), this.$.amount.addRemoveClass("neutralBalance", r["amount"] == 0)), this.$.cleared.addRemoveClass("checked", r.cleared === 1), this.account.enableCategories === 1 ? (this.$.category.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(r.category, r.category2, !0, "smaller"))) : this.$.category.hide(), this.$.checkNum.setContent(this.account.checkField === 1 && r.checkNum && r.checkNum !== "" ? "Check #" + r.checkNum : ""), this.$.payee.setContent(this.account.payeeField === 1 && r.payee && r.payee !== "" ? "Payee: " + r.payee : ""), this.$.note.setContent((this.account.hideNotes === 1 ? "" : r.note).replace(/\n/g, "<br />"));
 var o = r.linkedRecord && !isNaN(r.linkedRecord) && r["linkedRecord"] != "", u = r.repeatId && !isNaN(r.repeatId) && r["repeatId"] != "";
 return this.$.mainBody.addRemoveClass("repeatTransferIcon", o && u), this.$.mainBody.addRemoveClass("transferIcon", o && !u), this.$.mainBody.addRemoveClass("repeatIcon", !o && u), !0;
 }
 },
 transactionFetchGroup: function(e, t) {
-this.log(), t.pageSize = 50;
+this.log(e, "|", t);
 var n = t.page * t.pageSize;
 if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
 if (n < 0) return !1;
@@ -11447,7 +12928,7 @@ this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.init
 duplicateTransaction: function(e) {
 this.log(), this.toggleCreateButtons();
 var t, n = enyo.clone(this.transactions[e]);
-Object.validNumber(n.linkedRecord) && n.linkedRecord >= 0 ? t = "transfer" : n.amount < 0 ? t = "expense" : t = "income", delete n.date, delete n.itemId, delete n.linkedRecord, delete n.repeatId, delete n.cleared, enyo.Signals.send("modifyTransaction", {
+GTS.Object.validNumber(n.linkedRecord) && n.linkedRecord >= 0 ? t = "transfer" : n.amount < 0 ? t = "expense" : t = "income", delete n.date, delete n.itemId, delete n.linkedRecord, delete n.repeatId, delete n.cleared, enyo.Signals.send("modifyTransaction", {
 name: "createTransaction",
 kind: "Checkbook.transactions.modify",
 accountObj: this.account,
@@ -11457,7 +12938,7 @@ onFinish: enyo.bind(this, this.addTransactionComplete)
 });
 },
 transactiontapped: function(e, t) {
-return this.log(), Checkbook.globals.prefs.transPreview === 1 ? (this.$.viewSingle.setIndex(t.rowIndex), this.$.viewSingle.setTransaction(this.transactions[t.rowIndex]), this.$.viewSingle.setAccount(this.account), this.$.viewSingle.show()) : this.vsEdit(null, t), !0;
+return Checkbook.globals.prefs.transPreview === 1 ? (this.$.viewSingle.setIndex(t.rowIndex), this.$.viewSingle.setTransaction(this.transactions[t.rowIndex]), this.$.viewSingle.setAccount(this.account), enyo.asyncMethod(this.$.viewSingle, this.$.viewSingle.show)) : enyo.asyncMethod(this, this.vsEdit, null, t), !0;
 },
 vsEdit: function(e, t) {
 this.log(), this.account.frozen !== 1 && enyo.Signals.send("modifyTransaction", {
@@ -11470,7 +12951,7 @@ onFinish: enyo.bind(this, this.modifyTransactionComplete, t.rowIndex)
 });
 },
 modifyTransactionComplete: function(e, t, n) {
-this.log(), this.log(arguments);
+this.log();
 var r = n.modifyStatus;
 delete n.modifyStatus, r === 1 ? (enyo.Signals.send("accountBalanceChanged", {
 accounts: n
@@ -11491,7 +12972,6 @@ transactionCleared: function(e, t) {
 return this.log(), this.vsCleared(null, t), t.preventDefault(), !0;
 },
 vsCleared: function(e, t) {
-this.log();
 var n = t.rowIndex;
 if (!this.transactions[n]) return;
 if (this.account.frozen === 1) {
@@ -11528,7 +13008,9 @@ var i = this.transactions[n].amount;
 this.transactions.splice(n, 1);
 if (this.account.runningBalance === 1 && (this.account.sort === 0 || this.account.sort === 1 || this.account.sort === 6 || this.account.sort === 7 || this.account.sort === 8)) {
 if (n === 0) {
-this.reloadTransactionList();
+enyo.Signals.send("accountBalanceChanged", {
+accounts: r
+}), this.reloadTransactionList();
 return;
 }
 var s = n > this.$.list.getPageSize() ? n - this.$.list.getPageSize() : 0, o = n + this.$.list.getPageSize() < this.transactions.length ? n + this.$.list.getPageSize() : this.transactions.length, u = s, a = this.transactions[u].runningBalance - i;
@@ -11672,6 +13154,18 @@ content: "check number",
 classes: "label"
 } ]
 }, {
+name: "payeeHolder",
+kind: "enyo.FittableColumns",
+noStretch: !0,
+classes: "bordered padding-std text-middle",
+components: [ {
+name: "payee",
+fit: !0
+}, {
+content: "payee",
+classes: "label"
+} ]
+}, {
 name: "cleared",
 kind: "GTS.ToggleBar",
 classes: "bordered",
@@ -11737,7 +13231,6 @@ t <= 5 ? Checkbook.globals.accountManager.fetchAccount(this.account.acctId, {
 onSuccess: enyo.bind(this, this.loadAccount, r)
 }) : this.renderDisplay(r);
 } else this.inherited(arguments);
-this.reflow();
 },
 reflow: function() {
 this.log(), this.$.scroller.applyStyle("height", null), this.inherited(arguments), this.$.scroller.applyStyle("height", this.$.scroller.getBounds().height + "px");
@@ -11754,25 +13247,24 @@ loadAccount: function(e, t) {
 this.log(), this.account = t, this.renderDisplay(e);
 },
 renderDisplay: function(e) {
-this.log(), this.account.frozen === 1 ? (this.$.btnEdit.hide(), this.$.btnDelete.hide()) : (this.$.btnEdit.show(), this.$.btnDelete.show()), this.$.desc.addRemoveClass("custom-background legend " + this.account.acctCategoryColor, Checkbook.globals.prefs.dispColor === 1), this.$.desc.setContent(this.transaction.desc), Object.isNumber(this.transaction.linkedRecord) && this.transaction.linkedRecord >= 0 ? this.transactionType = "transfer" : this.transaction.amount < 0 ? this.transactionType = "expense" : this.transactionType = "income", this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.$.amount.setContent(formatAmount(Math.abs(this.transaction.amount))), this.transactionType === "transfer" ? (this.$.fromAccountHolder.show(), this.$.toAccountHolder.show(), this.transaction.amount < 0 ? (this._binds.renderFromAccount(this.account), Checkbook.globals.accountManager.fetchAccount(this.transaction.linkedAccount, {
+this.log(), this.account.frozen === 1 ? (this.$.btnEdit.hide(), this.$.btnDelete.hide()) : (this.$.btnEdit.show(), this.$.btnDelete.show()), this.$.desc.addRemoveClass("custom-background legend " + this.account.acctCategoryColor, Checkbook.globals.prefs.dispColor === 1), this.$.desc.setContent(this.transaction.desc), GTS.Object.isNumber(this.transaction.linkedRecord) && this.transaction.linkedRecord >= 0 ? this.transactionType = "transfer" : this.transaction.amount < 0 ? this.transactionType = "expense" : this.transactionType = "income", this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.$.amount.setContent(formatAmount(Math.abs(this.transaction.amount))), this.transactionType === "transfer" ? (this.$.fromAccountHolder.show(), this.$.toAccountHolder.show(), this.transaction.amount < 0 ? (this._binds.renderFromAccount(this.account), Checkbook.globals.accountManager.fetchAccount(this.transaction.linkedAccount, {
 onSuccess: this._binds.renderToAccount
 })) : (Checkbook.globals.accountManager.fetchAccount(this.transaction.linkedAccount, {
 onSuccess: this._binds.renderFromAccount
 }), this._binds.renderToAccount(this.account))) : (this.$.fromAccountHolder.hide(), this.$.toAccountHolder.hide());
 var t = new Date(parseInt(this.transaction.date));
 this.$.time.setContent(t.format({
-date: "longDate",
-time: this.account.showTransTime === 1 ? "shortTime" : ""
-})), this.account.enableCategories === 1 ? (this.$.categoryHolder.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(this.transaction.category, this.transaction.category2, !1, ""))) : this.$.categoryHolder.hide(), this.account.checkField === 1 && this.transaction.checkNum && this.transaction.checkNum !== "" ? (this.$.checkNumHolder.show(), this.$.checkNum.setContent("#" + this.transaction.checkNum)) : (this.$.checkNumHolder.hide(), this.$.checkNum.setContent("")), this.$.cleared.setValue(this.transaction["cleared"] == 1), this.transaction["note"] != "" ? (this.$.noteHolder.show(), this.$.note.setContent(this.transaction.note)) : this.$.noteHolder.hide(), e();
+date: "long",
+time: this.account.showTransTime === 1 ? "short" : ""
+})), this.account.enableCategories === 1 ? (this.$.categoryHolder.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(this.transaction.category, this.transaction.category2, !1, ""))) : this.$.categoryHolder.hide(), this.account.checkField === 1 && this.transaction.checkNum && this.transaction.checkNum !== "" ? (this.$.checkNumHolder.show(), this.$.checkNum.setContent("#" + this.transaction.checkNum)) : (this.$.checkNumHolder.hide(), this.$.checkNum.setContent("")), this.$.cleared.setValue(this.transaction["cleared"] == 1), this.account.payeeField === 1 && this.transaction.payee && this.transaction.payee !== "" ? (this.$.payeeHolder.show(), this.$.payee.setContent(this.transaction.payee)) : this.$.payeeHolder.hide(), this.transaction["note"] != "" ? (this.$.noteHolder.show(), this.$.note.setContent(this.transaction.note.replace(/\n/g, "<br />"))) : this.$.noteHolder.hide(), e();
 },
 renderFromAccount: function(e) {
-this.log(), this.$.fromAccountImg.setSrc("assets/" + e.acctCategoryIcon), this.$.fromAccount.setContent(e.acctName), Checkbook.globals.prefs.dispColor === 1 ? this.$.fromAccountHolder.addClass(e.acctCategoryColor) : this.$.fromAccountHolder.removeClass("custom-background");
+this.$.fromAccountImg.setSrc("assets/" + e.acctCategoryIcon), this.$.fromAccount.setContent(e.acctName), Checkbook.globals.prefs.dispColor === 1 ? this.$.fromAccountHolder.addClass(e.acctCategoryColor) : this.$.fromAccountHolder.removeClass("custom-background");
 },
 renderToAccount: function(e) {
-this.log(), this.$.toAccountImg.setSrc("assets/" + e.acctCategoryIcon), this.$.toAccount.setContent(e.acctName), Checkbook.globals.prefs.dispColor === 1 ? this.$.toAccountHolder.addClass(e.acctCategoryColor) : this.$.toAccountHolder.removeClass("custom-background");
+this.$.toAccountImg.setSrc("assets/" + e.acctCategoryIcon), this.$.toAccount.setContent(e.acctName), Checkbook.globals.prefs.dispColor === 1 ? this.$.toAccountHolder.addClass(e.acctCategoryColor) : this.$.toAccountHolder.removeClass("custom-background");
 },
 clearToggled: function() {
-this.log();
 var e = this.doClear({
 rowIndex: this.index,
 callback: enyo.bind(this, this.clearToggledHandler)
@@ -11780,15 +13272,15 @@ callback: enyo.bind(this, this.clearToggledHandler)
 return !0;
 },
 clearToggledHandler: function(e) {
-return this.log(), this.$.cleared.setValue(e), !0;
+return this.$.cleared.setValue(e), !0;
 },
 editClicked: function() {
-this.log(), this.doEdit({
+this.doEdit({
 rowIndex: this.index
 }), enyo.asyncMethod(this, this.hide);
 },
 deleteClicked: function() {
-this.log(), this.createComponent({
+this.createComponent({
 name: "deleteTransactionConfirm",
 kind: "gts.ConfirmDialog",
 title: "Delete Transaction",
@@ -11802,10 +13294,10 @@ onCancel: "deleteTransactionConfirmClose"
 }), this.hide(!0), this.$.deleteTransactionConfirm.show();
 },
 deleteTransactionConfirmClose: function() {
-this.log(), this.$.deleteTransactionConfirm.destroy(), this.show(!0);
+this.$.deleteTransactionConfirm.hide(), this.$.deleteTransactionConfirm.destroy(), this.show(!0);
 },
 deleteTransactionHandler: function() {
-this.log(), this.deleteTransactionConfirmClose(), this.doDelete({
+this.deleteTransactionConfirmClose(), this.doDelete({
 rowIndex: this.index
 }), enyo.asyncMethod(this, this.hide);
 }
@@ -11917,19 +13409,7 @@ classes: "arrow"
 }, {
 name: "dateDrawer",
 kind: "onyx.Drawer",
-open: !1,
-components: [ {
-name: "date",
-kind: "GTS.DatePicker",
-onChange: "dateChanged",
-components: [ {
-name: "time",
-kind: "GTS.TimePicker",
-minuteInterval: 5,
-is24HrMode: !1,
-label: "Time"
-} ]
-} ]
+open: !1
 } ]
 }, {
 name: "categoryHolder",
@@ -11945,20 +13425,20 @@ kind: "enyo.Repeater",
 onSetupItem: "getCategoryItem",
 classes: "transaction-category-list",
 components: [ {
-kind: "enyo.FittableColumns",
-classes: "onyx-item text-middle bordered",
+name: "categoryWrapper",
+classes: "onyx-item text-middle bordered h-box",
 components: [ {
 name: "categoryText",
-classes: "margin-right",
-fit: !0,
+kind: "onyx.Button",
+classes: "margin-right box-flex",
 ontap: "categoryTapped"
 }, {
 name: "categoryItemBreak",
 tag: "br"
 }, {
+components: [ {
 kind: "onyx.InputDecorator",
-classes: "margin-right",
-style: "display: inline-block;",
+classes: "inline-force margin-right",
 components: [ {
 name: "categoryAmount",
 kind: "GTS.DecimalInput",
@@ -11968,9 +13448,10 @@ placeholder: "0.00"
 }, {
 name: "categoryDelete",
 kind: "onyx.Button",
-content: "-",
 classes: "small-padding",
+content: "-",
 ontap: "categoryDelete"
+} ]
 } ]
 } ]
 }, {
@@ -12053,6 +13534,24 @@ ontap: "autofillCheckNo"
 } ]
 } ]
 }, {
+name: "payeeFieldHolder",
+kind: "onyx.Groupbox",
+classes: "padding-half-top padding-half-bottom",
+components: [ {
+kind: "onyx.InputDecorator",
+layoutKind: "FittableColumnsLayout",
+noStretch: !0,
+classes: "padding-half-top",
+components: [ {
+name: "payeeField",
+kind: "onyx.Input",
+fit: !0
+}, {
+content: "Payee",
+classes: "label"
+} ]
+} ]
+}, {
 name: "cleared",
 kind: "GTS.ToggleBar",
 classes: "bordered",
@@ -12120,15 +13619,53 @@ kind: "onyx.Scrim",
 classes: "onyx-scrim-translucent"
 }, {
 name: "loadingSpinner",
-kind: "jmtk.Spinner",
-color: "#272D70",
-diameter: "90",
-shape: "spiral",
-style: "z-index: 2; position: absolute; width: 90px; height: 90px; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+kind: "onyx.Spinner",
+classes: "size-double",
+style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 }, {
 name: "categorySystem",
 kind: "Checkbook.transactionCategory.select"
 } ],
+create: function() {
+this.inherited(arguments), this.buildDateSystem();
+},
+buildDateSystem: function() {
+enyo.Panels.isScreenNarrow() ? this.$.dateDrawer.createComponents([ {
+classes: "onyx-toolbar-inline",
+components: [ {
+name: "label",
+classes: "label",
+content: "Date"
+}, {
+name: "date",
+kind: "onyx.DatePicker",
+onSelect: "dateChanged"
+} ]
+}, {
+name: "time",
+kind: "GTS.TimePicker",
+label: "Time",
+minuteInterval: 5,
+is24HrMode: !1,
+onSelect: "dateChanged"
+} ], {
+owner: this
+}) : this.$.dateDrawer.createComponent({
+name: "date",
+kind: "GTS.DatePicker",
+onSelect: "dateChanged",
+components: [ {
+name: "time",
+kind: "GTS.TimePicker",
+label: "Time",
+minuteInterval: 5,
+is24HrMode: !1,
+onSelect: "dateChanged"
+} ]
+}, {
+owner: this
+});
+},
 rendered: function() {
 this.inherited(arguments), this.$.loadingScrim.show(), this.$.loadingSpinner.show(), delete this.trsnObj.dispRunningBalance, delete this.trsnObj.runningBalance, this.trsnObj = enyo.mixin({
 itemId: -1,
@@ -12144,7 +13681,8 @@ cleared: 0,
 repeatId: -1,
 checkNum: "",
 category: "Uncategorized",
-category2: "Other"
+category2: "Other",
+payee: ""
 }, this.trsnObj), this.trsnObj.itemId < 0 ? (this.$.transTypeText.setContent("New Transaction"), this.$.transactionDeleteButton.hide()) : this.$.transTypeText.setContent("Modify Transaction"), Checkbook.globals.accountManager.fetchAccountsList({
 onSuccess: enyo.bind(this, this.buildAccountSystems)
 });
@@ -12161,12 +13699,12 @@ initialAccountLoadHandler: function(e) {
 this.$.account.removeClass(this.accountObj.acctCategoryColor), this.accountObj = e, this.$.categorySystem.loadCategories(enyo.bind(this, this.loadTransactionData));
 },
 loadTransactionData: function() {
-this.log(), Object.validNumber(this.trsnObj.amount) && (this.trsnObj.amount_old = this.trsnObj.amount), this.trsnObj.itemId >= 0 && (Object.validNumber(this.trsnObj.linkedRecord) && this.trsnObj.linkedRecord >= 0 ? this.transactionType = "transfer" : this.trsnObj.amount < 0 ? this.transactionType = "expense" : this.transactionType = "income"), this.trsnObj.amount = Math.abs(this.trsnObj.amount).toFixed(2), this.trsnObj.date = new Date(parseInt(this.trsnObj.date)), this.trsnObj.cleared = this.trsnObj.cleared === 1, this.$.desc.setValue(this.trsnObj.desc), this.$.amount.setValue(this.trsnObj.amount), this.$.account.setValue(this.trsnObj.account), this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.$.date.setValue(this.trsnObj.date), this.$.time.setValue(this.trsnObj.date), this.$.checkNum.setValue(this.trsnObj.checkNum), this.$.cleared.setValue(this.trsnObj.cleared), this.$.notes.setValue(this.trsnObj.note), this.trsnObj.category = Checkbook.globals.transactionManager.parseCategoryDB(this.trsnObj.category, this.trsnObj.category2), this.renderCategories = !0, this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.adjustSystemViews(), this.dateChanged(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.reflow();
+this.log(), GTS.Object.validNumber(this.trsnObj.amount) && (this.trsnObj.amount_old = this.trsnObj.amount), this.trsnObj.itemId >= 0 && (GTS.Object.validNumber(this.trsnObj.linkedRecord) && this.trsnObj.linkedRecord >= 0 ? this.transactionType = "transfer" : this.trsnObj.amount < 0 ? this.transactionType = "expense" : this.transactionType = "income"), this.trsnObj.amount = Math.abs(this.trsnObj.amount).toFixed(2), this.trsnObj.date = new Date(parseInt(this.trsnObj.date)), this.trsnObj.cleared = this.trsnObj.cleared === 1, this.$.desc.setValue(this.trsnObj.desc), this.$.amount.setValue(this.trsnObj.amount), this.$.account.setValue(this.trsnObj.account), this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.$.date.setValue(this.trsnObj.date), this.$.time.setValue(this.trsnObj.date), this.$.checkNum.setValue(this.trsnObj.checkNum), this.$.payeeField.setValue(this.trsnObj.payee), this.$.cleared.setValue(this.trsnObj.cleared), this.$.notes.setValue(this.trsnObj.note), this.trsnObj.category = Checkbook.globals.transactionManager.parseCategoryDB(this.trsnObj.category, this.trsnObj.category2), this.renderCategories = !0, this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.adjustSystemViews(), this.dateChanged(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.reflow();
 },
 adjustSystemViews: function() {
 this.$.linkedAccount.setShowing(this.transactionType === "transfer"), this.$.autocomplete.setEnabled(this.accountObj.useAutoComplete === 1), this.$.autoTrans.setShowing(this.trsnObj.itemId < 0 && this.transactionType !== "transfer" && this.accountObj.auto_savings > 0 && this.accountObj.auto_savings_link > -1), this.accountObj["atmEntry"] == 1 ? (this.$.amount.setAtm(!0), this.$.amount.setSelectAllOnFocus(!1)) : (this.$.amount.setAtm(!1), this.$.amount.setSelectAllOnFocus(!0)), this.accountObj["enableCategories"] == 1 ? (this.categoryChanged(), this.$.categoryHolder.show()) : this.$.categoryHolder.hide(), this.accountObj["checkField"] == 1 ? (this.$.checkNumHolder.show(), Checkbook.globals.transactionManager.fetchMaxCheckNumber(this.$.account.getValue(), {
 onSuccess: enyo.bind(this, this.adjustMaxCheckNumber)
-})) : this.$.checkNumHolder.hide(), Checkbook.globals.prefs.dispColor === 1 ? (this.$.account.addClass(this.accountObj.acctCategoryColor), this.$.linkedAccount.getDisabled() || Checkbook.globals.accountManager.fetchAccount(this.$.linkedAccount.getValue(), {
+})) : this.$.checkNumHolder.hide(), this.accountObj["payeeField"] == 1 ? this.$.payeeFieldHolder.show() : this.$.payeeFieldHolder.hide(), Checkbook.globals.prefs.dispColor === 1 ? (this.$.account.addClass(this.accountObj.acctCategoryColor), this.$.linkedAccount.getDisabled() || Checkbook.globals.accountManager.fetchAccount(this.$.linkedAccount.getValue(), {
 onSuccess: enyo.bind(this, this.linkedAccountChangedFollower, "set")
 })) : (this.$.account.removeClass("custom-background"), this.$.linkedAccount.removeClass("custom-background")), this.$.desc.focus();
 },
@@ -12211,15 +13749,15 @@ this.$.dateArrow.addRemoveClass("invert", !this.$.dateDrawer.getOpen()), this.$.
 },
 dateChanged: function(e, t) {
 var n = this.$.date.getValue(), r = this.$.time.getValue();
-n.setHours(r.getHours()), n.setMinutes(r.getMinutes()), this.$.dateDisplay.setContent(n.format({
-date: "longDate",
-time: this.accountObj.showTransTime === 1 ? "shortTime" : ""
-}));
+return n.setHours(r.getHours()), n.setMinutes(r.getMinutes()), this.$.dateDisplay.setContent(n.format({
+date: "long",
+time: this.accountObj.showTransTime === 1 ? "short" : ""
+})), !0;
 },
 getCategoryItem: function(e, t) {
 if (!this.renderCategories) return;
 var n = this.trsnObj.category[t.index], r = t.item;
-if (n && r) return r.$.categoryItemBreak.setShowing(enyo.Panels.isScreenNarrow()), r.$.categoryText.setContent(n.category + " >> " + GTS.String.dirtyString(n.category2)), this.trsnObj.category.length > 1 ? (n.amount = Math.abs(n.amount).toFixed(2), this.accountObj["atmEntry"] == 1 ? (r.$.categoryAmount.setValue(deformatAmount(n.amount)), r.$.categoryAmount.setAtm(!0), r.$.categoryAmount.setSelectAllOnFocus(!1)) : (r.$.categoryAmount.setAtm(!1), r.$.categoryAmount.setSelectAllOnFocus(!0)), r.$.categoryAmount.setDisabled(!1), r.$.categoryDelete.setDisabled(!1)) : (r.$.categoryAmount.setDisabled(!0), r.$.categoryDelete.setDisabled(!0), n.amount = 0), !0;
+if (n && r) return r.$.categoryWrapper.addRemoveClass("h-box", !enyo.Panels.isScreenNarrow()), r.$.categoryItemBreak.setShowing(enyo.Panels.isScreenNarrow()), r.$.categoryText.setContent(n.category + " >> " + GTS.String.dirtyString(n.category2)), r.$.categoryText.addRemoveClass("margin-half-bottom", enyo.Panels.isScreenNarrow()), r.$.categoryText.addRemoveClass("full-width", enyo.Panels.isScreenNarrow()), this.trsnObj.category.length > 1 ? (n.amount = Math.abs(n.amount).toFixed(2), this.accountObj["atmEntry"] == 1 ? (r.$.categoryAmount.setValue(deformatAmount(n.amount)), r.$.categoryAmount.setAtm(!0), r.$.categoryAmount.setSelectAllOnFocus(!1)) : (r.$.categoryAmount.setAtm(!1), r.$.categoryAmount.setSelectAllOnFocus(!0)), r.$.categoryAmount.setDisabled(!1), r.$.categoryDelete.setDisabled(!1), r.$.categoryDelete.addClass("onyx-negative")) : (r.$.categoryAmount.setDisabled(!0), r.$.categoryDelete.setDisabled(!0), r.$.categoryDelete.removeClass("onyx-negative"), n.amount = 0), !0;
 },
 categoryTapped: function(e, t) {
 this.$.categorySystem.getCategoryChoice(enyo.bind(this, this.categorySelected, t.index), this.trsnObj.category[t.index]);
@@ -12269,7 +13807,7 @@ this.accountObj["checkField"] == 1 && this.$.checkNum.getValue().length <= 0 && 
 saveTransaction: function() {
 this.trsnObj.desc = this.$.desc.getValue(), this.trsnObj.amount = this.$.amount.getValue(), this.trsnObj.account = this.$.account.getValue(), this.trsnObj.linkedAccount = this.$.linkedAccount.getValue();
 var e = this.$.time.getValue();
-this.trsnObj.date = this.$.date.getValue(), this.trsnObj.date.setHours(e.getHours()), this.trsnObj.date.setMinutes(e.getMinutes()), this.trsnObj.checkNum = this.$.checkNum.getValue(), this.trsnObj.cleared = this.$.cleared.getValue(), this.trsnObj.note = this.$.notes.getValue(), this.trsnObj.rObj = {
+this.trsnObj.date = this.$.date.getValue(), this.trsnObj.date.setHours(e.getHours()), this.trsnObj.date.setMinutes(e.getMinutes()), this.trsnObj.checkNum = this.$.checkNum.getValue(), this.trsnObj.payee = this.$.payeeField.getValue(), this.trsnObj.cleared = this.$.cleared.getValue(), this.trsnObj.note = this.$.notes.getValue(), this.trsnObj.rObj = {
 pattern: "none"
 }, this.log(this.trsnObj.rObj, this.trsnObj.repeatId, this.trsnObj.repeatUnlinked), this.trsnObj.autoTransfer = this.$.autoTrans.getShowing() && this.$.autoTrans.getValue() ? this.accountObj.auto_savings : 0, this.trsnObj.autoTransferLink = this.accountObj.auto_savings_link;
 var t = {
@@ -12730,72 +14268,66 @@ name: "scroller",
 kind: "enyo.Scroller",
 horizontal: "hidden",
 classes: "light popup-scroller",
-components: [ {
-name: "categoryList",
-kind: "enyo.Repeater",
-onSetupItem: "setupRow",
-components: [ {
-name: "item",
-kind: "enyo.FittableColumns",
-classes: "onyx-item text-middle bordered",
-tapHighlight: !0,
-ontap: "rowClicked",
-components: [ {
-name: "sheetName",
-fit: !0
-}, {
-name: "arrows",
-content: ""
-} ]
-} ]
-} ]
+components: []
 } ],
+handlers: {
+onShow: "_show"
+},
+_show: function() {
+var e = this.$.scroller.getBounds();
+this.$.scroller.applyStyle("height", e.height + "px");
+},
 loadCategories: function(e) {
 Checkbook.globals.transactionCategoryManager.trsnCategories ? (this.log("transaction categories already built"), e()) : Checkbook.globals.transactionCategoryManager.load(null, {
 onSuccess: e
 }, null, null);
 },
 getCategoryChoice: function(e, t) {
-this.dispCategories = enyo.clone(Checkbook.globals.transactionCategoryManager.trsnCategories.mainCats), this.show(), this.datasetChanged(), this.doCategorySelect = e, t ? (this.selected = t, this.$.subheader.setContent(t.category + " >> " + t.category2)) : (this.selected = {
+this.dispCategories = enyo.clone(Checkbook.globals.transactionCategoryManager.trsnCategories.mainCats), this._generateTree(), this.show(), this.doCategorySelect = e, t ? (this.selected = t, this.$.subheader.setContent(t.category + " >> " + t.category2)) : (this.selected = {
 category: "",
 category2: ""
-}, this.$.subheader.setContent(""));
+}, this.$.subheader.setContent("")), this.reflow();
 },
-rowClicked: function(e, t) {
-var n = this.dispCategories[t.index];
-n && n.parent !== "|-add_edit-|" && (n.parent === "|-go_back-|" ? (this.dispCategories = enyo.clone(Checkbook.globals.transactionCategoryManager.trsnCategories.mainCats), this.datasetChanged()) : n.parent !== "" ? (enyo.isFunction(this.doCategorySelect) && this.doCategorySelect({
-category: n.parent,
-category2: n.content === "All Sub Categories" ? "%" : n.content
-}), this.hide()) : (this.dispCategories = enyo.clone(Checkbook.globals.transactionCategoryManager.trsnCategories.subCats[n.content]), this.entireGeneral && this.dispCategories.unshift({
-content: "All Sub Categories",
-parent: n.content
-}), this.dispCategories.push({
-content: "Back",
-parent: "|-go_back-|"
-}), this.datasetChanged()));
+_generateTree: function() {
+this.log(), this.$.scroller.destroyClientControls();
+var e = [], t = Checkbook.globals.transactionCategoryManager.trsnCategories.mainCats;
+for (var n = 0; n < t.length; n++) {
+var r = {
+kind: "enyo.Node",
+expandable: !0,
+expanded: !1,
+style: "padding: 0.5em;",
+classes: "padding-std bordered",
+icon: "assets/folder.png",
+content: t[n].content,
+onExpand: "nodeExpand",
+onNodeTap: "nodeTap",
+components: []
+}, i = Checkbook.globals.transactionCategoryManager.trsnCategories.subCats[t[n].content];
+for (var s = 0; s < i.length; s++) r.components.push({
+style: "padding: 0.25em;",
+classes: "padding-half-std margin-left margin-right bordered",
+icon: "assets/tag.png",
+content: i[s].content,
+parentNode: i[s].parent
+});
+e.push(r);
+}
+this.$.scroller.createComponents(e, {
+owner: this
+}), this.$.scroller.render();
 },
-datasetChanged: function() {
-this.$.categoryList.setCount(this.dispCategories.length), this.reflow();
+nodeExpand: function(e, t) {
+e.setIcon("assets/" + (e.expanded ? "folder-open.png" : "folder.png"));
 },
-reflow: function() {
-this.$.scroller.applyStyle("height", null), this.inherited(arguments), this.$.scroller.applyStyle("height", this.$.scroller.getBounds().height + "px");
+nodeTap: function(e, t) {
+return t.originator.parentNode && (enyo.isFunction(this.doCategorySelect) && this.doCategorySelect({
+category: t.originator.parentNode,
+category2: t.originator.content === "All Sub Categories" ? "%" : t.originator.content
+}), this.hide()), !0;
 },
 returnedFromView: function() {
 this.$.transactionCategoryView.hide(), this.$.transactionCategoryView.destroy(), this.datasetChanged();
-},
-setupRow: function(e, t) {
-var n = this.dispCategories[t.index], r = t.item;
-if (n && r) {
-r.$.sheetName.setContent(n.content), r.$.sheetName.addRemoveClass("positiveBalance", n.parent === "|-add_edit-|");
-if (n.parent === "|-add_edit-|") r.$.arrows.hide(); else if (n.parent === "|-go_back-|") r.$.arrows.setContent("<<"), r.$.arrows.show(); else if (n.parent !== "") {
-var i = this.selected.category2 === n.content;
-r.$.item.addRemoveClass("selected", i), r.$.item.addRemoveClass("normal", !i), r.$.arrows.hide();
-} else {
-var i = this.selected.category === n.content;
-r.$.item.addRemoveClass("selected", i), r.$.item.addRemoveClass("normal", !i), r.$.arrows.setContent(">>"), r.$.arrows.show();
-}
-return !0;
-}
 }
 });
 
@@ -13254,13 +14786,13 @@ Checkbook.globals.gts_db.query(new GTS.databaseQuery({
 sql: "SELECT DISTINCT desc FROM transactions WHERE desc LIKE ? ORDER BY desc ASC LIMIT ?;",
 values: [ t.value + "%", e.getLimit() ]
 }), {
-onSuccess: enyo.bind(this, this.buildSuggestionList, t.callback)
+onSuccess: enyo.bind(this, this.buildSuggestionList)
 });
 },
-buildSuggestionList: function(e, t) {
-var n = [];
-for (var r = 0; r < t.length; r++) n.push(t[r].desc);
-e(n);
+buildSuggestionList: function(e) {
+var t = [];
+for (var n = 0; n < e.length; n++) t.push(e[n].desc);
+this.$.ac.setValues(t);
 },
 handleSuggestion: function(e, t) {
 return Checkbook.globals.gts_db.query(new GTS.databaseQuery({
@@ -13862,7 +15394,7 @@ onError: r.onError
 });
 },
 fetchBudgets: function(e, t, n, r, i, s) {
-r = Object.validNumber(r) ? r : 0, i = Object.validNumber(i) ? i : 100, s = Object.validNumber(s) ? s : 0, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+r = GTS.Object.validNumber(r) ? r : 0, i = GTS.Object.validNumber(i) ? i : 100, s = GTS.Object.validNumber(s) ? s : 0, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
 sql: "SELECT *, ( IFNULL( ( SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) + ( IFNULL( ( SELECT ABS( SUM( ts.amount ) ) FROM transactions ex LEFT JOIN transactionSplit ts ON ts.transId = ex.itemId WHERE ts.genCat LIKE budgets.category AND ts.specCat LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) ) ) AS spent FROM budgets ORDER BY " + budgetSortOptions[r].query + " LIMIT ?" + " OFFSET ?;",
 values: [ e, t, e, t, i, s ]
 }), n);
@@ -14313,7 +15845,7 @@ renderAmount: function() {
 this.$.amount.setValue(this.budgetObj.spending_limit);
 },
 save: function() {
-this.budgetObj.spending_limit = Object.validNumber(this.$.amount.getValue()) ? 0 : Number(Number(this.$.amount.getValue()).toFixed(2));
+this.budgetObj.spending_limit = GTS.Object.validNumber(this.$.amount.getValue()) ? 0 : Number(Number(this.$.amount.getValue()).toFixed(2));
 if (this.budgetObj.spending_limit === 0) {
 this.$.errorMessage.load(null, "Spending limit must not be zero.", null, null);
 return;

@@ -12,9 +12,8 @@
 		<link href="build/enyo.css" rel="stylesheet" />
 		<link href="build/app.css" rel="stylesheet" />
 		<!-- js -->
-		<script src="lib/cordova-2.1.0.js"></script>
+		<script src="lib/cordova-2.2.0.js"></script>
 		<script src="lib/childbrowser.js"></script>
-		<!--<script src="lib/backbone.js"></script>-->
 		<script src="build/enyo.js"></script>
 		<script src="build/app.js"></script>
 	</head>
@@ -28,7 +27,10 @@
 				// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
 				function onDeviceReady() {
 
+					//Force touch scrolling
 					enyo.Scroller.touchScrolling = true;
+					//Disable log statements
+					enyo.setLogLevel( enyo.logging['levels']['warn'] );
 
 					enyo.dispatcher.listen( document, "backbutton" );
 					enyo.dispatcher.listen( document, "menubutton" );
