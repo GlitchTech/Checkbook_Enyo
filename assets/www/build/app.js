@@ -7429,8 +7429,8 @@ name: "private.gapi",
 kind: "enyo.Component",
 published: {
 apiKey: "AIzaSyBOKT9NrmlBVx4RFPk2p3c5ee5cHMvs8Lc",
-clientId: "933238428058-smvr0gsdpbpiuo2q59gcll54rau9ivus.apps.googleusercontent.com",
-clientSecret: "mqgBXW7pTj1kUvpGswmD7miK"
+clientId: "933238428058.apps.googleusercontent.com",
+clientSecret: "AmttUjVelS_L4X46GCltvF94"
 }
 });
 
@@ -8601,6 +8601,7 @@ name: "menubar",
 kind: "onyx.Toolbar",
 classes: "padding-none",
 components: [ {
+name: "appMenu",
 kind: "onyx.MenuDecorator",
 components: [ {
 name: "appMenuButton",
@@ -8615,6 +8616,7 @@ content: "Checkbook"
 kind: "onyx.Menu",
 showOnTop: !0,
 floating: !0,
+modal: !1,
 components: [ {
 content: "Preferences",
 ontap: "openPreferences"
@@ -8631,25 +8633,30 @@ showing: !1,
 classes: "onyx-menu-divider"
 }, {
 showing: !1,
-content: "Search (NYI)"
+content: "Search (NYI)",
+ontap: "openSearch"
 }, {
 showing: !1,
-content: "Budget (NYI)"
+content: "Budget (NYI)",
+ontap: "openBudget"
 }, {
 showing: !1,
-content: "Reports (NYI)"
+content: "Reports (NYI)",
+ontap: "openReports"
 }, {
 showing: !1,
 classes: "onyx-menu-divider"
 }, {
 showing: !1,
-content: "Report Bug (NYI)"
+content: "Report Bug (NYI)",
+ontap: "errorReport"
 }, {
+showing: !1,
 classes: "onyx-menu-divider"
 }, {
+showing: !1,
 content: "About",
-ontap: "showPopup",
-popup: "about"
+ontap: "showAbout"
 } ]
 } ]
 } ]
@@ -8657,6 +8664,7 @@ popup: "about"
 name: "mainViews",
 kind: "Panels",
 fit: !0,
+animate: !1,
 draggable: !1,
 classes: "app-panels",
 arrangerKind: "CollapsingArranger",
@@ -8699,30 +8707,30 @@ onkeydown: "keyboardHandler"
 appReady: !1,
 paneStack: [],
 rendered: function() {
-this.inherited(arguments), this.$.splash.show(), (enyo.platform.android || enyo.platform.androidChrome) && this.$.menubar.hide();
+this.inherited(arguments), enyo.Scroller.touchScrolling = !0, enyo.dispatcher.listen(document, "backbutton"), enyo.dispatcher.listen(document, "menubutton"), enyo.dispatcher.listen(document, "searchbutton"), this.$.splash.show(), (enyo.platform.android || enyo.platform.androidChrome) && this.$.menubar.hide();
 },
 keyboardHandler: function(e, t) {
 if (!this.appReady) return;
-if (t.which === 18) return this.menuHandler();
-if (t.which === 27) return this.backHandler();
+if (t.which === 18) return enyo.Signals.send("onmenubutton"), !0;
+if (t.which === 27) return enyo.Signals.send("onbackbutton"), !0;
 },
 menuHandler: function() {
 if (!this.appReady) return;
-return this.paneStack.length <= 0 && this.$.appMenuButton.waterfall("ontap", "ontap", this), !0;
+return this.paneStack.length <= 0 && (this.$.appMenuButton.getActive() === !0 ? this.$.appMenu.requestHideMenu() : this.$.appMenuButton.waterfall("ontap", "ontap", this)), !0;
 },
 backHandler: function() {
 if (!this.appReady) return;
-if (this.paneStack.length > 0) this.$[this.paneStack[this.paneStack.length - 1]].doFinish(); else if (this.$.mainViews.getIndex() > 0) this.$.mainViews.previous(); else if (enyo.platform.android || enyo.platform.androidChrome) this.createComponent({
+return this.$.appMenu.menuActive === !0 ? this.$.appMenu.requestHideMenu() : this.paneStack.length > 0 ? this.$[this.paneStack[this.paneStack.length - 1]].doFinish() : this.$.mainViews.getIndex() > 0 ? this.$.mainViews.previous() : enyo.platform.android || enyo.platform.androidChrome ? this.$.exitConfirmation ? this.exitConfirmationHandler() : (this.createComponent({
 name: "exitConfirmation",
 kind: "gts.ConfirmDialog",
 title: "Exit Checkbook",
 message: "Are you sure you want to close Checkbook?",
 confirmText: "Yes",
 cancelText: "No",
+modal: !1,
 onConfirm: "exitConfirmationHandler",
 onCancel: "exitConfirmationClose"
-}), this.$.exitConfirmation.show();
-return !0;
+}), this.$.exitConfirmation.show()) : this.log("backHandler: no action possible"), !0;
 },
 exitConfirmationClose: function() {
 this.$.exitConfirmation.hide(), this.$.exitConfirmation.destroy();
@@ -8774,6 +8782,11 @@ var t = enyo.fetchAppInfo();
 Checkbook.globals.criticalError.load("Welcome to " + t.title, "If you have any questions, visit <a href='" + t.vendorurl + "' target='_blank'>" + t.vendorurl + "</a> or email <a href='mailto:" + t.vendoremail + "?subject=" + t.title + " Support'>" + t.vendoremail + "</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png");
 }
 this.appReady = !0;
+},
+showAbout: function() {
+this.showPopup({
+popup: "about"
+});
 },
 showPopup: function(e) {
 var t = this.$[e.popup];
@@ -10546,7 +10559,8 @@ components: [ {
 content: "Thank you for using " + enyo.fetchAppInfo().title + " powered by"
 }, {
 kind: "enyo.Image",
-src: "assets/enyo-logo.png"
+src: "assets/enyo-logo.png",
+style: "height: 32px; width: 87px;"
 } ]
 }, {
 classes: "h-box box-align-center margin-half-top margin-half-bottom",
