@@ -17,7 +17,9 @@ enyo.kind({
 					classes: "padding-none",
 					components: [
 						{
+							name: "appMenu",
 							kind: "onyx.MenuDecorator",
+
 							components: [
 								{
 									name: "appMenuButton",
@@ -32,8 +34,12 @@ enyo.kind({
 									]
 								}, {
 									kind: "onyx.Menu",
+
 									showOnTop: true,
 									floating: true,
+
+									modal: false,
+
 									components: [
 										{
 											content: "Preferences",
@@ -52,28 +58,30 @@ enyo.kind({
 										}, {
 											showing: false,
 											content: "Search (NYI)",
-											//ontap: "openSearch"
+											ontap: "openSearch"
 										}, {
 											showing: false,
 											content: "Budget (NYI)",
-											//ontap: "openBudget"
+											ontap: "openBudget"
 										}, {
 											showing: false,
 											content: "Reports (NYI)",
-											//ontap: "openReports"
+											ontap: "openReports"
 										}, {
 											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
 											showing: false,
 											content: "Report Bug (NYI)",
-											//ontap: "errorReport"
+											ontap: "errorReport"
 										}, {
+											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
+											//hidden until handling in about for links in child view
+											showing: false,
 											content: "About",
-											ontap: "showPopup",
-											popup: "about"
+											ontap: "showAbout"
 										}
 									]
 								}
@@ -85,6 +93,7 @@ enyo.kind({
 					kind: "Panels",
 
 					fit: true,
+					animate: false,
 					draggable: false,
 
 					classes: "app-panels",
@@ -149,6 +158,15 @@ enyo.kind({
 
 		this.inherited( arguments );
 
+		//Force touch scrolling
+		enyo.Scroller.touchScrolling = true;
+
+		//Bind phonegap events (should auto-bind)
+		enyo.dispatcher.listen( document, "backbutton" );
+		enyo.dispatcher.listen( document, "menubutton" );
+		enyo.dispatcher.listen( document, "searchbutton" );
+
+		//Start app
 		this.$['splash'].show();
 
 		if( enyo.platform.android || enyo.platform.androidChrome ) {
@@ -167,11 +185,13 @@ enyo.kind({
 		if( inEvent.which === 18 ) {
 			//alt key
 
-			return this.menuHandler();
+			enyo.Signals.send( "onmenubutton" );
+			return true;
 		} else if( inEvent.which === 27 ) {
 			//escape key
 
-			return this.backHandler();
+			enyo.Signals.send( "onbackbutton" );
+			return true;
 		}
 	},
 
@@ -182,7 +202,13 @@ enyo.kind({
 		if( this.paneStack.length <= 0 ) {
 			//Menu is only available on Accounts or Transaction list screens.
 
-			this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+			if( this.$['appMenuButton'].getActive() === true ) {
+
+				this.$['appMenu'].requestHideMenu();
+			} else {
+
+				this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+			}
 		}
 
 		return true;
@@ -192,7 +218,11 @@ enyo.kind({
 
 		if( !this.appReady ) { return; }
 
-		if( this.paneStack.length > 0 ) {
+		if( this.$['appMenu'].menuActive === true ) {
+			//Hide app menu
+
+			this.$['appMenu'].requestHideMenu();
+		} else if( this.paneStack.length > 0 ) {
 			//Exit top most layer
 
 			this.$[this.paneStack[this.paneStack.length - 1]].doFinish();
@@ -203,21 +233,32 @@ enyo.kind({
 		} else if( enyo.platform.android || enyo.platform.androidChrome ) {
 			//Confirm exit (android only)
 
-			this.createComponent( {
-					name: "exitConfirmation",
-					kind: "gts.ConfirmDialog",
+			if( this.$['exitConfirmation'] ) {
 
-					title: "Exit Checkbook",
-					message: "Are you sure you want to close Checkbook?",
+				this.exitConfirmationHandler();
+			} else {
 
-					confirmText: "Yes",
-					cancelText: "No",
+				this.createComponent( {
+						name: "exitConfirmation",
+						kind: "gts.ConfirmDialog",
 
-					onConfirm: "exitConfirmationHandler",
-					onCancel: "exitConfirmationClose"
-				});
+						title: "Exit Checkbook",
+						message: "Are you sure you want to close Checkbook?",
 
-			this.$['exitConfirmation'].show();
+						confirmText: "Yes",
+						cancelText: "No",
+
+						modal: false,
+
+						onConfirm: "exitConfirmationHandler",
+						onCancel: "exitConfirmationClose",
+					});
+
+				this.$['exitConfirmation'].show();
+			}
+		} else {
+
+			this.log( "backHandler: no action possible" );
 		}
 
 		return true;
@@ -376,6 +417,11 @@ enyo.kind({
 	},
 
 	/** PopUp Controls **/
+
+	showAbout: function() {
+
+		this.showPopup( { "popup": "about" } );
+	},
 
 	showPopup: function( inSender ) {
 

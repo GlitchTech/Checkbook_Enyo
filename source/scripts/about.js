@@ -51,7 +51,8 @@ enyo.kind({
 					content: "Thank you for using " + enyo.fetchAppInfo()['title'] + " powered by"
 				}, {
 					kind: "enyo.Image",
-					src: "assets/enyo-logo.png"
+					src: "assets/enyo-logo.png",
+					style: "height: 32px; width: 87px;"
 				}
 			]
 		},
