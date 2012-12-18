@@ -28,12 +28,13 @@ enyo.kind( {
 			components: [
 				{
 					name: "transactionWrapper",
-					kind: "onyx.Item",//SwipeableItem
-					tapHighlight: true,
+					kind: "GTS.Item",
 
 					ontap: "transactiontapped",
 					onhold: "transactionHeld",
 					onDelete: "transactionDeleted",
+
+					classes: "bordered",
 
 					style: "padding-right: 20px; padding-left: 30px;",
 
@@ -96,7 +97,7 @@ enyo.kind( {
 			],
 
 			belowComponents: [
-				/* Content that displays below the list NYI */
+				/* Content that displays below the list (Incorrectly implemented) */
 				{
 					content: "&nbsp;",
 					allowHtml: true
@@ -531,6 +532,8 @@ results = {
 	},
 
 	transactiontapped: function( inSender, inEvent ) {
+
+		return true;//TEMP
 
 		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode
