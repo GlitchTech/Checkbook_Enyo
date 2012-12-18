@@ -521,7 +521,9 @@ enyo.kind({
 
 	openPreferences: function() {
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				{
 					name: "preferences",
@@ -534,7 +536,9 @@ enyo.kind({
 
 	openExport: function( inSender, inEvent ) {
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				{
 					name: "export",
@@ -545,7 +549,9 @@ enyo.kind({
 
 	openImport: function( inSender, inEvent ) {
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				{
 					name: "import",
@@ -577,7 +583,9 @@ enyo.kind({
 		this.log( arguments );
 		return;
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				enyo.mixin(
 						{
@@ -593,7 +601,12 @@ enyo.kind({
 
 	openSearch: function( inSender, inEvent ) {
 
-		this.showPanePopup(
+		this.log( arguments );
+		return;
+
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				enyo.mixin(
 						inEvent,
