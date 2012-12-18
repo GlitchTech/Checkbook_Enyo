@@ -38,8 +38,6 @@ enyo.kind({
 									showOnTop: true,
 									floating: true,
 
-									//modal: false,//allows event though
-
 									components: [
 										{
 											content: "Preferences",
@@ -204,15 +202,25 @@ enyo.kind({
 
 			if( this.$['appMenuButton'].getActive() === true ) {
 
-				this.$['appMenuButton'].setActive( false );
-				this.$['appMenu'].requestHideMenu();
+				this.hideAppMenu();
 			} else {
 
-				this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+				this.showAppMenu();
 			}
 		}
 
 		return true;
+	},
+
+	showAppMenu: function() {
+
+		this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+	},
+
+	hideAppMenu: function() {
+
+		this.$['appMenuButton'].setActive( false );
+		this.$['appMenu'].requestHideMenu();
 	},
 
 	backHandler: function() {
@@ -222,7 +230,7 @@ enyo.kind({
 		if( this.$['appMenu'].menuActive === true ) {
 			//Hide app menu
 
-			this.$['appMenu'].requestHideMenu();
+			this.hideAppMenu();
 		} else if( this.paneStack.length > 0 ) {
 			//Exit top most layer
 
