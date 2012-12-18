@@ -38,7 +38,7 @@ enyo.kind({
 									showOnTop: true,
 									floating: true,
 
-									modal: false,
+									//modal: false,//allows event though
 
 									components: [
 										{
@@ -204,6 +204,7 @@ enyo.kind({
 
 			if( this.$['appMenuButton'].getActive() === true ) {
 
+				this.$['appMenuButton'].setActive( false );
 				this.$['appMenu'].requestHideMenu();
 			} else {
 
