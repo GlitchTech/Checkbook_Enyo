@@ -6,6 +6,11 @@ enyo.kind( {
 	transactions: [],
 	account: {},
 
+	events: {
+		onLoadingStart: "",
+		onLoadingFinish: ""
+	},
+
 	components: [
 		{
 			name: "list",
@@ -391,6 +396,8 @@ enyo.kind( {
 
 		if( this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
 
+			this.doLoadingStart();
+
 			Checkbook.globals.transactionManager.fetchTransactions(
 					this.account,
 					{
@@ -479,6 +486,8 @@ results = {
 			this.initialScrollCompleted = true;
 			this.initialScroll();
 		}
+
+		enyo.asyncMethod( this, this.doLoadingFinish );
 	},
 
 	/** List Reaction Events **/

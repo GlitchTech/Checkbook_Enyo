@@ -16,13 +16,20 @@ enyo.kind( {
 			name: "header",
 			kind: "onyx.Toolbar",
 			layoutKind: "enyo.FittableColumnsLayout",
+			noStretch: true,
 			components: [
 				{//Swap between icon for account & spinner when loading data in the background.
 					name: "acctTypeIcon",
 					kind: "enyo.Image",
 					src: "assets/dollar_sign_1.png",
 					classes: "img-icon",
-					style: "margin: 0 15px 0 0; height: 32px;"
+					style: "margin: 0 15px 0 0;"
+				}, {
+					name: "loadingSpinner",
+					kind: "onyx.Spinner",
+					showing: false,
+					classes: " img-icon",
+					style: "margin: 0 15px 0 0;"
 				}, {
 					name: "acctName",
 					content: "Checkbook",
@@ -48,7 +55,10 @@ enyo.kind( {
 
 			ondragstart: "listDrag",
 			ondrag: "listDrag",
-			ondragfinish: "listDrag"
+			ondragfinish: "listDrag",
+
+			onLoadingStart: "showLoadingIcon",
+			onLoadingFinish: "hidenLoadingIcon"
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",
@@ -223,7 +233,7 @@ enyo.kind( {
 
 			//Make a clone; else unable to modify account
 			this.account = enyo.clone( inEvent['account'] );
-			this.$['entries'].account = enyo.clone( inEvent['account'] );
+			this.$['entries'].account = enyo.clone( this.account );
 
 			this.$['acctName'].setContent( this.account['acctName'] );
 			this.$['acctTypeIcon'].setSrc( "assets/" + this.account['acctCategoryIcon'] );
@@ -397,6 +407,7 @@ enyo.kind( {
 	},
 
 	/* Header Control */
+
 	renderBalanceButton: function() {
 
 		this.$['balanceMenu'].setChoices(
@@ -457,6 +468,18 @@ enyo.kind( {
 		return true;
 	},
 
+	showLoadingIcon: function() {
+
+		this.$['acctTypeIcon'].hide();
+		this.$['loadingSpinner'].show();
+	},
+
+	hidenLoadingIcon: function() {
+
+		this.$['loadingSpinner'].hide();
+		this.$['acctTypeIcon'].show();
+	},
+
 	/* Footer Control */
 
 	renderSortButton: function() {
@@ -495,6 +518,8 @@ enyo.kind( {
 				this.account['acctId'],
 				this.account['sort']
 			);
+
+		this.$['entries'].account = enyo.clone( this.account );
 
 		this.$['entries'].reloadSystem();
 

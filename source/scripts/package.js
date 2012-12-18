@@ -15,5 +15,6 @@ enyo.depends(
 	"accounts/",
 	"transactions/",
 	"search/",
-	"budget/"
+	"budget/",
+	"reports/"
 );
