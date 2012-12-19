@@ -49,11 +49,13 @@ enyo.kind( {
 		}, {
 			name: "entries",
 			kind: "Checkbook.accounts.list",
-			fit: true,
 
 			balanceView: 4,
 
-			editMode: false
+			editMode: false,
+
+			onLoadStart: "showLoading",
+			onLoadStop: "hideLoading"
 		}, {
 			kind: "onyx.MoreToolbar",
 			classes: "rich-brown",
@@ -161,6 +163,22 @@ enyo.kind( {
 		},
 
 		{
+			name: "loadingScrim",
+			kind: "onyx.Scrim",
+			classes: "onyx-scrim-translucent",
+
+			showing: false,
+			style: "z-index: 1000;"
+		}, {
+			name: "loadingSpinner",
+			kind: "onyx.Spinner",
+			style: "size-double",
+
+			showing: false,
+			style: "z-index: 10001; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+		},
+
+		{
 			kind: "Signals",
 
 			accountChanged: "renderAccountList",
@@ -179,7 +197,6 @@ enyo.kind( {
 
 	/**
 	 * @protected
-	 * @function
 	 * @name Checkbook.accounts.view#renderAccountList
 	 *
 	 * Called to force an update to the account lists and balance.
@@ -189,6 +206,30 @@ enyo.kind( {
 		this.accountBalanceForceUpdate();
 
 		this.$['sortMenu'].setValue( Checkbook.globals.prefs['custom_sort'] );
+	},
+
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#showLoading
+	 *
+	 * Shows scrim & spinner.
+	 */
+	showLoading: function() {
+
+		this.$['loadingScrim'].show();
+		this.$['loadingSpinner'].show();
+	},
+
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#hideLoading
+	 *
+	 * Hides scrim & spinner.
+	 */
+	hideLoading: function() {
+
+		this.$['loadingScrim'].hide();
+		this.$['loadingSpinner'].hide();
 	},
 
 	/**
@@ -212,7 +253,7 @@ enyo.kind( {
 			this.$['entries'].accounts[inEvent.index]['bal_view'] = inEvent.mode;
 		}
 
-		this.$['entries'].refresh( inEvent.index );
+		this.$['entries'].refresh();
 
 		if( enyo.isFunction( inEvent.callbackFn ) ) {
 
