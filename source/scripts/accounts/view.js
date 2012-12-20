@@ -182,6 +182,7 @@ enyo.kind( {
 			kind: "Signals",
 
 			accountChanged: "renderAccountList",
+			accountSortOptionChanged: "updateSortMenu",
 			balanceViewChanged: "accountBalanceViewChanged",
 			accountBalanceChanged: "accountBalanceForceUpdate"
 		}
@@ -205,7 +206,7 @@ enyo.kind( {
 
 		this.accountBalanceForceUpdate();
 
-		this.$['sortMenu'].setValue( Checkbook.globals.prefs['custom_sort'] );
+		this.updateSortMenu();
 	},
 
 	/**
@@ -318,7 +319,7 @@ enyo.kind( {
 						"onSuccess": function() {
 
 							Checkbook.globals.accountManager.updateAccountModTime();
-							enyo.Signals.send( "accountChanged" );
+							enyo.Signals.send( "accountSortChanged" );
 						}
 					}
 				);
@@ -387,6 +388,14 @@ enyo.kind( {
 	},
 
 	/** Footer Control **/
+
+	/**
+	 * TODO DEFINITION
+	 */
+	updateSortMenu: function() {
+
+		this.$['sortMenu'].setValue( Checkbook.globals.prefs['custom_sort'] );
+	},
 
 	/**
 	 * TODO DEFINITION

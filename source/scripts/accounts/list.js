@@ -176,6 +176,7 @@ enyo.kind({
 			kind: "Signals",
 
 			accountChanged: "renderAccountList",
+			accountSortChanged: "renderAccountList",
 			balanceChanged: "refresh",
 			accountBalanceChanged: "accountBalanceChanged"
 		}
@@ -321,19 +322,14 @@ enyo.kind({
 	},
 
 	listReorder: function( inSender, inEvent ) {
-
-		this.log( arguments );
-	},
-
-	reorder: function( inSender, toIndex, fromIndex ) {
 		//Row moved
 
-		if( toIndex != fromIndex && toIndex > -1 && toIndex < this.accounts.length ) {
+		if( inEvent.reorderTo != inEvent.reorderFrom && inEvent.reorderTo > -1 && inEvent.reorderTo < this.accounts.length ) {
 
-			var temp = this.accounts.splice( fromIndex, 1 );
-			var bottom = this.accounts.slice( toIndex );
+			var temp = this.accounts.splice( inEvent.reorderFrom, 1 );
+			var bottom = this.accounts.slice( inEvent.reorderTo );
 
-			this.accounts.length = toIndex;
+			this.accounts.length = inEvent.reorderTo;
 			this.accounts.push.apply( this.accounts, temp );
 			this.accounts.push.apply( this.accounts, bottom );
 
@@ -360,6 +356,8 @@ enyo.kind({
 			Checkbook.globals.gts_db.queries( qryOrder );
 
 			this.refresh();
+
+			enyo.Signals.send( "accountSortOptionChanged" );
 		}
 	},
 
