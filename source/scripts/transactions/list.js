@@ -545,8 +545,6 @@ results = {
 
 	transactiontapped: function( inSender, inEvent ) {
 
-		return true;//TEMP
-
 		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode
 
