@@ -41,8 +41,7 @@ enyo.kind({
 			classes: "enyo-fit",
 
 			reorderable: true,
-			enableSwipe: true,
-			persistSwipeableItem: true,
+			enableSwipe: false,
 
 			onSetupItem: "handleSetupRow",
 			onReorder: "listReorder",
@@ -101,7 +100,8 @@ enyo.kind({
 			reorderComponents: [
 				{
 					name: "reorderContent",
-					classes: "enyo-fit h-box box-align-center deep-green-trans padding-std",
+					layoutKind: "FittableColumnsLayout",
+					classes: "enyo-fit deep-green-trans padding-std",
 					components: [
 						{
 							name: "reorderIcon",
@@ -109,7 +109,8 @@ enyo.kind({
 							classes: "accountIcon"
 						}, {
 							name: "reorderName",
-							classes: "text-ellipsis accountName box-flex-1"
+							classes: "text-ellipsis accountName",
+							fit: true
 						}
 					]
 				}
@@ -118,7 +119,8 @@ enyo.kind({
 			pinnedReorderComponents: [
 				{
 					name: "pinnedReorderItem",
-					classes: "enyo-fit h-box box-align-center rich-brown-trans padding-std",
+					layoutKind: "FittableColumnsLayout",
+					classes: "enyo-fit rich-brown-trans padding-std",
 					components: [
 						{
 							name: "pinIcon",
@@ -126,8 +128,10 @@ enyo.kind({
 							classes: "accountIcon"
 						}, {
 							name: "pinName",
-							classes: "text-ellipsis accountName box-flex-1"
+							classes: "text-ellipsis accountName",
+							fit: true
 						}, {
+							showing: false,
 							kind: "onyx.Button",
 							ontap: "dropPinnedRow",
 							content: "Drop"
@@ -139,12 +143,21 @@ enyo.kind({
 			swipeableComponents: [
 				{
 					name: "swipeItem",
-					classes: "enyo-fit h-box box-align-center naka-red-trans padding-std",
+					layoutKind: "FittableColumnsLayout",
+					classes: "enyo-fit naka-red-trans padding-std",
 					components: [
 						{
-							name: "swipeTitle",
-							style: "font-size: 30px; font-weight: bold; color: #fff; line-height: 80px; text-transform: capitalize;",
-							classes: "text-center padding-none margin-none"
+							content: "Delete Account?",
+							fit: true
+						}, {
+							kind: "onyx.Button",
+							ontap: "",
+							content: "Cancel"
+						}, {
+							kind: "onyx.Button",
+							ontap: "",
+							classes: "onyx-negative",
+							content: "Cancel"
 						}
 					]
 				}
@@ -193,8 +206,6 @@ enyo.kind({
 
 		this.$['entries'].setCount( this.accounts.length );
 		this.$['entries'].refresh();
-
-		this.$['entries'].reflow();
 	},
 
 	renderRow: function( index ) {
@@ -346,23 +357,26 @@ enyo.kind({
 
 			this.$['pinName'].setContent( row['acctName'] );
 			this.$['pinIcon'].setSrc( "assets/" + row['acctCategoryIcon'] );
+
+			enyo.asyncMethod( this, this.dropPinnedRow, inSender, inEvent );
 		}
 	},
 
-    //* Called when the "Drop" button is pressed on the pinned placeholder row
-    dropPinnedRow: function (inSender, inEvent) {
+    dropPinnedRow: function ( inSender, inEvent ) {
 
         this.$['entries'].dropPinnedRow( inEvent );
     },
 
 	setupSwipeItem: function( inSender, inEvent ) {
 
-		this.log( arguments );
+		this.log( "NYI", arguments );
+
+		//this.$['entries'].setPersistSwipeableItem( true );//required
 	},
 
 	swipeComplete: function( inSender, inEvent ) {
 
-		this.log( arguments, this.$['entries'].getPersistSwipeableItem() );
+		this.log( "NYI", arguments );
 	},
 
 	accountDeleted: function( inSender, inEvent ) {
