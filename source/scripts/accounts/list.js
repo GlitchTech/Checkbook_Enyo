@@ -100,23 +100,15 @@ enyo.kind({
 			reorderComponents: [
 				{
 					name: "reorderContent",
-					classes: "deep-green-trans account padding-std",
+					classes: "deep-green-trans account h-box box-align-center padding-std",
 					components: [
 						{
-							classes: "h-box box-align-center",
-							components: [
-								{
-									name: "reorderIcon",
-									kind: "enyo.Image",
-									classes: "accountIcon"
-								}, {
-									name: "reorderName",
-									classes: "text-ellipsis accountName box-flex-1"
-								}
-							]
+							name: "reorderIcon",
+							kind: "enyo.Image",
+							classes: "accountIcon"
 						}, {
-							name: "reorderCategory",
-							classes: "smaller"
+							name: "reorderName",
+							classes: "text-ellipsis accountName box-flex-1"
 						}
 					]
 				}
@@ -128,25 +120,12 @@ enyo.kind({
 					classes: "rich-brown-trans h-box box-align-center account padding-std",
 					components: [
 						{
-							classes: "box-flex-1",
-							components: [
-								{
-									classes: "h-box box-align-center",
-									components: [
-										{
-											name: "pinIcon",
-											kind: "enyo.Image",
-											classes: "accountIcon"
-										}, {
-											name: "pinName",
-											classes: "text-ellipsis accountName box-flex-1"
-										}
-									]
-								}, {
-									name: "pinCategory",
-									classes: "smaller"
-								}
-							]
+							name: "pinIcon",
+							kind: "enyo.Image",
+							classes: "accountIcon"
+						}, {
+							name: "pinName",
+							classes: "text-ellipsis accountName box-flex-1"
 						}, {
 							kind: "onyx.Button",
 							ontap: "dropPinnedRow",
@@ -316,7 +295,6 @@ enyo.kind({
 		if( row ) {
 
 			this.$['reorderName'].setContent( row['acctName'] );
-			this.$['reorderCategory'].setContent( row['acctCategory'] );
 			this.$['reorderIcon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 		}
 	},
@@ -326,12 +304,9 @@ enyo.kind({
 
 		if( inEvent.reorderTo != inEvent.reorderFrom && inEvent.reorderTo > -1 && inEvent.reorderTo < this.accounts.length ) {
 
-			var temp = this.accounts.splice( inEvent.reorderFrom, 1 );
-			var bottom = this.accounts.slice( inEvent.reorderTo );
-
-			this.accounts.length = inEvent.reorderTo;
-			this.accounts.push.apply( this.accounts, temp );
-			this.accounts.push.apply( this.accounts, bottom );
+			var movedItem = enyo.clone( this.accounts[inEvent.reorderFrom] );
+			this.accounts.splice( inEvent.reorderFrom, 1 );
+			this.accounts.splice( ( inEvent.reorderTo ), 0, movedItem );
 
 			var qryOrder = [];
 
@@ -368,7 +343,6 @@ enyo.kind({
 		if( row ) {
 
 			this.$['pinName'].setContent( row['acctName'] );
-			this.$['pinCategory'].setContent( row['acctCategory'] );
 			this.$['pinIcon'].setSrc( "assets/" + row['acctCategoryIcon'] );
 		}
 	},
