@@ -163,6 +163,8 @@ enyo.kind({
 									kind: "onyx.GroupboxHeader",
 									content: "Accounts"
 								}, {
+									/*
+
 									kind: "onyx.Item",
 									classes: "padding-none",
 									components: [
@@ -181,6 +183,7 @@ enyo.kind({
 										}
 									]
 								}, {
+									*/
 									kind: "onyx.Item",
 									components: [
 										{
@@ -306,7 +309,7 @@ enyo.kind({
 
 		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
 
-		this.$['entries'].renderAccountList();
+		//this.$['entries'].renderAccountList();
 
 		this.inherited( arguments );
 
