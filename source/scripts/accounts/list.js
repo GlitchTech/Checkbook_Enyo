@@ -13,6 +13,7 @@ enyo.kind({
 
 	fit: true,
 	style: "position: relative;",
+	classes: "enyo-fit",
 
 	accounts: [],
 
@@ -37,11 +38,11 @@ enyo.kind({
 			name: "entries",
 			kind: "enyo.List",
 
-			fit: true,
 			classes: "enyo-fit",
 
 			reorderable: true,
 			enableSwipe: true,
+			persistSwipeableItem: true,
 
 			onSetupItem: "handleSetupRow",
 			onReorder: "listReorder",
@@ -100,7 +101,7 @@ enyo.kind({
 			reorderComponents: [
 				{
 					name: "reorderContent",
-					classes: "deep-green-trans account h-box box-align-center padding-std",
+					classes: "enyo-fit h-box box-align-center deep-green-trans padding-std",
 					components: [
 						{
 							name: "reorderIcon",
@@ -117,7 +118,7 @@ enyo.kind({
 			pinnedReorderComponents: [
 				{
 					name: "pinnedReorderItem",
-					classes: "rich-brown-trans h-box box-align-center account padding-std",
+					classes: "enyo-fit h-box box-align-center rich-brown-trans padding-std",
 					components: [
 						{
 							name: "pinIcon",
@@ -138,8 +139,7 @@ enyo.kind({
 			swipeableComponents: [
 				{
 					name: "swipeItem",
-					style: "background-color: rgba( 0, 160, 40, 0.8 ); color: white;",
-					classes: "enyo-fit",
+					classes: "enyo-fit h-box box-align-center naka-red-trans padding-std",
 					components: [
 						{
 							name: "swipeTitle",
@@ -193,6 +193,8 @@ enyo.kind({
 
 		this.$['entries'].setCount( this.accounts.length );
 		this.$['entries'].refresh();
+
+		this.$['entries'].reflow();
 	},
 
 	renderRow: function( index ) {
@@ -360,7 +362,7 @@ enyo.kind({
 
 	swipeComplete: function( inSender, inEvent ) {
 
-		this.log( arguments );
+		this.log( arguments, this.$['entries'].getPersistSwipeableItem() );
 	},
 
 	accountDeleted: function( inSender, inEvent ) {

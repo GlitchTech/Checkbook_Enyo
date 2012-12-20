@@ -163,7 +163,7 @@ enyo.kind({
 									kind: "onyx.GroupboxHeader",
 									content: "Accounts"
 								}, {
-									showing: false,
+									/*
 
 									kind: "onyx.Item",
 									classes: "padding-none",
@@ -183,6 +183,7 @@ enyo.kind({
 										}
 									]
 								}, {
+									*/
 									kind: "onyx.Item",
 									components: [
 										{

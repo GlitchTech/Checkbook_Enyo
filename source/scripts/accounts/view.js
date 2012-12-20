@@ -11,7 +11,8 @@
  */
 enyo.kind( {
 	name: "Checkbook.accounts.view",
-	layoutKind: "FittableRowsLayout",
+//	layoutKind: "FittableRowsLayout",
+	classes: "v-box",//don't want to use this here, but FittableRowsLayout is causing trouble
 
 	accounts: [],
 	totalBalance: [ 0, 0, 0, 0, 0 ],
@@ -49,6 +50,7 @@ enyo.kind( {
 		}, {
 			name: "entries",
 			kind: "Checkbook.accounts.list",
+			classes: "box-flex-1",
 
 			balanceView: 4,
 
@@ -205,7 +207,6 @@ enyo.kind( {
 	renderAccountList: function() {
 
 		this.accountBalanceForceUpdate();
-
 		this.updateSortMenu();
 	},
 
