@@ -362,10 +362,10 @@ enyo.kind({
 		}
 	},
 
-    dropPinnedRow: function ( inSender, inEvent ) {
+	dropPinnedRow: function ( inSender, inEvent ) {
 
-        this.$['entries'].dropPinnedRow( inEvent );
-    },
+		this.$['entries'].dropPinnedRow( inEvent );
+	},
 
 	setupSwipeItem: function( inSender, inEvent ) {
 

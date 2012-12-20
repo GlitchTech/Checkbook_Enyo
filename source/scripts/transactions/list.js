@@ -16,12 +16,20 @@ enyo.kind( {
 			name: "list",
 			kind: "GTS.LazyList",
 
-			fit: true,
-
 			classes: "checkbook-stamp enyo-fit",
+
+			reorderable: false,
+			enableSwipe: false,
 
 			onSetupItem: "transactionBuildRow",
 			onAcquirePage: "transactionFetchGroup",
+
+			onReorder: "",
+			onSetupReorderComponents: "",
+			onSetupPinnedReorderComponents: "",
+			onSetupSwipeItem: "",
+			onSwipeComplete: "",
+
 
 			aboveComponents: [ /* Content that displays above the list */ ],
 
@@ -102,7 +110,11 @@ enyo.kind( {
 					content: "&nbsp;",
 					allowHtml: true
 				}
-			]
+			],
+
+			reorderComponents: [],
+			pinnedReorderComponents: [],
+			swipeableComponents: []
 		},
 
 		{
