@@ -53,14 +53,14 @@ enyo.kind({
 			components: [
 				{
 					name: "accountItem",
-					classes: "bordered norm-row account-item",
-
 					kind: "GTS.Item",
-					tapPulse: false,
-					tapHighlight: false,
+
+					classes: "bordered account-item",
+
+					tapPulse: true,//tap
+					tapHighlight: false,//hold
 
 					ontap: "accountTapped",
-					onDelete: "accountDeleted",
 
 					components: [
 						{
@@ -272,7 +272,7 @@ enyo.kind({
 			}
 		}
 
-		return true;
+		return;
 	},
 
 	editAccountComplete: function( rowIndex, inSender, inEvent ) {
