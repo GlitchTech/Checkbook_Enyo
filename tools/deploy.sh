@@ -21,7 +21,7 @@ fi
 
 if [ -z "${TARGET}" ]; then
     TARGET="$SOURCE/$FOLDER/$DEPLOY"
-fi    
+fi
 
 if [ -d $TARGET ]; then
 	echo "$TARGET folder already exists, please rename or remove it and try again."
@@ -54,7 +54,7 @@ while getopts hco: OPT; do
             ;;
     esac
 done
-	
+
 echo "This script can create a deployment in $TARGET"
 
 cat <<EOF
@@ -75,7 +75,7 @@ EOF
 mkdir -p "$TARGET/lib"
 
 # copy root folder files
-cp "$SOURCE/index.html" "$SOURCE/icon.png" "$TARGET"
+cp "$SOURCE/index.html" "$SOURCE/icon.png" "$SOURCE/appinfo.json" "$TARGET"
 
 # copy assets and build
 cp -r "$SOURCE/assets" "$SOURCE/build" "$TARGET"

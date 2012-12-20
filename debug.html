@@ -29,12 +29,6 @@
 				// PhoneGap is loaded and it is now safe to make calls PhoneGap methods
 				function onDeviceReady() {
 
-					enyo.Scroller.touchScrolling = true;
-
-					enyo.dispatcher.listen( document, "backbutton" );
-					enyo.dispatcher.listen( document, "menubutton" );
-					enyo.dispatcher.listen( document, "searchbutton" );
-
 					new Checkbook.app().renderInto( document.body );
 				}
 			</script>

@@ -454,7 +454,7 @@ enyo.kind({
 			item.$['sheetName'].setContent( row['title'] );
 
 			var dateObj = new Date( row['modifiedDate'] );
-			item.$['sheetUpdated'].setContent( dateObj.format( { date: "longDate", time: "shortTime" } ) );
+			item.$['sheetUpdated'].setContent( dateObj.format( { date: "long", time: "short" } ) );
 
 			item.$['sheetSelected'].setValue( row['selectStatus'] );
 

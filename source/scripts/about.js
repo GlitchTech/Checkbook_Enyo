@@ -6,6 +6,7 @@ enyo.kind({
 
 	classes: "small-popup",
 
+	modal: true,
 	centered: true,
 	floating: true,
 
@@ -51,7 +52,8 @@ enyo.kind({
 					content: "Thank you for using " + enyo.fetchAppInfo()['title'] + " powered by"
 				}, {
 					kind: "enyo.Image",
-					src: "assets/enyo-logo.png"
+					src: "assets/enyo-logo.png",
+					style: "height: 32px; width: 87px;"
 				}
 			]
 		},
@@ -114,6 +116,25 @@ enyo.kind({
 			content: enyo.fetchAppInfo()['copyright'],
 			allowHtml: true,
 			classes: "smaller margin-top"
+		},
+
+		{
+			kind: "Signals",
+
+			onbackbutton: "test",
+			onmenubutton: "test",
+			onsearchbutton: "test",
+			onkeydown: "test"//for testing only
 		}
-	]
+	],
+
+	test: function() {
+
+		if( !this.showing ) {
+
+			return;
+		}
+
+		this.log( arguments );
+	}
 });

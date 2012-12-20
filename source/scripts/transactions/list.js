@@ -6,29 +6,43 @@ enyo.kind( {
 	transactions: [],
 	account: {},
 
+	events: {
+		onLoadingStart: "",
+		onLoadingFinish: ""
+	},
+
 	components: [
 		{
 			name: "list",
 			kind: "GTS.LazyList",
 
-			fit: true,
-
 			classes: "checkbook-stamp enyo-fit",
+
+			reorderable: false,
+			enableSwipe: false,
 
 			onSetupItem: "transactionBuildRow",
 			onAcquirePage: "transactionFetchGroup",
+
+			onReorder: "",
+			onSetupReorderComponents: "",
+			onSetupPinnedReorderComponents: "",
+			onSetupSwipeItem: "",
+			onSwipeComplete: "",
+
 
 			aboveComponents: [ /* Content that displays above the list */ ],
 
 			components: [
 				{
 					name: "transactionWrapper",
-					kind: "onyx.Item",//SwipeableItem
-					tapHighlight: true,
+					kind: "GTS.Item",
 
 					ontap: "transactiontapped",
 					onhold: "transactionHeld",
 					onDelete: "transactionDeleted",
+
+					classes: "bordered",
 
 					style: "padding-right: 20px; padding-left: 30px;",
 
@@ -91,12 +105,16 @@ enyo.kind( {
 			],
 
 			belowComponents: [
-				/* Content that displays below the list NYI */
+				/* Content that displays below the list (Incorrectly implemented) */
 				{
 					content: "&nbsp;",
 					allowHtml: true
 				}
-			]
+			],
+
+			reorderComponents: [],
+			pinnedReorderComponents: [],
+			swipeableComponents: []
 		},
 
 		{
@@ -391,6 +409,8 @@ enyo.kind( {
 
 		if( this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
 
+			this.doLoadingStart();
+
 			Checkbook.globals.transactionManager.fetchTransactions(
 					this.account,
 					{
@@ -479,6 +499,8 @@ results = {
 			this.initialScrollCompleted = true;
 			this.initialScroll();
 		}
+
+		enyo.asyncMethod( this, this.doLoadingFinish );
 	},
 
 	/** List Reaction Events **/
@@ -522,6 +544,8 @@ results = {
 	},
 
 	transactiontapped: function( inSender, inEvent ) {
+
+		return true;//TEMP
 
 		if( Checkbook.globals.prefs['transPreview'] === 1 ) {
 			//preview mode

@@ -752,7 +752,7 @@ enyo.kind( {
 			this.$['linkedAccount'].removeClass( "custom-background" );
 		}
 
-		this.$['desc'].focus();
+		enyo.asyncMethod( this.$['desc'], this.$['desc'].focus );
 	},
 
 	/** Data Change Handlers **/
@@ -781,7 +781,7 @@ enyo.kind( {
 			this.categoryChanged();
 		}
 
-		this.$['amount'].focus();
+		enyo.asyncMethod( this.$['amount'], this.$['amount'].focus );
 	},
 
 	/** Total Amount Controls **/

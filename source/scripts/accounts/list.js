@@ -10,19 +10,21 @@
 
 enyo.kind({
 	name: "Checkbook.accounts.list",
-	kind: "enyo.Scroller",
-	fit: true,
 
+	fit: true,
 	style: "position: relative;",
+	classes: "enyo-fit",
 
 	accounts: [],
 
 	events: {
-		onSetupRow: ""
+		onSetupRow: "",
+
+		onLoadStart: "",
+		onLoadStop: ""
 	},
 
 	published: {
-		//pageSize: 15,
 		balanceView: 4,
 
 		editMode: false,
@@ -34,20 +36,28 @@ enyo.kind({
 	components: [
 		{
 			name: "entries",
-			kind: "enyo.Repeater",
+			kind: "enyo.List",
 
 			classes: "enyo-fit",
 
-			//onReorder: "reorder",
+			reorderable: true,
+			enableSwipe: false,
+
 			onSetupItem: "handleSetupRow",
+			onReorder: "listReorder",
+			onSetupReorderComponents: "setupReorderComponents",
+			onSetupPinnedReorderComponents: "setupPinnedReorderComponents",
+			onSetupSwipeItem: "setupSwipeItem",
+			onSwipeComplete: "swipeComplete",
 
 			components: [
 				{
 					name: "accountItem",
 					classes: "bordered norm-row account-item",
 
-					kind: "onyx.Item",//SwipeableItem
-					tapHighlight: true,
+					kind: "GTS.Item",
+					tapPulse: false,
+					tapHighlight: false,
 
 					ontap: "accountTapped",
 					onDelete: "accountDeleted",
@@ -63,11 +73,11 @@ enyo.kind({
 							components: [
 								{
 									name: "icon",
-									kind: enyo.Image,
+									kind: "enyo.Image",
 									classes: "accountIcon"
 								}, {
 									name: "iconLock",
-									kind: enyo.Image,
+									kind: "enyo.Image",
 									src: "assets/padlock_1.png",
 									classes: "accountLockIcon unlocked"
 								}, {
@@ -85,58 +95,92 @@ enyo.kind({
 						}
 					]
 				}
+			],
+
+			reorderComponents: [
+				{
+					name: "reorderContent",
+					layoutKind: "FittableColumnsLayout",
+					classes: "enyo-fit deep-green-trans padding-std",
+					components: [
+						{
+							name: "reorderIcon",
+							kind: "enyo.Image",
+							classes: "accountIcon"
+						}, {
+							name: "reorderName",
+							classes: "text-ellipsis accountName",
+							fit: true
+						}
+					]
+				}
+			],
+
+			pinnedReorderComponents: [
+				{
+					name: "pinnedReorderItem",
+					layoutKind: "FittableColumnsLayout",
+					classes: "enyo-fit rich-brown-trans padding-std",
+					components: [
+						{
+							name: "pinIcon",
+							kind: "enyo.Image",
+							classes: "accountIcon"
+						}, {
+							name: "pinName",
+							classes: "text-ellipsis accountName",
+							fit: true
+						}, {
+							showing: false,
+							kind: "onyx.Button",
+							ontap: "dropPinnedRow",
+							content: "Drop"
+						}
+					]
+				}
+			],
+
+			swipeableComponents: [
+				{
+					name: "swipeItem",
+					layoutKind: "FittableColumnsLayout",
+					classes: "enyo-fit naka-red-trans padding-std",
+					components: [
+						{
+							content: "Delete Account?",
+							fit: true
+						}, {
+							kind: "onyx.Button",
+							ontap: "",
+							content: "Cancel"
+						}, {
+							kind: "onyx.Button",
+							ontap: "",
+							classes: "onyx-negative",
+							content: "Cancel"
+						}
+					]
+				}
 			]
-		},
-
-		{
-			name: "loadingScrim",
-			kind: onyx.Scrim,
-			classes: "onyx-scrim-translucent",
-			showing: true
-		}, {
-			name: "loadingSpinner",
-			kind: "onyx.Spinner",
-			style: "size-double",
-
-			style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 		},
 
 		{
 			kind: "Signals",
 
 			accountChanged: "renderAccountList",
+			accountSortChanged: "renderAccountList",
 			balanceChanged: "refresh",
 			accountBalanceChanged: "accountBalanceChanged"
 		}
 	],
-
-	rendered: function() {
-
-		this.log();
-
-		//this.$['entries'].setReorderable( this.reorderable );
-
-		this.inherited( arguments );
-	},
-
-	/** Event Handlers **/
-
-	handleSetupRow: function( inSender, inEvent ) {
-
-		if( enyo.isFunction( this.doSetupRow ) && this.onSetupRow !== "" ) {
-
-			return( this.doSetupRow( inEvent ) );
-		} else {
-
-			return( this.setupRow( inSender, inEvent ) );
-		}
-	},
 
 	/** List Control **/
 
 	renderAccountList: function() {
 
 		this.log();
+
+		this.doLoadStart();
 
 		this.accounts = [];
 
@@ -149,29 +193,11 @@ enyo.kind({
 
 	dataResponse: function( results ) {
 
-		this.log();
-
 		this.accounts = enyo.clone( results );
 
-		//Reload list
-		this.punt();
-
-		//Hide loading items; heartbeat delay
-		enyo.asyncMethod(
-				this.$['loadingScrim'],
-				this.$['loadingScrim'].hide
-			);
-		enyo.asyncMethod(
-				this.$['loadingSpinner'],
-				this.$['loadingSpinner'].hide
-			);
-	},
-
-	punt: function() {
-
-		this.log();
-
 		this.refresh();
+
+		enyo.asyncMethod( this, this.doLoadStop );
 	},
 
 	refresh: function() {
@@ -179,6 +205,7 @@ enyo.kind({
 		this.log();
 
 		this.$['entries'].setCount( this.accounts.length );
+		this.$['entries'].refresh();
 	},
 
 	renderRow: function( index ) {
@@ -189,100 +216,7 @@ enyo.kind({
 		}
 	},
 
-	/**
-	 * @protected
-	 *
-	 * Update balance for recently changed account.
-	 */
-	accountBalanceChanged: function( inSender, inEvent ) {
-
-		if( !inEvent || !inEvent['accounts'] ) {
-			//No data, full rebuild
-
-			this.renderAccountList();
-			return;
-		}
-
-		inEvent = inEvent['accounts'];
-
-		if( typeof( inEvent['account'] ) === "undefined" && typeof( inEvent['linkedAccount'] ) === "undefined" && typeof( inEvent['atAccount'] ) === "undefined" ) {
-			//No data, full rebuild
-
-			this.renderAccountList();
-			return;
-		}
-
-		if( typeof( inEvent['account'] ) !== "undefined" ) {
-			//Main Account
-
-			var acctIndex = inEvent['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['account'] ) : - 1;
-
-			if( acctIndex >= 0 ) {
-
-				if( typeof( inEvent['accountBal'] ) !== "undefined" && GTS.Object.size( inEvent['accountBal'] ) > 0 ) {
-
-					this.accountBalanceChangedHandler( acctIndex, inEvent['accountBal'] );
-				} else {
-
-					Checkbook.globals.accountManager.fetchAccountBalance(
-							inEvent['account'],
-							{
-								"onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, acctIndex )
-							}
-						);
-				}
-			}
-		}
-
-		if( typeof( inEvent['linkedAccount'] ) !== "undefined" ) {
-			//Linked Account
-
-			var linkedIndex = inEvent['linkedAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['linkedAccount'] ) : - 1;
-
-			if( linkedIndex >= 0 ) {
-
-				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
-			}
-		}
-
-		if( typeof( inEvent['atAccount'] ) !== "undefined" && inEvent['linkedAccount'] != inEvent['atAccount'] ) {
-			//Auto-Transfer Account
-
-			var linkedIndex = inEvent['atAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['atAccount'] ) : - 1;
-
-			if( linkedIndex >= 0 ) {
-
-				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
-			}
-		}
-	},
-
-	/**
-	 * @protected
-	 * @function
-	 * @name Checkbook.accounts.view#accountBalanceChangedHandler
-	 *
-	 * Handles updating specific item in account listing
-	 *
-	 * @param int	index	Index of account
-	 * @param [obj]	results	Result set from DB
-	 */
-	accountBalanceChangedHandler: function( index, results ) {
-
-		this.log( arguments );
-
-		if( typeof( results ) === "undefined" || isNaN( index ) || index < 0 || index >= this.accounts.length ) {
-
-			return;
-		}
-
-		this.accounts[index]['balance0'] = results['balance0'];
-		this.accounts[index]['balance1'] = results['balance1'];
-		this.accounts[index]['balance2'] = results['balance2'];
-		this.accounts[index]['balance3'] = results['balance3'];
-
-		this.renderRow( index );
-	},
+	/** List Events **/
 
 	dividerTapped: function( inSender, inEvent ) {
 		//Not allowed, block action
@@ -367,17 +301,25 @@ enyo.kind({
 		}
 	},
 
-	reorder: function( inSender, toIndex, fromIndex ) {
+	setupReorderComponents: function( inSender, inEvent ) {
+
+		var row = this.accounts[inEvent.index];
+
+		if( row ) {
+
+			this.$['reorderName'].setContent( row['acctName'] );
+			this.$['reorderIcon'].setSrc( "assets/" + row['acctCategoryIcon'] );
+		}
+	},
+
+	listReorder: function( inSender, inEvent ) {
 		//Row moved
 
-		if( toIndex != fromIndex && toIndex > -1 && toIndex < this.accounts.length ) {
+		if( inEvent.reorderTo != inEvent.reorderFrom && inEvent.reorderTo > -1 && inEvent.reorderTo < this.accounts.length ) {
 
-			var temp = this.accounts.splice( fromIndex, 1 );
-			var bottom = this.accounts.slice( toIndex );
-
-			this.accounts.length = toIndex;
-			this.accounts.push.apply( this.accounts, temp );
-			this.accounts.push.apply( this.accounts, bottom );
+			var movedItem = enyo.clone( this.accounts[inEvent.reorderFrom] );
+			this.accounts.splice( inEvent.reorderFrom, 1 );
+			this.accounts.splice( ( inEvent.reorderTo ), 0, movedItem );
 
 			var qryOrder = [];
 
@@ -402,7 +344,39 @@ enyo.kind({
 			Checkbook.globals.gts_db.queries( qryOrder );
 
 			this.refresh();
+
+			enyo.Signals.send( "accountSortOptionChanged" );
 		}
+	},
+
+	setupPinnedReorderComponents: function( inSender, inEvent ) {
+
+		var row = this.accounts[inEvent.index];
+
+		if( row ) {
+
+			this.$['pinName'].setContent( row['acctName'] );
+			this.$['pinIcon'].setSrc( "assets/" + row['acctCategoryIcon'] );
+
+			enyo.asyncMethod( this, this.dropPinnedRow, inSender, inEvent );
+		}
+	},
+
+	dropPinnedRow: function ( inSender, inEvent ) {
+
+		this.$['entries'].dropPinnedRow( inEvent );
+	},
+
+	setupSwipeItem: function( inSender, inEvent ) {
+
+		this.log( "NYI", arguments );
+
+		//this.$['entries'].setPersistSwipeableItem( true );//required
+	},
+
+	swipeComplete: function( inSender, inEvent ) {
+
+		this.log( "NYI", arguments );
 	},
 
 	accountDeleted: function( inSender, inEvent ) {
@@ -415,8 +389,6 @@ enyo.kind({
 				{
 					"onSuccess": function() {
 
-		this.log();
-
 						enyo.Signals.send( "accountChanged", { "accountId": self.accounts[inEvent.index]['acctId'], "deleted": true } );
 					}
 				}
@@ -425,28 +397,54 @@ enyo.kind({
 		return true;
 	},
 
-	/** List Display **/
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#handleSetupRow
+	 *
+	 * Determines row rendering handler
+	 *
+	 * @param {inSender}
+	 * @param {inEvent}
+	 */
+	handleSetupRow: function( inSender, inEvent ) {
 
+		if( enyo.isFunction( this.doSetupRow ) && this.onSetupRow !== "" ) {
+
+			return( this.doSetupRow( inEvent ) );
+		} else {
+
+			return( this.setupRow( inSender, inEvent ) );
+		}
+	},
+
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#setupRow
+	 *
+	 * Renders each list item row (unless overridden from parent)
+	 *
+	 * @param {inSender}
+	 * @param {inEvent}
+	 */
 	setupRow: function( inSender, inEvent ) {
 
 		var index = inEvent.index;
-		var item = inEvent.item;
 		var row = this.accounts[index];
 
 		if( row ) {
 
 			row['index'] = index;
 
-			item.$['accountItem'].addRemoveClass( "alt-row", ( row['index'] % 2 === 0 ) );
-			item.$['accountItem'].addRemoveClass( "norm-row", ( row['index'] % 2 !== 0 ) );
+			this.$['accountItem'].addRemoveClass( "alt-row", ( row['index'] % 2 === 0 ) );
+			this.$['accountItem'].addRemoveClass( "norm-row", ( row['index'] % 2 !== 0 ) );
 
-			item.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
-			item.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
+			this.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
+			this.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
 
-			item.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
-			item.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
+			this.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
+			this.$['iconLock'].addRemoveClass( "unlocked", ( row['acctLocked'] !== 1 ) );
 
-			item.$['name'].setContent( row['acctName'] );
+			this.$['name'].setContent( row['acctName'] );
 
 			//Header balance view - override account default setting
 
@@ -471,12 +469,12 @@ enyo.kind({
 
 			row['balance'] = prepAmount( row['balance'] );
 
-			item.$['balance'].setContent( formatAmount( row['balance'] ) );
-			item.$['balance'].addRemoveClass( "positiveBalance", ( row['balance'] > 0 ) );
-			item.$['balance'].addRemoveClass( "negativeBalance", ( row['balance'] < 0 ) );
-			item.$['balance'].addRemoveClass( "neutralBalance", ( row['balance'] == 0 ) );
+			this.$['balance'].setContent( formatAmount( row['balance'] ) );
+			this.$['balance'].addRemoveClass( "positiveBalance", ( row['balance'] > 0 ) );
+			this.$['balance'].addRemoveClass( "negativeBalance", ( row['balance'] < 0 ) );
+			this.$['balance'].addRemoveClass( "neutralBalance", ( row['balance'] == 0 ) );
 
-			item.$['note'].setContent( row['acctNotes'].replace( /\n/, "<br />" ) );
+			this.$['note'].setContent( row['acctNotes'].replace( /\n/, "<br />" ) );
 
 			//proper sort mode && difference between categories
 			var showDivider = (
@@ -484,37 +482,104 @@ enyo.kind({
 					( row['index'] <= 0 || row['acctCategory'] !== this.accounts[row['index'] - 1]['acctCategory'] )
 				);
 
-			item.$['catDivider'].setContent( row['acctCategory'] );
-			item.$['catDivider'].canGenerate = showDivider;
+			this.$['catDivider'].setContent( row['acctCategory'] );
+			this.$['catDivider'].canGenerate = showDivider;
 
-/*
-				"acctId"
-				"acctName"
-				"acctNotes"
-				"acctCategory"
-				"acctCategoryIcon"
-				"balance"
-				"balanceColor"
-				"sort"
-				"defaultAccount"
-				"frozen"
-				"hidden"
-				"acctLocked"
-				"lockedCode"
-				"transDescMultiLine"
-				"showTransTime"
-				"useAutoComplete"
-				"atmEntry"
-				"auto_savings"
-				"auto_savings_link"
-				"bal_view"
-				"runningBalance"
-				"checkField"
-				"hideNotes"
-				"enableCategories"
-				"hide_cleared"
-*/
 			return true;
 		}
+	},
+
+	/** Other Events **/
+
+	/**
+	 * @protected
+	 *
+	 * Update balance for recently changed account.
+	 */
+	accountBalanceChanged: function( inSender, inEvent ) {
+
+		if( !inEvent || !inEvent['accounts'] ) {
+			//No data, full rebuild
+
+			this.renderAccountList();
+			return;
+		}
+
+		inEvent = inEvent['accounts'];
+
+		if( typeof( inEvent['account'] ) === "undefined" && typeof( inEvent['linkedAccount'] ) === "undefined" && typeof( inEvent['atAccount'] ) === "undefined" ) {
+			//No data, full rebuild
+
+			this.renderAccountList();
+			return;
+		}
+
+		if( typeof( inEvent['account'] ) !== "undefined" ) {
+			//Main Account
+
+			var acctIndex = inEvent['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['account'] ) : - 1;
+
+			if( acctIndex >= 0 ) {
+
+				if( typeof( inEvent['accountBal'] ) !== "undefined" && GTS.Object.size( inEvent['accountBal'] ) > 0 ) {
+
+					this.accountBalanceChangedHandler( acctIndex, inEvent['accountBal'] );
+				} else {
+
+					Checkbook.globals.accountManager.fetchAccountBalance(
+							inEvent['account'],
+							{
+								"onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, acctIndex )
+							}
+						);
+				}
+			}
+		}
+
+		if( typeof( inEvent['linkedAccount'] ) !== "undefined" ) {
+			//Linked Account
+
+			var linkedIndex = inEvent['linkedAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['linkedAccount'] ) : - 1;
+
+			if( linkedIndex >= 0 ) {
+
+				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
+			}
+		}
+
+		if( typeof( inEvent['atAccount'] ) !== "undefined" && inEvent['linkedAccount'] != inEvent['atAccount'] ) {
+			//Auto-Transfer Account
+
+			var linkedIndex = inEvent['atAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['atAccount'] ) : - 1;
+
+			if( linkedIndex >= 0 ) {
+
+				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
+			}
+		}
+	},
+
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#accountBalanceChangedHandler
+	 *
+	 * Handles updating specific item in account listing
+	 *
+	 * @param int	index	Index of account
+	 * @param [obj]	results	Result set from DB
+	 */
+	accountBalanceChangedHandler: function( index, results ) {
+
+		if( typeof( results ) === "undefined" || isNaN( index ) || index < 0 || index >= this.accounts.length ) {
+
+			return;
+		}
+
+		this.accounts[index]['balance0'] = results['balance0'];
+		this.accounts[index]['balance1'] = results['balance1'];
+		this.accounts[index]['balance2'] = results['balance2'];
+		this.accounts[index]['balance3'] = results['balance3'];
+
+		this.renderRow( index );
 	}
 });

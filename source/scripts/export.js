@@ -710,10 +710,10 @@ enyo.kind({
 		const contentType = "text/csv";
 
 		var dateObj = new Date();
-		var docTitle = "[" + "Checkbook GUTOC" + "] " + uploadData['accountName'] + " [" + uploadData['accountCategory'] + "] [" + dateObj.format( { date: "longDate", time: "shortTime" } ) + "]";
+		var docTitle = "[" + "Checkbook GUTOC" + "] " + uploadData['accountName'] + " [" + uploadData['accountCategory'] + "] [" + dateObj.format( { date: "long", time: "short" } ) + "]";
 
 		var metadata = {
-				"title": docTitle.cleanString(),
+				"title": GTS.String.cleanString( docTitle ),
 				"mimeType": contentType
 			};
 

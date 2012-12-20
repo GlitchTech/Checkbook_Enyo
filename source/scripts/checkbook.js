@@ -17,7 +17,9 @@ enyo.kind({
 					classes: "padding-none",
 					components: [
 						{
+							name: "appMenu",
 							kind: "onyx.MenuDecorator",
+
 							components: [
 								{
 									name: "appMenuButton",
@@ -32,8 +34,10 @@ enyo.kind({
 									]
 								}, {
 									kind: "onyx.Menu",
+
 									showOnTop: true,
 									floating: true,
+
 									components: [
 										{
 											content: "Preferences",
@@ -52,28 +56,30 @@ enyo.kind({
 										}, {
 											showing: false,
 											content: "Search (NYI)",
-											//ontap: "openSearch"
+											ontap: "openSearch"
 										}, {
 											showing: false,
 											content: "Budget (NYI)",
-											//ontap: "openBudget"
+											ontap: "openBudget"
 										}, {
 											showing: false,
 											content: "Reports (NYI)",
-											//ontap: "openReports"
+											ontap: "openReports"
 										}, {
 											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
 											showing: false,
 											content: "Report Bug (NYI)",
-											//ontap: "errorReport"
+											ontap: "errorReport"
 										}, {
+											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
+											//hidden until handling in about for links in child view
+											showing: false,
 											content: "About",
-											ontap: "showPopup",
-											popup: "about"
+											ontap: "showAbout"
 										}
 									]
 								}
@@ -85,6 +91,7 @@ enyo.kind({
 					kind: "Panels",
 
 					fit: true,
+					animate: false,
 					draggable: false,
 
 					classes: "app-panels",
@@ -149,6 +156,15 @@ enyo.kind({
 
 		this.inherited( arguments );
 
+		//Force touch scrolling
+		enyo.Scroller.touchScrolling = true;
+
+		//Bind phonegap events (should auto-bind)
+		enyo.dispatcher.listen( document, "backbutton" );
+		enyo.dispatcher.listen( document, "menubutton" );
+		enyo.dispatcher.listen( document, "searchbutton" );
+
+		//Start app
 		this.$['splash'].show();
 
 		if( enyo.platform.android || enyo.platform.androidChrome ) {
@@ -167,11 +183,13 @@ enyo.kind({
 		if( inEvent.which === 18 ) {
 			//alt key
 
-			return this.menuHandler();
+			enyo.Signals.send( "onmenubutton" );
+			return true;
 		} else if( inEvent.which === 27 ) {
 			//escape key
 
-			return this.backHandler();
+			enyo.Signals.send( "onbackbutton" );
+			return true;
 		}
 	},
 
@@ -182,17 +200,38 @@ enyo.kind({
 		if( this.paneStack.length <= 0 ) {
 			//Menu is only available on Accounts or Transaction list screens.
 
-			this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+			if( this.$['appMenuButton'].getActive() === true ) {
+
+				this.hideAppMenu();
+			} else {
+
+				this.showAppMenu();
+			}
 		}
 
 		return true;
+	},
+
+	showAppMenu: function() {
+
+		this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+	},
+
+	hideAppMenu: function() {
+
+		this.$['appMenuButton'].setActive( false );
+		this.$['appMenu'].requestHideMenu();
 	},
 
 	backHandler: function() {
 
 		if( !this.appReady ) { return; }
 
-		if( this.paneStack.length > 0 ) {
+		if( this.$['appMenu'].menuActive === true ) {
+			//Hide app menu
+
+			this.hideAppMenu();
+		} else if( this.paneStack.length > 0 ) {
 			//Exit top most layer
 
 			this.$[this.paneStack[this.paneStack.length - 1]].doFinish();
@@ -203,21 +242,32 @@ enyo.kind({
 		} else if( enyo.platform.android || enyo.platform.androidChrome ) {
 			//Confirm exit (android only)
 
-			this.createComponent( {
-					name: "exitConfirmation",
-					kind: "gts.ConfirmDialog",
+			if( this.$['exitConfirmation'] ) {
 
-					title: "Exit Checkbook",
-					message: "Are you sure you want to close Checkbook?",
+				this.exitConfirmationHandler();
+			} else {
 
-					confirmText: "Yes",
-					cancelText: "No",
+				this.createComponent( {
+						name: "exitConfirmation",
+						kind: "gts.ConfirmDialog",
 
-					onConfirm: "exitConfirmationHandler",
-					onCancel: "exitConfirmationClose"
-				});
+						title: "Exit Checkbook",
+						message: "Are you sure you want to close Checkbook?",
 
-			this.$['exitConfirmation'].show();
+						confirmText: "Yes",
+						cancelText: "No",
+
+						modal: false,
+
+						onConfirm: "exitConfirmationHandler",
+						onCancel: "exitConfirmationClose",
+					});
+
+				this.$['exitConfirmation'].show();
+			}
+		} else {
+
+			this.log( "backHandler: no action possible" );
 		}
 
 		return true;
@@ -353,11 +403,11 @@ enyo.kind({
 		} else if( this.notificationType === false ) {
 			//First run notice
 
+			var info = enyo.fetchAppInfo();
+
 			Checkbook.globals.criticalError.load(
-					//"Welcome to " + enyo.fetchAppInfo()['title'],
-					//"If you have any questions, visit <a href='" + enyo.fetchAppInfo()['vendorurl'] + "' target='_blank'>" + enyo.fetchAppInfo()['vendorurl'] + "</a> or email <a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support'>" + enyo.fetchAppInfo()['vendoremail'] + "</a>.",
-					"Welcome to Checkbook",
-					"If you have any questions, visit <a href='http://glitchtechscience.com' target='_blank'>http://glitchtechscience.com</a> or email <a href='mailto:glitchtechscience@gmail.com?subject=Checkbook Support'>glitchtechscience@gmail.com</a>.",
+					"Welcome to " + info['title'],
+					"If you have any questions, visit <a href='" + info['vendorurl'] + "' target='_blank'>" + info['vendorurl'] + "</a> or email <a href='mailto:" + info['vendoremail'] + "?subject=" + info['title'] + " Support'>" + info['vendoremail'] + "</a>.",
 					"",
 					"assets/icon_1_32x32.png"
 				);
@@ -376,6 +426,11 @@ enyo.kind({
 	},
 
 	/** PopUp Controls **/
+
+	showAbout: function() {
+
+		this.showPopup( { "popup": "about" } );
+	},
 
 	showPopup: function( inSender ) {
 
@@ -474,7 +529,9 @@ enyo.kind({
 
 	openPreferences: function() {
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				{
 					name: "preferences",
@@ -487,7 +544,9 @@ enyo.kind({
 
 	openExport: function( inSender, inEvent ) {
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				{
 					name: "export",
@@ -498,7 +557,9 @@ enyo.kind({
 
 	openImport: function( inSender, inEvent ) {
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				{
 					name: "import",
@@ -530,7 +591,9 @@ enyo.kind({
 		this.log( arguments );
 		return;
 
-		this.showPanePopup(
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				enyo.mixin(
 						{
@@ -546,7 +609,12 @@ enyo.kind({
 
 	openSearch: function( inSender, inEvent ) {
 
-		this.showPanePopup(
+		this.log( arguments );
+		return;
+
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
 				null,
 				enyo.mixin(
 						inEvent,

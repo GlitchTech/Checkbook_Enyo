@@ -31,11 +31,31 @@ First sync on a device options: Overwrite Server, Overwrite Local, Merge (May du
 	- Data: json of object to sync
 	- Where: where args for edit, delete
 
-
+-----------
 Checkout Twitter bootstrap
 
-
+-----------
 REPORT
 Today I switch from Checkbook Beta to Checkbook (finally...) and found a bug during export. When the amount is greater than a million, ex $1,200,000, it will export "1.2M" instead of the real number. When the account is imported the amount becomes $1.2.
 
 PS. I'm not that rich, just my currency is smaller than dollars. For the same reason I'll appreciate if the number after decimal can be set to not shown. It occupies too much space, ex. $986,000.00
+
+-----------
+Make loading display screen for accounts <-> transactions
+
+-----------
+After budget system is built, create Overview page (optionally default page).
+	- see mint
+	- Total funds (per acct cat breakdown)
+	- Budget total for month, markings for today in comparision
+	- Income/Spent budget view
+	- Alerts (for bills in future or budget limits)
+
+-----------
+(potential) GPS Tagging for locations w/ Google Map view
+
+-----------
+Report System
+
+-----------
+Budget System
