@@ -53,20 +53,21 @@ enyo.kind({
 			components: [
 				{
 					name: "accountItem",
-					classes: "bordered norm-row account-item",
-
 					kind: "GTS.Item",
-					tapPulse: false,
-					tapHighlight: false,
+
+					classes: "bordered account-item",
+
+					tapPulse: true,//tap
+					tapHighlight: false,//hold
 
 					ontap: "accountTapped",
-					onDelete: "accountDeleted",
 
 					components: [
 						{
 							name: "catDivider",
 							kind: "GTS.Divider",
-							ontap: "dividerTapped"
+							ontap: "dividerTapped",
+							useFittable: false
 						}, {
 							layoutKind: "",
 							classes: "account",

@@ -38,9 +38,11 @@ enyo.kind( {
 					name: "transactionWrapper",
 					kind: "GTS.Item",
 
+					tapPulse: true,//tap
+					tapHighlight: false,//hold
+
 					ontap: "transactiontapped",
 					onhold: "transactionHeld",
-					onDelete: "transactionDeleted",
 
 					classes: "bordered",
 

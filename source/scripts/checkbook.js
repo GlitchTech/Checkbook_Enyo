@@ -353,8 +353,7 @@ enyo.kind({
 
 		this.$['mainViews'].render();
 		this.$['container'].show();
-
-		this.waterfall( "onresize", "onresize", this );
+		this.$['container'].render();
 
 		Checkbook.globals.criticalError = this.$['criticalError'];
 		Checkbook.globals.accountManager = new Checkbook.accounts.manager();
