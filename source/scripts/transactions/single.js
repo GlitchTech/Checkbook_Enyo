@@ -314,7 +314,12 @@ enyo.kind( {
 
 		this.inherited( arguments );
 
-		this.$['scroller'].applyStyle( "height", this.$['scroller'].getBounds().height + "px" );
+		var b = this.$['scroller'].getBounds();
+
+		if( b ) {
+
+			this.$['scroller'].applyStyle( "height", b.height + "px" );
+		}
 	},
 
 	/**
