@@ -66,7 +66,8 @@ enyo.kind({
 						{
 							name: "catDivider",
 							kind: "GTS.Divider",
-							ontap: "dividerTapped"
+							ontap: "dividerTapped",
+							useFittable: false
 						}, {
 							layoutKind: "",
 							classes: "account",
@@ -272,7 +273,7 @@ enyo.kind({
 			}
 		}
 
-		return;
+		return true;
 	},
 
 	editAccountComplete: function( rowIndex, inSender, inEvent ) {

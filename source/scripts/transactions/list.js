@@ -560,7 +560,7 @@ results = {
 			enyo.asyncMethod( this, this.vsEdit, null, inEvent );
 		}
 
-		return;
+		return true;
 	},
 
 	vsEdit: function( inSender, inEvent ) {
