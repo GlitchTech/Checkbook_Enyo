@@ -241,6 +241,8 @@ enyo.kind({
 	/** Initialization **/
 	rendered: function() {
 
+		this.log();
+
 		this.inherited( arguments );
 
 		this.$['instructions'].show();
@@ -262,10 +264,14 @@ enyo.kind({
 
 	refreshLayout: function() {
 
+		this.log();
+
 		this.waterfall( "onresize", "onresize", this );
 	},
 
 	gapiReady: function() {
+
+		this.log();
 
 		this.$['progress'].setProgress( 60 );
 
@@ -318,6 +324,8 @@ enyo.kind({
 	/** Authenticate **/
 	authenticateWithGoogle: function() {
 
+		this.log();
+
 		this.$['gapi'].setScope( [ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ] );
 
 		this.$['gapi'].auth( { "onSuccess": enyo.bind( this, this.userAuthenticated ), "onError": enyo.bind( this, this.userNotAuthenticated ) } );
@@ -331,10 +339,14 @@ enyo.kind({
 
 	userNotAuthenticated: function() {
 
+		this.log();
+
 		this.closeExport();
 	},
 
 	userAuthenticated: function() {
+
+		this.log();
 
 		this.$['progress'].show( {
 				"title": "Export Progress",
@@ -380,6 +392,8 @@ enyo.kind({
 
 	/** Render/Display Accounts **/
 	fetchAccounts: function() {
+
+		this.log();
 
 		this.$['progress'].show( {
 				"title": "Export Progress",
@@ -448,6 +462,8 @@ enyo.kind({
 
 	showAccountList: function() {
 
+		this.log();
+
 		this.$['progress'].setMessage( "Processing accounts..." );
 		this.$['progress'].setProgress( 75 );
 
@@ -459,8 +475,6 @@ enyo.kind({
 		this.$['accountList'].show();
 
 		this.$['accountList'].setCount( this.acctList.length );
-
-		this.refreshLayout();
 
 		this.$['progress'].hide();
 	},
@@ -549,6 +563,8 @@ enyo.kind({
 
 	/** Run export process **/
 	beginExportProcess: function() {
+
+		this.log();
 
 		this.$['progress'].show( {
 				"title": "Exporting",
@@ -788,6 +804,8 @@ enyo.kind({
 
 	closeErrorMessage: function() {
 
+		this.log();
+
 		this.$['errorMessage'].hide();
 
 		this.onErrorClose();
@@ -797,6 +815,8 @@ enyo.kind({
 
 	/** Finisher **/
 	closeExport: function() {
+
+		this.log();
 
 		try {
 
