@@ -1259,6 +1259,14 @@ return typeof e == "string" ? (t || document).getElementById(e) : e;
 escape: function(e) {
 return e !== null ? String(e).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
 },
+getBounds: function(e) {
+return e ? {
+left: e.offsetLeft,
+top: e.offsetTop,
+width: e.offsetWidth,
+height: e.offsetHeight
+} : null;
+},
 getComputedStyle: function(e) {
 return window.getComputedStyle && e && window.getComputedStyle(e, null);
 },
@@ -1311,16 +1319,17 @@ return this.calcBoxExtents(e, "padding");
 calcMarginExtents: function(e) {
 return this.calcBoxExtents(e, "margin");
 },
-calcViewportPositionForNode: function(e) {
-var t = 0, n = 0, r = e, i = r.offsetWidth, s = r.offsetHeight, o = document.body.parentNode.offsetHeight > this.getWindowHeight() ? this.getWindowHeight() - document.body.parentNode.scrollTop : document.body.parentNode.offsetHeight, u = document.body.parentNode.offsetWidth > this.getWindowWidth() ? this.getWindowWidth() - document.body.parentNode.scrollLeft : document.body.parentNode.offsetWidth, a = enyo.dom.getStyleTransformProp(), f = /translateX\((-?\d+)px\)/i, l = /translateY\((-?\d+)px\)/i;
-if (r.offsetParent) do n += r.offsetLeft - (r.offsetParent ? r.offsetParent.scrollLeft : 0), a && f.test(r.style[a]) && (n += parseInt(r.style[a].replace(f, "$1"), 10)), t += r.offsetTop - (r.offsetParent ? r.offsetParent.scrollTop : 0), a && l.test(r.style[a]) && (t += parseInt(r.style[a].replace(l, "$1"), 10)); while (r = r.offsetParent);
+calcNodePosition: function(e, t) {
+var n = 0, r = 0, i = e, s = i.offsetWidth, o = i.offsetHeight, u = enyo.dom.getStyleTransformProp(), a = /translateX\((-?\d+)px\)/i, f = /translateY\((-?\d+)px\)/i, l = 0, c = 0, h = 0, p = 0;
+t ? (h = t.offsetHeight, p = t.offsetWidth) : (h = document.body.parentNode.offsetHeight > this.getWindowHeight() ? this.getWindowHeight() - document.body.parentNode.scrollTop : document.body.parentNode.offsetHeight, p = document.body.parentNode.offsetWidth > this.getWindowWidth() ? this.getWindowWidth() - document.body.parentNode.scrollLeft : document.body.parentNode.offsetWidth);
+if (i.offsetParent) do r += i.offsetLeft - (i.offsetParent ? i.offsetParent.scrollLeft : 0), u && a.test(i.style[u]) && (r += parseInt(i.style[u].replace(a, "$1"), 10)), n += i.offsetTop - (i.offsetParent ? i.offsetParent.scrollTop : 0), u && f.test(i.style[u]) && (n += parseInt(i.style[u].replace(f, "$1"), 10)), i !== e && (i.currentStyle ? (l = parseInt(i.currentStyle.borderLeftWidth, 10), c = parseInt(i.currentStyle.borderTopWidth, 10)) : window.getComputedStyle ? (l = parseInt(window.getComputedStyle(i, "").getPropertyValue("border-left-width"), 10), c = parseInt(window.getComputedStyle(i, "").getPropertyValue("border-top-width"), 10)) : (l = parseInt(i.style.borderLeftWidth, 10), c = parseInt(i.style.borderTopWidth, 10)), l && (r += l), c && (n += c)); while ((i = i.offsetParent) && i !== t);
 return {
-top: t,
-left: n,
-bottom: o - t - s,
-right: u - n - i,
-height: s,
-width: i
+top: n,
+left: r,
+bottom: h - n - o,
+right: p - r - s,
+height: o,
+width: s
 };
 }
 };
@@ -1518,13 +1527,8 @@ hide: function() {
 this.setShowing(!1);
 },
 getBounds: function() {
-var e = this.node || this.hasNode() || 0;
-return {
-left: e.offsetLeft,
-top: e.offsetTop,
-width: e.offsetWidth,
-height: e.offsetHeight
-};
+var e = this.node || this.hasNode();
+return enyo.dom.getBounds(e);
 },
 setBounds: function(e, t) {
 var n = this.domStyles, r = t || "px", i = [ "width", "height", "left", "top", "right", "bottom" ];
@@ -1825,7 +1829,7 @@ for (var t = 0, n; n = e[t]; t++) document.addEventListener(n, enyo.bind(enyo.Si
 enyo.$ = {}, enyo.dispatcher = {
 events: [ "mousedown", "mouseup", "mouseover", "mouseout", "mousemove", "mousewheel", "click", "dblclick", "change", "keydown", "keyup", "keypress", "input" ],
 windowEvents: [ "resize", "load", "unload", "message" ],
-cssEvents: [ "webkitTransitionEnd" ],
+cssEvents: [ "webkitTransitionEnd", "transitionend" ],
 features: [],
 connect: function() {
 var e = enyo.dispatcher, t, n;
@@ -2188,6 +2192,10 @@ var i = enyo.gesture.makeEvent("flick", e);
 i.xVelocity = t, i.yVelocity = n, i.velocity = r, enyo.dispatch(i);
 }
 };
+
+// transition.js
+
+enyo.dom.transition = enyo.platform.ios || enyo.platform.android || enyo.platform.chrome || enyo.platform.androidChrome || enyo.platform.safari ? "-webkit-transition" : enyo.platform.firefox || enyo.platform.androidFirefox ? "-moz-transition" : "transition";
 
 // touch.js
 
@@ -3082,14 +3090,20 @@ scrollInterval: null,
 scrollIntervalMS: 50,
 transitions: {
 none: "",
-scroll: "-webkit-transform 3.8s cubic-bezier(.19,1,.28,1.0) 0s",
-bounce: "-webkit-transform 0.5s cubic-bezier(0.06,.5,.5,.94) 0s"
+scroll: "3.8s cubic-bezier(.19,1,.28,1.0) 0s",
+bounce: "0.5s cubic-bezier(0.06,.5,.5,.94) 0s"
 },
 setScrollLeft: function(e) {
-this.stop(), this.scrollLeft = e, this.effectScroll();
+var t = this.scrollLeft;
+this.stop(), this.scrollLeft = e;
+if (this.isInLeftOverScroll() || this.isInRightOverScroll()) this.scrollLeft = t;
+this.effectScroll();
 },
 setScrollTop: function(e) {
-this.stop(), this.scrollTop = e, this.effectScroll();
+var t = this.scrollTop;
+this.stop(), this.scrollTop = e;
+if (this.isInTopOverScroll() || this.isInBottomOverScroll()) this.scrollTop = t;
+this.effectScroll();
 },
 setScrollX: function(e) {
 this.scrollLeft = -1 * e;
@@ -3106,6 +3120,9 @@ return this.scrollTop;
 create: function() {
 this.inherited(arguments), enyo.dom.transformValue(this.$.client, this.translation, "0,0,0");
 },
+destroy: function() {
+this.clearCSSTransitionInterval(), this.inherited(arguments);
+},
 getScrollSize: function() {
 var e = this.$.client.hasNode();
 return {
@@ -3114,22 +3131,24 @@ height: e ? e.scrollHeight : 0
 };
 },
 horizontalChanged: function() {
-this.horizontal == "hidden" && (this.horizontal = !1);
+this.horizontal == "hidden" && (this.scrollHorizontal = !1);
 },
 verticalChanged: function() {
-this.vertical == "hidden" && (this.vertical = !1);
+this.vertical == "hidden" && (this.scrollVertical = !1);
 },
 calcScrollNode: function() {
 return this.$.clientContainer.hasNode();
+},
+calcBoundaries: function() {
+var e = this._getScrollBounds();
+this.bottomBoundary = e.clientHeight - e.height, this.rightBoundary = e.clientWidth - e.width;
 },
 maxHeightChanged: function() {
 this.$.client.applyStyle("min-height", this.maxHeight ? null : "100%"), this.$.client.applyStyle("max-height", this.maxHeight), this.$.clientContainer.addRemoveClass("enyo-scrollee-fit", !this.maxHeight);
 },
 calcAutoScrolling: function() {
-if ((this.vertical || this.horizontal) && this.scrollNode) {
 var e = this.getScrollBounds();
-this.vertical && (this.vertical = e.height > e.clientHeight), this.horizontal && (this.horizontal = e.width > e.clientWidth);
-}
+this.vertical && (this.scrollVertical = e.height > e.clientHeight), this.horizontal && (this.scrollHorizontal = e.width > e.clientWidth);
 },
 isInOverScroll: function() {
 return this.isInTopOverScroll() || this.isInBottomOverScroll() || this.isInLeftOverScroll() || this.isInRightOverScroll();
@@ -3172,15 +3191,15 @@ stop: function() {
 this.isScrolling() && this.stopScrolling(), this.thumb && this.delayHideThumbs(100), this.doScrollStop();
 },
 updateX: function() {
-var e = window.getComputedStyle(this.$.client.node, null).getPropertyValue("-webkit-transform").split("(")[1];
-e = e == undefined ? 0 : e.split(")")[0].split(",")[4], this.scrollLeft = -1 * parseFloat(e);
+var e = window.getComputedStyle(this.$.client.node, null).getPropertyValue(enyo.dom.getCssTransformProp()).split("(")[1];
+return e = e == undefined ? 0 : e.split(")")[0].split(",")[4], -1 * parseFloat(e) === this.scrollLeft ? !1 : (this.scrollLeft = -1 * parseFloat(e), !0);
 },
 updateY: function() {
-var e = window.getComputedStyle(this.$.client.node, null).getPropertyValue("-webkit-transform").split("(")[1];
-e = e == undefined ? 0 : e.split(")")[0].split(",")[5], this.scrollTop = -1 * parseFloat(e);
+var e = window.getComputedStyle(this.$.client.node, null).getPropertyValue(enyo.dom.getCssTransformProp()).split("(")[1];
+return e = e == undefined ? 0 : e.split(")")[0].split(",")[5], -1 * parseFloat(e) === this.scrollTop ? !1 : (this.scrollTop = -1 * parseFloat(e), !0);
 },
 effectScroll: function() {
-var e = -1 * this.scrollLeft + "px, " + -1 * this.scrollTop + "px" + (this.accel ? ",0" : "");
+var e = -1 * this.scrollLeft + "px, " + -1 * this.scrollTop + "px" + (this.accel ? ", 0" : "");
 enyo.dom.transformValue(this.$.client, this.translation, e);
 },
 down: function(e, t) {
@@ -3199,7 +3218,7 @@ if (this.preventDragPropagation) return !0;
 }
 },
 shouldDrag: function(e) {
-return this.calcStartInfo(), this.calcAutoScrolling(), this.horizontal ? this.vertical ? this.shouldDragVertical(e) || this.shouldDragHorizontal(e) : this.shouldDragHorizontal(e) : this.shouldDragVertical(e);
+return this.calcStartInfo(), this.calcBoundaries(), this.calcAutoScrolling(), this.scrollHorizontal ? this.scrollVertical ? this.shouldDragVertical(e) || this.shouldDragHorizontal(e) : this.shouldDragHorizontal(e) : this.shouldDragVertical(e);
 },
 shouldDragVertical: function(e) {
 var t = this.canDragVertical(e), n = this.oobVertical(e);
@@ -3212,10 +3231,10 @@ var t = this.canDragHorizontal(e), n = this.oobHorizontal(e);
 if (!n && t) return e.dragger = this, !0;
 },
 canDragVertical: function(e) {
-return this.vertical && e.vertical;
+return this.scrollVertical && e.vertical;
 },
 canDragHorizontal: function(e) {
-return this.horizontal && !e.vertical;
+return this.scrollHorizontal && !e.vertical;
 },
 oobVertical: function(e) {
 var t = e.dy < 0;
@@ -3227,7 +3246,7 @@ return !t && this.startEdges.left || t && this.startEdges.right;
 },
 drag: function(e, t) {
 if (this.listReordering) return !1;
-this.dragging && (t.preventDefault(), this.scrollLeft = this.horizontal ? this.calculateDragDistance(parseInt(this.getScrollLeft()), -1 * (t.pageX - this.prevX), this.leftBoundary, this.rightBoundary) : this.getScrollLeft(), this.scrollTop = this.vertical ? this.calculateDragDistance(this.getScrollTop(), -1 * (t.pageY - this.prevY), this.topBoundary, this.bottomBoundary) : this.getScrollTop(), this.effectScroll(), this.scroll(), this.prevY = t.pageY, this.prevX = t.pageX, this.setBoundaryX(), this.setBoundaryY());
+this.dragging && (t.preventDefault(), this.scrollLeft = this.scrollHorizontal ? this.calculateDragDistance(parseInt(this.getScrollLeft()), -1 * (t.pageX - this.prevX), this.leftBoundary, this.rightBoundary) : this.getScrollLeft(), this.scrollTop = this.scrollVertical ? this.calculateDragDistance(this.getScrollTop(), -1 * (t.pageY - this.prevY), this.topBoundary, this.bottomBoundary) : this.getScrollTop(), this.effectScroll(), this.scroll(), this.prevY = t.pageY, this.prevX = t.pageX, this.resetBoundaryX(), this.resetBoundaryY());
 },
 calculateDragDistance: function(e, t, n, r) {
 var i = e + t;
@@ -3237,19 +3256,19 @@ overscrollDragDamping: function(e, t, n, r, i) {
 if (t < r || t * -1 < i) n /= 2, t = e + n;
 return t;
 },
-setBoundaryX: function() {
-this.boundaryX = this.isInLeftOverScroll() ? this.leftBoundary : this.isInRightOverScroll() ? this.rightBoundary : null;
+resetBoundaryX: function() {
+this.boundaryX = 0;
 },
-setBoundaryY: function() {
-this.boundaryY = this.isInTopOverScroll() ? this.topBoundary : this.isInBottomOverScroll() ? this.bottomBoundary : null;
+resetBoundaryY: function() {
+this.boundaryY = 0;
 },
 dragfinish: function(e, t) {
 this.dragging && (t.preventTap(), this.dragging = !1, this.isScrolling() || this.correctOverflow(), this.scrim && this.$.scrim.hide());
 },
 correctOverflow: function() {
 if (this.isInOverScroll()) {
-var e = this.horizontal ? this.correctOverflowX() : !1, t = this.vertical ? this.correctOverflowY() : !1;
-e !== !1 && t !== !1 ? (this.scrollLeft = e !== !1 ? e : this.getScrollLeft(), this.scrollTop = t !== !1 ? t : this.getScrollTop(), this.startOverflowScrolling()) : e !== !1 ? (this.scrollLeft = e, this.startOverflowScrolling()) : t !== !1 && (this.scrollTop = t, this.startOverflowScrolling());
+var e = this.scrollHorizontal ? this.correctOverflowX() : !1, t = this.scrollVertical ? this.correctOverflowY() : !1;
+e !== !1 && t !== !1 ? (this.scrollLeft = e !== !1 ? e : this.getScrollLeft(), this.scrollTop = t !== !1 ? t : this.getScrollTop(), this.startOverflowScrolling()) : e !== !1 ? (this.scrollLeft = e, this.scrollTop = this.targetScrollTop || this.scrollTop, this.targetScrollLeft = this.getScrollLeft(), this.vertical ? this.startScrolling() : this.startOverflowScrolling()) : t !== !1 && (this.scrollTop = t, this.scrollLeft = this.targetScrollLeft || this.scrollLeft, this.targetScrollTop = this.getScrollTop(), this.scrollHorizontal ? this.startScrolling() : this.startOverflowScrolling());
 }
 },
 correctOverflowX: function() {
@@ -3268,10 +3287,10 @@ beyondBoundary: function(e, t, n) {
 return Math.abs(Math.abs(t) - Math.abs(e)) > Math.abs(n);
 },
 flick: function(e, t) {
-if (this.dragging && this.flickOnEnabledAxis(t)) return this.scrollLeft = this.horizontal ? this.calculateFlickDistance(this.scrollLeft, -1 * t.xVelocity) : this.getScrollLeft(), this.scrollTop = this.vertical ? this.calculateFlickDistance(this.scrollTop, -1 * t.yVelocity) : this.getScrollTop(), this.boundaryX = null, this.boundaryY = null, this.isInLeftOverScroll() ? this.boundaryX = this.figureBoundary(this.getScrollLeft()) : this.isInRightOverScroll() && (this.boundaryX = this.figureBoundary(-1 * this.bottomBoundary - this.getScrollLeft())), this.isInTopOverScroll() ? this.boundaryY = this.figureBoundary(this.getScrollTop()) : this.isInBottomOverScroll() && (this.boundaryY = this.figureBoundary(-1 * this.bottomBoundary - this.getScrollTop())), this.startScrolling(), this.preventDragPropagation;
+if (this.dragging && this.flickOnEnabledAxis(t)) return this.scrollLeft = this.scrollHorizontal ? this.calculateFlickDistance(this.scrollLeft, -1 * t.xVelocity) : this.getScrollLeft(), this.scrollTop = this.scrollVertical ? this.calculateFlickDistance(this.scrollTop, -1 * t.yVelocity) : this.getScrollTop(), this.targetScrollLeft = this.scrollLeft, this.targetScrollTop = this.scrollTop, this.boundaryX = null, this.boundaryY = null, this.isInLeftOverScroll() ? this.boundaryX = this.figureBoundary(this.getScrollLeft()) : this.isInRightOverScroll() && (this.boundaryX = this.figureBoundary(-1 * this.bottomBoundary - this.getScrollLeft())), this.isInTopOverScroll() ? this.boundaryY = this.figureBoundary(this.getScrollTop()) : this.isInBottomOverScroll() && (this.boundaryY = this.figureBoundary(-1 * this.bottomBoundary - this.getScrollTop())), this.startScrolling(), this.preventDragPropagation;
 },
 flickOnEnabledAxis: function(e) {
-return Math.abs(e.xVelocity) > Math.abs(e.yVelocity) ? this.horizontal : this.vertical;
+return Math.abs(e.xVelocity) > Math.abs(e.yVelocity) ? this.scrollHorizontal : this.scrollVertical;
 },
 calculateFlickDistance: function(e, t) {
 return e + t * this.kFlickScalar;
@@ -3283,6 +3302,7 @@ startOverflowScrolling: function() {
 this.applyTransition("bounce"), this.effectScroll(), this.setOverflowTransitionInterval(), this.scrolling = !0;
 },
 applyTransition: function(e) {
+var t = this.translation + ": " + this.transitions[e];
 this.$.client.applyStyle("-webkit-transition", this.transitions[e]);
 },
 stopScrolling: function() {
@@ -3299,14 +3319,15 @@ this.updateScrollPosition();
 }), this.scrollIntervalMS);
 },
 updateScrollPosition: function() {
-this.updateY(), this.updateX(), this.scroll();
+var e = this.updateY(), t = this.updateX();
+this.scroll(), !e && !t && this.stop();
 },
 clearCSSTransitionInterval: function() {
 this.scrollInterval && (clearInterval(this.scrollInterval), this.scrollInterval = null);
 },
 resetCSSTranslationVals: function() {
-var e = getComputedStyle(this.$.client.node, null).getPropertyValue("-webkit-transform").split("(")[1].split(")")[0].split(",");
-this.applyTransition("none"), this.scrollLeft = -1 * e[4], this.scrollTop = -1 * e[5], this.effectScroll();
+var e = enyo.dom.getCssTransformProp(), t = window.getComputedStyle(this.$.client.node, null).getPropertyValue(e).split("(")[1].split(")")[0].split(",");
+this.applyTransition("none"), this.scrollLeft = -1 * t[4], this.scrollTop = -1 * t[5], this.effectScroll();
 },
 figureBoundary: function(e) {
 var t = Math.abs(e), n = t - t / Math.pow(t, .02);
@@ -3319,6 +3340,12 @@ this.isInTopOverScroll() ? (n = !0, this.scrollTop = this.topBoundary) : this.is
 },
 scrollTo: function(e, t) {
 this.setScrollTop(-1 * t), this.setScrollLeft(-1 * e), this.start();
+},
+getOverScrollBounds: function() {
+return {
+overleft: Math.min(this.leftBoundary - -1 * this.scrollLeft, 0) || Math.max(this.rightBoundary - -1 * this.scrollLeft, 0),
+overtop: Math.min(this.topBoundary - -1 * this.scrollTop, 0) || Math.max(this.bottomBoundary - -1 * this.scrollTop, 0)
+};
 }
 });
 
@@ -3341,6 +3368,9 @@ onScrollStart: "",
 onScroll: "",
 onScrollStop: ""
 },
+touchOverscroll: !0,
+preventDragPropagation: !0,
+preventScrollPropagation: !0,
 handlers: {
 onscroll: "domScroll",
 onScrollStart: "scrollStart",
@@ -3348,9 +3378,6 @@ onScroll: "scroll",
 onScrollStop: "scrollStop"
 },
 classes: "enyo-scroller",
-touchOverscroll: !0,
-preventDragPropagation: !0,
-preventScrollPropagation: !0,
 statics: {
 osInfo: [ {
 os: "android",
@@ -4106,7 +4133,7 @@ updatePosition: function() {
 var e = this.calcViewportSize(), t = this.getBounds();
 if (this.targetPosition) {
 var n = this.targetPosition;
-typeof n.left == "number" ? n.left + t.width > e.width ? (n.left - t.width >= 0 ? n.right = e.width - n.left : n.right = 0, n.left = null) : n.right = null : typeof n.right == "number" && (n.right - t.width < 0 ? (n.right + t.width <= e.width ? n.left = e.width - n.right : n.left = 0, n.right = null) : n.left = null), typeof n.top == "number" ? n.top + t.height > e.height ? (n.top - t.height > 0 ? n.bottom = e.height - n.top : n.bottom = 0, n.top = null) : n.bottom = null : typeof n.bottom == "number" && (n.bottom - t.height < 0 ? (n.bottom + t.height <= e.height ? n.top = e.height - n.bottom : n.top = 0, n.bottom = null) : n.top = null), this.addStyles("left: " + (n.left !== null ? n.left + "px" : "initial") + "; right: " + (n.right !== null ? n.right + "px" : "initial") + "; top: " + (n.top !== null ? n.top + "px" : "initial") + "; bottom: " + (n.bottom !== null ? n.bottom + "px" : "initial") + ";");
+typeof n.left == "number" ? n.left + t.width > e.width ? (n.left - t.width >= 0 ? n.right = e.width - n.left : n.right = 0, n.left = null) : n.right = null : typeof n.right == "number" && (n.right + t.width > e.width ? (n.right - t.width >= 0 ? n.left = e.width - n.right : n.left = 0, n.right = null) : n.left = null), typeof n.top == "number" ? n.top + t.height > e.height ? (n.top - t.height >= 0 ? n.bottom = e.height - n.top : n.bottom = 0, n.top = null) : n.bottom = null : typeof n.bottom == "number" && (n.bottom + t.height > e.height ? (n.bottom - t.height >= 0 ? n.top = e.height - n.bottom : n.top = 0, n.bottom = null) : n.top = null), this.addStyles("left: " + (n.left !== null ? n.left + "px" : "initial") + "; right: " + (n.right !== null ? n.right + "px" : "initial") + "; top: " + (n.top !== null ? n.top + "px" : "initial") + "; bottom: " + (n.bottom !== null ? n.bottom + "px" : "initial") + ";");
 } else this.centered && this.addStyles("top: " + Math.max((e.height - t.height) / 2, 0) + "px; left: " + Math.max((e.width - t.width) / 2, 0) + "px;");
 },
 showingChanged: function() {

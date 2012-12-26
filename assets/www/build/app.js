@@ -1136,7 +1136,8 @@ clientClasses: "",
 clientStyle: ""
 },
 events: {
-onSetupItem: ""
+onSetupItem: "",
+onRenderRow: ""
 },
 bottomUp: !1,
 components: [ {
@@ -1183,7 +1184,7 @@ var r = t && t.index != null ? t.index : this.index;
 t && r != null && (t.index = r, t.flyweight = this), this.inherited(arguments);
 },
 tap: function(e, t) {
-if (this.noSelect) return;
+if (this.noSelect || t.index === -1) return;
 this.toggleSelected ? this.$.selection.toggle(t.index) : this.$.selection.select(t.index);
 },
 selectDeselect: function(e, t) {
@@ -1196,25 +1197,27 @@ isSelected: function(e) {
 return this.getSelection().isSelected(e);
 },
 renderRow: function(e) {
+this.setupItem(e);
 var t = this.fetchRowNode(e);
-t && (this.setupItem(e), t.innerHTML = this.$.client.generateChildHtml(), this.$.client.teardownChildren());
+t && (t.innerHTML = this.$.client.generateChildHtml(), this.$.client.teardownChildren(), this.doRenderRow({
+rowIndex: e
+}));
 },
 fetchRowNode: function(e) {
-if (this.hasNode()) {
-var t = this.node.querySelectorAll('[data-enyo-index="' + e + '"]');
-return t && t[0];
-}
+if (this.hasNode()) return this.node.querySelector('[data-enyo-index="' + e + '"]');
 },
 rowForEvent: function(e) {
-var t = e.target, n = this.hasNode().id;
-while (t && t.parentNode && t.id != n) {
-var r = t.getAttribute && t.getAttribute("data-enyo-index");
-if (r !== null) return Number(r);
+if (!this.hasNode()) return -1;
+var t = e.target;
+while (t && t !== this.node) {
+var n = t.getAttribute && t.getAttribute("data-enyo-index");
+if (n !== null) return Number(n);
 t = t.parentNode;
 }
 return -1;
 },
 prepareRow: function(e) {
+this.setupItem(e);
 var t = this.fetchRowNode(e);
 enyo.FlyweightRepeater.claimNode(this.$.client, t);
 },
@@ -1226,8 +1229,8 @@ t && (this.prepareRow(e), enyo.call(n || null, t), this.lockRow());
 },
 statics: {
 claimNode: function(e, t) {
-var n = t && t.querySelectorAll("#" + e.id);
-n = n && n[0], e.generated = Boolean(n || !e.tag), e.node = n, e.node && e.rendered();
+var n;
+t && (t.id !== e.id ? n = t.querySelector("#" + e.id) : n = t), e.generated = Boolean(n || !e.tag), e.node = n, e.node && e.rendered();
 for (var r = 0, i = e.children, s; s = i[r]; r++) this.claimNode(s, t);
 }
 }
@@ -1247,17 +1250,29 @@ noSelect: !1,
 multiSelect: !1,
 toggleSelected: !1,
 fixedHeight: !1,
-reorderable: !1
+reorderable: !1,
+swipeableComponents: [],
+enableSwipe: !0,
+persistSwipeableItem: !1
 },
 events: {
 onSetupItem: "",
-onReorder: ""
+onSetupReorderComponents: "",
+onSetupPinnedReorderComponents: "",
+onReorder: "",
+onSetupSwipeItem: "",
+onSwipeDrag: "",
+onSwipe: "",
+onSwipeComplete: ""
 },
 handlers: {
 onAnimateFinish: "animateFinish",
 ondrag: "drag",
 onup: "dragfinish",
-onholdpulse: "holdpulse"
+onholdpulse: "holdpulse",
+onRenderRow: "rowRendered",
+ondragstart: "dragstart",
+onflick: "flick"
 },
 rowHeight: 0,
 listTools: [ {
@@ -1280,24 +1295,11 @@ name: "page1",
 allowHtml: !0,
 classes: "enyo-list-page"
 }, {
-name: "reorderContainer",
-classes: "list-reorder-container"
-}, {
 name: "placeholder",
-classes: "listPlaceholder",
-style: "height:0px;"
+classes: "enyo-list-placeholder"
 }, {
-name: "pinnedPlaceholder",
-classes: "pinned-list-placeholder",
-components: [ {
-name: "pinnedPlaceholderContents",
-allowHtml: !0
-}, {
-name: "testButton",
-kind: "enyo.Button",
-content: "Drop",
-ontap: "dropPinnedRow"
-} ]
+name: "swipeableComponents",
+style: "position:absolute; display:block; top:-1000px; left:0px;"
 } ]
 } ],
 initHoldCounter: 3,
@@ -1312,23 +1314,47 @@ pinnedReorderMode: !1,
 initialPinPosition: -1,
 itemMoved: !1,
 currentPage: null,
+swipeIndex: null,
+swipeDirection: null,
+persistentItemVisible: !1,
+persistentItemOrigin: null,
+swipeComplete: !1,
+completeSwipeTimeout: null,
+completeSwipeDelayMS: 500,
+normalSwipeSpeedMS: 200,
+fastSwipeSpeedMS: 100,
+flicked: !0,
+percentageDraggedThreshold: .2,
+importProps: function(e) {
+e.reorderable && (this.touch = !0), this.inherited(arguments);
+},
 create: function() {
-this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged(), this.reorderableChanged();
+this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged();
+},
+initComponents: function() {
+this.createReorderTools(), this.inherited(arguments), this.createSwipeableComponents();
+},
+createReorderTools: function() {
+this.createComponent({
+name: "reorderContainer",
+classes: "enyo-list-reorder-container",
+ondown: "sendToStrategy",
+ondrag: "sendToStrategy",
+ondragstart: "sendToStrategy",
+ondragfinish: "sendToStrategy",
+onflick: "sendToStrategy"
+});
 },
 createStrategy: function() {
 this.controlParentName = "strategy", this.inherited(arguments), this.createChrome(this.listTools), this.controlParentName = "client", this.discoverControlParent();
 },
+createSwipeableComponents: function() {
+for (var e = 0; e < this.swipeableComponents.length; e++) this.$.swipeableComponents.createComponent(this.swipeableComponents[e], {
+owner: this.owner
+});
+},
 rendered: function() {
 this.inherited(arguments), this.$.generator.node = this.$.port.hasNode(), this.$.generator.generated = !0, this.reset();
-},
-initComponents: function() {
-this.inherited(arguments), this.hideReorderableContainer(), this.hidePinnedPlaceholderContainer();
-},
-hideReorderableContainer: function() {
-this.$.reorderContainer.setShowing(!1);
-},
-hidePinnedPlaceholderContainer: function() {
-this.$.pinnedPlaceholder.setShowing(!1);
 },
 resizeHandler: function() {
 this.inherited(arguments), this.refresh();
@@ -1348,8 +1374,8 @@ this.$.generator.setToggleSelected(this.toggleSelected);
 countChanged: function() {
 this.hasNode() && this.updateMetrics();
 },
-reorderableChanged: function() {
-this.reorderable && !this.fixedHeight && (enyo.log("Lists without a fixed row height cannont be reorderable!"), this.reorderable = !1);
+sendToStrategy: function(e, t) {
+this.$.strategy.dispatchEvent("on" + t.type, t, e);
 },
 updateMetrics: function() {
 this.defaultPageHeight = this.rowsPerPage * (this.rowHeight || 100), this.pageCount = Math.ceil(this.count / this.rowsPerPage), this.portSize = 0;
@@ -1371,12 +1397,17 @@ hold: function(e, t) {
 t.preventDefault();
 if (this.shouldDoReorderHold(e, t)) return this.holding = !0, this.reorderHold(t), !1;
 },
+dragstart: function(e, t) {
+return this.swipeDragStart(e, t);
+},
 drag: function(e, t) {
-t.preventDefault();
-if (this.shouldDoReorderDrag(t)) return this.reorderDrag(t), !0;
+return t.preventDefault(), this.shouldDoReorderDrag(t) ? (this.reorderDrag(t), !0) : this.shouldDoSwipeDrag() ? (this.swipeDrag(e, t), !0) : this.preventDragPropagation;
+},
+flick: function(e, t) {
+this.shouldDoSwipeFlick() && this.swipeFlick(e, t);
 },
 dragfinish: function(e, t) {
-this.getReorderable() && (this.resetHoldCounter(), this.finishReordering(e, t));
+this.getReorderable() && (this.resetHoldCounter(), this.finishReordering(e, t)), this.swipeDragFinish(e, t);
 },
 generatePage: function(e, t) {
 this.page = e;
@@ -1391,7 +1422,36 @@ o != s && s > 0 && (this.pageHeights[e] = s, this.portSize += s - o);
 },
 update: function(e) {
 var t = !1, n = this.positionToPageInfo(e), r = n.pos + this.scrollerHeight / 2, i = Math.floor(r / Math.max(n.height, this.scrollerHeight) + .5) + n.no, s = i % 2 === 0 ? i : i - 1;
-this.p0 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
+this.p0 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
+},
+getPageRowHeights: function(e) {
+var t = [], n = document.querySelectorAll("#" + e.id + " div[data-enyo-index]");
+for (var r = 0, i, s; r < n.length; r++) i = n[r].getAttribute("data-enyo-index"), i !== null && (s = enyo.dom.getBounds(n[r]), t.push({
+height: s.height,
+width: s.width,
+index: i
+}));
+return t;
+},
+updateRowBounds: function(e) {
+var t = this.getRowBoundsUpdateIndex(e, this.p0RowBounds);
+if (t > -1) {
+this.updateRowBoundsAtIndex(t, this.p0RowBounds, this.$.page0);
+return;
+}
+t = this.getRowBoundsUpdateIndex(e, this.p1RowBounds);
+if (t > -1) {
+this.updateRowBoundsAtIndex(t, this.p1RowBounds, this.$.page1);
+return;
+}
+},
+getRowBoundsUpdateIndex: function(e, t) {
+for (var n = 0; n < t.length; n++) if (t[n].index == e) return n;
+return -1;
+},
+updateRowBoundsAtIndex: function(e, t, n) {
+var r = document.querySelectorAll("#" + n.id + ' div[data-enyo-index="' + t[e].index + '"]'), i = enyo.dom.getBounds(r[0]);
+t[e].height = i.height, t[e].width = i.width;
 },
 updateForPosition: function(e) {
 this.update(this.calcPos(e));
@@ -1421,7 +1481,7 @@ return t;
 positionToPageInfo: function(e) {
 var t = -1, n = this.calcPos(e), r = this.defaultPageHeight;
 while (n >= 0) t++, r = this.getPageHeight(t), n -= r;
-return {
+return t = Math.max(t, 0), {
 no: t,
 height: r,
 pos: n + r
@@ -1443,9 +1503,6 @@ scroll: function(e, t) {
 var n = this.inherited(arguments);
 return this.update(this.getScrollTop()), this.shouldDoPinnedReorderScroll() && this.reorderScroll(e, t), n;
 },
-scrollToBottom: function() {
-this.update(this.getScrollBounds().maxTop), this.inherited(arguments);
-},
 setScrollTop: function(e) {
 this.update(e), this.inherited(arguments), this.twiddle();
 },
@@ -1454,6 +1511,9 @@ return this.calcPos(this.getScrollTop());
 },
 setScrollPosition: function(e) {
 this.setScrollTop(this.calcPos(e));
+},
+scrollToBottom: function() {
+this.update(this.getScrollBounds().maxTop), this.inherited(arguments);
 },
 scrollToRow: function(e) {
 var t = Math.floor(e / this.rowsPerPage), n = e % this.rowsPerPage, r = this.pageToPosition(t);
@@ -1495,6 +1555,9 @@ return this.$.generator.isSelected(e);
 renderRow: function(e) {
 this.$.generator.renderRow(e);
 },
+rowRendered: function(e, t) {
+this.updateRowBounds(t.rowIndex);
+},
 prepareRow: function(e) {
 this.$.generator.prepareRow(e);
 },
@@ -1512,13 +1575,20 @@ var e = this.getStrategy();
 enyo.call(e, "twiddle");
 },
 shouldDoReorderHold: function(e, t) {
-return !this.getReorderable() || t.rowIndex < 0 || this.pinnedReorderMode || e !== this.$.strategy ? !1 : !0;
+return !!this.getReorderable() && t.rowIndex >= 0 && !this.pinnedReorderMode && e === this.$.strategy && t.index >= 0 ? !0 : !1;
 },
 reorderHold: function(e) {
-this.$.strategy.listReordering = !0, this.setupReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = Math.floor(e.rowIndex / this.rowsPerPage), this.currentPage = this.currentPageNumber % 2, this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlacholder(e.rowIndex);
+this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = Math.floor(e.rowIndex / this.rowsPerPage), this.currentPage = this.currentPageNumber % 2, this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
 },
-setupReorderContainer: function(e) {
-this.setItemPosition(this.$.reorderContainer, e.rowIndex), this.setItemBounds(this.$.reorderContainer, e.rowIndex), this.appendNodeToReorderContainer(this.cloneRowNode(e.rowIndex)), this.$.reorderContainer.setShowing(!0), this.centerReorderContainerOnPointer(e);
+buildReorderContainer: function() {
+this.$.reorderContainer.destroyClientControls();
+for (var e = 0; e < this.reorderComponents.length; e++) this.$.reorderContainer.createComponent(this.reorderComponents[e], {
+owner: this.owner
+});
+this.$.reorderContainer.render();
+},
+styleReorderContainer: function(e) {
+this.setItemPosition(this.$.reorderContainer, e.rowIndex), this.setItemBounds(this.$.reorderContainer, e.rowIndex), this.$.reorderContainer.setShowing(!0), this.centerReorderContainerOnPointer(e);
 },
 appendNodeToReorderContainer: function(e) {
 this.$.reorderContainer.createComponent({
@@ -1527,16 +1597,16 @@ content: e.innerHTML
 }).render();
 },
 centerReorderContainerOnPointer: function(e) {
-var t = this.getNodePosition(this.hasNode()), n = e.pageX - t.left - parseInt(this.$.reorderContainer.domStyles.width, 10) / 2, r = e.pageY - t.top + this.getScrollTop() - parseInt(this.$.reorderContainer.domStyles.height, 10) / 2;
-this.positionReorderContainer(n, r);
+var t = this.getNodePosition(this.hasNode()), n = e.pageX - t.left - parseInt(this.$.reorderContainer.domStyles.width) / 2, r = e.pageY - t.top + this.getScrollTop() - parseInt(this.$.reorderContainer.domStyles.height) / 2;
+this.getStrategyKind() != "ScrollStrategy" && (n -= this.getScrollLeft(), r -= this.getScrollTop()), this.positionReorderContainer(n, r);
 },
 positionReorderContainer: function(e, t) {
-this.$.reorderContainer.addClass("animatedTopAndLeft"), this.$.reorderContainer.addStyles("left:" + e + "px;top:" + t + "px;"), this.setPositionReorderContainerTimeout();
+this.$.reorderContainer.addClass("enyo-animatedTopAndLeft"), this.$.reorderContainer.addStyles("left:" + e + "px;top:" + t + "px;"), this.setPositionReorderContainerTimeout();
 },
 setPositionReorderContainerTimeout: function() {
 var e = this;
 this.clearPositionReorderContainerTimeout(), this.positionReorderContainerTimeout = setTimeout(function() {
-e.$.reorderContainer.removeClass("animatedTopAndLeft"), e.clearPositionReorderContainerTimeout();
+e.$.reorderContainer.removeClass("enyo-animatedTopAndLeft"), e.clearPositionReorderContainerTimeout();
 }, 100);
 },
 clearPositionReorderContainerTimeout: function() {
@@ -1548,11 +1618,11 @@ return !this.getReorderable() || this.draggingRowIndex < 0 || this.pinnedReorder
 reorderDrag: function(e) {
 this.positionReorderNode(e), this.checkForAutoScroll(e);
 var t = this.getRowIndexFromCoordinate(e.pageY);
-t != this.placeholderRowIndex && this.movePlaceholderToIndex(t);
+t !== -1 && t != this.placeholderRowIndex && this.movePlaceholderToIndex(t);
 },
 positionReorderNode: function(e) {
-var t = this.$.reorderContainer.hasNode().style, n = parseInt(t.left, 10) + e.ddx, r = this.getScrollTop() - this.prevScrollTop, i = parseInt(t.top, 10) + parseInt(e.ddy, 10) + r;
-this.$.reorderContainer.addStyles("top: " + i + "px ; left: " + n + "px"), this.prevScrollTop = this.getScrollTop();
+var t = this.$.reorderContainer.hasNode().style, n = parseInt(t.left) + e.ddx, r = parseInt(t.top) + e.ddy;
+r = this.getStrategyKind() == "ScrollStrategy" ? r + (this.getScrollTop() - this.prevScrollTop) : r, this.$.reorderContainer.addStyles("top: " + r + "px ; left: " + n + "px"), this.prevScrollTop = this.getScrollTop();
 },
 checkForAutoScroll: function(e) {
 var t = this.getNodePosition(this.hasNode()), n = this.getBounds(), r;
@@ -1577,7 +1647,7 @@ enyo.log("No node - " + e);
 return;
 }
 var n = e > this.draggingRowIndex ? e + 1 : e, r = Math.floor(n / this.rowsPerPage), i = r % 2;
-r >= this.pageCount && (r = this.currentPageNumber, i = this.currentPage), this.currentPage == i ? this.$["page" + this.currentPage].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n)) : (this.updatePageHeights(r), this.updatePagePositions(r, i), this.$["page" + i].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n))), this.placeholderRowIndex = e, this.currentPageNumber = r, this.currentPage = i, this.itemMoved = !0;
+r >= this.pageCount && (r = this.currentPageNumber, i = this.currentPage), this.currentPage == i ? this.$["page" + this.currentPage].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n)) : (this.$["page" + i].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n)), this.updatePageHeight(this.currentPageNumber, this.$["page" + this.currentPage]), this.updatePageHeight(r, this.$["page" + i]), this.updatePagePositions(r, i)), this.placeholderRowIndex = e, this.currentPageNumber = r, this.currentPage = i, this.itemMoved = !0;
 },
 finishReordering: function(e, t) {
 if (this.draggingRowIndex < 0 || this.pinnedReorderMode) return;
@@ -1587,51 +1657,60 @@ n.completeFinishReordering(t);
 }, 100), t.preventDefault(), !0;
 },
 moveReorderedContainerToDroppedPosition: function() {
-var e = this.getRelativeOffset(this.placeholderNode, this.hasNode());
-this.positionReorderContainer(e.left, e.top);
+var e = this.getRelativeOffset(this.placeholderNode, this.hasNode()), t = this.getStrategyKind() == "ScrollStrategy" ? e.top : e.top - this.getScrollTop(), n = e.left - this.getScrollLeft();
+this.positionReorderContainer(n, t);
 },
 completeFinishReordering: function(e) {
-this.removePlaceholderNode();
-if (this.draggingRowIndex == this.placeholderRowIndex) {
+if (this.draggingRowIndex == this.placeholderRowIndex && !this.pinnedReorderMode) {
 if (!this.itemMoved) {
 this.beginPinnedReorder(e);
 return;
 }
 this.dropReorderedRow(e);
 }
-this.dropReorderedRow(e), this.reorderRows(e), this.resetReorderState();
+this.removePlaceholderNode(), this.dropReorderedRow(e), this.reorderRows(e), this.resetReorderState(), this.refresh();
 },
 beginPinnedReorder: function(e) {
-this.emptyAndHideReorderContainer(), this.setupPinnedPlaceholder(), this.pinnedReorderMode = !0, this.initialPinPosition = e.pageY;
+this.buildPinnedReorderContainer(), this.doSetupPinnedReorderComponents(enyo.mixin(e, {
+index: this.draggingRowIndex
+})), this.pinnedReorderMode = !0, this.initialPinPosition = e.pageY;
 },
 emptyAndHideReorderContainer: function() {
 this.$.reorderContainer.destroyComponents(), this.$.reorderContainer.setShowing(!1);
 },
-setupPinnedPlaceholder: function() {
-this.$.pinnedPlaceholderContents.setContent(this.cloneRowNode(this.draggingRowIndex).innerHTML), this.showNode(this.hiddenNode), this.setItemBounds(this.$.pinnedPlaceholder, this.draggingRowIndex), this.hideNode(this.hiddenNode), this.$["page" + this.currentPage].hasNode().insertBefore(this.$.pinnedPlaceholder.hasNode(), this.$.generator.fetchRowNode(this.draggingRowIndex)), this.$.pinnedPlaceholder.setShowing(!0);
+buildPinnedReorderContainer: function() {
+this.$.reorderContainer.destroyClientControls();
+for (var e = 0; e < this.pinnedReorderComponents.length; e++) this.$.reorderContainer.createComponent(this.pinnedReorderComponents[e], {
+owner: this.owner
+});
+this.$.reorderContainer.render();
 },
 dropReorderedRow: function(e) {
 this.emptyAndHideReorderContainer(), this.positionReorderedNode();
 },
 reorderRows: function(e) {
-this.doReorder(this.makeReorderEvent(e)), this.fixPageHeightsAndPortSize(), this.updateListIndices();
+this.doReorder(this.makeReorderEvent(e)), this.shouldMoveItemtoDiffPage() && this.moveItemToDiffPage(), this.updateListIndices();
 },
 makeReorderEvent: function(e) {
 return e.reorderFrom = this.draggingRowIndex, e.reorderTo = this.placeholderRowIndex, e;
 },
-fixPageHeightsAndPortSize: function() {
-this.currentPageNumber != this.initialPageNumber && (this.correctPageHeights(), this.adjustPortSize());
+shouldMoveItemtoDiffPage: function() {
+return this.currentPageNumber != this.initialPageNumber;
+},
+moveItemToDiffPage: function() {
+var e, t, n = this.currentPage == 1 ? 0 : 1;
+this.initialPageNumber < this.currentPageNumber ? (e = this.$["page" + this.currentPage].hasNode().firstChild, this.$["page" + n].hasNode().appendChild(e)) : (e = this.$["page" + this.currentPage].hasNode().lastChild, t = this.$["page" + n].hasNode().firstChild, this.$["page" + n].hasNode().insertBefore(e, t)), this.updatePagePositions(this.initialPageNumber, n);
 },
 positionReorderedNode: function() {
 var e = this.placeholderRowIndex > this.draggingRowIndex ? this.placeholderRowIndex + 1 : this.placeholderRowIndex, t = this.$.generator.fetchRowNode(e);
 this.$["page" + this.currentPage].hasNode().insertBefore(this.hiddenNode, t), this.showNode(this.hiddenNode);
 },
 resetReorderState: function() {
-this.draggingRowIndex = this.placeholderRowIndex = -1, this.holding = !1;
+this.draggingRowIndex = this.placeholderRowIndex = -1, this.holding = !1, this.pinnedReorderMode = !1;
 },
 updateListIndices: function() {
 if (this.shouldDoRefresh()) {
-this.refresh(), this.draggingRowIndex < this.placeholderRowIndex && this.setScrollPosition(this.getScrollPosition() - this.rowHeight);
+this.refresh();
 return;
 }
 var e = Math.min(this.draggingRowIndex, this.placeholderRowIndex), t = Math.max(this.draggingRowIndex, this.placeholderRowIndex), n = this.draggingRowIndex - this.placeholderRowIndex > 0 ? 1 : -1, r, i, s, o;
@@ -1643,7 +1722,7 @@ if (!r) {
 enyo.log("No node - " + i);
 continue;
 }
-o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o + 1, r.setAttribute("data-enyo-index", s);
+o = parseInt(r.getAttribute("data-enyo-index")), s = o + 1, r.setAttribute("data-enyo-index", s);
 }
 r = document.querySelectorAll('[data-enyo-index="reordered"]')[0], r.setAttribute("data-enyo-index", this.placeholderRowIndex);
 } else {
@@ -1654,7 +1733,7 @@ if (!r) {
 enyo.log("No node - " + i);
 continue;
 }
-o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o - 1, r.setAttribute("data-enyo-index", s);
+o = parseInt(r.getAttribute("data-enyo-index")), s = o - 1, r.setAttribute("data-enyo-index", s);
 }
 }
 },
@@ -1669,10 +1748,10 @@ return;
 }
 var n = this.getRelativeOffset(t, this.hasNode()), r = this.getDimensions(t);
 return {
-h: parseInt(r.height, 10),
-w: parseInt(r.width, 10),
-left: parseInt(n.left, 10),
-top: parseInt(n.top, 10)
+h: parseInt(r.height),
+w: parseInt(r.width),
+left: parseInt(n.left),
+top: parseInt(n.top)
 };
 },
 getRelativeOffset: function(e, t) {
@@ -1684,22 +1763,13 @@ if (e !== t && e.parentNode) do n.top += e.offsetTop || 0, n.left += e.offsetLef
 return n;
 },
 getDimensions: function(e) {
-var t = getComputedStyle(e, null);
+var t = window.getComputedStyle(e, null);
 return {
 height: t.getPropertyValue("height"),
 width: t.getPropertyValue("width")
 };
 },
-movePinnedRow: function(e) {
-var t = this.$.generator.fetchRowNode(e);
-if (!t) {
-enyo.log("No node - " + e);
-return;
-}
-var n = Math.floor(e / this.rowsPerPage), r = n % 2;
-n >= this.pageCount && (n = this.currentPageNumber, r = this.currentPage), this.currentPage == r ? this.$["page" + this.currentPage].hasNode().insertBefore(this.$.pinnedPlaceholder.hasNode(), t) : (this.updatePageHeights(n), this.updatePagePositions(n, r), this.$["page" + r].hasNode().insertBefore(this.$.pinnedPlaceholder.hasNode(), t)), this.placeholderRowIndex = e > this.draggingRowIndex ? e - 1 : e, this.currentPageNumber = n, this.currentPage = r;
-},
-replaceNodeWithPlacholder: function(e) {
+replaceNodeWithPlaceholder: function(e) {
 var t = this.$.generator.fetchRowNode(e);
 if (!t) {
 enyo.log("No node - " + e);
@@ -1721,15 +1791,16 @@ removeNode: function(e) {
 if (!e || !e.parentNode) return;
 e.parentNode.removeChild(e);
 },
-updatePageHeights: function(e) {
-this.pageHeights[this.currentPageNumber] = this.getPageHeight(this.currentPageNumber) - this.rowHeight, this.pageHeights[e] = this.getPageHeight(e) + this.rowHeight;
+updatePageHeight: function(e, t) {
+var n = t.getBounds().height;
+this.pageHeights[e] = n;
 },
 updatePagePositions: function(e, t) {
 this.positionPage(this.currentPageNumber, this.$["page" + this.currentPage]), this.positionPage(e, this.$["page" + t]);
 },
 correctPageHeights: function() {
-var e = this.currentPage == 1 ? 0 : 1, t, n;
-this.initialPageNumber < this.currentPageNumber ? (t = this.$["page" + this.currentPage].hasNode().firstChild, this.$["page" + e].hasNode().appendChild(t)) : (t = this.$["page" + this.currentPage].hasNode().lastChild, n = this.$["page" + e].hasNode().firstChild, this.$["page" + e].hasNode().insertBefore(t, n)), this.pageHeights[this.initialPageNumber] = this.getPageHeight(this.initialPageNumber) + this.rowHeight, this.pageHeights[this.currentPageNumber] = this.getPageHeight(this.currentPageNumber) - this.rowHeight, this.updatePagePositions(this.initialPageNumber, e);
+var e = this.initialPageNumber % 2;
+this.updatePageHeight(this.currentPageNumber, this.$["page" + this.currentPage]), e != this.currentPageNumber && this.updatePageHeight(this.initialPageNumber, this.$["page" + e]);
 },
 hideNode: function(e) {
 return e.style.display = "none", e;
@@ -1737,12 +1808,22 @@ return e.style.display = "none", e;
 showNode: function(e) {
 return e.style.display = "block", e;
 },
-dropPinnedRow: function(e, t) {
-this.dropReorderedRow(t), this.pinnedReorderMode = !1, this.$.pinnedPlaceholder.setShowing(!1), this.draggingRowIndex != this.placeholderRowIndex && this.reorderRows(t), this.resetReorderState();
+dropPinnedRow: function(e) {
+var t = this;
+this.moveReorderedContainerToDroppedPosition(e), setTimeout(function() {
+t.completeFinishReordering(e);
+}, 100);
+return;
 },
 getRowIndexFromCoordinate: function(e) {
-var t = this.getScrollTop() + e - this.getNodePosition(this.hasNode()).top;
-return Math.floor(t / this.rowHeight);
+var t = this.getScrollTop() + e - this.getNodePosition(this.hasNode()).top, n = this.positionToPageInfo(t), r = n.no == this.p0 ? this.p0RowBounds : this.p1RowBounds;
+if (!r) return -1;
+var i = n.pos, s = parseInt(window.getComputedStyle(this.placeholderNode).height);
+for (var o = 0, u = 0; o < r.length; o++) {
+u += r[o].height > 0 ? r[o].height : s;
+if (u >= i) return parseInt(r[o].index);
+}
+return -1;
 },
 getIndexPosition: function(e) {
 return this.getNodePosition(this.$.generator.fetchRowNode(e));
@@ -1769,8 +1850,8 @@ cloneRowNode: function(e) {
 return this.$.generator.fetchRowNode(e).cloneNode(!0);
 },
 setItemPosition: function(e, t) {
-var n = this.getNodeStyle(t), r = "top:" + n.top + "px; left:" + n.left + "px;";
-e.addStyles(r);
+var n = this.getNodeStyle(t), r = this.getStrategyKind() == "ScrollStrategy" ? n.top : n.top - this.getScrollTop(), i = "top:" + r + "px; left:" + n.left + "px;";
+e.addStyles(i);
 },
 setItemBounds: function(e, t) {
 var n = this.getNodeStyle(t), r = "width:" + n.w + "px; height:" + n.h + "px;";
@@ -1780,12 +1861,132 @@ shouldDoPinnedReorderScroll: function() {
 return !this.getReorderable() || !this.pinnedReorderMode ? !1 : !0;
 },
 reorderScroll: function(e, t) {
+this.getStrategyKind() == "ScrollStrategy" && this.$.reorderContainer.addStyles("top:" + (this.initialPinPosition + this.getScrollTop() - this.rowHeight) + "px;");
 var n = this.getRowIndexFromCoordinate(this.initialPinPosition);
-n != this.placeholderRowIndex && this.movePinnedRow(n);
+n != this.placeholderRowIndex && this.movePlaceholderToIndex(n);
 },
 hideReorderingRow: function() {
 var e = document.querySelectorAll('[data-enyo-index="' + this.draggingRowIndex + '"]')[0];
 e && (this.hiddenNode = this.hideNode(e));
+},
+isReordering: function() {
+return this.draggingRowIndex > -1;
+},
+swipeDragStart: function(e, t) {
+return !this.hasSwipeableComponents() || t.vertical || this.draggingRowIndex > -1 ? !1 : (this.setSwipeDirection(t.xDirection), this.completeSwipeTimeout && this.completeSwipe(t), this.setFlicked(!1), this.setSwipeComplete(!1), this.swipeIndexChanged(t.index) && (this.clearSwipeables(), this.setSwipeIndex(t.index)), this.persistentItemVisible || this.startSwipe(t), this.draggedXDistance = 0, this.draggedYDistance = 0, !0);
+},
+shouldDoSwipeDrag: function() {
+return this.getEnableSwipe() && !this.isReordering();
+},
+swipeDrag: function(e, t) {
+return this.draggedOutOfBounds(t) ? (this.swipeDragFinish(t), this.preventDragPropagation) : this.persistentItemVisible ? (this.dragPersistentItem(t), this.preventDragPropagation) : (this.dragSwipeableComponents(this.calcNewDragPosition(t.ddx)), this.draggedXDistance = t.dx, this.draggedYDistance = t.dy, this.preventDragPropagation);
+},
+shouldDoSwipeFlick: function() {
+return !this.isReordering();
+},
+swipeFlick: function(e, t) {
+return this.getEnableSwipe() ? Math.abs(t.xVelocity) < Math.abs(t.yVelocity) ? !1 : (this.setFlicked(!0), this.persistentItemVisible ? (this.flickPersistentItem(t), !0) : (this.swipe(this.normalSwipeSpeedMS), !0)) : !1;
+},
+swipeDragFinish: function(e, t) {
+return this.getEnableSwipe() ? this.wasFlicked() ? this.preventDragPropagation : (this.persistentItemVisible ? this.dragFinishPersistentItem(t) : this.calcPercentageDragged(this.draggedXDistance) > this.percentageDraggedThreshold ? this.swipe(this.fastSwipeSpeedMS) : this.backOutSwipe(t), this.preventDragPropagation) : this.preventDragPropagation;
+},
+hasSwipeableComponents: function() {
+return this.$.swipeableComponents.controls.length !== 0;
+},
+positionSwipeableContainer: function(e, t) {
+var n = this.$.generator.fetchRowNode(e);
+if (!n) return;
+var r = this.getRelativeOffset(n, this.hasNode()), i = this.getDimensions(n), s = t == 1 ? -1 * parseInt(i.width) : parseInt(i.width);
+this.$.swipeableComponents.addStyles("top: " + r.top + "px; left: " + s + "px; height: " + i.height + "; width: " + i.width);
+},
+setSwipeDirection: function(e) {
+this.swipeDirection = e;
+},
+setFlicked: function(e) {
+this.flicked = e;
+},
+wasFlicked: function() {
+return this.flicked;
+},
+setSwipeComplete: function(e) {
+this.swipeComplete = e;
+},
+swipeIndexChanged: function(e) {
+return this.swipeIndex === null ? !0 : e === undefined ? !1 : e !== this.swipeIndex;
+},
+setSwipeIndex: function(e) {
+this.swipeIndex = e === undefined ? this.swipeIndex : e;
+},
+calcNewDragPosition: function(e) {
+var t = window.getComputedStyle(this.$.swipeableComponents.hasNode());
+if (!t) return !1;
+var n = parseInt(t.left), r = this.getDimensions(this.$.swipeableComponents.node), i = this.swipeDirection == 1 ? 0 : -1 * parseInt(r.width), s = this.swipeDirection == 1 ? n + e > i ? i : n + e : n + e < i ? i : n + e;
+return s;
+},
+dragSwipeableComponents: function(e) {
+this.$.swipeableComponents.applyStyle("left", e + "px");
+},
+draggedOutOfBounds: function(e) {
+var t = this.getNodePosition(this.hasNode()), n = this.getBounds(), r = e.pageY - t.top < 0, i = e.pageY - t.top > n.height, s = e.pageX - t.left < 0, o = e.pageX - t.left > n.width;
+return r || i || s || o;
+},
+startSwipe: function(e) {
+e.index = this.swipeIndex, this.positionSwipeableContainer(this.swipeIndex, e.xDirection), this.$.swipeableComponents.setShowing(!0), this.setPersistentItemOrigin(e.xDirection), this.doSetupSwipeItem(e);
+},
+dragPersistentItem: function(e) {
+var t = 0, n = this.persistentItemOrigin == "right" ? Math.max(t, t + e.dx) : Math.min(t, t + e.dx);
+this.$.swipeableComponents.applyStyle("left", n + "px");
+},
+dragFinishPersistentItem: function(e) {
+var t = this.calcPercentageDragged(e.dx) > .2, n = e.dx > 0 ? "right" : e.dx < 0 ? "left" : null;
+this.persistentItemOrigin == n ? t ? this.slideAwayItem() : this.bounceItem(e) : this.bounceItem(e);
+},
+flickPersistentItem: function(e) {
+e.xVelocity > 0 ? this.persistentItemOrigin == "left" ? this.bounceItem(e) : this.slideAwayItem() : e.xVelocity < 0 && (this.persistentItemOrigin == "right" ? this.bounceItem(e) : this.slideAwayItem());
+},
+setPersistentItemOrigin: function(e) {
+this.persistentItemOrigin = e == 1 ? "left" : "right";
+},
+calcPercentageDragged: function(e) {
+return Math.abs(e / parseInt(window.getComputedStyle(this.$.swipeableComponents.hasNode()).width));
+},
+swipe: function(e) {
+this.setSwipeComplete(!0), this.animateSwipe(0, e);
+},
+backOutSwipe: function(e) {
+var t = this.getDimensions(this.$.swipeableComponents.node), n = this.swipeDirection == 1 ? -1 * parseInt(t.width) : parseInt(t.width);
+this.animateSwipe(n, this.fastSwipeSpeedMS), this.setSwipeDirection(null), this.setFlicked(!0);
+},
+bounceItem: function(e) {
+var t = window.getComputedStyle(this.$.swipeableComponents.node);
+parseInt(t.left) != parseInt(t.width) && this.animateSwipe(0, this.normalSwipeSpeedMS);
+},
+slideAwayItem: function() {
+var e = this.$.swipeableComponents, t = window.getComputedStyle(e.node), n = this.persistentItemOrigin == "left" ? -1 * parseInt(t.width) : parseInt(t.width);
+this.animateSwipe(n, this.normalSwipeSpeedMS), this.persistentItemVisible = !1, this.setPersistSwipeableItem(!1);
+},
+clearSwipeables: function() {
+this.$.swipeableComponents.setShowing(!1), this.persistentItemVisible = !1, this.setPersistSwipeableItem(!1);
+},
+completeSwipe: function(e) {
+this.completeSwipeTimeout && (clearTimeout(this.completeSwipeTimeout), this.completeSwipeTimeout = null), this.getPersistSwipeableItem() ? this.persistentItemVisible = !0 : (this.$.swipeableComponents.setShowing(!1), this.swipeComplete && this.doSwipeComplete({
+index: this.swipeIndex,
+xDirection: this.swipeDirection
+})), this.setSwipeDirection(null);
+},
+animateSwipe: function(e, t) {
+var n = enyo.now(), r = 0, i = this.$.swipeableComponents, s = parseInt(i.domStyles.left, 10), o = e - s;
+this.stopAnimateSwipe();
+var u = enyo.bind(this, function() {
+var e = enyo.now() - n, r = e / t, a = s + o * Math.min(r, 1);
+i.applyStyle("left", a + "px"), this.job = enyo.requestAnimationFrame(u), e / t >= 1 && (this.stopAnimateSwipe(), this.completeSwipeTimeout = setTimeout(enyo.bind(this, function() {
+this.completeSwipe();
+}), this.completeSwipeDelayMS));
+});
+this.job = enyo.requestAnimationFrame(u);
+},
+stopAnimateSwipe: function() {
+this.job && (this.job = enyo.cancelRequestAnimationFrame(this.job));
 }
 });
 
@@ -1833,7 +2034,10 @@ onCreate: "setPully"
 this.listTools.splice(0, 0, e), this.inherited(arguments), this.setPulling();
 },
 initComponents: function() {
-this.createChrome(this.pulldownTools), this.accel = enyo.dom.canAccelerate(), this.translation = this.accel ? "translate3d" : "translate", this.inherited(arguments);
+this.createChrome(this.pulldownTools), this.accel = enyo.dom.canAccelerate(), this.translation = this.accel ? "translate3d" : "translate", this.strategyKind = this.resetStrategyKind(), this.inherited(arguments);
+},
+resetStrategyKind: function() {
+return enyo.platform.android >= 3 ? "TranslateScrollStrategy" : "TouchScrollStrategy";
 },
 setPully: function(e, t) {
 this.pully = t.originator;
@@ -1937,14 +2141,14 @@ classes: "enyo-list-page"
 name: "belowClient"
 }, {
 name: "reorderContainer",
-classes: "list-reorder-container"
+classes: "enyo-list-reorder-container"
 }, {
 name: "placeholder",
-classes: "listPlaceholder",
+classes: "enyo-list-placeholder",
 style: "height:0px;"
 }, {
 name: "pinnedPlaceholder",
-classes: "pinned-list-placeholder",
+classes: "enyo-pinned-list-placeholder",
 components: [ {
 name: "pinnedPlaceholderContents",
 allowHtml: !0
@@ -2408,7 +2612,7 @@ var n = this.container.getPanels();
 for (var r = 0, i = this.containerPadding.left, s, o, u = 0; o = n[r]; r++) o.getShowing() ? (this.arrangeControl(o, {
 left: i + u * this.peekWidth
 }), r >= t && (i += o.width + o.marginWidth - this.peekWidth), u++) : (this.arrangeControl(o, {
-left: i + u
+left: i
 }), r >= t && (i += o.width + o.marginWidth)), r == n.length - 1 && t < 0 && this.arrangeControl(o, {
 left: i - t
 });
@@ -3921,7 +4125,7 @@ value: n,
 active: n == t.getMonth()
 });
 var i = t.getFullYear();
-this.$.yearPicker.setSelected(i - this.minYear), this.$.year.setContent(i);
+this.$.yearPicker.setSelected(i - this.minYear);
 for (n = 1; n <= this.monthLength(t.getYear(), t.getMonth()); n++) this.$.dayPicker.createComponent({
 content: n,
 value: n,
@@ -5057,8 +5261,8 @@ scrolling: !0,
 title: undefined,
 actionButtons: []
 },
-vertFlushMargin: 100,
-horizFlushMargin: 120,
+vertFlushMargin: 60,
+horizFlushMargin: 50,
 widePopup: 200,
 longPopup: 200,
 horizBuffer: 16,
@@ -5129,7 +5333,7 @@ for (n in e) t += n + ":" + e[n] + (isNaN(e[n]) ? "; " : "px; ");
 this.addStyles(t);
 },
 getPageOffset: function(e) {
-var t = e.getBoundingClientRect(), n = window.pageYOffset === undefined ? document.documentElement.scrollTop : window.pageYOffset, r = window.pageXOffset === undefined ? document.documentElement.scrollLeft : window.pageXOffset, i = t.height === undefined ? t.bottom - t.top : t.height, s = t.width === undefined ? t.right - t.left : t.width;
+var t = this.getBoundingRect(e), n = window.pageYOffset === undefined ? document.documentElement.scrollTop : window.pageYOffset, r = window.pageXOffset === undefined ? document.documentElement.scrollLeft : window.pageXOffset, i = t.height === undefined ? t.bottom - t.top : t.height, s = t.width === undefined ? t.right - t.left : t.width;
 return {
 top: t.top + n,
 left: t.left + r,
@@ -5146,28 +5350,28 @@ if (this.applyVerticalFlushPositioning(i, s)) return;
 if (this.applyHorizontalFlushPositioning(i, s)) return;
 if (this.applyVerticalPositioning()) return;
 } else if (this.activatorOffset.left + this.activatorOffset.width < i || this.activatorOffset.left > s) if (this.applyHorizontalPositioning()) return;
-var o = this.node.getBoundingClientRect(), u = o.height === undefined ? o.bottom - o.top : o.height;
+var o = this.getBoundingRect(this.node);
 if (o.width > this.widePopup) {
 if (this.applyVerticalPositioning()) return;
-} else if (u > this.longPopup && this.applyHorizontalPositioning()) return;
+} else if (o.height > this.longPopup && this.applyHorizontalPositioning()) return;
 if (this.applyVerticalPositioning()) return;
 if (this.applyHorizontalPositioning()) return;
 }
 },
 initVerticalPositioning: function() {
 this.resetPositioning(), this.addClass("vertical");
-var e = this.node.getBoundingClientRect(), t = e.height === undefined ? e.bottom - e.top : e.height, n = this.getViewHeight();
-return this.floating ? this.activatorOffset.top < n / 2 ? (this.applyPosition({
+var e = this.getBoundingRect(this.node), t = this.getViewHeight();
+return this.floating ? this.activatorOffset.top < t / 2 ? (this.applyPosition({
 top: this.activatorOffset.top + this.activatorOffset.height,
 bottom: "auto"
 }), this.addClass("below")) : (this.applyPosition({
 top: this.activatorOffset.top - e.height,
 bottom: "auto"
-}), this.addClass("above")) : e.top + t > n && n - e.bottom < e.top - t ? this.addClass("above") : this.addClass("below"), e = this.node.getBoundingClientRect(), e.top + t > n || e.top < 0 ? !1 : !0;
+}), this.addClass("above")) : e.top + e.height > t && t - e.bottom < e.top - e.height ? this.addClass("above") : this.addClass("below"), e = this.getBoundingRect(this.node), e.top + e.height > t || e.top < 0 ? !1 : !0;
 },
 applyVerticalPositioning: function() {
 if (!this.initVerticalPositioning()) return !1;
-var e = this.node.getBoundingClientRect(), t = this.getViewWidth();
+var e = this.getBoundingRect(this.node), t = this.getViewWidth();
 if (this.floating) {
 var n = this.activatorOffset.left + this.activatorOffset.width / 2 - e.width / 2;
 n + e.width > t ? (this.applyPosition({
@@ -5180,7 +5384,7 @@ left: n
 } else {
 var r = this.activatorOffset.left + this.activatorOffset.width / 2 - e.left - e.width / 2;
 e.right + r > t ? (this.applyPosition({
-left: -(e.right - (this.activatorOffset.left + this.activatorOffset.width))
+left: this.activatorOffset.left + this.activatorOffset.width - e.right
 }), this.addRemoveClass("left", !0)) : e.left + r < 0 ? this.addRemoveClass("right", !0) : this.applyPosition({
 left: r
 });
@@ -5189,18 +5393,20 @@ return !0;
 },
 applyVerticalFlushPositioning: function(e, t) {
 if (!this.initVerticalPositioning()) return !1;
-var n = this.node.getBoundingClientRect(), r = this.getViewWidth();
-return this.activatorOffset.left + this.activatorOffset.width < e ? (this.activatorOffset.left < this.horizBuffer && this.applyPosition({
-left: -n.left + this.horizBuffer
-}), this.addClass("right"), this.addClass("corner"), !0) : this.activatorOffset.left > t ? (this.activatorOffset.left + this.activatorOffset.width > r - this.horizBuffer ? this.applyPosition({
-left: r - n.right - this.horizBuffer
+var n = this.getBoundingRect(this.node), r = this.getViewWidth();
+return this.activatorOffset.left + this.activatorOffset.width / 2 < e ? (this.activatorOffset.left + this.activatorOffset.width / 2 < this.horizBuffer ? this.applyPosition({
+left: this.horizBuffer + (this.floating ? 0 : -n.left)
 }) : this.applyPosition({
-left: -(n.right - (this.activatorOffset.left + this.activatorOffset.width))
+left: this.activatorOffset.width / 2 + (this.floating ? this.activatorOffset.left : 0)
+}), this.addClass("right"), this.addClass("corner"), !0) : this.activatorOffset.left + this.activatorOffset.width / 2 > t ? (this.activatorOffset.left + this.activatorOffset.width / 2 > r - this.horizBuffer ? this.applyPosition({
+left: r - this.horizBuffer - n.right
+}) : this.applyPosition({
+left: this.activatorOffset.left + this.activatorOffset.width / 2 - n.right
 }), this.addClass("left"), this.addClass("corner"), !0) : !1;
 },
 initHorizontalPositioning: function() {
 this.resetPositioning();
-var e = this.node.getBoundingClientRect(), t = this.getViewWidth();
+var e = this.getBoundingRect(this.node), t = this.getViewWidth();
 return this.floating ? this.activatorOffset.left + this.activatorOffset.width < t / 2 ? (this.applyPosition({
 left: this.activatorOffset.left + this.activatorOffset.width
 }), this.addRemoveClass("left", !0)) : (this.applyPosition({
@@ -5209,11 +5415,11 @@ left: this.activatorOffset.left - e.width
 left: this.activatorOffset.left - e.left - e.width
 }), this.addRemoveClass("right", !0)) : (this.applyPosition({
 left: this.activatorOffset.width
-}), this.addRemoveClass("left", !0)), e = this.node.getBoundingClientRect(), e.left < 0 || e.left + e.width > t ? !1 : !0;
+}), this.addRemoveClass("left", !0)), this.addRemoveClass("horizontal", !0), e = this.getBoundingRect(this.node), e.left < 0 || e.left + e.width > t ? !1 : !0;
 },
 applyHorizontalPositioning: function() {
 if (!this.initHorizontalPositioning()) return !1;
-var e = this.node.getBoundingClientRect(), t = this.getViewHeight(), n = this.activatorOffset.top + this.activatorOffset.height / 2;
+var e = this.getBoundingRect(this.node), t = this.getViewHeight(), n = this.activatorOffset.top + this.activatorOffset.height / 2;
 return this.floating ? n >= t / 2 - .05 * t && n <= t / 2 + .05 * t ? this.applyPosition({
 top: this.activatorOffset.top + this.activatorOffset.height / 2 - e.height / 2,
 bottom: "auto"
@@ -5233,16 +5439,27 @@ top: e.top - e.height - this.activatorOffset.top + this.activatorOffset.height
 },
 applyHorizontalFlushPositioning: function(e, t) {
 if (!this.initHorizontalPositioning()) return !1;
-var n = this.node.getBoundingClientRect(), r = this.getViewWidth();
+var n = this.getBoundingRect(this.node), r = this.getViewWidth();
 return this.floating ? this.activatorOffset.top < innerHeight / 2 ? (this.applyPosition({
-top: this.activatorOffset.top
+top: this.activatorOffset.top + this.activatorOffset.height / 2
 }), this.addRemoveClass("high", !0)) : (this.applyPosition({
-top: this.activatorOffset.top + this.activatorOffset.height - n.height
+top: this.activatorOffset.top + this.activatorOffset.height / 2 - n.height
 }), this.addRemoveClass("low", !0)) : n.top + n.height > innerHeight && innerHeight - n.bottom < n.top - n.height ? (this.applyPosition({
-top: n.top - n.height - this.activatorOffset.top - this.activatorOffset.height / 4
+top: n.top - n.height - this.activatorOffset.top - this.activatorOffset.height / 2
 }), this.addRemoveClass("low", !0)) : (this.applyPosition({
-top: this.activatorOffset.height / 4
+top: this.activatorOffset.height / 2
 }), this.addRemoveClass("high", !0)), this.activatorOffset.left + this.activatorOffset.width < e ? (this.addClass("left"), this.addClass("corner"), !0) : this.activatorOffset.left > t ? (this.addClass("right"), this.addClass("corner"), !0) : !1;
+},
+getBoundingRect: function(e) {
+var t = e.getBoundingClientRect();
+return !t.width || !t.height ? {
+left: t.left,
+right: t.right,
+top: t.top,
+bottom: t.bottom,
+width: t.right - t.left,
+height: t.bottom - t.top
+} : t;
 },
 getViewHeight: function() {
 return window.innerHeight === undefined ? document.documentElement.clientHeight : window.innerHeight;
@@ -5251,7 +5468,7 @@ getViewWidth: function() {
 return window.innerWidth === undefined ? document.documentElement.clientWidth : window.innerWidth;
 },
 resetPositioning: function() {
-this.removeClass("right"), this.removeClass("left"), this.removeClass("high"), this.removeClass("low"), this.removeClass("corner"), this.removeClass("below"), this.removeClass("above"), this.removeClass("vertical"), this.applyPosition({
+this.removeClass("right"), this.removeClass("left"), this.removeClass("high"), this.removeClass("low"), this.removeClass("corner"), this.removeClass("below"), this.removeClass("above"), this.removeClass("vertical"), this.removeClass("horizontal"), this.applyPosition({
 left: "auto"
 }), this.applyPosition({
 top: "auto"
@@ -6147,28 +6364,37 @@ dirtyItem: [ "&", "<", ">", '"', "`", "'", "\n" ],
 cleanItem: [ "&amp;", "$lt;", "&gt;", "&quot;", "'", "'", "&crarr;" ]
 },
 stripHTML: function(e) {
-return e.replace(/<\S[^><]*>/g, "");
+return e ? e.replace(/<\S[^><]*>/g, "") : "";
 },
 cleanString: function(e) {
+if (e) {
 for (var t = 0; t < this.dirtyItem.length; t++) e = e.replace(new RegExp(this.dirtyItem[t], "g"), this.cleanItem[t]);
 return e;
+}
+return "";
 },
 dirtyString: function(e) {
+if (e) {
 for (var t = 0; t < this.dirtyItem.length; t++) e = e.replace(new RegExp(this.cleanItem[t], "g"), this.dirtyItem[t]);
 return e;
+}
+return "";
 },
 trim: function(e) {
-return e.replace(/^\s\s*/, "").replace(/\s\s*$/, "");
+return e ? e.replace(/^\s\s*/, "").replace(/\s\s*$/, "") : "";
 },
 ucfirst: function(e) {
+if (e) {
 var t = e.charAt(0).toUpperCase();
 return t + e.substr(1);
+}
+return "";
 },
 isBlank: function(e) {
-return /^\s*$/.test(e);
+return e ? /^\s*$/.test(e) : !0;
 },
 isJSON: function(e) {
-return e.blank() ? !1 : (e = e.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@"), e = e.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]"), e = e.replace(/(?:^|:|,)(?:\s*\[)+/g, ""), /^[\],:{}\s]*$/.test(e));
+return e && !this.isBlank(e) ? (e = e.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@"), e = e.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]"), e = e.replace(/(?:^|:|,)(?:\s*\[)+/g, ""), /^[\],:{}\s]*$/.test(e)) : !1;
 }
 });
 
@@ -6282,15 +6508,16 @@ return;
 this.log("Fetching fresh token");
 var r = new enyo.Ajax({
 url: this.gapiConfig.endtoken,
-method: "POST"
-});
-r.go({
+method: "POST",
+postBody: {
 client_id: this.clientId,
 client_secret: this.clientSecret,
 refresh_token: n.access_token,
 redirect_uri: this.gapiConfig.redirect_uri,
 grant_type: this.gapiConfig.grantTypes.AUTHORIZE
-}), r.response(this, function(t, n) {
+}
+});
+r.go(), r.response(this, function(t, n) {
 this.log("Access complete");
 var r = {
 access_token: n.access_token
@@ -6304,16 +6531,17 @@ getRefreshToken: function(e, t) {
 this.log("Refresh token");
 var n = new enyo.Ajax({
 url: this.gapiConfig.endtoken,
-method: "POST"
-});
-n.go({
+method: "POST",
+postBody: {
 code: e,
 client_id: this.clientId,
 client_secret: this.clientSecret,
 redirect_uri: this.gapiConfig.redirect_uri,
 grant_type: this.gapiConfig.grantTypes.AUTHORIZE
-}), n.response(this, function(e, n) {
-return this.log("Refresh complete"), this.setAuthToken(n), enyo.isFunction(t.onSuccess) && t.onSuccess(n), !0;
+}
+});
+n.go(), n.response(this, function(e, n) {
+return this.log("Refresh complete", enyo.json.stringify(n)), this.setAuthToken(n), enyo.isFunction(t.onSuccess) && t.onSuccess(n), !0;
 }), n.error(this, function(e, n) {
 return this.log("Refresh error", enyo.json.stringify(n)), enyo.isFunction(t.onError) && (n.error = !0, t.onError(n)), !0;
 });
@@ -6579,11 +6807,19 @@ enyo.kind({
 name: "GTS.Divider",
 classes: "gts-Divider",
 published: {
-content: ""
+content: "",
+useFittable: !0
 },
-components: [ {
+create: function() {
+this.inherited(arguments), this.useFittableChanged(), this.contentChanged();
+},
+reflow: function() {
+this.$.base.reflow();
+},
+useFittableChanged: function() {
+this.destroyComponents(), this.createComponents([ {
 name: "base",
-kind: "enyo.FittableColumns",
+kind: this.useFittable ? "enyo.FittableColumns" : "enyo.Control",
 noStretch: !0,
 classes: "base-bar",
 components: [ {
@@ -6592,15 +6828,12 @@ classes: "end-cap bar"
 name: "caption",
 classes: "caption"
 }, {
-classes: "bar",
+classes: "bar full",
 fit: !0
 } ]
-} ],
-rendered: function() {
-this.inherited(arguments), this.contentChanged();
-},
-reflow: function() {
-this.$.base.reflow();
+} ], {
+owner: this
+});
 },
 contentChanged: function() {
 this.$.caption.setContent(this.content), this.$.caption.applyStyle("display", this.content ? "" : "none"), this.reflow();
@@ -7419,6 +7652,41 @@ if (!this.allowDirty) return e;
 var t = [ /&amp;/g, /&quot;/g, /$lt;/g, /&gt;/g, /&rsquo;/g, /&nbsp;/g ], n = [ "&", '"', "<", ">", "'", " " ];
 for (var r = 0; r < n.length; r++) e = e.replace(t[r], n[r]);
 return e;
+}
+});
+
+// Item.js
+
+enyo.kind({
+name: "GTS.Item",
+kind: "onyx.Item",
+classes: "gts-item",
+published: {
+tapHighlight: !1,
+tapPulse: !0,
+tapClass: "gts-pulse",
+highlightClass: "onyx-highlight"
+},
+preventTapDisplayTimer: 0,
+handlers: {
+ontap: "startTap",
+onhold: "hold",
+onrelease: "release"
+},
+startTap: function(e, t) {
+if (this.tapPulse) {
+if (this.preventTapDisplayTimer >= (new Date).getTime() - 50) return;
+onyx.Item.addFlyweightClass(this.controlParent || this, this.tapClass, t), enyo.job("endTap", enyo.bind(this, this.endTap, e, t), 250);
+}
+},
+endTap: function(e, t) {
+this.tapPulse && onyx.Item.removeFlyweightClass(this.controlParent || this, this.tapClass, t);
+},
+hold: function(e, t) {
+this.tapHighlight && onyx.Item.addFlyweightClass(this.controlParent || this, this.highlightClass, t);
+},
+release: function(e, t) {
+this.tapHighlight && (this.preventTapDisplayTimer = (new Date).getTime(), onyx.Item.removeFlyweightClass(this.controlParent || this, this.highlightClass, t));
 }
 });
 
@@ -8616,7 +8884,6 @@ content: "Checkbook"
 kind: "onyx.Menu",
 showOnTop: !0,
 floating: !0,
-modal: !1,
 components: [ {
 content: "Preferences",
 ontap: "openPreferences"
@@ -8716,11 +8983,17 @@ if (t.which === 27) return enyo.Signals.send("onbackbutton"), !0;
 },
 menuHandler: function() {
 if (!this.appReady) return;
-return this.paneStack.length <= 0 && (this.$.appMenuButton.getActive() === !0 ? this.$.appMenu.requestHideMenu() : this.$.appMenuButton.waterfall("ontap", "ontap", this)), !0;
+return this.paneStack.length <= 0 && (this.$.appMenuButton.getActive() === !0 ? this.hideAppMenu() : this.showAppMenu()), !0;
+},
+showAppMenu: function() {
+this.$.appMenuButton.waterfall("ontap", "ontap", this);
+},
+hideAppMenu: function() {
+this.$.appMenuButton.setActive(!1), this.$.appMenu.requestHideMenu();
 },
 backHandler: function() {
 if (!this.appReady) return;
-return this.$.appMenu.menuActive === !0 ? this.$.appMenu.requestHideMenu() : this.paneStack.length > 0 ? this.$[this.paneStack[this.paneStack.length - 1]].doFinish() : this.$.mainViews.getIndex() > 0 ? this.$.mainViews.previous() : enyo.platform.android || enyo.platform.androidChrome ? this.$.exitConfirmation ? this.exitConfirmationHandler() : (this.createComponent({
+return this.$.appMenu.menuActive === !0 ? this.hideAppMenu() : this.paneStack.length > 0 ? this.$[this.paneStack[this.paneStack.length - 1]].doFinish() : this.$.mainViews.getIndex() > 0 ? this.$.mainViews.previous() : enyo.platform.android || enyo.platform.androidChrome ? this.$.exitConfirmation ? this.exitConfirmationHandler() : (this.createComponent({
 name: "exitConfirmation",
 kind: "gts.ConfirmDialog",
 title: "Exit Checkbook",
@@ -8760,7 +9033,7 @@ name: "transactions",
 kind: "Checkbook.transactions.view"
 } ], {
 owner: this
-}), this.$.mainViews.render(), this.$.container.show(), this.waterfall("onresize", "onresize", this), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, enyo.asyncMethod(this, this.loadCheckbookStage2);
+}), this.$.mainViews.render(), this.$.container.show(), this.$.container.render(), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, enyo.asyncMethod(this, this.loadCheckbookStage2);
 },
 loadCheckbookStage2: function() {
 Checkbook.globals.accountManager.fetchDefaultAccount({
@@ -8818,19 +9091,19 @@ viewAccount: function() {
 enyo.Panels.isScreenNarrow() && this.$.mainViews.setIndex(1);
 },
 openPreferences: function() {
-this.showPanePopup(null, {
+enyo.asyncMethod(this, this.showPanePopup, null, {
 name: "preferences",
 kind: "Checkbook.preferences"
 });
 },
 openExport: function(e, t) {
-this.showPanePopup(null, {
+enyo.asyncMethod(this, this.showPanePopup, null, {
 name: "export",
 kind: "Checkbook.export"
 });
 },
 openImport: function(e, t) {
-this.showPanePopup(null, {
+enyo.asyncMethod(this, this.showPanePopup, null, {
 name: "import",
 kind: "Checkbook.import",
 onFinish: enyo.bind(this, this.importComplete)
@@ -8844,13 +9117,8 @@ this.log(arguments);
 return;
 },
 openSearch: function(e, t) {
-this.showPanePopup(null, enyo.mixin(t, {
-name: "search",
-kind: "Checkbook.search.pane",
-onModify: "showPanePopup",
-onFinish: enyo.bind(this, this.closeSearch),
-doNext: t && enyo.isFunction(t.onFinish) ? t.onFinish : null
-}));
+this.log(arguments);
+return;
 },
 closeSearch: function(e, t) {
 t === !0 && (Checkbook.globals.accountManager.updateAccountModTime(), enyo.Signals.send("accountChanged"), this.$.transactions.reloadSystem()), enyo.isFunction(e.doNext) && e.doNext(t);
@@ -9487,19 +9755,6 @@ kind: "onyx.GroupboxHeader",
 content: "Accounts"
 }, {
 kind: "onyx.Item",
-classes: "padding-none",
-components: [ {
-name: "entries",
-kind: "Checkbook.accounts.list",
-fit: !0,
-balanceView: 4,
-editMode: !0,
-style: "height: 300px;",
-classes: "checkbook-stamp",
-onSetupRow: "setupRow"
-} ]
-}, {
-kind: "onyx.Item",
 components: [ {
 name: "defaultAccount",
 kind: "GTS.SelectorBar",
@@ -9578,7 +9833,7 @@ kind: "Checkbook.encryption"
 rendered: function() {
 this.$.pinLock.setValue(Checkbook.globals.prefs.useCode === 1), this.$.pinCode.setValue(Checkbook.globals.prefs.code), this.$.pinLockDrawer.setOpen(this.$.pinLock.getValue()), this.$.transPreview.setValue(Checkbook.globals.prefs.transPreview === 1), this.$.updateNotice.setValue(Checkbook.globals.prefs.updateCheckNotification === 1), this.$.errorReporting.setValue(Checkbook.globals.prefs.errorReporting === 1), this.$.dispColor.setValue(Checkbook.globals.prefs.dispColor === 1), Checkbook.globals.accountManager.fetchAccountsList({
 onSuccess: enyo.bind(this, this.buildDefaultAccountList)
-}), this.$.entries.renderAccountList(), this.inherited(arguments), this.$.header.addRemoveClass("text-left", enyo.Panels.isScreenNarrow()), this.$.header.addRemoveClass("text-center", !enyo.Panels.isScreenNarrow());
+}), this.inherited(arguments), this.$.header.addRemoveClass("text-left", enyo.Panels.isScreenNarrow()), this.$.header.addRemoveClass("text-center", !enyo.Panels.isScreenNarrow());
 },
 togglePINStatus: function() {
 Checkbook.globals.prefs.useCode = this.$.pinLock.getValue() ? 1 : 0, this.$.pinLockDrawer.setOpen(this.$.pinLock.getValue()), this.saveAppPin();
@@ -9948,7 +10203,7 @@ this.$.progress.hide(), this.showErrorMessage(enyo.bind(this, this.closeImport),
 return;
 }
 if (typeof this.$["progress"] == "undefined") return;
-this.$.progress.setMessage("Processing spreadsheets..."), this.$.progress.setProgress(75), this.$.sheetListButton.setDisabled(!1), this.$.instructionsBar.hide(), this.$.sheetListBar.show(), this.$.instructions.hide(), this.$.sheetList.show(), this.allSheetsList = e, this.$.sheetList.setCount(this.allSheetsList.length), this.refreshLayout(), this.$.progress.hide();
+this.$.progress.setMessage("Processing spreadsheets..."), this.$.progress.setProgress(75), this.$.sheetListButton.setDisabled(!1), this.$.instructionsBar.hide(), this.$.sheetListBar.show(), this.$.instructions.hide(), this.$.sheetList.show(), this.allSheetsList = e, this.$.sheetList.setCount(this.allSheetsList.length), this.$.progress.hide();
 },
 setupRow: function(e, t) {
 var n = t.index, r = t.item, i = this.allSheetsList[n];
@@ -9956,8 +10211,8 @@ if (i) {
 r.$.sheetName.setContent(i.title);
 var s = new Date(i.modifiedDate);
 return r.$.sheetUpdated.setContent(s.format({
-date: "longDate",
-time: "shortTime"
+date: "long",
+time: "short"
 })), r.$.sheetSelected.setValue(i.selectStatus), !0;
 }
 },
@@ -10333,17 +10588,17 @@ name: "cryptoSystem",
 kind: "Checkbook.encryption"
 } ],
 rendered: function() {
-this.inherited(arguments), this.$.instructions.show(), this.$.instructionsBar.show(), this.$.instructionsButton.setDisabled(!0), this.$.accountList.hide(), this.$.accountListBar.hide(), this.$.progress.show({
+this.log(), this.inherited(arguments), this.$.instructions.show(), this.$.instructionsBar.show(), this.$.instructionsButton.setDisabled(!0), this.$.accountList.hide(), this.$.accountListBar.hide(), this.$.progress.show({
 title: "Export Progress",
 message: "Linking to Google...",
 progress: 25
 }), this.refreshLayout();
 },
 refreshLayout: function() {
-this.waterfall("onresize", "onresize", this);
+this.log(), this.waterfall("onresize", "onresize", this);
 },
 gapiReady: function() {
-this.$.progress.setProgress(60), Checkbook.globals.gts_db.query("SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;", {
+this.log(), this.$.progress.setProgress(60), Checkbook.globals.gts_db.query("SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;", {
 onSuccess: enyo.bind(this, this.decryptGapiData)
 });
 },
@@ -10354,7 +10609,7 @@ loadGapiData: function(e) {
 this.$.gapi.setApiKey(this.$.gapiAccess.getApiKey()), this.$.gapi.setClientId(this.$.gapiAccess.getClientId()), this.$.gapi.setClientSecret(this.$.gapiAccess.getClientSecret()), this.$.saveCredentialsWrapper.hide(), this.$.gapi.setAuthToken(enyo.json.parse(e)), this.$.instructionsButton.setDisabled(!1), this.$.progress.hide();
 },
 authenticateWithGoogle: function() {
-this.$.gapi.setScope([ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ]), this.$.gapi.auth({
+this.log(), this.$.gapi.setScope([ "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/drive.file", "https://spreadsheets.google.com/feeds", "https://docs.google.com/feeds" ]), this.$.gapi.auth({
 onSuccess: enyo.bind(this, this.userAuthenticated),
 onError: enyo.bind(this, this.userNotAuthenticated)
 }), this.$.progress.show({
@@ -10364,10 +10619,10 @@ progress: 5
 });
 },
 userNotAuthenticated: function() {
-this.closeExport();
+this.log(), this.closeExport();
 },
 userAuthenticated: function() {
-this.$.progress.show({
+this.log(), this.$.progress.show({
 title: "Export Progress",
 message: "Authenticated...",
 progress: 15
@@ -10384,7 +10639,7 @@ gSheetPass: e
 }), Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", t, {}));
 },
 fetchAccounts: function() {
-this.$.progress.show({
+this.log(), this.$.progress.show({
 title: "Export Progress",
 message: "Retrieving accounts...",
 progress: 50
@@ -10411,7 +10666,7 @@ selectStatus: n["acctLocked"] != 1
 this.acctList.length <= 0 ? (this.$.progress.hide(), this.showErrorMessage(enyo.bind(this, this.closeExport), "No data available to be exported.")) : this.showAccountList();
 },
 showAccountList: function() {
-this.$.progress.setMessage("Processing accounts..."), this.$.progress.setProgress(75), this.$.instructionsBar.hide(), this.$.instructions.hide(), this.$.accountListButton.setDisabled(!1), this.$.accountListBar.show(), this.$.accountList.show(), this.$.accountList.setCount(this.acctList.length), this.refreshLayout(), this.$.progress.hide();
+this.log(), this.$.progress.setMessage("Processing accounts..."), this.$.progress.setProgress(75), this.$.instructionsBar.hide(), this.$.instructions.hide(), this.$.accountListButton.setDisabled(!1), this.$.accountListBar.show(), this.$.accountList.show(), this.$.accountList.setCount(this.acctList.length), this.$.progress.hide();
 },
 setupRow: function(e, t) {
 var n = t.index, r = t.item, i = this.acctList[n];
@@ -10432,7 +10687,7 @@ for (var n = 0; n < this.acctList.length; n++) if (!this.acctList[n].acctLocked 
 this.$.accountList.setCount(this.acctList.length);
 },
 beginExportProcess: function() {
-this.$.progress.show({
+this.log(), this.$.progress.show({
 title: "Exporting",
 message: "Preparing data...",
 progress: 0
@@ -10481,10 +10736,10 @@ uploadSheet: function(e, t, n) {
 this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Uploading data"), this.$.progress.setProgress((t + 1) * 3 / 4 / e.length * 100);
 const r = "----END_OF_PART----", i = "\r\n--" + r + "\r\n", s = "\r\n--" + r + "--", o = "text/csv";
 var u = new Date, a = "[Checkbook GUTOC] " + n.accountName + " [" + n.accountCategory + "] [" + u.format({
-date: "longDate",
-time: "shortTime"
+date: "long",
+time: "short"
 }) + "]", f = {
-title: a.cleanString(),
+title: GTS.String.cleanString(a),
 mimeType: o
 }, l = i + "Content-Type: application/json\r\n\r\n" + JSON.stringify(f) + i + "Content-Type: " + o + "\r\n" + "\r\n" + n.csv + s, c = gapi.client.request({
 path: "/upload/drive/v2/files?convert=true",
@@ -10512,9 +10767,10 @@ showErrorMessage: function(e, t) {
 this.onErrorClose = e, this.$.progress.hide(), this.$.errorMessage.show(), this.$.errorMessage.setMainMessage(t);
 },
 closeErrorMessage: function() {
-return this.$.errorMessage.hide(), this.onErrorClose(), !0;
+return this.log(), this.$.errorMessage.hide(), this.onErrorClose(), !0;
 },
 closeExport: function() {
+this.log();
 try {
 enyo.windows.blockScreenTimeout(!1), this.log("Window: blockScreenTimeout: false");
 } catch (e) {
@@ -10530,6 +10786,7 @@ enyo.kind({
 name: "Checkbook.about",
 kind: "onyx.Popup",
 classes: "small-popup",
+modal: !0,
 centered: !0,
 floating: !0,
 scrim: !0,
@@ -10606,7 +10863,17 @@ allowHtml: !0
 content: enyo.fetchAppInfo().copyright,
 allowHtml: !0,
 classes: "smaller margin-top"
-} ]
+}, {
+kind: "Signals",
+onbackbutton: "test",
+onmenubutton: "test",
+onsearchbutton: "test",
+onkeydown: "test"
+} ],
+test: function() {
+if (!this.showing) return;
+this.log(arguments);
+}
 });
 
 // manager.js
@@ -10842,12 +11109,14 @@ enyo.error("Account Control Error: " + Object.toJSON(arguments)), Checkbook.glob
 
 enyo.kind({
 name: "Checkbook.accounts.list",
-kind: "enyo.Scroller",
 fit: !0,
 style: "position: relative;",
+classes: "enyo-fit",
 accounts: [],
 events: {
-onSetupRow: ""
+onSetupRow: "",
+onLoadStart: "",
+onLoadStop: ""
 },
 published: {
 balanceView: 4,
@@ -10857,30 +11126,38 @@ horizontal: "hidden"
 },
 components: [ {
 name: "entries",
-kind: "enyo.Repeater",
+kind: "enyo.List",
 classes: "enyo-fit",
+reorderable: !0,
+enableSwipe: !1,
 onSetupItem: "handleSetupRow",
+onReorder: "listReorder",
+onSetupReorderComponents: "setupReorderComponents",
+onSetupPinnedReorderComponents: "setupPinnedReorderComponents",
+onSetupSwipeItem: "setupSwipeItem",
+onSwipeComplete: "swipeComplete",
 components: [ {
 name: "accountItem",
-classes: "bordered norm-row account-item",
-kind: "onyx.Item",
-tapHighlight: !0,
+kind: "GTS.Item",
+classes: "bordered account-item",
+tapPulse: !0,
+tapHighlight: !1,
 ontap: "accountTapped",
-onDelete: "accountDeleted",
 components: [ {
 name: "catDivider",
 kind: "GTS.Divider",
-ontap: "dividerTapped"
+ontap: "dividerTapped",
+useFittable: !1
 }, {
 layoutKind: "",
 classes: "account",
 components: [ {
 name: "icon",
-kind: enyo.Image,
+kind: "enyo.Image",
 classes: "accountIcon"
 }, {
 name: "iconLock",
-kind: enyo.Image,
+kind: "enyo.Image",
 src: "assets/padlock_1.png",
 classes: "accountLockIcon unlocked"
 }, {
@@ -10895,79 +11172,78 @@ name: "note",
 allowHtml: !0,
 classes: "note smaller text-ellipsis"
 } ]
+} ],
+reorderComponents: [ {
+name: "reorderContent",
+layoutKind: "FittableColumnsLayout",
+classes: "enyo-fit deep-green-trans padding-std",
+components: [ {
+name: "reorderIcon",
+kind: "enyo.Image",
+classes: "accountIcon"
+}, {
+name: "reorderName",
+classes: "text-ellipsis accountName",
+fit: !0
 } ]
+} ],
+pinnedReorderComponents: [ {
+name: "pinnedReorderItem",
+layoutKind: "FittableColumnsLayout",
+classes: "enyo-fit rich-brown-trans padding-std",
+components: [ {
+name: "pinIcon",
+kind: "enyo.Image",
+classes: "accountIcon"
 }, {
-name: "loadingScrim",
-kind: onyx.Scrim,
-classes: "onyx-scrim-translucent",
-showing: !0
+name: "pinName",
+classes: "text-ellipsis accountName",
+fit: !0
 }, {
-name: "loadingSpinner",
-kind: "onyx.Spinner",
-style: "size-double",
-style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+showing: !1,
+kind: "onyx.Button",
+ontap: "dropPinnedRow",
+content: "Drop"
+} ]
+} ],
+swipeableComponents: [ {
+name: "swipeItem",
+layoutKind: "FittableColumnsLayout",
+classes: "enyo-fit naka-red-trans padding-std",
+components: [ {
+content: "Delete Account?",
+fit: !0
+}, {
+kind: "onyx.Button",
+ontap: "",
+content: "Cancel"
+}, {
+kind: "onyx.Button",
+ontap: "",
+classes: "onyx-negative",
+content: "Cancel"
+} ]
+} ]
 }, {
 kind: "Signals",
 accountChanged: "renderAccountList",
+accountSortChanged: "renderAccountList",
 balanceChanged: "refresh",
 accountBalanceChanged: "accountBalanceChanged"
 } ],
-rendered: function() {
-this.log(), this.inherited(arguments);
-},
-handleSetupRow: function(e, t) {
-return enyo.isFunction(this.doSetupRow) && this.onSetupRow !== "" ? this.doSetupRow(t) : this.setupRow(e, t);
-},
 renderAccountList: function() {
-this.log(), this.accounts = [], Checkbook.globals.accountManager.fetchAccounts({
+this.log(), this.doLoadStart(), this.accounts = [], Checkbook.globals.accountManager.fetchAccounts({
 onSuccess: enyo.bind(this, this.dataResponse)
 });
 },
 dataResponse: function(e) {
-this.log(), this.accounts = enyo.clone(e), this.punt(), enyo.asyncMethod(this.$.loadingScrim, this.$.loadingScrim.hide), enyo.asyncMethod(this.$.loadingSpinner, this.$.loadingSpinner.hide);
-},
-punt: function() {
-this.log(), this.refresh();
+this.accounts = enyo.clone(e), this.refresh(), enyo.asyncMethod(this, this.doLoadStop);
 },
 refresh: function() {
-this.log(), this.$.entries.setCount(this.accounts.length);
+this.log(), this.$.entries.setCount(this.accounts.length), this.$.entries.refresh();
 },
 renderRow: function(e) {
 typeof e != "undefined" && !isNaN(e) && this.$.entries.renderRow(e);
-},
-accountBalanceChanged: function(e, t) {
-if (!t || !t.accounts) {
-this.renderAccountList();
-return;
-}
-t = t.accounts;
-if (typeof t.account == "undefined" && typeof t.linkedAccount == "undefined" && typeof t.atAccount == "undefined") {
-this.renderAccountList();
-return;
-}
-if (typeof t["account"] != "undefined") {
-var n = t.account >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.account) : -1;
-n >= 0 && (typeof t.accountBal != "undefined" && GTS.Object.size(t.accountBal) > 0 ? this.accountBalanceChangedHandler(n, t.accountBal) : Checkbook.globals.accountManager.fetchAccountBalance(t.account, {
-onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, n)
-}));
-}
-if (typeof t["linkedAccount"] != "undefined") {
-var r = t.linkedAccount >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.linkedAccount) : -1;
-r >= 0 && Checkbook.globals.accountManager.fetchAccountBalance(t.linkedAccount, {
-onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, r)
-});
-}
-if (typeof t.atAccount != "undefined" && t["linkedAccount"] != t["atAccount"]) {
-var r = t.atAccount >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.atAccount) : -1;
-r >= 0 && Checkbook.globals.accountManager.fetchAccountBalance(t.atAccount, {
-onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, r)
-});
-}
-},
-accountBalanceChangedHandler: function(e, t) {
-this.log(arguments);
-if (typeof t == "undefined" || isNaN(e) || e < 0 || e >= this.accounts.length) return;
-this.accounts[e].balance0 = t.balance0, this.accounts[e].balance1 = t.balance1, this.accounts[e].balance2 = t.balance2, this.accounts[e].balance3 = t.balance3, this.renderRow(e);
 },
 dividerTapped: function(e, t) {
 return t.preventDefault(), !0;
@@ -11007,58 +11283,111 @@ accountId: this.accounts[e].acctId,
 deleted: !0
 }));
 },
-reorder: function(e, t, n) {
-if (t != n && t > -1 && t < this.accounts.length) {
-var r = this.accounts.splice(n, 1), i = this.accounts.slice(t);
-this.accounts.length = t, this.accounts.push.apply(this.accounts, r), this.accounts.push.apply(this.accounts, i);
-var s = [];
-for (var o = 0; o < this.accounts.length; o++) s.push(Checkbook.globals.gts_db.getUpdate("accounts", {
-sect_order: o
+setupReorderComponents: function(e, t) {
+var n = this.accounts[t.index];
+n && (this.$.reorderName.setContent(n.acctName), this.$.reorderIcon.setSrc("assets/" + n.acctCategoryIcon));
+},
+listReorder: function(e, t) {
+if (t.reorderTo != t.reorderFrom && t.reorderTo > -1 && t.reorderTo < this.accounts.length) {
+var n = enyo.clone(this.accounts[t.reorderFrom]);
+this.accounts.splice(t.reorderFrom, 1), this.accounts.splice(t.reorderTo, 0, n);
+var r = [];
+for (var i = 0; i < this.accounts.length; i++) r.push(Checkbook.globals.gts_db.getUpdate("accounts", {
+sect_order: i
 }, {
-rowid: this.accounts[o].acctId
+rowid: this.accounts[i].acctId
 }));
-Checkbook.globals.prefs.custom_sort !== 1 && (Checkbook.globals.prefs.custom_sort = 1, s.push(new GTS.databaseQuery({
+Checkbook.globals.prefs.custom_sort !== 1 && (Checkbook.globals.prefs.custom_sort = 1, r.push(new GTS.databaseQuery({
 sql: "UPDATE prefs SET custom_sort = ?;",
 values: [ Checkbook.globals.prefs.custom_sort ]
-}))), Checkbook.globals.gts_db.queries(s), this.refresh();
+}))), Checkbook.globals.gts_db.queries(r), this.refresh(), enyo.Signals.send("accountSortOptionChanged");
 }
+},
+setupPinnedReorderComponents: function(e, t) {
+var n = this.accounts[t.index];
+n && (this.$.pinName.setContent(n.acctName), this.$.pinIcon.setSrc("assets/" + n.acctCategoryIcon), enyo.asyncMethod(this, this.dropPinnedRow, e, t));
+},
+dropPinnedRow: function(e, t) {
+this.$.entries.dropPinnedRow(t);
+},
+setupSwipeItem: function(e, t) {
+this.log("NYI", arguments);
+},
+swipeComplete: function(e, t) {
+this.log("NYI", arguments);
 },
 accountDeleted: function(e, t) {
 var n = this;
 return Checkbook.globals.accountManager.deleteAccount(this.accounts[t.index].acctId, {
 onSuccess: function() {
-this.log(), enyo.Signals.send("accountChanged", {
+enyo.Signals.send("accountChanged", {
 accountId: n.accounts[t.index].acctId,
 deleted: !0
 });
 }
 }), !0;
 },
+handleSetupRow: function(e, t) {
+return enyo.isFunction(this.doSetupRow) && this.onSetupRow !== "" ? this.doSetupRow(t) : this.setupRow(e, t);
+},
 setupRow: function(e, t) {
-var n = t.index, r = t.item, i = this.accounts[n];
-if (i) {
-i.index = n, r.$.accountItem.addRemoveClass("alt-row", i.index % 2 === 0), r.$.accountItem.addRemoveClass("norm-row", i.index % 2 !== 0), r.$.accountItem.addRemoveClass("hiddenAccount", i.hidden === 2), r.$.accountItem.addRemoveClass("maskedAccount", i.hidden === 1), r.$.icon.setSrc("assets/" + i.acctCategoryIcon), r.$.iconLock.addRemoveClass("unlocked", i.acctLocked !== 1), r.$.name.setContent(i.acctName);
-var s = this.balanceView === 4 ? i.bal_view : this.balanceView;
-switch (s) {
+var n = t.index, r = this.accounts[n];
+if (r) {
+r.index = n, this.$.accountItem.addRemoveClass("alt-row", r.index % 2 === 0), this.$.accountItem.addRemoveClass("norm-row", r.index % 2 !== 0), this.$.accountItem.addRemoveClass("hiddenAccount", r.hidden === 2), this.$.accountItem.addRemoveClass("maskedAccount", r.hidden === 1), this.$.icon.setSrc("assets/" + r.acctCategoryIcon), this.$.iconLock.addRemoveClass("unlocked", r.acctLocked !== 1), this.$.name.setContent(r.acctName);
+var i = this.balanceView === 4 ? r.bal_view : this.balanceView;
+switch (i) {
 case 0:
-i.balance = i.balance0;
+r.balance = r.balance0;
 break;
 case 1:
-i.balance = i.balance1;
+r.balance = r.balance1;
 break;
 case 2:
-i.balance = i.balance2;
+r.balance = r.balance2;
 break;
 case 3:
-i.balance = i.balance3;
+r.balance = r.balance3;
 break;
 default:
-i.balance = 0;
+r.balance = 0;
 }
-i.balance = prepAmount(i.balance), r.$.balance.setContent(formatAmount(i.balance)), r.$.balance.addRemoveClass("positiveBalance", i.balance > 0), r.$.balance.addRemoveClass("negativeBalance", i.balance < 0), r.$.balance.addRemoveClass("neutralBalance", i["balance"] == 0), r.$.note.setContent(i.acctNotes.replace(/\n/, "<br />"));
-var o = (Checkbook.globals.prefs.custom_sort === 0 || Checkbook.globals.prefs.custom_sort === 3) && (i.index <= 0 || i.acctCategory !== this.accounts[i.index - 1].acctCategory);
-return r.$.catDivider.setContent(i.acctCategory), r.$.catDivider.canGenerate = o, !0;
+r.balance = prepAmount(r.balance), this.$.balance.setContent(formatAmount(r.balance)), this.$.balance.addRemoveClass("positiveBalance", r.balance > 0), this.$.balance.addRemoveClass("negativeBalance", r.balance < 0), this.$.balance.addRemoveClass("neutralBalance", r["balance"] == 0), this.$.note.setContent(r.acctNotes.replace(/\n/, "<br />"));
+var s = (Checkbook.globals.prefs.custom_sort === 0 || Checkbook.globals.prefs.custom_sort === 3) && (r.index <= 0 || r.acctCategory !== this.accounts[r.index - 1].acctCategory);
+return this.$.catDivider.setContent(r.acctCategory), this.$.catDivider.canGenerate = s, !0;
 }
+},
+accountBalanceChanged: function(e, t) {
+if (!t || !t.accounts) {
+this.renderAccountList();
+return;
+}
+t = t.accounts;
+if (typeof t.account == "undefined" && typeof t.linkedAccount == "undefined" && typeof t.atAccount == "undefined") {
+this.renderAccountList();
+return;
+}
+if (typeof t["account"] != "undefined") {
+var n = t.account >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.account) : -1;
+n >= 0 && (typeof t.accountBal != "undefined" && GTS.Object.size(t.accountBal) > 0 ? this.accountBalanceChangedHandler(n, t.accountBal) : Checkbook.globals.accountManager.fetchAccountBalance(t.account, {
+onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, n)
+}));
+}
+if (typeof t["linkedAccount"] != "undefined") {
+var r = t.linkedAccount >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.linkedAccount) : -1;
+r >= 0 && Checkbook.globals.accountManager.fetchAccountBalance(t.linkedAccount, {
+onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, r)
+});
+}
+if (typeof t.atAccount != "undefined" && t["linkedAccount"] != t["atAccount"]) {
+var r = t.atAccount >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.atAccount) : -1;
+r >= 0 && Checkbook.globals.accountManager.fetchAccountBalance(t.atAccount, {
+onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, r)
+});
+}
+},
+accountBalanceChangedHandler: function(e, t) {
+if (typeof t == "undefined" || isNaN(e) || e < 0 || e >= this.accounts.length) return;
+this.accounts[e].balance0 = t.balance0, this.accounts[e].balance1 = t.balance1, this.accounts[e].balance2 = t.balance2, this.accounts[e].balance3 = t.balance3, this.renderRow(e);
 }
 });
 
@@ -11066,7 +11395,7 @@ return r.$.catDivider.setContent(i.acctCategory), r.$.catDivider.canGenerate = o
 
 enyo.kind({
 name: "Checkbook.accounts.view",
-layoutKind: "FittableRowsLayout",
+classes: "v-box",
 accounts: [],
 totalBalance: [ 0, 0, 0, 0, 0 ],
 balanceView: 4,
@@ -11092,9 +11421,11 @@ style: "padding: 0 8px; margin: 0;"
 }, {
 name: "entries",
 kind: "Checkbook.accounts.list",
-fit: !0,
+classes: "box-flex-1",
 balanceView: 4,
-editMode: !1
+editMode: !1,
+onLoadStart: "showLoading",
+onLoadStop: "hideLoading"
 }, {
 kind: "onyx.MoreToolbar",
 classes: "rich-brown",
@@ -11129,8 +11460,21 @@ ontap: "toggleLock"
 } ]
 } ]
 }, {
+name: "loadingScrim",
+kind: "onyx.Scrim",
+classes: "onyx-scrim-translucent",
+showing: !1,
+style: "z-index: 1000;"
+}, {
+name: "loadingSpinner",
+kind: "onyx.Spinner",
+style: "size-double",
+showing: !1,
+style: "z-index: 10001; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+}, {
 kind: "Signals",
 accountChanged: "renderAccountList",
+accountSortOptionChanged: "updateSortMenu",
 balanceViewChanged: "accountBalanceViewChanged",
 accountBalanceChanged: "accountBalanceForceUpdate"
 } ],
@@ -11138,7 +11482,13 @@ handlers: {
 onSelect: "menuItemSelected"
 },
 renderAccountList: function() {
-this.accountBalanceForceUpdate(), this.$.sortMenu.setValue(Checkbook.globals.prefs.custom_sort);
+this.accountBalanceForceUpdate(), this.updateSortMenu();
+},
+showLoading: function() {
+this.$.loadingScrim.show(), this.$.loadingSpinner.show();
+},
+hideLoading: function() {
+this.$.loadingScrim.hide(), this.$.loadingSpinner.hide();
 },
 accountBalanceViewChanged: function(e, t) {
 if (typeof t.index == "undefined" || t.index < 0 || t.index >= this.$.entries.accounts.length) {
@@ -11147,7 +11497,7 @@ this.$.entries.accounts[n].bal_view = t.mode, t.index = n;
 break;
 }
 } else this.$.entries.accounts[t.index].bal_view = t.mode;
-this.$.entries.refresh(t.index), enyo.isFunction(t.callbackFn) && t.callbackFn(t.index);
+this.$.entries.refresh(), enyo.isFunction(t.callbackFn) && t.callbackFn(t.index);
 },
 accountBalanceForceUpdate: function() {
 Checkbook.globals.accountManager.fetchOverallBalances({
@@ -11168,7 +11518,7 @@ sql: "UPDATE prefs SET custom_sort = ?;",
 values: [ Checkbook.globals.prefs.custom_sort ]
 }), {
 onSuccess: function() {
-Checkbook.globals.accountManager.updateAccountModTime(), enyo.Signals.send("accountChanged");
+Checkbook.globals.accountManager.updateAccountModTime(), enyo.Signals.send("accountSortChanged");
 }
 }), !0;
 }
@@ -11201,6 +11551,9 @@ value: 2
 },
 handleBalanceButton: function(e, t) {
 this.balanceView = t.value, this.$.entries.setBalanceView(this.balanceView), this.$.entries.refresh();
+},
+updateSortMenu: function() {
+this.$.sortMenu.setValue(Checkbook.globals.prefs.custom_sort);
 },
 addAccount: function() {
 this.$.addAccountButton.getDisabled() || (this.$.addAccountButton.setDisabled(!0), enyo.Signals.send("modifyAccount", {
@@ -12473,12 +12826,19 @@ components: [ {
 name: "header",
 kind: "onyx.Toolbar",
 layoutKind: "enyo.FittableColumnsLayout",
+noStretch: !0,
 components: [ {
 name: "acctTypeIcon",
 kind: "enyo.Image",
 src: "assets/dollar_sign_1.png",
 classes: "img-icon",
-style: "margin: 0 15px 0 0; height: 32px;"
+style: "margin: 0 15px 0 0;"
+}, {
+name: "loadingSpinner",
+kind: "onyx.Spinner",
+showing: !1,
+classes: " img-icon",
+style: "margin: 0 15px 0 0;"
 }, {
 name: "acctName",
 content: "Checkbook",
@@ -12499,7 +12859,9 @@ classes: "checkbook-stamp",
 style: "position: relative;",
 ondragstart: "listDrag",
 ondrag: "listDrag",
-ondragfinish: "listDrag"
+ondragfinish: "listDrag",
+onLoadingStart: "showLoadingIcon",
+onLoadingFinish: "hidenLoadingIcon"
 }, {
 name: "footer",
 kind: "onyx.MoreToolbar",
@@ -12604,7 +12966,7 @@ this.unloadSystem();
 return;
 }
 this.account.acctId || (this.$.header.show(), this.$.footer.show());
-if (t.force || !this.account.acctId || this.account.acctId !== t.account.acctId) this.account = enyo.clone(t.account), this.$.entries.account = enyo.clone(t.account), this.$.acctName.setContent(this.account.acctName), this.$.acctTypeIcon.setSrc("assets/" + this.account.acctCategoryIcon), this.renderBalanceButton(), this.renderSortButton(), this.$.entries.reloadSystem(), this.account.frozen === 1 ? (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0)) : (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1));
+if (t.force || !this.account.acctId || this.account.acctId !== t.account.acctId) this.account = enyo.clone(t.account), this.$.entries.account = enyo.clone(this.account), this.$.acctName.setContent(this.account.acctName), this.$.acctTypeIcon.setSrc("assets/" + this.account.acctCategoryIcon), this.renderBalanceButton(), this.renderSortButton(), this.$.entries.reloadSystem(), this.account.frozen === 1 ? (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0)) : (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1));
 this.$.header.reflow(), this.$.footer.reflow(), this.reflow();
 },
 getAccountId: function() {
@@ -12686,6 +13048,12 @@ mode: this.account.bal_view,
 callbackFn: enyo.bind(this, this.setAccountIndex)
 }), !0);
 },
+showLoadingIcon: function() {
+this.$.acctTypeIcon.hide(), this.$.loadingSpinner.show();
+},
+hidenLoadingIcon: function() {
+this.$.loadingSpinner.hide(), this.$.acctTypeIcon.show();
+},
 renderSortButton: function() {
 transactionSortOptions.length <= 0 ? Checkbook.globals.transactionManager.fetchTransactionSorting({
 onSuccess: enyo.bind(this, this.buildTransactionSorting)
@@ -12695,7 +13063,7 @@ buildTransactionSorting: function() {
 enyo.isArray(transactionSortOptions) && (this.$.sortMenu.setChoices(transactionSortOptions), this.$.sortMenu.setValue(this.account.sort));
 },
 transactionSortingChanged: function(e, t) {
-return this.account.sort === t.value ? !0 : (this.account.sort = t.value, this.account.sortQry = t.qry, Checkbook.globals.accountManager.updateAccountSorting(this.account.acctId, this.account.sort), this.$.entries.reloadSystem(), !0);
+return this.account.sort === t.value ? !0 : (this.account.sort = t.value, this.account.sortQry = t.qry, Checkbook.globals.accountManager.updateAccountSorting(this.account.acctId, this.account.sort), this.$.entries.account = enyo.clone(this.account), this.$.entries.reloadSystem(), !0);
 },
 addIncome: function() {
 this.newTransaction("Income");
@@ -12738,21 +13106,32 @@ enyo.kind({
 name: "Checkbook.transactions.list",
 transactions: [],
 account: {},
+events: {
+onLoadingStart: "",
+onLoadingFinish: ""
+},
 components: [ {
 name: "list",
 kind: "GTS.LazyList",
-fit: !0,
 classes: "checkbook-stamp enyo-fit",
+reorderable: !1,
+enableSwipe: !1,
 onSetupItem: "transactionBuildRow",
 onAcquirePage: "transactionFetchGroup",
+onReorder: "",
+onSetupReorderComponents: "",
+onSetupPinnedReorderComponents: "",
+onSetupSwipeItem: "",
+onSwipeComplete: "",
 aboveComponents: [],
 components: [ {
 name: "transactionWrapper",
-kind: "onyx.Item",
-tapHighlight: !0,
+kind: "GTS.Item",
+tapPulse: !0,
+tapHighlight: !1,
 ontap: "transactiontapped",
 onhold: "transactionHeld",
-onDelete: "transactionDeleted",
+classes: "bordered",
 style: "padding-right: 20px; padding-left: 30px;",
 components: [ {
 name: "mainBody",
@@ -12799,7 +13178,10 @@ allowHtml: !0
 belowComponents: [ {
 content: "&nbsp;",
 allowHtml: !0
-} ]
+} ],
+reorderComponents: [],
+pinnedReorderComponents: [],
+swipeableComponents: []
 }, {
 name: "transactonMenu",
 kind: "onyx.Menu",
@@ -12921,7 +13303,7 @@ this.log(e, "|", t);
 var n = t.page * t.pageSize;
 if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
 if (n < 0) return !1;
-if (this.account.itemCount > this.$.list.getCount() && !this.transactions[n]) return Checkbook.globals.transactionManager.fetchTransactions(this.account, {
+if (this.account.itemCount > this.$.list.getCount() && !this.transactions[n]) return this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
 onSuccess: enyo.bind(this, this.transactionFetchGroupHandler)
 }, t.pageSize, n), !0;
 },
@@ -12937,7 +13319,7 @@ runningBalance: prepAmount(r),
 amount: prepAmount(t[s].amount)
 }, t[s]), this.transactions[e + s].desc = GTS.String.dirtyString(this.transactions[e + s].desc), this.transactions[e + s].category = GTS.String.dirtyString(this.transactions[e + s].category), this.transactions[e + s].category2 = GTS.String.dirtyString(this.transactions[e + s].category2), this.transactions[e + s].note = GTS.String.dirtyString(this.transactions[e + s].note), this.account.sort !== 0 && this.account.sort !== 6 && this.account.sort !== 8 && (r -= this.transactions[e + s].amount);
 }
-this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted || (this.initialScrollCompleted = !0, this.initialScroll());
+this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted || (this.initialScrollCompleted = !0, this.initialScroll()), enyo.asyncMethod(this, this.doLoadingFinish);
 },
 duplicateTransaction: function(e) {
 this.log(), this.toggleCreateButtons();
@@ -13247,7 +13629,9 @@ onSuccess: enyo.bind(this, this.loadAccount, r)
 } else this.inherited(arguments);
 },
 reflow: function() {
-this.log(), this.$.scroller.applyStyle("height", null), this.inherited(arguments), this.$.scroller.applyStyle("height", this.$.scroller.getBounds().height + "px");
+this.log(), this.$.scroller.applyStyle("height", null), this.inherited(arguments);
+var e = this.$.scroller.getBounds();
+e && this.$.scroller.applyStyle("height", e.height + "px");
 },
 hide: function(e) {
 this.log();
@@ -13720,13 +14104,13 @@ this.$.linkedAccount.setShowing(this.transactionType === "transfer"), this.$.aut
 onSuccess: enyo.bind(this, this.adjustMaxCheckNumber)
 })) : this.$.checkNumHolder.hide(), this.accountObj["payeeField"] == 1 ? this.$.payeeFieldHolder.show() : this.$.payeeFieldHolder.hide(), Checkbook.globals.prefs.dispColor === 1 ? (this.$.account.addClass(this.accountObj.acctCategoryColor), this.$.linkedAccount.getDisabled() || Checkbook.globals.accountManager.fetchAccount(this.$.linkedAccount.getValue(), {
 onSuccess: enyo.bind(this, this.linkedAccountChangedFollower, "set")
-})) : (this.$.account.removeClass("custom-background"), this.$.linkedAccount.removeClass("custom-background")), this.$.desc.focus();
+})) : (this.$.account.removeClass("custom-background"), this.$.linkedAccount.removeClass("custom-background")), enyo.asyncMethod(this.$.desc, this.$.desc.focus);
 },
 descKeyPress: function(e, t) {
 this.accountObj.transDescMultiLine !== 1 && t.keyCode === 13 && t.preventDefault();
 },
 descAutoSuggestMade: function(e, t) {
-this.trsnObj.desc = this.$.desc.getValue(), t.data && (this.trsnObj.linkedAccount = this.transactionType === "transfer" ? t.linkedAccount : -1, this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.trsnObj.category = t.category, this.categoryChanged()), this.$.amount.focus();
+this.trsnObj.desc = this.$.desc.getValue(), t.data && (this.trsnObj.linkedAccount = this.transactionType === "transfer" ? t.linkedAccount : -1, this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.trsnObj.category = t.category, this.categoryChanged()), enyo.asyncMethod(this.$.amount, this.$.amount.focus);
 },
 amountTypeChanged: function(e, t) {
 switch (this.transactionType) {
