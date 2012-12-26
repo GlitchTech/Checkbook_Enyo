@@ -437,8 +437,6 @@ enyo.kind({
 
 		this.$['sheetList'].setCount( this.allSheetsList.length );
 
-		this.refreshLayout();
-
 		this.$['progress'].hide();
 	},
 
