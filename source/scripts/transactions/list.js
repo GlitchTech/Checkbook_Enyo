@@ -206,6 +206,14 @@ enyo.kind( {
 		this.reloadTransactionList();
 	},
 
+	setItemCount: function( count ) {
+
+		if( Number.isFinite( count ) ) {
+
+			this.account['itemCount'] = count;
+		}
+	},
+
 	reloadTransactionList: function() {
 
 		this.log();
@@ -230,6 +238,8 @@ enyo.kind( {
 	_initialScroll: function() {
 
 		if( this.$['list'].getCount() <= 0 ) {
+
+			this.log( "empty list" );
 
 			return;
 		}
@@ -403,13 +413,8 @@ enyo.kind( {
 			return false;
 		}
 
-		if( index < 0 ) {
-			//No indexes below zero, don't bother calling
 
-			return false;
-		}
-
-		if( this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
+		if( index >= 0 && this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
 
 			this.doLoadingStart();
 
@@ -424,6 +429,8 @@ enyo.kind( {
 
 			return true;
 		}
+
+		return false;
 	},
 
 	transactionFetchGroupHandler: function( offset, results, rbResults ) {
