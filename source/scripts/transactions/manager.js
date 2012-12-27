@@ -68,22 +68,7 @@ enyo.kind({
 
 		Checkbook.globals.gts_db.queries(
 				this.generateInsertTransactionSQL( data, type ),
-				{
-					"onSuccess": function() {
-
-						if( enyo.isFunction( options['onSuccess'] ) ) {
-
-							options['onSuccess']();
-						}
-					},
-					"onError": function() {
-
-						if( enyo.isFunction( options['onError'] ) ) {
-
-							options['onError']();
-						}
-					}
-				}
+				options
 			);
 	},
 
@@ -289,25 +274,7 @@ enyo.kind({
 			sql.push( Checkbook.globals.gts_db.getUpdate( "transactions", linkedData, { "itemId": linkedData['itemId'] } ) );
 		}
 
-		Checkbook.globals.gts_db.queries(
-				sql,
-				{
-					"onSuccess": function() {
-
-						if( enyo.isFunction( options['onSuccess'] ) ) {
-
-							options['onSuccess']();
-						}
-					},
-					"onError": function() {
-
-						if( enyo.isFunction( options['onError'] ) ) {
-
-							options['onError']();
-						}
-					}
-				}
-			);
+		Checkbook.globals.gts_db.queries( sql, options );
 	},
 
 	/**
