@@ -1077,7 +1077,7 @@ enyo.kind( {
 		var options = {
 				"onSuccess": enyo.bind(
 						this,
-						this.doFinish,
+						this.saveCompleteHandler,
 						{
 							"modifyStatus": 1,
 							"account": this.trsnObj['account'],
@@ -1119,6 +1119,11 @@ All transactions in the series will be deleted.
 		}
 	},
 
+	saveCompleteHandler: function( inEvent ) {
+
+		enyo.asyncMethod( this, this.doFinish, inEvent );
+	},
+
 	deleteTransaction: function() {
 
 		if( this.trsnObj['itemId'] < 0 ) {
@@ -1128,7 +1133,7 @@ All transactions in the series will be deleted.
 
 			this.createComponent( {
 					name: "deleteTransactionConfirm",
-					kind: "GTS.deleteConfirm",
+					kind: "gts.ConfirmDialog",
 
 					title: "Delete Transaction",
 					message: "Are you sure you want to delete this transaction?",
@@ -1160,7 +1165,7 @@ All transactions in the series will be deleted.
 		Checkbook.globals.transactionManager.deleteTransaction(
 				this.trsnObj['itemId'],
 				{
-					"onSuccess": enyo.bind( this, this.doFinish, { status: "2" } )
+					"onSuccess": enyo.bind( this, this.saveCompleteHandler, { "modifyStatus": 2 } )
 				}
 			);
 	}

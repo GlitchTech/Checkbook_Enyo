@@ -206,6 +206,14 @@ enyo.kind( {
 		this.reloadTransactionList();
 	},
 
+	setItemCount: function( count ) {
+
+		if( Number.isFinite( count ) ) {
+
+			this.account['itemCount'] = count;
+		}
+	},
+
 	reloadTransactionList: function() {
 
 		this.log();
@@ -230,6 +238,8 @@ enyo.kind( {
 	_initialScroll: function() {
 
 		if( this.$['list'].getCount() <= 0 ) {
+
+			this.log( "empty list" );
 
 			return;
 		}
@@ -403,13 +413,8 @@ enyo.kind( {
 			return false;
 		}
 
-		if( index < 0 ) {
-			//No indexes below zero, don't bother calling
 
-			return false;
-		}
-
-		if( this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
+		if( index >= 0 && this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
 
 			this.doLoadingStart();
 
@@ -424,6 +429,8 @@ enyo.kind( {
 
 			return true;
 		}
+
+		return false;
 	},
 
 	transactionFetchGroupHandler: function( offset, results, rbResults ) {
@@ -586,12 +593,10 @@ results = {
 
 	modifyTransactionComplete: function( rowIndex, inSender, accounts ) {
 
-		this.log();
-
 		var action = accounts['modifyStatus'];
 		delete accounts['modifyStatus'];
 
-		if( action === 1 ) {
+		if( action == 1 ) {
 			//edited
 
 			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
@@ -603,7 +608,7 @@ results = {
 					this.$['list'].scrollToRow,
 					rowIndex
 				);
-		} else if( action === 2 ) {
+		} else if( action == 2 ) {
 			//deleted
 
 			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
@@ -703,7 +708,6 @@ results = {
 
 		//Update row UI
 		this.$['list'].renderRow( index );
-
 
 		enyo.Signals.send(
 				"accountBalanceChanged",

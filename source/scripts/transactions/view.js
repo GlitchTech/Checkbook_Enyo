@@ -604,6 +604,7 @@ enyo.kind( {
 
 			//Reload full list
 			this.account['itemCount']++;
+			this.$['entries'].setItemCount( this.account['itemCount'] );
 			this.$['entries'].reloadSystem();
 		}
 	},

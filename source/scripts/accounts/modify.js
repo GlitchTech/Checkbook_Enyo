@@ -863,7 +863,7 @@ enyo.kind( {
 
 	saveFinished: function( status ) {
 
-		this.doFinish( { "action": 1, "actionStatus": status } );
+		enyo.asyncMethod( this, this.doFinish, { "action": 1, "actionStatus": status } );
 	},
 
 	/**
@@ -926,6 +926,6 @@ enyo.kind( {
 	 */
 	deleteFinished: function( status ) {
 
-		this.doFinish( { "action": 2, "actionStatus": status } );
+		enyo.asyncMethod( this, this.doFinish, { "action": 2, "actionStatus": status } );
 	}
 });
