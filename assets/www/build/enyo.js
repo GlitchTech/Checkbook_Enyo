@@ -90,7 +90,7 @@ this.verbose && console.log("+ module: [" + r + "][" + e + "]"), this.requireScr
 },
 getPathPrefix: function(e) {
 var t = e.slice(0, 1);
-return t != "/" && t != "\\" && t != "$" && e.slice(0, 5) != "http:" ? this.packageFolder : "";
+return t != "/" && t != "\\" && t != "$" && !/^https?:/i.test(e) ? this.packageFolder : "";
 },
 requireStylesheet: function(e) {
 this.sheets.push(e), this.loadSheet(e);
@@ -153,7 +153,7 @@ less.refresh(!0);
 script: function(e, t, n) {
 if (!enyo.runtimeLoading) document.write('<script src="' + e + '"' + (t ? ' onload="' + t + '"' : "") + (n ? ' onerror="' + n + '"' : "") + "></scri" + "pt>"); else {
 var r = document.createElement("script");
-r.src = e, r.onLoad = t, r.onError = n, document.getElementsByTagName("head")[0].appendChild(r);
+r.src = e, r.onload = t, r.onerror = n, document.getElementsByTagName("head")[0].appendChild(r);
 }
 },
 inject: function(e) {
@@ -207,7 +207,7 @@ var r = console[e];
 r && r.apply ? r.apply(console, n) : console.log.apply ? console.log.apply(console, n) : console.log(n.join(" "));
 },
 log: function(e, t) {
-window.console && this.shouldLog(e) && this._log(e, t);
+typeof console != "undefined" && this.shouldLog(e) && this._log(e, t);
 }
 }, enyo.setLogLevel = function(e) {
 var t = parseInt(e, 0);

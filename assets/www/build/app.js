@@ -5542,7 +5542,7 @@ if (!this.db) {
 this._db_lost();
 return;
 }
-t = typeof t != "undefined" ? t : {}, t = this._getOptions(t);
+t = this._getOptions(t);
 var n = this.debug;
 this.db.transaction(function(r) {
 var i = e.length, s = null, o = "", u = [];
@@ -5647,15 +5647,16 @@ var n = {
 onSuccess: this._emptyFunction,
 onError: this.bound._errorHandler
 };
-return typeof t != "undefined" && (n = enyo.mixin(n, t)), typeof e == "undefined" && (e = {}), enyo.mixin(n, e), enyo.isFunction(e.onError) && (n.onError = enyo.bind(this, function() {
-this.bound._errorHandler.apply(this, arguments), e.onError.apply(null, arguments);
-})), n;
+return typeof t != "undefined" && (n = enyo.mixin(n, t)), typeof e == "undefined" && (e = {}), enyo.mixin(n, e), enyo.isFunction(e.onError) && (n.onError = enyo.bind(this, this._errorMixed, e.onError)), n;
 },
 _emptyFunction: function() {},
 _convertResultSet: function(e) {
 var t = [];
 if (e.rows) for (var n = 0; n < e.rows.length; n++) t.push(e.rows.item(n));
 return t;
+},
+_errorMixed: function(e) {
+return this.bound._errorHandler.apply(this, arguments), e.apply(null, arguments), !1;
 },
 _errorHandler: function(e, t) {
 typeof t == "undefined" && (t = e);
@@ -9052,7 +9053,7 @@ account: e
 })), enyo.Signals.send("accountChanged");
 if (this.notificationType !== !0 || Checkbook.globals.prefs["updateCheckNotification"] != 1) if (this.notificationType === !1) {
 var t = enyo.fetchAppInfo();
-Checkbook.globals.criticalError.load("Welcome to " + t.title, "If you have any questions, visit <a href='" + t.vendorurl + "' target='_blank'>" + t.vendorurl + "</a> or email <a href='mailto:" + t.vendoremail + "?subject=" + t.title + " Support'>" + t.vendoremail + "</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png");
+Checkbook.globals.criticalError.load("Welcome to " + t.title, "If you have any questions, email <a href='mailto:" + t.vendoremail + "?subject=" + t.title + " Support'>" + t.vendoremail + "</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png");
 }
 this.appReady = !0;
 },
@@ -12045,7 +12046,7 @@ onSuccess: enyo.bind(this, this.saveFinished)
 this.acctId < 0 ? Checkbook.globals.accountManager.createAccount(e, t) : Checkbook.globals.accountManager.updateAccount(e, this.acctId, this.pinChanged, t);
 },
 saveFinished: function(e) {
-this.doFinish({
+enyo.asyncMethod(this, this.doFinish, {
 action: 1,
 actionStatus: e
 });
@@ -12073,7 +12074,7 @@ onSuccess: enyo.bind(this, this.deleteFinished)
 });
 },
 deleteFinished: function(e) {
-this.doFinish({
+enyo.asyncMethod(this, this.doFinish, {
 action: 2,
 actionStatus: e
 });
@@ -12491,14 +12492,7 @@ onSuccess: enyo.bind(this, this.createTransactionFollower, e, t, n)
 });
 },
 createTransactionFollower: function(e, t, n, r) {
-e.itemId = parseInt(r[0].maxItemId) + 1, e.maxRepeatId = parseInt(r[0].maxRepeatId) + 1, Checkbook.globals.gts_db.queries(this.generateInsertTransactionSQL(e, t), {
-onSuccess: function() {
-enyo.isFunction(n.onSuccess) && n.onSuccess();
-},
-onError: function() {
-enyo.isFunction(n.onError) && n.onError();
-}
-});
+e.itemId = parseInt(r[0].maxItemId) + 1, e.maxRepeatId = parseInt(r[0].maxRepeatId) + 1, Checkbook.globals.gts_db.queries(this.generateInsertTransactionSQL(e, t), n);
 },
 generateInsertTransactionSQL: function(e, t) {
 var n = enyo.clone(e), r = n.autoTransfer, i = n.autoTransferLink, s = this._prepareData(n, t);
@@ -12542,14 +12536,7 @@ GTS.Object.swap(s, "linkedRecord", "itemId"), GTS.Object.swap(s, "linkedAccount"
 itemId: s.itemId
 }));
 }
-Checkbook.globals.gts_db.queries(i, {
-onSuccess: function() {
-enyo.isFunction(n.onSuccess) && n.onSuccess();
-},
-onError: function() {
-enyo.isFunction(n.onError) && n.onError();
-}
-});
+Checkbook.globals.gts_db.queries(i, n);
 },
 _prepareData: function(e, t) {
 return e.desc = e.desc === "" || e.desc === null ? "Description" : e.desc, e.cleared = e.cleared ? 1 : 0, e.amount = GTS.Object.isNumber(e.amount) ? 0 : Number(e.amount).toFixed(2).valueOf(), e.date = Date.parse(e.date), t == "transfer" ? e.amount_old !== "NOT_A_VALUE" && e.amount_old < 0 ? e.amount = -Math.abs(e.amount) : e.amount_old !== "NOT_A_VALUE" && e.amount_old >= 0 ? e.amount = Math.abs(e.amount) : (e.linkedRecord = e.itemId + 1, e.amount = -Math.abs(e.amount)) : t == "income" ? (e.amount = Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null) : (e.amount = -Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null), delete e.amount_old, delete e.autoTransfer, delete e.autoTransferLink, [];
@@ -13093,7 +13080,7 @@ onFinish: enyo.bind(this, this.addTransactionComplete)
 }));
 },
 addTransactionComplete: function(e, t) {
-this.toggleCreateButtons(), t.modifyStatus === 1 && (delete t.modifyStatus, this.balanceChangedHandler(t), this.account.itemCount++, this.$.entries.reloadSystem());
+this.toggleCreateButtons(), t.modifyStatus === 1 && (delete t.modifyStatus, this.balanceChangedHandler(t), this.account.itemCount++, this.$.entries.setItemCount(this.account.itemCount), this.$.entries.reloadSystem());
 },
 toggleCreateButtons: function() {
 this.$.addIncomeButton.getDisabled() ? (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1)) : (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0));
@@ -13230,6 +13217,9 @@ this.log();
 if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
 this.initialScrollCompleted = !1, this.reloadTransactionList();
 },
+setItemCount: function(e) {
+Number.isFinite(e) && (this.account.itemCount = e);
+},
 reloadTransactionList: function() {
 this.log();
 if (!this.account.acctId || this.account.acctId < 0) return !1;
@@ -13239,7 +13229,10 @@ initialScroll: function() {
 enyo.job("initialScroll", enyo.bind(this, "_initialScroll"), 100);
 },
 _initialScroll: function() {
-if (this.$.list.getCount() <= 0) return;
+if (this.$.list.getCount() <= 0) {
+this.log("empty list");
+return;
+}
 if (this.account.sort !== 0 && this.account.sort !== 1 && this.account.sort !== 6 && this.account.sort !== 7) {
 this.$.list.scrollToRow(0);
 return;
@@ -13301,11 +13294,9 @@ return this.$.mainBody.addRemoveClass("repeatTransferIcon", o && u), this.$.main
 transactionFetchGroup: function(e, t) {
 this.log(e, "|", t);
 var n = t.page * t.pageSize;
-if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
-if (n < 0) return !1;
-if (this.account.itemCount > this.$.list.getCount() && !this.transactions[n]) return this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
+return !this.account.acctId || this.account.acctId < 0 ? (this.log("System not ready yet"), !1) : n >= 0 && this.account.itemCount > this.$.list.getCount() && !this.transactions[n] ? (this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
 onSuccess: enyo.bind(this, this.transactionFetchGroupHandler)
-}, t.pageSize, n), !0;
+}, t.pageSize, n), !0) : !1;
 },
 transactionFetchGroupHandler: function(e, t, n) {
 var r = 0;
@@ -13347,11 +13338,10 @@ onFinish: enyo.bind(this, this.modifyTransactionComplete, t.rowIndex)
 });
 },
 modifyTransactionComplete: function(e, t, n) {
-this.log();
 var r = n.modifyStatus;
-delete n.modifyStatus, r === 1 ? (enyo.Signals.send("accountBalanceChanged", {
+delete n.modifyStatus, r == 1 ? (enyo.Signals.send("accountBalanceChanged", {
 accounts: n
-}), this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e)) : r === 2 && (enyo.Signals.send("accountBalanceChanged", {
+}), this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e)) : r == 2 && (enyo.Signals.send("accountBalanceChanged", {
 accounts: n
 }), this.account.itemCount--, this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e - 1));
 },
@@ -14209,7 +14199,7 @@ this.trsnObj.date = this.$.date.getValue(), this.trsnObj.date.setHours(e.getHour
 pattern: "none"
 }, this.log(this.trsnObj.rObj, this.trsnObj.repeatId, this.trsnObj.repeatUnlinked), this.trsnObj.autoTransfer = this.$.autoTrans.getShowing() && this.$.autoTrans.getValue() ? this.accountObj.auto_savings : 0, this.trsnObj.autoTransferLink = this.accountObj.auto_savings_link;
 var t = {
-onSuccess: enyo.bind(this, this.doFinish, {
+onSuccess: enyo.bind(this, this.saveCompleteHandler, {
 modifyStatus: 1,
 account: this.trsnObj.account,
 linkedAccount: this.transactionType == "transfer" ? this.trsnObj.linkedAccount : -1,
@@ -14219,12 +14209,15 @@ onFailure: null
 };
 this.trsnObj.itemId < 0 ? Checkbook.globals.transactionManager.createTransaction(this.trsnObj, this.transactionType, t) : Checkbook.globals.transactionManager.updateTransaction(this.trsnObj, this.transactionType, t);
 },
+saveCompleteHandler: function(e) {
+enyo.asyncMethod(this, this.doFinish, e);
+},
 deleteTransaction: function() {
 this.trsnObj.itemId < 0 ? this.doFinish({
 status: 0
 }) : (this.createComponent({
 name: "deleteTransactionConfirm",
-kind: "GTS.deleteConfirm",
+kind: "gts.ConfirmDialog",
 title: "Delete Transaction",
 message: "Are you sure you want to delete this transaction?",
 confirmText: "Delete",
@@ -14240,8 +14233,8 @@ this.$.deleteTransactionConfirm.hide(), this.$.deleteTransactionConfirm.destroy(
 },
 deleteTransactionHandler: function() {
 this.deleteTransactionConfirmClose(), Checkbook.globals.transactionManager.deleteTransaction(this.trsnObj.itemId, {
-onSuccess: enyo.bind(this, this.doFinish, {
-status: "2"
+onSuccess: enyo.bind(this, this.saveCompleteHandler, {
+modifyStatus: 2
 })
 });
 }
