@@ -593,12 +593,10 @@ results = {
 
 	modifyTransactionComplete: function( rowIndex, inSender, accounts ) {
 
-		this.log();
-
 		var action = accounts['modifyStatus'];
 		delete accounts['modifyStatus'];
 
-		if( action === 1 ) {
+		if( action == 1 ) {
 			//edited
 
 			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
@@ -610,7 +608,7 @@ results = {
 					this.$['list'].scrollToRow,
 					rowIndex
 				);
-		} else if( action === 2 ) {
+		} else if( action == 2 ) {
 			//deleted
 
 			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
@@ -710,7 +708,6 @@ results = {
 
 		//Update row UI
 		this.$['list'].renderRow( index );
-
 
 		enyo.Signals.send(
 				"accountBalanceChanged",
