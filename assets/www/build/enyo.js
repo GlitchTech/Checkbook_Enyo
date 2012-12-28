@@ -1527,8 +1527,13 @@ hide: function() {
 this.setShowing(!1);
 },
 getBounds: function() {
-var e = this.node || this.hasNode();
-return enyo.dom.getBounds(e);
+var e = this.node || this.hasNode(), t = enyo.dom.getBounds(e);
+return t || {
+left: undefined,
+top: undefined,
+width: undefined,
+height: undefined
+};
 },
 setBounds: function(e, t) {
 var n = this.domStyles, r = t || "px", i = [ "width", "height", "left", "top", "right", "bottom" ];
