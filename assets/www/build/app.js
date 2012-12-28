@@ -5794,12 +5794,14 @@ sync: !0
 }).responseText);
 } catch (t) {
 enyo._applicationInformation = {
+title: "App Name",
 error: "Error in fetching application information."
 }, enyo.error("enyo.fetchAppInfo(): couldn't fetch app info", t);
 }
 return enyo._applicationInformation;
 } : enyo.fetchAppInfo = function() {
 return {
+title: "App Name",
 error: "enyo.g11n.Utils._fetchAppRootPath does not exist. Please make sure you are using the enyo.g11n library in this application."
 };
 });
@@ -10736,7 +10738,7 @@ o < s.length ? enyo.asyncMethod(this, this.buildSheetContent, e, t, o, r, i, s) 
 uploadSheet: function(e, t, n) {
 this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Uploading data"), this.$.progress.setProgress((t + 1) * 3 / 4 / e.length * 100);
 const r = "----END_OF_PART----", i = "\r\n--" + r + "\r\n", s = "\r\n--" + r + "--", o = "text/csv";
-var u = new Date, a = "[Checkbook GUTOC] " + n.accountName + " [" + n.accountCategory + "] [" + u.format({
+var u = new Date, a = "[" + enyo.fetchAppInfo().title + "] " + n.accountName + " [" + n.accountCategory + "] [" + u.format({
 date: "long",
 time: "short"
 }) + "]", f = {
