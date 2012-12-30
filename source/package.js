@@ -9,6 +9,7 @@ enyo.depends(
 	"$lib/onyx/source",
 	"Theme.less",
 
+	"$lib/SQLitePlugin.android.js",
 	"$lib/database.js",
 	"$lib/gdata.js",
 	"$lib/utils.js",
