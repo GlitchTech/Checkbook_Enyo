@@ -22,7 +22,7 @@ enyo.kind({
 
 			this.log( "creating database object." );
 
-			var db = new GTS.database( dbArgs );
+			var db = new GTS.database( getDBArgs() );
 		}
 	},
 

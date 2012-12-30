@@ -119,7 +119,7 @@ enyo.kind({
 
 		if( !Checkbook.globals.gts_db ) {
 
-			Checkbook.globals.gts_db = new GTS.database( dbArgs );
+			Checkbook.globals.gts_db = new GTS.database( getDBArgs() );
 
 			this.log( "Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created." );
 		}
@@ -712,6 +712,14 @@ enyo.kind({
 			//Optionally break early to force this.versionCheck to not be max version, will force another db update
 
 		switch( currVersion ) {
+			case 15:
+				// webOS updated acct cats
+				querySet.push( "ALTER TABLE accounts ADD COLUMN auto_savings INTEGER NOT NULL DEFAULT 0;" );// OPTIONS: +1$, +remainder of dollar, none
+				querySet.push( "ALTER TABLE accounts ADD COLUMN auto_savings_link INTEGER NOT NULL DEFAULT 0;" );// Linked account
+
+				querySet.push( "DROP TABLE IF EXISTS repeats;" );
+				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurance TEXT, desc TEXT, amount REAL, note TEXT, category TEXT, acctId INTEGER, linkedAcctId INTEGER );" );
+
 			case 16:
 				querySet.push( "ALTER TABLE expenses ADD COLUMN repeatUnlinked INTEGER NOT NULL DEFAULT 0;" );
 

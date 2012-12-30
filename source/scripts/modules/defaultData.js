@@ -1,4 +1,6 @@
-var dbArgs = {
+function getDBArgs() {
+
+	var args = {
 		database: "ext:checkbook-database",
 		version: "1",
 		name: "Checkbook DB",
@@ -6,6 +8,15 @@ var dbArgs = {
 
 		debug: false//Only debug when in Beta versions
 	};
+
+	if( enyo.platform.android || enyo.platform.androidChrome ) {
+		//Use android overrides
+
+		window.openDatabase = window.sqlitePlugin.openDatabase;
+	}
+
+	return args;
+}
 
 /** Default Data **/
 var defaultAccountCategories = [
