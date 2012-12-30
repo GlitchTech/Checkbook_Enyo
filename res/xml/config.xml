@@ -56,6 +56,9 @@
         <plugin
             name="ChildBrowser"
             value="com.phonegap.plugins.childBrowser.ChildBrowser" />
+        <plugin
+            name="SQLitePlugin"
+            value="com.glitchtechscience.gtcheckbook.SQLitePlugin" />
     </plugins>
 
 </cordova>

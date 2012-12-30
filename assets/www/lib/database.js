@@ -179,8 +179,6 @@ enyo.kind({
 		// Run the transaction
 		var self = this;
 
-		//determine if read only transaction && not android, then use readTransaction
-
 		this.db.transaction( function( transaction ) {
 
 			if( self.debug ) {

@@ -5482,6 +5482,117 @@ this.setShowing(!1);
 }
 });
 
+// $lib/SQLitePlugin.android.js
+
+(function() {
+var e, t, n, r, i, s, o, u, a, f;
+return u = this, t = function(e, t, n) {
+var r;
+enyo.log("SQLitePlugin");
+if (!e || !e.name) throw new Error("Cannot create a SQLitePlugin instance without a db name");
+r = e.name, this.openargs = e, this.dbname = r, this.openSuccess = t, this.openError = n, this.openSuccess || (this.openSuccess = function() {
+return enyo.log("DB opened: " + r);
+}), this.openError || (this.openError = function(e) {
+return enyo.log(e.message);
+}), this.open(this.openSuccess, this.openError);
+}, t.prototype.openDBs = {}, t.prototype.transaction = function(e, t, n) {
+enyo.log("SQLitePlugin.prototype.transaction");
+var i;
+i = new r(this.dbname), e(i), i.complete(n, t);
+}, t.prototype.open = function(e, t) {
+enyo.log("SQLitePlugin.prototype.open"), this.dbname in this.openDBs || (this.openDBs[this.dbname] = !0, cordova.exec(e, t, "SQLitePlugin", "open", [ this.openargs ]));
+}, t.prototype.close = function(e, t) {
+enyo.log("SQLitePlugin.prototype.close"), this.dbname in this.openDBs && (delete this.openDBs[this.dbname], cordova.exec(null, null, "SQLitePlugin", "close", [ this.dbname ]));
+}, o = function() {
+return 1;
+}, t.prototype.executePragmaStatement = function(e, t, n) {
+enyo.log("SQLitePlugin::executePragmaStatement"), o = t, cordova.exec(function() {
+return 1;
+}, n, "SQLitePlugin", "executePragmaStatement", [ this.dbname, e ]);
+}, n = {
+p1: function(e, t) {
+var n;
+enyo.log("PRAGMA CB"), n = o, o = function() {
+return 1;
+}, n(t);
+}
+}, s = function() {
+var e, t;
+e = (new Date).getTime(), t = (new Date).getTime();
+while (e === t) t = (new Date).getTime();
+return t + "000";
+}, f = [], a = {}, r = function(e) {
+this.dbname = e, this.executes = [], this.trans_id = s(), this.__completed = !1, this.__submitted = !1, this.optimization_no_nested_callbacks = !1, enyo.log("SQLitePluginTransaction - this.trans_id:" + this.trans_id), f[this.trans_id] = [], a[this.trans_id] = new Object;
+}, i = {}, i.queryCompleteCallback = function(e, t, n) {
+enyo.log("SQLitePluginTransaction.queryCompleteCallback");
+var r, i;
+r = null;
+for (i in f[e]) if (f[e][i].query_id === t) {
+r = f[e][i], f[e].length === 1 ? f[e] = [] : f[e].splice(i, 1);
+break;
+}
+if (r && r.callback) return r.callback(n);
+}, i.queryErrorCallback = function(e, t, n) {
+enyo.log("SQLitePluginTransaction.queryErrorCallback");
+var r, i;
+r = null;
+for (i in f[e]) if (f[e][i].query_id === t) {
+r = f[e][i], f[e].length === 1 ? f[e] = [] : f[e].splice(i, 1);
+break;
+}
+if (r && r.err_callback) return r.err_callback(n);
+}, i.txCompleteCallback = function(e) {
+if (typeof e == "undefined") return enyo.log("SQLitePluginTransaction.txCompleteCallback---transId = NULL");
+if (e && a[e] && a[e].success) return a[e].success();
+}, i.txErrorCallback = function(e, t) {
+return typeof e != "undefined" ? (enyo.log("SQLitePluginTransaction.txErrorCallback---transId:" + e), e && a[e].error && a[e].error(t), delete f[e], delete a[e]) : enyo.log("SQLitePluginTransaction.txErrorCallback---transId = NULL");
+}, r.prototype.add_to_transaction = function(e, t, n, r, i) {
+var o;
+o = new Object, o.trans_id = e, r || !this.optimization_no_nested_callbacks ? o.query_id = s() : this.optimization_no_nested_callbacks && (o.query_id = ""), o.query = t, n ? o.params = n : o.params = [], o.callback = r, o.err_callback = i, f[e] || (f[e] = []), f[e].push(o);
+}, r.prototype.executeSql = function(e, t, n, r) {
+enyo.log("SQLitePluginTransaction.prototype.executeSql");
+var i, s, o;
+i = void 0, s = void 0, o = void 0, o = this, s = null, n && (s = function(e) {
+var t, r;
+return enyo.log("executeSql callback:" + JSON.stringify(e)), t = void 0, r = void 0, r = e, t = {
+rows: {
+item: function(e) {
+return r[e];
+},
+length: r.length
+},
+rowsAffected: r.rowsAffected,
+insertId: r.insertId || null
+}, n(o, t);
+}), i = null, r ? (enyo.log("error not NULL: " + e), i = function(e) {
+return r(o, e);
+}) : enyo.log("error NULL: " + e), enyo.log("executeSql - add_to_transaction: " + e), this.add_to_transaction(this.trans_id, e, t, s, i);
+}, r.prototype.complete = function(e, t) {
+var n, r, i;
+enyo.log("SQLitePluginTransaction.prototype.complete");
+if (this.__completed) throw new Error("Transaction already run");
+if (this.__submitted) throw new Error("Transaction already submitted");
+this.__submitted = !0, i = this, r = function() {
+if (f[i.trans_id].length > 0 && !i.optimization_no_nested_callbacks) return i.__submitted = !1, i.complete(e, t);
+this.__completed = !0;
+if (e) return e(i);
+}, n = function(e) {
+return null;
+}, t && (n = function(e) {
+return t(i, e);
+}), a[this.trans_id].success = r, a[this.trans_id].error = n, cordova.exec(null, null, "SQLitePlugin", "executeSqlBatch", [ this.dbname, f[this.trans_id] ]);
+}, e = {
+opendb: function() {
+var e, n, r, i;
+return arguments.length < 1 ? null : (n = arguments[0], i = null, r = null, e = null, n.constructor === String ? (i = {
+name: n
+}, arguments.length >= 5 && (r = arguments[4], arguments.length > 5 && (e = arguments[5]))) : (i = n, arguments.length >= 2 && (r = arguments[1], arguments.length > 2 && (e = arguments[2]))), new t(i, r, e));
+}
+}, u.SQLitePluginCallback = n, u.SQLitePluginTransactionCB = i, u.sqlitePlugin = {
+openDatabase: e.opendb
+};
+})();
+
 // $lib/database.js
 
 enyo.kind({
@@ -7765,13 +7876,19 @@ return !0;
 
 // defaultData.js
 
-var dbArgs = {
+function getDBArgs() {
+var e = {
 database: "ext:checkbook-database",
 version: "1",
 name: "Checkbook DB",
 estimatedSize: 5242880,
 debug: !1
-}, defaultAccountCategories = [ {
+};
+if (enyo.platform.android || enyo.platform.androidChrome) window.openDatabase = window.sqlitePlugin.openDatabase;
+return e;
+}
+
+var defaultAccountCategories = [ {
 name: "Checking",
 catOrder: 1,
 icon: "checkbook_1.png",
@@ -9192,7 +9309,7 @@ owner: this
 }), this.$.headerWrapper.render(), this.headerBuilt = !0), this.$.spinner.show(), this.checkSystem(), this.reflow();
 },
 checkSystem: function() {
-this.$.title.setContent("Loading Checkbook"), this.$.message.setContent("Preparing application."), this.$.splashProgress.animateProgressTo(5), Checkbook.globals || (Checkbook.globals = {}), Checkbook.globals.gts_db || (Checkbook.globals.gts_db = new GTS.database(dbArgs), this.log("Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created.")), Checkbook.globals.prefs || (Checkbook.globals.prefs = {}, this.log("creating prefs")), this.checkDB();
+this.$.title.setContent("Loading Checkbook"), this.$.message.setContent("Preparing application."), this.$.splashProgress.animateProgressTo(5), Checkbook.globals || (Checkbook.globals = {}), Checkbook.globals.gts_db || (Checkbook.globals.gts_db = new GTS.database(getDBArgs()), this.log("Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created.")), Checkbook.globals.prefs || (Checkbook.globals.prefs = {}, this.log("creating prefs")), this.checkDB();
 },
 checkDB: function() {
 this.log(), this.$.message.setContent("Checking database version..."), this.$.splashProgress.animateProgressTo(10), Checkbook.globals.gts_db.query("SELECT * FROM prefs LIMIT 1;", {
@@ -9592,6 +9709,8 @@ onSuccess: this._binds.checkDB,
 onError: this._binds.splashCrash
 };
 switch (e) {
+case 15:
+t.push("ALTER TABLE accounts ADD COLUMN auto_savings INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE accounts ADD COLUMN auto_savings_link INTEGER NOT NULL DEFAULT 0;"), t.push("DROP TABLE IF EXISTS repeats;"), t.push("CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurance TEXT, desc TEXT, amount REAL, note TEXT, category TEXT, acctId INTEGER, linkedAcctId INTEGER );");
 case 16:
 t.push("ALTER TABLE expenses ADD COLUMN repeatUnlinked INTEGER NOT NULL DEFAULT 0;"), this.versionCheck = 17;
 case 17:
@@ -10902,7 +11021,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(dbArgs);
+var e = new GTS.database(getDBArgs());
 }
 this.bound = {
 _errorHandler: enyo.bind(this, this._errorHandler)
@@ -12092,7 +12211,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(dbArgs);
+var e = new GTS.database(getDBArgs());
 }
 },
 fetchCategories: function(e, t, n) {
@@ -12482,7 +12601,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(dbArgs);
+var e = new GTS.database(getDBArgs());
 }
 },
 createTransaction: function(e, t, n) {
@@ -14530,7 +14649,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(dbArgs);
+var e = new GTS.database(getDBArgs());
 }
 },
 fetchCategories: function(e, t, n) {
@@ -15049,7 +15168,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(dbArgs);
+var e = new GTS.database(getDBArgs());
 }
 }
 });
@@ -15736,7 +15855,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(dbArgs);
+var e = new GTS.database(getDBArgs());
 }
 },
 createBudget: function(e, t) {
