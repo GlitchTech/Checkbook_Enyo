@@ -143,11 +143,17 @@ enyo.kind( {
 					components: [
 						{
 							name: "addAccountButton",
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/new.png",
+							kind: "onyx.Button",
 
 							ontap: "addAccount",
-							classes: "add"
+
+							classes: "padding-none",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/new.png"
+								}
+							]
 						}
 					]
 				}, {
