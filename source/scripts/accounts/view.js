@@ -169,7 +169,7 @@ enyo.kind( {
 			kind: "onyx.Scrim",
 			classes: "onyx-scrim-translucent",
 
-			showing: false,
+			showing: true,
 			style: "z-index: 1000;"
 		}, {
 			name: "loadingSpinner",
