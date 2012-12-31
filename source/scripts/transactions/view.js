@@ -73,7 +73,7 @@ enyo.kind( {
 					components: [
 						{
 							kind: "onyx.Button",
-							classes: "padding-none",
+							classes: "padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -99,7 +99,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addIncome",
-							classes: "margin-half-left margin-half-right padding-none",
+							classes: "margin-half-left margin-half-right padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -111,7 +111,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addTransfer",
-							classes: "margin-half-left margin-half-right padding-none",
+							classes: "margin-half-left margin-half-right padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -123,7 +123,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addExpense",
-							classes: "margin-half-left margin-half-right padding-none",
+							classes: "margin-half-left margin-half-right padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -138,7 +138,7 @@ enyo.kind( {
 					components: [
 						{
 							kind: "onyx.Button",
-							classes: "padding-none",
+							classes: "padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -166,7 +166,7 @@ enyo.kind( {
 					components: [
 						{
 							kind: "onyx.Button",
-							classes: "padding-none",
+							classes: "padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
