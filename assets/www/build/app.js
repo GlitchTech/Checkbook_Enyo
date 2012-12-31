@@ -9136,7 +9136,7 @@ if (!this.appReady) return;
 return this.log("NYI"), !0;
 },
 splashFinisher: function() {
-this.notificationType = !this.$.splash.getFirstRun(), this.$.splash.hide(), this.$.splash.destroy(), Checkbook.globals.security = this.$.security, Checkbook.globals.prefs["useCode"] != 0 ? Checkbook.globals.security.authUser("Main Program PIN Code", Checkbook.globals.prefs.code, {
+this.notificationType = !this.$.splash.getFirstRun(), Checkbook.globals.security = this.$.security, Checkbook.globals.prefs["useCode"] != 0 ? Checkbook.globals.security.authUser("Main Program PIN Code", Checkbook.globals.prefs.code, {
 onSuccess: enyo.bind(this, this.loadCheckbook),
 onFailure: enyo.bind(this, this.appAuthFailure)
 }) : this.loadCheckbook();
@@ -9174,7 +9174,7 @@ if (this.notificationType !== !0 || Checkbook.globals.prefs["updateCheckNotifica
 var t = enyo.fetchAppInfo();
 Checkbook.globals.criticalError.load("Welcome to " + t.title, "If you have any questions, email <a href='mailto:" + t.vendoremail + "?subject=" + t.title + " Support'>" + t.vendoremail + "</a>.", "", "assets/icon_1_32x32.png"), enyo.asyncMethod(Checkbook.globals.criticalError, Checkbook.globals.criticalError.set, "~|p2t|~", "", "~|mt|~", "assets/status_icons/warning.png");
 }
-this.appReady = !0;
+this.appReady = !0, this.$.splash && (this.$.splash.hide(), this.$.splash.destroy());
 },
 showAbout: function() {
 this.showPopup({
@@ -11568,10 +11568,13 @@ classes: "text-center",
 fit: !0,
 components: [ {
 name: "addAccountButton",
-kind: "onyx.IconButton",
-src: "assets/menu_icons/new.png",
+kind: "onyx.Button",
 ontap: "addAccount",
-classes: "add"
+classes: "padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/new.png"
+} ]
 } ]
 }, {
 components: [ {
@@ -11585,7 +11588,7 @@ ontap: "toggleLock"
 name: "loadingScrim",
 kind: "onyx.Scrim",
 classes: "onyx-scrim-translucent",
-showing: !1,
+showing: !0,
 style: "z-index: 1000;"
 }, {
 name: "loadingSpinner",
@@ -12981,8 +12984,12 @@ style: "height: 27px;"
 }, {
 kind: "onyx.MenuDecorator",
 components: [ {
-kind: "onyx.IconButton",
+kind: "onyx.Button",
+classes: "padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
 src: "assets/menu_icons/sort.png"
+} ]
 }, {
 name: "sortMenu",
 kind: "GTS.SelectedMenu",
@@ -12995,29 +13002,42 @@ classes: "text-center",
 fit: !0,
 components: [ {
 name: "addIncomeButton",
-kind: "onyx.IconButton",
-src: "assets/menu_icons/income.png",
+kind: "onyx.Button",
 ontap: "addIncome",
-classes: "income margin-half-left margin-half-right"
+classes: "margin-half-left margin-half-right padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/income.png"
+} ]
 }, {
 name: "addTransferButton",
-kind: "onyx.IconButton",
-src: "assets/menu_icons/transfer.png",
+kind: "onyx.Button",
 ontap: "addTransfer",
-classes: "transfer margin-half-left margin-half-right"
+classes: "margin-half-left margin-half-right padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/transfer.png"
+} ]
 }, {
 name: "addExpenseButton",
-kind: "onyx.IconButton",
-src: "assets/menu_icons/expense.png",
+kind: "onyx.Button",
 ontap: "addExpense",
-classes: "expense margin-half-left margin-half-right"
+classes: "margin-half-left margin-half-right padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/expense.png"
+} ]
 } ]
 }, {
 showing: !1,
 kind: "onyx.MenuDecorator",
 components: [ {
-kind: "onyx.IconButton",
+kind: "onyx.Button",
+classes: "padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
 src: "assets/menu_icons/search.png"
+} ]
 }, {
 kind: "onyx.Menu",
 floating: !0,
@@ -13034,8 +13054,12 @@ content: "Search"
 showing: !1,
 kind: "onyx.MenuDecorator",
 components: [ {
-kind: "onyx.IconButton",
+kind: "onyx.Button",
+classes: "padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
 src: "assets/menu_icons/config.png"
+} ]
 }, {
 kind: "onyx.Menu",
 floating: !0,

@@ -1717,6 +1717,9 @@ body {
 
 }
 /* Backgrounds/Gradients */
+.transparent {
+  background-color: transparent;
+}
 .deep-green {
   color: #f1f1f1;
   background-color: #284907;
