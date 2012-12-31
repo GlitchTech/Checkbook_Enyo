@@ -301,10 +301,6 @@ enyo.kind({
 
 		this.notificationType = !this.$['splash'].getFirstRun();
 
-		//Close & remove splash system. Not used again
-		this.$['splash'].hide();
-		this.$['splash'].destroy();
-
 		Checkbook.globals.security = this.$['security'];
 
 		if( Checkbook.globals.prefs['useCode'] != 0 ) {
@@ -423,6 +419,13 @@ enyo.kind({
 		}
 
 		this.appReady = true;
+
+		if( this.$['splash'] ) {
+
+			//Close & remove splash system. Not used again
+			this.$['splash'].hide();
+			this.$['splash'].destroy();
+		}
 	},
 
 	/** PopUp Controls **/
