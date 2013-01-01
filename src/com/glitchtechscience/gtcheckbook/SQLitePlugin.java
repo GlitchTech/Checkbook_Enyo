@@ -29,4 +29,7 @@ public class SQLitePlugin extends com.phonegap.plugin.sqlitePlugin.SQLitePlugin 
 
 		dbmap.put( dbname, mydb );
 	}
+	
+	//stuck in loop on requesting new set of transactions
+	//slow on update
 }
