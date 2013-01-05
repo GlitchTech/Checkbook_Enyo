@@ -62,14 +62,19 @@ enyo.kind( {
 			kind: "onyx.MoreToolbar",
 			classes: "rich-brown",
 			components: [
-				/*
-				planned design once search system is functional
 				{
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/sort.png"
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/sort.png"
+								}
+							]
 						}, {
 							name: "sortMenu",
 							kind: "GTS.SelectedMenu",
@@ -88,7 +93,7 @@ enyo.kind( {
 
 							ontap: "addAccount",
 
-							classes: "padding-none transparent",
+							classes: "margin-half-right padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -96,21 +101,36 @@ enyo.kind( {
 								}
 							]
 						}, {
-							name: "editModeToggle",
-							kind: "onyx.ToggleIconButton",
-							src: "assets/menu_icons/lock.png?1=2",
+							kind: "onyx.Button",
 
-							ontap: "toggleLock"
+							ontap: "toggleLock",
+
+							classes: "margin-half-left padding-none transparent",
+							components: [
+								{
+									name: "editModeButtonIcon",
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/lock.png",
+									classes: "onyx-icon-button onyx-icon-toggle"
+								}
+							]
 						}
 					]
 				}, {
-					showing: false,
+					showing: true,
 
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/search.png"
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/search.png"
+								}
+							]
 						}, {
 							kind: "onyx.Menu",
 							floating: true,
@@ -126,50 +146,6 @@ enyo.kind( {
 									menuParent: "searchMenu"
 								}
 							]
-						}
-					]
-				}*/
-				{
-					kind: "onyx.MenuDecorator",
-					components: [
-						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/sort.png"
-						}, {
-							name: "sortMenu",
-							kind: "GTS.SelectedMenu",
-							floating: true,
-							style: "min-width: 225px;",
-							components: accountSortOptions
-						}
-					]
-				}, {
-					classes: "text-center",
-					fit: true,
-					components: [
-						{
-							name: "addAccountButton",
-							kind: "onyx.Button",
-
-							ontap: "addAccount",
-
-							classes: "padding-none transparent",
-							components: [
-								{
-									kind: "onyx.Icon",
-									src: "assets/menu_icons/new.png"
-								}
-							]
-						}
-					]
-				}, {
-					components: [
-						{
-							name: "editModeToggle",
-							kind: "onyx.ToggleIconButton",
-							src: "assets/menu_icons/lock.png?1=2",
-
-							ontap: "toggleLock"
 						}
 					]
 				}
@@ -450,12 +426,14 @@ enyo.kind( {
 	 */
 	toggleLock: function() {
 
-		if( this.$['editModeToggle'].getActive() ) {
-
-			this.$['entries'].setEditMode( true );
-		} else {
+		if( this.$['entries'].getEditMode() ) {
 
 			this.$['entries'].setEditMode( false );
+		} else {
+
+			this.$['entries'].setEditMode( true );
 		}
+
+		this.$['editModeButtonIcon'].addRemoveClass( "active", this.$['entries'].getEditMode() );
 	}
 });
