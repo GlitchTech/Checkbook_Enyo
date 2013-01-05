@@ -45,6 +45,11 @@ enyo.kind( {
 					onChange: "handleBalanceButton",
 
 					style: "padding: 0 8px; margin: 0;"
+				}, {
+					name: "editOverlay",
+					content: "Edit Accounts",
+					classes: "enyo-fit text-center header-overlay",
+					showing: false
 				}
 			]
 		}, {
@@ -55,6 +60,7 @@ enyo.kind( {
 			balanceView: 4,
 
 			editMode: false,
+			showHidden: false,
 
 			onLoadStart: "showLoading",
 			onLoadStop: "hideLoading"
@@ -62,18 +68,26 @@ enyo.kind( {
 			kind: "onyx.MoreToolbar",
 			classes: "rich-brown",
 			components: [
-				/*
-				planned design once search system is functional
 				{
 					kind: "onyx.MenuDecorator",
+					onSelect: "sortMenuSelected",
 					components: [
 						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/sort.png"
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/sort.png"
+								}
+							]
 						}, {
 							name: "sortMenu",
 							kind: "GTS.SelectedMenu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 							style: "min-width: 225px;",
 							components: accountSortOptions
 						}
@@ -84,80 +98,66 @@ enyo.kind( {
 					components: [
 						{
 							name: "addAccountButton",
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/new.png",
+							kind: "onyx.Button",
 
 							ontap: "addAccount",
-							classes: "add"
-						}, {
-							name: "editModeToggle",
-							kind: "onyx.ToggleIconButton",
-							src: "assets/menu_icons/lock.png?1=2",
 
-							ontap: "toggleLock"
-						}
-					]
-				}, {
-					showing: false,
-
-					kind: "onyx.MenuDecorator",
-					components: [
-						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/search.png"
-						}, {
-							kind: "onyx.Menu",
-							floating: true,
+							classes: "margin-half-right padding-none transparent",
 							components: [
 								{
-									content: "Reports",
-									menuParent: "searchMenu"
-								}, {
-									content: "Budget",
-									menuParent: "searchMenu"
-								}, {
-									content: "Search",
-									menuParent: "searchMenu"
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/new.png"
+								}
+							]
+						}, {
+							kind: "onyx.Button",
+
+							ontap: "toggleLock",
+
+							classes: "margin-half-left padding-none transparent",
+							components: [
+								{
+									name: "editModeButtonIcon",
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/lock.png",
+									classes: "onyx-icon-button onyx-icon-toggle"
 								}
 							]
 						}
 					]
-				}*/
-				{
+				}, {
 					kind: "onyx.MenuDecorator",
+					onSelect: "searchMenuSelected",
 					components: [
 						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/sort.png"
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/search.png"
+								}
+							]
 						}, {
-							name: "sortMenu",
-							kind: "GTS.SelectedMenu",
+							kind: "onyx.Menu",
 							floating: true,
-							style: "min-width: 225px;",
-							components: accountSortOptions
-						}
-					]
-				}, {
-					classes: "text-center",
-					fit: true,
-					components: [
-						{
-							name: "addAccountButton",
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/new.png",
-
-							ontap: "addAccount",
-							classes: "add"
-						}
-					]
-				}, {
-					components: [
-						{
-							name: "editModeToggle",
-							kind: "onyx.ToggleIconButton",
-							src: "assets/menu_icons/lock.png?1=2",
-
-							ontap: "toggleLock"
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
+							components: [
+								{
+									content: "Toggle Hidden"
+								}, {
+									showing: false,
+									content: "Reports"
+								}, {
+									showing: false,
+									content: "Budget"
+								}, {
+									showing: false,
+									content: "Search"
+								}
+							]
 						}
 					]
 				}
@@ -234,9 +234,6 @@ enyo.kind( {
 		this.$['loadingSpinner'].hide();
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	accountBalanceViewChanged: function( inSender, inEvent ) {
 
 		if( typeof( inEvent.index ) === "undefined" || inEvent.index < 0 || inEvent.index >= this.$['entries'].accounts.length ) {
@@ -263,9 +260,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	accountBalanceForceUpdate: function() {
 
 		//build balance object
@@ -274,66 +268,8 @@ enyo.kind( {
 			});
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
-	menuItemSelected: function( inSender, inEvent ) {
-		//All menu items come here
-
-		if( !inEvent.selected ) {
-
-			return;
-		}
-
-		var menuParent = inEvent.selected.menuParent.toLowerCase();
-
-		if( menuParent === "searchmenu" ) {
-			//Search Menu
-
-			var item = inEvent.content.toLowerCase();
-
-			if( item === "search" ) {
-
-				this.log( "launch search system (overlay like modify account)" );
-			} else if( item === "budget" ) {
-
-				this.log( "launch budget system (overlay like modify account)" );
-			} else if( item === "reports" ) {
-
-				this.log( "launch report system (overlay like modify account)" );
-			}
-
-			return true;
-		} else if( menuParent === "accountsortoptions" ) {
-			//Sort Menu
-
-			if( Checkbook.globals.prefs['custom_sort'] === inEvent.selected.value ) {
-				//No change, abort
-				return;
-			}
-
-			Checkbook.globals.prefs['custom_sort'] = inEvent.selected.value;
-
-			Checkbook.globals.gts_db.query(
-					new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
-					{
-						"onSuccess": function() {
-
-							Checkbook.globals.accountManager.updateAccountModTime();
-							enyo.Signals.send( "accountSortChanged" );
-						}
-					}
-				);
-
-			return true;
-		}
-	},
-
 	/** Header Control **/
 
-	/**
-	 * TODO DEFINITION
-	 */
 	buildBalanceButton: function( callbackFn, results ) {
 
 		this.totalBalance = results;
@@ -344,9 +280,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	renderBalanceButton: function() {
 
 		this.$['balanceMenu'].setChoices(
@@ -390,17 +323,35 @@ enyo.kind( {
 
 	/** Footer Control **/
 
-	/**
-	 * TODO DEFINITION
-	 */
 	updateSortMenu: function() {
 
 		this.$['sortMenu'].setValue( Checkbook.globals.prefs['custom_sort'] );
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
+	sortMenuSelected: function( inSender, inEvent ) {
+
+		if( !inEvent.selected || Checkbook.globals.prefs['custom_sort'] === inEvent.selected.value ) {
+			//No change, abort
+
+			return;
+		}
+
+		Checkbook.globals.prefs['custom_sort'] = inEvent.selected.value;
+
+		Checkbook.globals.gts_db.query(
+				new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
+				{
+					"onSuccess": function() {
+
+						Checkbook.globals.accountManager.updateAccountModTime();
+						enyo.Signals.send( "accountSortChanged" );
+					}
+				}
+			);
+
+		return true;
+	},
+
 	addAccount: function() {
 
 		//Prevent user from launching multiple New Account windows
@@ -420,9 +371,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	addAccountComplete: function( inSender, inEvent ) {
 
 		this.$['addAccountButton'].setDisabled( false );
@@ -433,17 +381,38 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	toggleLock: function() {
 
-		if( this.$['editModeToggle'].getActive() ) {
-
-			this.$['entries'].setEditMode( true );
-		} else {
+		if( this.$['entries'].getEditMode() ) {
 
 			this.$['entries'].setEditMode( false );
+		} else {
+
+			this.$['entries'].setEditMode( true );
 		}
-	}
+
+		this.$['editModeButtonIcon'].addRemoveClass( "active", this.$['entries'].getEditMode() );
+		this.$['editOverlay'].setShowing( this.$['entries'].getEditMode() );
+	},
+
+	searchMenuSelected: function( inSender, inEvent ) {
+
+		var item = inEvent.content.toLowerCase();
+
+		if( item === "search" ) {
+
+			this.log( "launch search system (overlay like modify account)" );
+		} else if( item === "budget" ) {
+
+			this.log( "launch budget system (overlay like modify account)" );
+		} else if( item === "reports" ) {
+
+			this.log( "launch report system (overlay like modify account)" );
+		} else if( item === "toggle hidden" ) {
+
+			this.$['entries'].setShowHidden( !this.$['entries'].getShowHidden() );
+		}
+
+		return true;
+	},
 });

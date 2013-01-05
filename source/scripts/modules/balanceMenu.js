@@ -25,6 +25,8 @@ enyo.kind({
 			name: "menu",
 			kind: "GTS.SelectedMenu",
 			floating: true,
+			scrim: true,
+			scrimclasses: "onyx-scrim-translucent",
 			style: "min-width: 200px;",
 			onChange: "balanceSelectionChanged"
 		}

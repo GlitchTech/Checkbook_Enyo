@@ -457,7 +457,7 @@ enyo.kind( {
 
 	buildDateSystem: function() {
 
-		if( !enyo.Panels.isScreenNarrow() ) {
+		if( !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs['alwaysFullCalendar'] ) {
 			//Big Screen
 
 			this.$['dateDrawer'].createComponent(

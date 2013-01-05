@@ -131,6 +131,7 @@ enyo.kind({
 			name: "modifyCat",
 			kind: "Checkbook.accountCategory.modify",
 
+			onHide: "modifyHidden",
 			onChangeComplete: "modificationComplete",
 		},
 
@@ -240,6 +241,17 @@ enyo.kind({
 
 			this.$['modifyCat'].hide();
 		}
+	},
+
+	modifyHidden: function() {
+
+		enyo.asyncMethod(
+				this,
+				this.waterfall,
+				"onresize",
+				"onresize",
+				this
+			);
 	},
 
 	moveUp: function( inSender, inEvent ) {

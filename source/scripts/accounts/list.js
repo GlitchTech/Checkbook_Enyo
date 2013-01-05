@@ -30,6 +30,8 @@ enyo.kind({
 		editMode: false,
 		reorderable: true,
 
+		showHidden: false,
+
 		horizontal: "hidden"
 	},
 
@@ -175,6 +177,21 @@ enyo.kind({
 		}
 	],
 
+	balanceViewChanged: function() {
+
+		this.refresh();
+	},
+
+	reorderableChanged: function() {
+
+		this.$['entries'].setReorderable( this.reorderable );
+	},
+
+	showHiddenChanged: function() {
+
+		this.renderAccountList();
+	},
+
 	/** List Control **/
 
 	renderAccountList: function() {
@@ -187,6 +204,7 @@ enyo.kind({
 
 		Checkbook.globals.accountManager.fetchAccounts(
 				{
+					"showHidden": this.showHidden,
 					"onSuccess": enyo.bind( this, this.dataResponse )
 				}
 			);
@@ -439,7 +457,7 @@ enyo.kind({
 			this.$['accountItem'].addRemoveClass( "alt-row", ( row['index'] % 2 === 0 ) );
 			this.$['accountItem'].addRemoveClass( "norm-row", ( row['index'] % 2 !== 0 ) );
 
-			this.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 ) );
+			this.$['accountItem'].addRemoveClass( "hiddenAccount", ( row['hidden'] === 2 && this.showHidden ) );
 			this.$['accountItem'].addRemoveClass( "maskedAccount", ( row['hidden'] === 1 ) );
 
 			this.$['icon'].setSrc( "assets/" + row['acctCategoryIcon'] );
@@ -477,14 +495,13 @@ enyo.kind({
 
 			this.$['note'].setContent( row['acctNotes'].replace( /\n/, "<br />" ) );
 
+			this.$['catDivider'].setContent( row['acctCategory'] );
+
 			//proper sort mode && difference between categories
-			var showDivider = (
+			this.$['catDivider'].canGenerate = (
 					( Checkbook.globals.prefs['custom_sort'] === 0 || Checkbook.globals.prefs['custom_sort'] === 3 ) &&
 					( row['index'] <= 0 || row['acctCategory'] !== this.accounts[row['index'] - 1]['acctCategory'] )
 				);
-
-			this.$['catDivider'].setContent( row['acctCategory'] );
-			this.$['catDivider'].canGenerate = showDivider;
 
 			return true;
 		}

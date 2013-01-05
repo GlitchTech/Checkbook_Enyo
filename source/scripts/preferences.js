@@ -118,6 +118,28 @@ enyo.kind({
 
 									onChange: "updateTransPreview"
 								}, {
+									name: "dispColor",
+									kind: "GTS.ToggleBar",
+
+									label: "Account Colors",
+									sublabel: "Add color in some areas based on account categories.",
+
+									onContent: "Yes",
+									offContent: "No",
+
+									onChange: "updateDispColor"
+								}, {
+									name: "alwaysFullCalendar",
+									kind: "GTS.ToggleBar",
+
+									label: "Full Calendar",
+									sublabel: "Set modify transaction system to always use a full calendar instead of a date picker for small screens.",
+
+									onContent: "Yes",
+									offContent: "No",
+
+									onChange: "updateAlwaysFullCalendar"
+								}, {
 									name: "updateNotice",
 									kind: "GTS.ToggleBar",
 
@@ -139,17 +161,6 @@ enyo.kind({
 									offContent: "No",
 
 									onChange: "updateErrorReporting"
-								}, {
-									name: "dispColor",
-									kind: "GTS.ToggleBar",
-
-									label: "Account Colors",
-									sublabel: "Add color in some areas based on account categories.",
-
-									onContent: "Yes",
-									offContent: "No",
-
-									onChange: "updateDispColor"
 								}, {
 									showing: false,
 									content: "backswipe save (function cannot not used on touchpad)"
@@ -401,6 +412,12 @@ enyo.kind({
 
 		Checkbook.globals.prefs['dispColor'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "dispColor": Checkbook.globals.prefs['dispColor'] }, {} ) );
+	},
+
+	updateAlwaysFullCalendar: function( inSender, inEvent ) {
+
+		Checkbook.globals.prefs['alwaysFullCalendar'] = ( inEvent.value ? 1 : 0 );
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "alwaysFullCalendar": Checkbook.globals.prefs['alwaysFullCalendar'] }, {} ) );
 	},
 
 	/** Account Controls **/

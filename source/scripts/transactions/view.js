@@ -72,12 +72,20 @@ enyo.kind( {
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/sort.png"
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/sort.png"
+								}
+							]
 						}, {
 							name: "sortMenu",
 							kind: "GTS.SelectedMenu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 
 							onChange: "transactionSortingChanged",
 
@@ -90,25 +98,40 @@ enyo.kind( {
 					components: [
 						{
 							name: "addIncomeButton",
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/income.png",
+							kind: "onyx.Button",
 
 							ontap: "addIncome",
-							classes: "income margin-half-left margin-half-right"
+							classes: "margin-half-left margin-half-right padding-none transparent",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/income.png"
+								}
+							]
 						}, {
 							name: "addTransferButton",
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/transfer.png",
+							kind: "onyx.Button",
 
 							ontap: "addTransfer",
-							classes: "transfer margin-half-left margin-half-right"
+							classes: "margin-half-left margin-half-right padding-none transparent",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/transfer.png"
+								}
+							]
 						}, {
 							name: "addExpenseButton",
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/expense.png",
+							kind: "onyx.Button",
 
 							ontap: "addExpense",
-							classes: "expense margin-half-left margin-half-right"
+							classes: "margin-half-left margin-half-right padding-none transparent",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/expense.png"
+								}
+							]
 						}
 					]
 				}, {
@@ -116,11 +139,19 @@ enyo.kind( {
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/search.png"
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/search.png"
+								}
+							]
 						}, {
 							kind: "onyx.Menu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 							onSelect: "searchSelected",
 							components: [
 								{
@@ -138,11 +169,19 @@ enyo.kind( {
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
-							kind: "onyx.IconButton",
-							src: "assets/menu_icons/config.png"
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/config.png"
+								}
+							]
 						}, {
 							kind: "onyx.Menu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 							onSelect: "functionSelected",
 							components: [
 								{

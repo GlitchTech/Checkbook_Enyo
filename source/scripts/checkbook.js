@@ -37,6 +37,8 @@ enyo.kind({
 
 									showOnTop: true,
 									floating: true,
+									scrim: true,
+									scrimclasses: "onyx-scrim-translucent",
 
 									components: [
 										{

@@ -2,22 +2,18 @@ var accountSortOptions = [
 		{
 			content: "Custom Category",
 			value: 0,
-			menuParent: "accountSortOptions",
 			query: "acctCatOrder, acctCategory COLLATE NOCASE, sect_order, acctName COLLATE NOCASE"
 		}, {
 			content: "Custom Account",
 			value: 1,
-			menuParent: "accountSortOptions",
 			query: "sect_order, acctName COLLATE NOCASE, acctCatOrder, acctCategory COLLATE NOCASE"
 		}, {
 			content: "Alphabetical Name",
 			value: 2,
-			menuParent: "accountSortOptions",
 			query: "acctName COLLATE NOCASE, acctCategory COLLATE NOCASE"
 		}, {
 			content: "Alphabetical Category",
 			value: 3,
-			menuParent: "accountSortOptions",
 			query: "acctCategory COLLATE NOCASE, acctName COLLATE NOCASE"
 		}
 	];
@@ -26,22 +22,18 @@ var budgetSortOptions = [
 		{
 			content: "Custom",
 			value: 0,
-			menuParent: "budgetSortOptions",
 			query: "budgetOrder ASC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 		}, {
 			content: "Alphabetical",
 			value: 1,
-			menuParent: "budgetSortOptions",
 			query: "category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 		}, {
 			content: "Budget Remaining (Asc)",
 			value: 2,
-			menuParent: "budgetSortOptions",
 			query: "( spent / spending_limit ) ASC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 		}, {
 			content: "Budget Remaining (Desc)",
 			value: 3,
-			menuParent: "budgetSortOptions",
 			query: "( spent / spending_limit ) DESC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 		}
 	];

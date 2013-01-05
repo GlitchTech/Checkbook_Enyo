@@ -807,7 +807,13 @@ enyo.kind( {
 
 		this.$['accountName'].focus();
 
-		this.waterfall( "onresize", "onresize", this );
+		enyo.asyncMethod(
+				this,
+				this.waterfall,
+				"onresize",
+				"onresize",
+				this
+			);
 	},
 
 	/**
