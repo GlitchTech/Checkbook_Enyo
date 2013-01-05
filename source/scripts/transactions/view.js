@@ -84,6 +84,8 @@ enyo.kind( {
 							name: "sortMenu",
 							kind: "GTS.SelectedMenu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 
 							onChange: "transactionSortingChanged",
 
@@ -148,6 +150,8 @@ enyo.kind( {
 						}, {
 							kind: "onyx.Menu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 							onSelect: "searchSelected",
 							components: [
 								{
@@ -176,6 +180,8 @@ enyo.kind( {
 						}, {
 							kind: "onyx.Menu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 							onSelect: "functionSelected",
 							components: [
 								{

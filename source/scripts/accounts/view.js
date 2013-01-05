@@ -86,6 +86,8 @@ enyo.kind( {
 							name: "sortMenu",
 							kind: "GTS.SelectedMenu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 							style: "min-width: 225px;",
 							components: accountSortOptions
 						}
@@ -140,6 +142,8 @@ enyo.kind( {
 						}, {
 							kind: "onyx.Menu",
 							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
 							components: [
 								{
 									content: "Toggle Hidden"
