@@ -502,7 +502,28 @@ enyo.kind({
 
 			if( enyo.isFunction( options['onSuccess'] ) ) {
 
-				options['onSuccess']( this.accountObject.accounts.slice( ( GTS.Object.isNumber( offset ) ? offset : 0 ), limit ) );
+				var data = [];
+
+				if( !options['showHidden'] ) {
+					//Don't return hidden accounts
+
+					offset = ( GTS.Object.isNumber( offset ) ? offset : 0 );
+					limit = ( GTS.Object.isNumber( limit ) ? limit : this.accountObject.accounts.length );
+
+					//hidden == 2
+					for( var i = offset; i < limit; i++ ) {
+
+						if( this.accountObject.accounts[i].hidden !== 2 ) {
+
+							data.push( this.accountObject.accounts[i] );
+						}
+					}
+				} else {
+
+					data = this.accountObject.accounts.slice( ( GTS.Object.isNumber( offset ) ? offset : 0 ), limit );
+				}
+
+				options['onSuccess']( data );
 			}
 		} else {
 

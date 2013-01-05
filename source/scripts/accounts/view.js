@@ -45,6 +45,11 @@ enyo.kind( {
 					onChange: "handleBalanceButton",
 
 					style: "padding: 0 8px; margin: 0;"
+				}, {
+					name: "editOverlay",
+					content: "Edit Accounts",
+					classes: "enyo-fit text-center header-overlay",
+					showing: false
 				}
 			]
 		}, {
@@ -55,6 +60,7 @@ enyo.kind( {
 			balanceView: 4,
 
 			editMode: false,
+			showHidden: false,
 
 			onLoadStart: "showLoading",
 			onLoadStop: "hideLoading"
@@ -64,6 +70,7 @@ enyo.kind( {
 			components: [
 				{
 					kind: "onyx.MenuDecorator",
+					onSelect: "sortMenuSelected",
 					components: [
 						{
 							kind: "onyx.Button",
@@ -117,9 +124,8 @@ enyo.kind( {
 						}
 					]
 				}, {
-					showing: true,
-
 					kind: "onyx.MenuDecorator",
+					onSelect: "searchMenuSelected",
 					components: [
 						{
 							kind: "onyx.Button",
@@ -136,14 +142,16 @@ enyo.kind( {
 							floating: true,
 							components: [
 								{
-									content: "Reports",
-									menuParent: "searchMenu"
+									content: "Toggle Hidden"
 								}, {
-									content: "Budget",
-									menuParent: "searchMenu"
+									showing: false,
+									content: "Reports"
 								}, {
-									content: "Search",
-									menuParent: "searchMenu"
+									showing: false,
+									content: "Budget"
+								}, {
+									showing: false,
+									content: "Search"
 								}
 							]
 						}
@@ -222,9 +230,6 @@ enyo.kind( {
 		this.$['loadingSpinner'].hide();
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	accountBalanceViewChanged: function( inSender, inEvent ) {
 
 		if( typeof( inEvent.index ) === "undefined" || inEvent.index < 0 || inEvent.index >= this.$['entries'].accounts.length ) {
@@ -251,9 +256,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	accountBalanceForceUpdate: function() {
 
 		//build balance object
@@ -262,66 +264,8 @@ enyo.kind( {
 			});
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
-	menuItemSelected: function( inSender, inEvent ) {
-		//All menu items come here
-
-		if( !inEvent.selected ) {
-
-			return;
-		}
-
-		var menuParent = inEvent.selected.menuParent.toLowerCase();
-
-		if( menuParent === "searchmenu" ) {
-			//Search Menu
-
-			var item = inEvent.content.toLowerCase();
-
-			if( item === "search" ) {
-
-				this.log( "launch search system (overlay like modify account)" );
-			} else if( item === "budget" ) {
-
-				this.log( "launch budget system (overlay like modify account)" );
-			} else if( item === "reports" ) {
-
-				this.log( "launch report system (overlay like modify account)" );
-			}
-
-			return true;
-		} else if( menuParent === "accountsortoptions" ) {
-			//Sort Menu
-
-			if( Checkbook.globals.prefs['custom_sort'] === inEvent.selected.value ) {
-				//No change, abort
-				return;
-			}
-
-			Checkbook.globals.prefs['custom_sort'] = inEvent.selected.value;
-
-			Checkbook.globals.gts_db.query(
-					new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
-					{
-						"onSuccess": function() {
-
-							Checkbook.globals.accountManager.updateAccountModTime();
-							enyo.Signals.send( "accountSortChanged" );
-						}
-					}
-				);
-
-			return true;
-		}
-	},
-
 	/** Header Control **/
 
-	/**
-	 * TODO DEFINITION
-	 */
 	buildBalanceButton: function( callbackFn, results ) {
 
 		this.totalBalance = results;
@@ -332,9 +276,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	renderBalanceButton: function() {
 
 		this.$['balanceMenu'].setChoices(
@@ -378,17 +319,35 @@ enyo.kind( {
 
 	/** Footer Control **/
 
-	/**
-	 * TODO DEFINITION
-	 */
 	updateSortMenu: function() {
 
 		this.$['sortMenu'].setValue( Checkbook.globals.prefs['custom_sort'] );
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
+	sortMenuSelected: function( inSender, inEvent ) {
+
+		if( !inEvent.selected || Checkbook.globals.prefs['custom_sort'] === inEvent.selected.value ) {
+			//No change, abort
+
+			return;
+		}
+
+		Checkbook.globals.prefs['custom_sort'] = inEvent.selected.value;
+
+		Checkbook.globals.gts_db.query(
+				new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
+				{
+					"onSuccess": function() {
+
+						Checkbook.globals.accountManager.updateAccountModTime();
+						enyo.Signals.send( "accountSortChanged" );
+					}
+				}
+			);
+
+		return true;
+	},
+
 	addAccount: function() {
 
 		//Prevent user from launching multiple New Account windows
@@ -408,9 +367,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	addAccountComplete: function( inSender, inEvent ) {
 
 		this.$['addAccountButton'].setDisabled( false );
@@ -421,9 +377,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	toggleLock: function() {
 
 		if( this.$['entries'].getEditMode() ) {
@@ -435,5 +388,27 @@ enyo.kind( {
 		}
 
 		this.$['editModeButtonIcon'].addRemoveClass( "active", this.$['entries'].getEditMode() );
-	}
+		this.$['editOverlay'].setShowing( this.$['entries'].getEditMode() );
+	},
+
+	searchMenuSelected: function( inSender, inEvent ) {
+
+		var item = inEvent.content.toLowerCase();
+
+		if( item === "search" ) {
+
+			this.log( "launch search system (overlay like modify account)" );
+		} else if( item === "budget" ) {
+
+			this.log( "launch budget system (overlay like modify account)" );
+		} else if( item === "reports" ) {
+
+			this.log( "launch report system (overlay like modify account)" );
+		} else if( item === "toggle hidden" ) {
+
+			this.$['entries'].setShowHidden( !this.$['entries'].getShowHidden() );
+		}
+
+		return true;
+	},
 });
