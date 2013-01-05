@@ -160,7 +160,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 25;
+		this.versionCheck = 26;
 
 		if( currVersion == this.versionCheck ) {
 
@@ -181,6 +181,8 @@ enyo.kind({
 
 			Checkbook.globals.prefs['dispColor'] = results[0]['dispColor'];
 			Checkbook.globals.prefs['bsSave'] = results[0]['bsSave'];
+
+			Checkbook.globals.prefs['alwaysFullCalendar'] = results[0]['alwaysFullCalendar'];
 
 			Checkbook.globals.prefs['custom_sort'] = results[0]['custom_sort'];
 
@@ -806,11 +808,15 @@ enyo.kind({
 
 				this.versionCheck = 25;
 			case 25:
+				querySet.push( "ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;" );
+
+				this.versionCheck = 26;
+			case 26:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );
 
-				//this.versionCheck = 26;
+				//this.versionCheck = ??;
 		}
 
 		querySet.push(
