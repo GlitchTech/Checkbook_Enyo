@@ -6,6 +6,8 @@ enyo.kind( {
 
 	classes: "large-popup",
 
+	modal: true,
+
 	centered: true,
 	floating: true,
 
