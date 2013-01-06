@@ -242,9 +242,7 @@ enyo.kind( {
 							]
 						},
 
-						{//TODO
-							showing: false,
-
+						{
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
 							components: [
@@ -283,7 +281,7 @@ enyo.kind( {
 									components: [
 										{
 											name: "recurrence",
-											content: "Checkbook.transactions.repeat.select",
+											kind: "Checkbook.transactions.repeat.select",
 											onChange: "recurrenceChanged"
 										}
 									]
