@@ -64,7 +64,7 @@ enyo.kind( {
 						}, {
 							content: "Frequency",
 
-							classes: "enyo-label box-flex-1 text-right"
+							classes: "label box-flex-1 text-right"
 						}
 					]
 				}, {
@@ -102,29 +102,30 @@ enyo.kind( {
 				}, {
 					name: "endingCountWrapper",
 					kind: "onyx.Item",
-					//layoutKind: "enyo.FittableColumns",
 
-					align: "center",
-
-					classes: "bordered",
+					classes: "text-center bordered h-box box-pack-center box-align-center",
 					showing: false,
 
 					components: [
 						{
-							name: "endingCount",
-							kind: "GTS.IntegerPicker",
+							kind: "onyx.PickerDecorator",
+							components: [
+								{
+									classes: "margin-half-left margin-half-right"
+								}, {
+									name: "endingCount",
+									kind: "GTS.IntegerPicker",
 
-							min: 1,
-							max: 100,
+									min: 1,
+									max: 100,
 
-							onChange: "sendSummary"
+									onChange: "sendSummary"
+								}
+							]
 						}, {
 							content: "Occurrences",
 
-							fit: true,
-
-							classes: "enyo-label",
-							style: "text-align: right;"
+							classes: "label box-flex-1 text-right"
 						}
 					]
 				}
@@ -136,7 +137,7 @@ enyo.kind( {
 	 * @protected
 	 * called when UI is built
 	 */
-	rendered: function() {
+	create: function() {
 
 		this.inherited( arguments );
 
@@ -461,7 +462,7 @@ enyo.kind( {
 					components: [
 						{
 							content: dowDate.format( { format: "EEE" } ),
-							classes: "enyo-label"
+							classes: "label"
 						}, {
 							name: "weekly" + i,
 							kind: "onyx.Checkbox",
@@ -540,6 +541,12 @@ enyo.kind( {
 
 		this.$['endingDateWrapper'].setShowing( this.$['endingCondition'].getValue() == 'd' );
 		this.$['endingCountWrapper'].setShowing( this.$['endingCondition'].getValue() == 'o' );
+
+		if( this.$['endingDateWrapper'].getShowing() ) {
+
+			this.$['endingDate'].render();
+			this.$['endingTime'].render();
+		}
 
 		this.sendSummary();
 	},
