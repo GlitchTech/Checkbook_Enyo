@@ -243,6 +243,7 @@ enyo.kind( {
 						},
 
 						{
+							name: "recurrenceWrapper",
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
 							components: [
@@ -282,7 +283,7 @@ enyo.kind( {
 										{
 											name: "recurrence",
 											kind: "Checkbook.transactions.repeat.select",
-											onChange: "recurrenceChanged"
+											onRecurrenceChange: "recurrenceChanged"
 										}
 									]
 								}
@@ -542,6 +543,7 @@ enyo.kind( {
 					"linkedAccount": -1,
 					"cleared": 0,
 					"repeatId": -1,
+					"repeatUnlinked": 0,
 					"checkNum": "",
 					"category": "Uncategorized",
 					"category2": "Other",
@@ -661,14 +663,22 @@ enyo.kind( {
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
+		if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
+			//Existing recurrence
+
+			this.loadRecurrenceData();
+		} else if( this.trsnObj['repeatUnlinked'] == 1 ) {
+			//Recurrence removed
+
+			this.$['recurrenceWrapper'].hide();
+		}
+
 		this.trsnObj['category'] = Checkbook.globals.transactionManager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
 
 		this.renderCategories = true;
 
 		//Run the formatters
 		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
-
-		//TODO set repeat values
 
 		this.adjustSystemViews();
 		this.dateChanged();
@@ -857,7 +867,7 @@ enyo.kind( {
 
 		this.$['dateDisplay'].setContent( date.format( { date: 'long', time: ( this.accountObj['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
-		//this.$['recurrence'].setDate( date );//TEMP
+		this.$['recurrence'].setDate( date );
 
 		return true;
 	},
@@ -1007,6 +1017,16 @@ enyo.kind( {
 
 	/** Recurrence Controls **/
 
+	loadRecurrenceData: function() {
+
+		//TODO set repeat values - need to exist first
+		this.log( this.trsnObj['repeatId'] );
+		//this.$['recurrence'].getValue();
+
+		//sql to get recurrence information from database
+		//on return, build object and send to this.$['recurrence']
+	},
+
 	toggleRecurrenceDrawer: function() {
 
 		this.$['recurrenceArrow'].addRemoveClass( "invert", !this.$['recurrenceDrawer'].getOpen() );
@@ -1067,7 +1087,7 @@ enyo.kind( {
 		//this.trsnObj['repeatId']
 		//this.trsnObj['repeatUnlinked']
 
-		this.log( this.trsnObj['rObj'], this.trsnObj['repeatId'], this.trsnObj['repeatUnlinked'] );
+		this.log( "Recurrence:", this.trsnObj['rObj'], this.trsnObj['repeatId'], this.trsnObj['repeatUnlinked'] );
 
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );
 		this.trsnObj['autoTransferLink'] = this.accountObj['auto_savings_link'];

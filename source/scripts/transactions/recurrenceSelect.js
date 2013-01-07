@@ -5,12 +5,14 @@ enyo.kind( {
 
 	recurrenceOptions: [],
 
+	systemActive: false,
+
 	published: {
 		date: ""
 	},
 
 	events: {
-		onChange: ""
+		onRecurrenceChange: ""
 	},
 
 	components: [
@@ -151,6 +153,8 @@ enyo.kind( {
 		this.buildDayOfWeekSystem();
 
 		this.recurrenceNodeChanged();
+
+		this.systemActive = true;
 	},
 
 	/**
@@ -350,7 +354,10 @@ enyo.kind( {
 			}
 		}
 
-		this.doChange( { "summary": summary, "value": this.getValue() } );
+		if( this.systemActive ) {
+
+			this.doRecurrenceChange( { "summary": summary, "value": this.getValue() } );
+		}
 	},
 
 	/** ----- Generators ----- **/
@@ -514,6 +521,8 @@ enyo.kind( {
 		}
 
 		this.sendSummary();
+
+		return true;
 	},
 
 	/**
@@ -531,6 +540,8 @@ enyo.kind( {
 				this.$['weekly' + i].setChecked( this.date.getDay() == i );
 			}
 		}
+
+		return true;
 	},
 
 	/**
@@ -549,6 +560,8 @@ enyo.kind( {
 		}
 
 		this.sendSummary();
+
+		return true;
 	},
 
 	/**************************/
