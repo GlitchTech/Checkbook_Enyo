@@ -1,7 +1,7 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
-	name: "Checkbook.transactions.repeat.select",
+	name: "Checkbook.transactions.recurrence.select",
 
 	recurrenceOptions: [],
 

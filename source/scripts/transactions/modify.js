@@ -1083,9 +1083,9 @@ enyo.kind( {
 		this.trsnObj['cleared'] = this.$['cleared'].getValue();
 		this.trsnObj['note'] = this.$['notes'].getValue();
 
-		this.trsnObj['rObj'] = { "pattern": "none" };//this.$['recurrence'].getValue();//TEMP
-		//this.trsnObj['repeatId']
-		//this.trsnObj['repeatUnlinked']
+		//this.trsnObj['repeatId']//Existing repeat
+		//this.trsnObj['repeatUnlinked']//Not linked to rest of series
+		this.trsnObj['rObj'] = this.$['recurrence'].getValue();
 
 		this.log( "Recurrence:", this.trsnObj['rObj'], this.trsnObj['repeatId'], this.trsnObj['repeatUnlinked'] );
 

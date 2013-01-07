@@ -8,8 +8,8 @@ enyo.depends(
 	"single.js",
 
 	"modify.js",
-	"recurrenceSelect.js",
 
-	"transactionCategory/",
-	"autocomplete/"
+	"autocomplete/",
+	"recurrence/",
+	"transactionCategory/"
 );
