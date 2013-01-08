@@ -548,8 +548,6 @@ enyo.kind( {
 				});
 		}
 
-		this.$['deleteTransactionConfirm'].show();
-
 		this.hide( true );
 		this.$['deleteTransactionConfirm'].show();
 	},
