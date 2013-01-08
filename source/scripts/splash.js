@@ -160,7 +160,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 28;
+		this.versionCheck = 29;
 
 		if( currVersion == this.versionCheck ) {
 
@@ -821,6 +821,10 @@ enyo.kind({
 				querySet.push( "ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;" );
 
 				this.versionCheck = 28;
+			case 28:
+				querySet.push( "ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;" );
+
+				this.versionCheck = 29;
 			case 28:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );

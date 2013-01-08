@@ -662,7 +662,7 @@ enyo.kind( {
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
-		if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
+		if( ( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) && this.trsnObj['repeatUnlinked'] != 1 ) {
 			//Existing recurrence
 
 			Checkbook.globals.transactionManager.$['recurrence'].fetch( this.trsnObj['repeatId'], { "onSuccess": enyo.bind( this, this.loadRecurrenceData ) } );
@@ -1084,7 +1084,7 @@ enyo.kind( {
 		} else {
 			//Modofied transaction
 
-			if( ( this.trsnObj['repeatId'] >= 0 || robj['pattern'] !== "none" ) && this.trsnObj['repeatUnlinked'] != 1  ) {
+			if( ( ( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) || robj['pattern'] !== "none" ) && this.trsnObj['repeatUnlinked'] != 1  ) {
 				//Repeating
 
 				//Did anything significant change?
@@ -1131,7 +1131,7 @@ enyo.kind( {
 
 				this.updateTransactionObject();
 
-				if( this.trsnObj['repeatId'] >= 0 ) {
+				if( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) {
 					//Existing recurrence event
 
 					if( this.trsnObj['rObj']['pattern'] == "none" ) {
@@ -1208,23 +1208,18 @@ enyo.kind( {
 			this.doFinish( { "status": 0 } );
 		} else {
 
-			if( this.trsnObj['repeatId'] >= 0 ) {
+			if( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) {
 
-				this.log( "DELETE RECURRENCE" );
-			/*
-				Would you like to delete only this transaction, all transactions in the series, or this and all future transactions in the series?
-				---
-				Only this instance
-				All other transactions in the series will remain.
-				//change repeatUnlinked to 1
-				---
-				All following
-				This and all the following transactions will be deleted.
-				---
-				All transactions in the series
-				All transactions in the series will be deleted.
-				---
-			*/
+				this.createComponent( {
+						name: "deleteTransactionConfirm",
+						kind: "Checkbook.transactions.recurrence.delete",
+
+						transactionId: this.trsnObj['itemId'],
+						recurrenceId: this.trsnObj['repeatId'],
+
+						onFinish: "deleteTransactionConfirmClose",
+						onCancel: "deleteTransactionConfirmClose"
+					});
 			} else {
 
 				this.createComponent( {

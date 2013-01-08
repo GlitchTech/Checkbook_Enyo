@@ -520,8 +520,6 @@ enyo.kind( {
 	 */
 	deleteAll: function( recurrenceId, options ) {
 
-		Checkbook.globals.gts_db.query(  ], options );
-
 		Checkbook.globals.gts_db.queries(
 				[
 					Checkbook.globals.gts_db.getDelete( "transactions", { "repeatId": recurrenceId } ),
