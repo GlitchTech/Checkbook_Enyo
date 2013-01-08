@@ -281,8 +281,8 @@ enyo.kind( {
 
 									components: [
 										{
-											name: "recurrence",
-											kind: "Checkbook.transactions.repeat.select",
+											name: "recurrenceSelect",
+											kind: "Checkbook.transactions.recurrence.select",
 											onRecurrenceChange: "recurrenceChanged"
 										}
 									]
@@ -548,7 +548,6 @@ enyo.kind( {
 					"category": "Uncategorized",
 					"category2": "Other",
 					"payee": ""
-					//TODO default repeat information
 				},
 				this.trsnObj
 			);
@@ -666,7 +665,7 @@ enyo.kind( {
 		if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
 			//Existing recurrence
 
-			this.loadRecurrenceData();
+			Checkbook.globals.transactionManager.$['recurrence'].fetch( this.trsnObj['repeatId'], { "onSuccess": enyo.bind( this, this.loadRecurrenceData ) } );
 		} else if( this.trsnObj['repeatUnlinked'] == 1 ) {
 			//Recurrence removed
 
@@ -867,7 +866,8 @@ enyo.kind( {
 
 		this.$['dateDisplay'].setContent( date.format( { date: 'long', time: ( this.accountObj['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
-		this.$['recurrence'].setDate( date );
+		this.$['recurrenceSelect'].setDate( date );
+		this.$['recurrenceSelect'].dateChanged();
 
 		return true;
 	},
@@ -1017,14 +1017,16 @@ enyo.kind( {
 
 	/** Recurrence Controls **/
 
-	loadRecurrenceData: function() {
+	loadRecurrenceData: function( results ) {
+
+		this.log( results );
 
 		//TODO set repeat values - need to exist first
 		this.log( this.trsnObj['repeatId'] );
-		//this.$['recurrence'].getValue();
+		//this.$['recurrenceSelect'].getValue();
 
 		//sql to get recurrence information from database
-		//on return, build object and send to this.$['recurrence']
+		//on return, build object and send to this.$['recurrenceSelect']
 	},
 
 	toggleRecurrenceDrawer: function() {
@@ -1085,7 +1087,7 @@ enyo.kind( {
 
 		//this.trsnObj['repeatId']//Existing repeat
 		//this.trsnObj['repeatUnlinked']//Not linked to rest of series
-		this.trsnObj['rObj'] = this.$['recurrence'].getValue();
+		this.trsnObj['rObj'] = this.$['recurrenceSelect'].getValue();
 
 		this.log( "Recurrence:", this.trsnObj['rObj'], this.trsnObj['repeatId'], this.trsnObj['repeatUnlinked'] );
 

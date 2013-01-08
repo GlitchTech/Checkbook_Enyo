@@ -401,7 +401,7 @@ enyo.kind( {
 					{
 						name: "endingDate",
 						kind: "GTS.DatePicker",
-						onSelect: "dateChanged",
+						onSelect: "sendSummary",
 
 						components: [
 							{
@@ -413,7 +413,7 @@ enyo.kind( {
 								minuteInterval: 5,
 								is24HrMode: false,
 
-								onSelect: "dateChanged"
+								onSelect: "sendSummary"
 							}
 						]
 					}, {
@@ -435,7 +435,7 @@ enyo.kind( {
 								}, {
 									name: "endingDate",
 									kind: "onyx.DatePicker",
-									onSelect: "dateChanged"
+									onSelect: "sendSummary"
 								}
 							]
 						}, {
@@ -447,7 +447,7 @@ enyo.kind( {
 							minuteInterval: 5,
 							is24HrMode: false,
 
-							onSelect: "dateChanged"
+							onSelect: "sendSummary"
 						}
 					], {
 						owner: this
@@ -541,7 +541,8 @@ enyo.kind( {
 			}
 		}
 
-		return true;
+		this.buildRecurrenceOptions();
+		this.sendSummary();
 	},
 
 	/**
