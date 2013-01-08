@@ -424,5 +424,110 @@ enyo.kind( {
 		}
 
 		return sql;
+	},
+
+	/**
+	 * @public
+	 * Deletes single recurring event item
+	 *
+	 * @param int	transactionId	ID of transaction
+	 * @param int	recurrenceId	ID of recurrence event
+	 *
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 */
+	deleteOne: function( transactionId, recurrenceId, options ) {
+
+		Checkbook.globals.gts_db.queries(
+				[
+					//Main Transaction
+					Checkbook.globals.gts_db.getDelete(
+							"transactions",
+							{
+								"itemId": transactionId
+							}
+						),
+					//Linked Transaction
+					Checkbook.globals.gts_db.getDelete(
+							"transactions",
+							{
+								"linkedRecord": transactionId
+							}
+						),
+					//Split Transactions
+					new GTS.databaseQuery(
+							{
+								'sql': "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )" ,
+								'values': [ transactionId, transactionId ]
+							}
+						),
+					//Decrement recurrence count
+					new GTS.databaseQuery(
+							{
+								'sql': "UPDATE repeats SET currCount = MAX( IFNULL( ( SELECT ( sub.currCount - 1 ) FROM repeats sub WHERE sub.repeatId = repeats.repeatId ), 0 ), 0 ) WHERE repeatId = ?" ,
+								'values': [ recurrenceId ]
+							}
+						)
+				],
+				options
+			);
+	},
+
+	/**
+	 * @public
+	 * Deletes single recurring event item
+	 *
+	 * @param int	transactionId	ID of transaction
+	 * @param int	recurrenceId	ID of recurrence event
+	 *
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 */
+	deleteFuture: function( transactionId, recurrenceId, options ) {
+
+		Checkbook.globals.gts_db.queries(
+				[
+					//Decrement recurrence count
+					new GTS.databaseQuery(
+							{
+								'sql': "UPDATE repeats SET terminated = 1, currCount = MAX( ( ( SELECT sub.currCount FROM repeats sub WHERE sub.repeatId = repeats.repeatId ) - ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId ) ), 0 ) WHERE repeatId = ?" ,
+								'values': [ recurrenceId ]
+							}
+						),
+					//Delete this and future transactions
+					new GTS.databaseQuery(
+							{
+								'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( itemId = ? OR itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date >= transactions.date ) )" ,
+								'values': [ recurrenceId, transactionId ]
+							}
+						)
+				],
+				options
+			);
+	},
+
+	/**
+	 * @public
+	 * Deletes single recurring event item
+	 *
+	 * @param int	id	ID of recurrence event
+	 *
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 */
+	deleteAll: function( recurrenceId, options ) {
+
+		Checkbook.globals.gts_db.query(  ], options );
+
+		Checkbook.globals.gts_db.queries(
+				[
+					Checkbook.globals.gts_db.getDelete( "transactions", { "repeatId": recurrenceId } ),
+					Checkbook.globals.gts_db.getDelete( "repeats", { "repeatId": recurrenceId } )
+				],
+				options
+			);
 	}
 });
