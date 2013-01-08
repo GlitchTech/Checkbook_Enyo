@@ -160,7 +160,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 26;
+		this.versionCheck = 28;
 
 		if( currVersion == this.versionCheck ) {
 
@@ -808,10 +808,20 @@ enyo.kind({
 
 				this.versionCheck = 25;
 			case 25:
-				querySet.push( "ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;" );
+				querySet.push( "ALTER TABLE transactions RENAME TO expenses;" );
+				querySet.push( "ALTER TABLE transactionCategories RENAME TO expenseCategories;" );
 
 				this.versionCheck = 26;
 			case 26:
+				querySet.push( "ALTER TABLE expenses RENAME TO transactions;" );
+				querySet.push( "ALTER TABLE expenseCategories RENAME TO transactionCategories;" );
+
+				this.versionCheck = 27;
+			case 27:
+				querySet.push( "ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;" );
+
+				this.versionCheck = 28;
+			case 28:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );
