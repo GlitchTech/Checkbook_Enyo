@@ -83,7 +83,7 @@ enyo.kind( {
 
 		if( data['rObj'] != false ) {
 
-			if( ( !data['repeatId'] || data['repeatId'] < 0 ) && data['rObj']['pattern'] != "none" ) {
+			if( ( !data['repeatId'] || data['repeatId'] < 0 ) && data['rObj']['frequency'] != "none" ) {
 				//New repeating transactions (check/handle)
 
 				data['repeatId'] = data['maxRepeatId'];
@@ -92,9 +92,9 @@ enyo.kind( {
 						"repeatId": data['repeatId'],
 
 						//Repeat settings
-						"frequency": data['rObj']['pattern'],//Daily, Weekly, Monthly, Yearly
-						"itemSpan": data['rObj']['frequency'],//Time between events (every 2 months)
-						"daysOfWeek": enyo.json.stringify( ( data['rObj']['pattern'] == "weekly" ) ? data['rObj']['dow'] : "" ),//Array for day index else blank
+						"frequency": data['rObj']['frequency'],//Daily, Weekly, Monthly, Yearly
+						"itemSpan": data['rObj']['itemSpan'],//Time between events (every 2 months)
+						"daysOfWeek": enyo.json.stringify( ( data['rObj']['frequency'] == "weekly" ) ? data['rObj']['daysOfWeek'] : "" ),//Array for day index else blank
 
 						"endingCondition": data['rObj']['endCondition'],
 						"endDate": ( ( data['rObj']['endCondition'] == "date" ) ? data['rObj']['endDate'] : "" ),
@@ -134,7 +134,7 @@ enyo.kind( {
 			} else if( data['repeatUnlinked'] != 1 ) {
 				//If transaction is not 'unlinked' from repeating series
 
-				if( data['rObj']['pattern'] == "none" ) {
+				if( data['rObj']['frequency'] == "none" ) {
 					//Delete repeating entry
 
 					sqlArray.push( Checkbook.globals.gts_db.getDelete( "repeats", { "repeatId": data['repeatId'] } ) );

@@ -50,7 +50,7 @@ enyo.kind( {
 								{
 									classes: "margin-half-left margin-half-right"
 								}, {
-									name: "frequency",
+									name: "itemSpan",
 									kind: "GTS.IntegerPicker",
 
 									min: 1,
@@ -62,7 +62,7 @@ enyo.kind( {
 								}
 							]
 						}, {
-							name: "frequencyUnits"
+							name: "itemSpanUnits"
 						}, {
 							content: "Frequency",
 
@@ -167,36 +167,36 @@ enyo.kind( {
 
 		if( this.$['recurrenceNode'].getValue() == 0 ) {
 
-			robj['pattern'] = "none";
+			robj['frequency'] = "none";
 		} else {
 			//Recurrence
 
 			robj['origDate'] = Date.parse( this.date );
-			robj['frequency'] = this.$['frequency'].getValue();
+			robj['itemSpan'] = this.$['itemSpan'].getValue();
 
 			switch( this.$['recurrenceNode'].getValue() ) {
 				case 1://Daily
-					robj['pattern'] = "daily";
+					robj['frequency'] = "daily";
 					break;
 				case 2://Weekly
-					robj['pattern'] = "weekly";
+					robj['frequency'] = "weekly";
 
-					robj['dow'] = [];
+					robj['daysOfWeek'] = [];
 
 					for( i = 0; i < 7; i++ ) {
 
 						if( this.$['weekly' + i].getChecked() ) {
 
-							robj['dow'].push( i );
+							robj['daysOfWeek'].push( i );
 						}
 					}
 					break;
 				case 3://Monthly
-					robj['pattern'] = "monthly";
+					robj['frequency'] = "monthly";
 					break;
 				case 4://Yearly
 				default:
-					robj['pattern'] = "yearly";
+					robj['frequency'] = "yearly";
 			}
 
 			//ending conditions
@@ -224,32 +224,35 @@ enyo.kind( {
 	 */
 	setValue: function( robj ) {
 
-		this.log( robj );
-
 		if( robj == null || typeof( robj ) === "undefined" ) {
 
 			this.$['recurrenceNode'].setValue( 0 );
 		} else {
 			//Recurrence
 
+			this.log( robj );
+			this.log( this.$['recurrenceNode'].getValue() );
+
 			this.date = robj['origDate'];
-			this.$['frequency'].setValue( robj['frequency'] );
+			this.$['itemSpan'].setValue( robj['itemSpan'] );
 
 			for( i = 0; i < 7; i++ ) {
 
 				this.$['weekly' + i].setChecked( false );
 			}
 
-			switch( robj['pattern'] ) {
+			switch( robj['frequency'] ) {
 				case "daily":
 					this.$['recurrenceNode'].setValue( 1 );
 					break;
 				case "weekly":
 					this.$['recurrenceNode'].setValue( 2 );
 
-					for( i = 0; i < robj['dow'].length; i++ ) {
+					robj['daysOfWeek'] = enyo.json.parse( robj['daysOfWeek'] );
 
-						this.$['weekly' + robj['dow'][i]].setChecked( true );
+					for( i = 0; i < robj['daysOfWeek'].length; i++ ) {
+
+						this.$['weekly' + robj['daysOfWeek'][i]].setChecked( true );
 					}
 					break;
 				case "monthly":
@@ -296,7 +299,7 @@ enyo.kind( {
 		} else {
 			//Recurrence
 
-			summary = "Repeats every " + this.$['frequency'].getValue() + " ";
+			summary = "Repeats every " + this.$['itemSpan'].getValue() + " ";
 
 			switch( this.$['recurrenceNode'].getValue() ) {
 				case 1://Daily
@@ -507,19 +510,19 @@ enyo.kind( {
 
 		switch( this.$['recurrenceNode'].getValue() ) {
 			case 1:
-				this.$['frequencyUnits'].setContent( "day(s)" );
+				this.$['itemSpanUnits'].setContent( "day(s)" );
 				break;
 			case 2:
-				this.$['frequencyUnits'].setContent( "week(s)" );
+				this.$['itemSpanUnits'].setContent( "week(s)" );
 				break;
 			case 3:
-				this.$['frequencyUnits'].setContent( "month(s)" );
+				this.$['itemSpanUnits'].setContent( "month(s)" );
 				break;
 			case 4:
-				this.$['frequencyUnits'].setContent( "year(s)" );
+				this.$['itemSpanUnits'].setContent( "year(s)" );
 				break;
 			default:
-				this.$['frequencyUnits'].setContent( "span(s)" );
+				this.$['itemSpanUnits'].setContent( "span(s)" );
 		}
 
 		this.sendSummary();
