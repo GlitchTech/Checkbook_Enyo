@@ -1020,14 +1020,14 @@ enyo.kind( {
 
 	loadRecurrenceData: function( results ) {
 
-		this.log( results );
+		var data = enyo.clone( results );
 
-		//TODO set repeat values - need to exist first
-		this.log( this.trsnObj['repeatId'] );
-		//this.$['recurrenceSelect'].getValue();
+		data['endDate'] = new Date( parseInt( results['endDate'] ) );
+		data['origDate'] = new Date( parseInt( results['origDate'] ) );
+		data['lastUpdated'] = new Date( parseInt( results['lastUpdated'] ) );
+		data['lastOccurrence'] = new Date( parseInt( results['lastOccurrence'] ) );
 
-		//sql to get recurrence information from database
-		//on return, build object and send to this.$['recurrenceSelect']
+		this.$['recurrenceSelect'].setValue( data );
 	},
 
 	toggleRecurrenceDrawer: function() {
@@ -1097,7 +1097,7 @@ enyo.kind( {
 				time.setMinutes( this.$['time'].getValue().getMinutes() );
 
 				if(
-					transactionshis.trsnObj['desc'] !== this.$['desc'].getValue() ||
+					this.trsnObj['desc'] !== this.$['desc'].getValue() ||
 					this.trsnObj['amount_old'] !== this.$['amount'].getValue() ||
 					this.trsnObj['date'] !== time ||
 					this.trsnObj['account'] !== this.$['account'].getValue() ||

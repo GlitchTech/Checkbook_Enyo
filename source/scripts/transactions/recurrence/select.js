@@ -171,7 +171,7 @@ enyo.kind( {
 		} else {
 			//Recurrence
 
-			robj['startDate'] = Date.parse( this.date );
+			robj['origDate'] = Date.parse( this.date );
 			robj['frequency'] = this.$['frequency'].getValue();
 
 			switch( this.$['recurrenceNode'].getValue() ) {
@@ -224,13 +224,15 @@ enyo.kind( {
 	 */
 	setValue: function( robj ) {
 
+		this.log( robj );
+
 		if( robj == null || typeof( robj ) === "undefined" ) {
 
 			this.$['recurrenceNode'].setValue( 0 );
 		} else {
 			//Recurrence
 
-			this.date = robj['startDate'];
+			this.date = robj['origDate'];
 			this.$['frequency'].setValue( robj['frequency'] );
 
 			for( i = 0; i < 7; i++ ) {
