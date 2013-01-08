@@ -10,6 +10,24 @@ enyo.kind( {
 	name: "Checkbook.transactions.recurrence.manager",
 	kind: "enyo.Component",
 
+	events: {
+		onRequestInsertTransactionSQL: ""
+	},
+
+	/**
+	 * @public
+	 * Compares two recurrence events
+	 *
+	 * @param {}	r1	recurrence event 1
+	 * @param {}	r2	recurrence event 2
+	 *
+	 * @returns bool	if objects are equal
+	 */
+	compare: function( r1, r2 ) {
+
+		return( enyo.json.stringify( r1 ) !== enyo.json.stringify( r2 ) );
+	},
+
 	/**
 	 * @public
 	 * Fetches recurrence information from the database
@@ -43,7 +61,8 @@ enyo.kind( {
 
 								options.onSuccess( results[0] );
 							}
-						}
+						},
+					"onError": options.onError
 				}
 			);
 	},
@@ -63,7 +82,6 @@ enyo.kind( {
 		var sqlArray = [];
 
 		if( data['rObj'] != false ) {
-			//Not creating from a recursion repeat call
 
 			if( ( !data['repeatId'] || data['repeatId'] < 0 ) && data['rObj']['pattern'] != "none" ) {
 				//New repeating transactions (check/handle)
@@ -148,13 +166,6 @@ enyo.kind( {
 
 		delete data['rObj'];
 		delete data['maxRepeatId'];
-
-		/////////////////////////////////
-		//Temp while system not completed
-		data['repeatId'] = null;
-		this.log( sqlArray );
-		return [];
-		/////////////////////////////////
 
 		return sqlArray;
 	},
@@ -390,7 +401,7 @@ enyo.kind( {
 						type = "income";
 					}
 
-					sql = sql.concat( this.generateInsertTransactionSQL( trsnData, type ) );//THIS IS IN PARENT
+					sql = sql.concat( this.doRequestInsertTransactionSQL( { "data": trsnData, "type": type } ) );
 
 					serCount++;
 					maxItemId += ( ( GTS.Object.validNumber( repeatArray[i]['linkedAccount'] ) && repeatArray[i]['linkedAccount'] >= 0 ) ? 2 : 1 );

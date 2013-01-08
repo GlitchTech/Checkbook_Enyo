@@ -13,7 +13,8 @@ enyo.kind({
 	components: [
 		{
 			name: "recurrence",
-			kind: "Checkbook.transactions.recurrence.manager"
+			kind: "Checkbook.transactions.recurrence.manager",
+			onRequestInsertTransactionSQL: "generateInsertTransactionSQL"
 		}
 	],
 
@@ -73,7 +74,7 @@ enyo.kind({
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
 		Checkbook.globals.gts_db.queries(
-				this.generateInsertTransactionSQL( data, type ),
+				this.generateInsertTransactionSQL( null, { "data": data, "type": type } ),
 				options
 			);
 	},
@@ -82,20 +83,21 @@ enyo.kind({
 	 * @protected
 	 * Creates SQL for inserting a new transaction (or set depending on type)
 	 *
-	 * @param {object}	dataIn	Object to be readied; Source object is not modified by function
-	 * @param {string}	type	Type of transaction; used to determine setting of amount;
+	 * @param {object}	inEvent			Event object for generation
+	 * @param {object}	inEvent.data	Object to be readied; Source object is not modified by function
+	 * @param {string}	inEvent.type	Type of transaction; used to determine setting of amount;
 	 */
-	generateInsertTransactionSQL: function( dataIn, type ) {
+	generateInsertTransactionSQL: function( inSender, inEvent ) {
 
 		//Copy object to break pass by reference link
-		var data = enyo.clone( dataIn );
+		var data = enyo.clone( inEvent['data'] );
 
 		//Save data about auto transfer system
 		var autoTransfer = data['autoTransfer'];
 		var autoTransferLink = data['autoTransferLink'];
 
 		//Prepare data
-		var sql = this._prepareData( data, type );
+		var sql = this._prepareData( data, inEvent['type'] );
 
 		//Handle repeating system
 		sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data, autoTransfer, autoTransferLink ) );
@@ -254,11 +256,18 @@ enyo.kind({
 
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
+		//Save data about auto transfer system
+		var autoTransfer = data['autoTransfer'];
+		var autoTransferLink = data['autoTransferLink'];
+
 		//Prepare data
 		var sql = this._prepareData( data, type );
 
-		//Handle repeating system
-		sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data, -1 ) );
+		if( options['changes'] ) {
+
+			//Handle repeating system
+			sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data, autoTransfer, autoTransferLink ) );
+		}
 
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );

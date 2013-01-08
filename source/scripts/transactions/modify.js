@@ -673,6 +673,7 @@ enyo.kind( {
 		}
 
 		this.trsnObj['category'] = Checkbook.globals.transactionManager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
+		this.trsnObj['categoryOriginal'] = this.trsnObj['category'];
 
 		this.renderCategories = true;
 
@@ -1060,6 +1061,105 @@ enyo.kind( {
 
 	saveTransaction: function() {
 
+		var options = {
+				"onSuccess": enyo.bind(
+						this,
+						this.saveCompleteHandler,
+						{
+							"modifyStatus": 1,
+							"account": this.trsnObj['account'],
+							"linkedAccount": ( this.transactionType == 'transfer' ? this.trsnObj['linkedAccount'] : -1 ),
+							"atAccount": ( ( this.trsnObj['autoTransfer'] > 0 && this.trsnObj['autoTransferLink'] >= 0 ) ? this.trsnObj['autoTransferLink'] : -1 )
+						}
+					),
+				"onFailure": null
+			};
+
+		if( this.trsnObj['itemId'] < 0 ) {
+			//New transaction
+
+			this.updateTransactionObject();
+
+			Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, options );
+		} else {
+			//Modofied transaction
+
+			if( ( this.trsnObj['repeatId'] >= 0 || robj['pattern'] !== "none" ) && this.trsnObj['repeatUnlinked'] != 1  ) {
+				//Repeating
+
+				//Did anything significant change?
+				var majorChange = false;
+				var minorChange = false;
+				var recurrenceChange = false;
+
+				var time = this.$['date'].getValue();
+				time.setHours( this.$['time'].getValue().getHours() );
+				time.setMinutes( this.$['time'].getValue().getMinutes() );
+
+				if(
+					transactionshis.trsnObj['desc'] !== this.$['desc'].getValue() ||
+					this.trsnObj['amount_old'] !== this.$['amount'].getValue() ||
+					this.trsnObj['date'] !== time ||
+					this.trsnObj['account'] !== this.$['account'].getValue() ||
+					this.trsnObj['linkedAccount'] !== this.$['linkedAccount'].getValue() ||
+					enyo.json.stringify( this.trsnObj['categoryOriginal'] ) !== enyo.json.stringify( this.trsnObj['category'] ) ||
+					this.trsnObj['payee'] !== this.$['payeeField'].getValue() ||
+					this.trsnObj['note'] !== this.$['notes'].getValue() ) {
+
+					majorChange = true;
+				}
+
+				if(
+					this.trsnObj['checkNum'] !== this.$['checkNum'].getValue() ||
+					this.trsnObj['cleared'] !== this.$['cleared'].getValue() ) {
+
+					minorChange = true;
+				}
+
+				if( Checkbook.globals.transactionManager.$['recurrence'].compare( this.trsnObj['rObj'], this.$['recurrenceSelect'].getValue() ) ) {
+
+					recurrenceChange = true;
+				}
+
+				if( !majorChange && !minorChange && !recurrenceChange ) {
+					//No changes
+
+					this.doFinish( { "status": 0 } );
+
+					return;
+				}
+
+				this.updateTransactionObject();
+
+				if( this.trsnObj['repeatId'] >= 0 ) {
+					//Existing recurrence event
+
+					if( this.trsnObj['rObj']['pattern'] == "none" ) {
+						//confirm that this will end the series & remove transactions after today
+					} else if( recurrenceChange ) {
+						//will only change all following events (continue, abort)
+					} else if( majorChange ) {
+						//content change: this, following, all
+					}
+
+					//???
+				}
+
+				options['changes'] = ( majorChange || recurrenceChange );
+
+				Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
+			} else {
+				//Nonrepeating or single instance
+
+				this.updateTransactionObject();
+
+				Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
+			}
+		}
+	},
+
+	updateTransactionObject: function() {
+
 		//this.transactionType
 
 		//this.trsnObj['itemId']
@@ -1079,6 +1179,7 @@ enyo.kind( {
 
 		//this.trsnObj['category']
 		//this.trsnObj['category2']
+		delete( this.trsnObj['categoryOriginal'] );
 
 		this.trsnObj['checkNum'] = this.$['checkNum'].getValue();
 		this.trsnObj['payee'] = this.$['payeeField'].getValue();
@@ -1093,50 +1194,6 @@ enyo.kind( {
 
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );
 		this.trsnObj['autoTransferLink'] = this.accountObj['auto_savings_link'];
-
-		var options = {
-				"onSuccess": enyo.bind(
-						this,
-						this.saveCompleteHandler,
-						{
-							"modifyStatus": 1,
-							"account": this.trsnObj['account'],
-							"linkedAccount": ( this.transactionType == 'transfer' ? this.trsnObj['linkedAccount'] : -1 ),
-							"atAccount": ( ( this.trsnObj['autoTransfer'] > 0 && this.trsnObj['autoTransferLink'] >= 0 ) ? this.trsnObj['autoTransferLink'] : -1 )
-						}
-					),
-				"onFailure": null
-			};
-
-		if( this.trsnObj['itemId'] < 0 ) {
-			//New transaction
-
-			Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, options );
-		//} else if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
-			//Modified repeating transaction
-
-//if this.trsnObj['rObj']['pattern'] == "none"
-	//confirm that this will end the series & remove transactions after today
-
-/*
-Would you like to delete only this transaction, all transactions in the series, or this and all future transactions in the series?
----
-Only this instance
-All other transactions in the series will remain.
-//change repeatUnlinked to 1
----
-All following
-This and all the following transactions will be deleted.
----
-All transactions in the series
-All transactions in the series will be deleted.
----
-*/
-		} else {
-			//Modified transaction
-
-			Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
-		}
 	},
 
 	saveCompleteHandler: function( inEvent ) {
@@ -1148,25 +1205,45 @@ All transactions in the series will be deleted.
 
 		if( this.trsnObj['itemId'] < 0 ) {
 
-			this.doFinish( { status: 0 } );
+			this.doFinish( { "status": 0 } );
 		} else {
 
-			this.createComponent( {
-					name: "deleteTransactionConfirm",
-					kind: "gts.ConfirmDialog",
+			if( this.trsnObj['repeatId'] >= 0 ) {
 
-					title: "Delete Transaction",
-					message: "Are you sure you want to delete this transaction?",
+				this.log( "DELETE RECURRENCE" );
+			/*
+				Would you like to delete only this transaction, all transactions in the series, or this and all future transactions in the series?
+				---
+				Only this instance
+				All other transactions in the series will remain.
+				//change repeatUnlinked to 1
+				---
+				All following
+				This and all the following transactions will be deleted.
+				---
+				All transactions in the series
+				All transactions in the series will be deleted.
+				---
+			*/
+			} else {
 
-					confirmText: "Delete",
-					confirmClass: "onyx-negative",
+				this.createComponent( {
+						name: "deleteTransactionConfirm",
+						kind: "gts.ConfirmDialog",
 
-					cancelText: "Cancel",
-					cancelClass: "",
+						title: "Delete Transaction",
+						message: "Are you sure you want to delete this transaction?",
 
-					onConfirm: "deleteTransactionHandler",
-					onCancel: "deleteTransactionConfirmClose"
-				});
+						confirmText: "Delete",
+						confirmClass: "onyx-negative",
+
+						cancelText: "Cancel",
+						cancelClass: "",
+
+						onConfirm: "deleteTransactionHandler",
+						onCancel: "deleteTransactionConfirmClose"
+					});
+			}
 
 			this.$['deleteTransactionConfirm'].show();
 		}
