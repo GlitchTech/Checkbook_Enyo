@@ -1429,7 +1429,7 @@ var t = [], n = document.querySelectorAll("#" + e.id + " div[data-enyo-index]");
 for (var r = 0, i, s; r < n.length; r++) i = n[r].getAttribute("data-enyo-index"), i !== null && (s = enyo.dom.getBounds(n[r]), t.push({
 height: s.height,
 width: s.width,
-index: i
+index: parseInt(i, 10)
 }));
 return t;
 },
@@ -1597,7 +1597,7 @@ content: e.innerHTML
 }).render();
 },
 centerReorderContainerOnPointer: function(e) {
-var t = this.getNodePosition(this.hasNode()), n = e.pageX - t.left - parseInt(this.$.reorderContainer.domStyles.width) / 2, r = e.pageY - t.top + this.getScrollTop() - parseInt(this.$.reorderContainer.domStyles.height) / 2;
+var t = this.getNodePosition(this.hasNode()), n = e.pageX - t.left - parseInt(this.$.reorderContainer.domStyles.width, 10) / 2, r = e.pageY - t.top + this.getScrollTop() - parseInt(this.$.reorderContainer.domStyles.height, 10) / 2;
 this.getStrategyKind() != "ScrollStrategy" && (n -= this.getScrollLeft(), r -= this.getScrollTop()), this.positionReorderContainer(n, r);
 },
 positionReorderContainer: function(e, t) {
@@ -1621,7 +1621,7 @@ var t = this.getRowIndexFromCoordinate(e.pageY);
 t !== -1 && t != this.placeholderRowIndex && this.movePlaceholderToIndex(t);
 },
 positionReorderNode: function(e) {
-var t = this.$.reorderContainer.hasNode().style, n = parseInt(t.left) + e.ddx, r = parseInt(t.top) + e.ddy;
+var t = this.$.reorderContainer.hasNode().style, n = parseInt(t.left, 10) + e.ddx, r = parseInt(t.top, 10) + e.ddy;
 r = this.getStrategyKind() == "ScrollStrategy" ? r + (this.getScrollTop() - this.prevScrollTop) : r, this.$.reorderContainer.addStyles("top: " + r + "px ; left: " + n + "px"), this.prevScrollTop = this.getScrollTop();
 },
 checkForAutoScroll: function(e) {
@@ -1722,7 +1722,7 @@ if (!r) {
 enyo.log("No node - " + i);
 continue;
 }
-o = parseInt(r.getAttribute("data-enyo-index")), s = o + 1, r.setAttribute("data-enyo-index", s);
+o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o + 1, r.setAttribute("data-enyo-index", s);
 }
 r = document.querySelectorAll('[data-enyo-index="reordered"]')[0], r.setAttribute("data-enyo-index", this.placeholderRowIndex);
 } else {
@@ -1733,7 +1733,7 @@ if (!r) {
 enyo.log("No node - " + i);
 continue;
 }
-o = parseInt(r.getAttribute("data-enyo-index")), s = o - 1, r.setAttribute("data-enyo-index", s);
+o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o - 1, r.setAttribute("data-enyo-index", s);
 }
 }
 },
@@ -1748,10 +1748,10 @@ return;
 }
 var n = this.getRelativeOffset(t, this.hasNode()), r = this.getDimensions(t);
 return {
-h: parseInt(r.height),
-w: parseInt(r.width),
-left: parseInt(n.left),
-top: parseInt(n.top)
+h: r.height,
+w: r.width,
+left: n.left,
+top: n.top
 };
 },
 getRelativeOffset: function(e, t) {
@@ -1765,8 +1765,8 @@ return n;
 getDimensions: function(e) {
 var t = window.getComputedStyle(e, null);
 return {
-height: t.getPropertyValue("height"),
-width: t.getPropertyValue("width")
+height: parseInt(t.getPropertyValue("height"), 10),
+width: parseInt(t.getPropertyValue("width"), 10)
 };
 },
 replaceNodeWithPlaceholder: function(e) {
@@ -1818,10 +1818,10 @@ return;
 getRowIndexFromCoordinate: function(e) {
 var t = this.getScrollTop() + e - this.getNodePosition(this.hasNode()).top, n = this.positionToPageInfo(t), r = n.no == this.p0 ? this.p0RowBounds : this.p1RowBounds;
 if (!r) return -1;
-var i = n.pos, s = parseInt(window.getComputedStyle(this.placeholderNode).height);
+var i = n.pos, s = parseInt(window.getComputedStyle(this.placeholderNode).height, 10);
 for (var o = 0, u = 0; o < r.length; o++) {
 u += r[o].height > 0 ? r[o].height : s;
-if (u >= i) return parseInt(r[o].index);
+if (u >= i) return r[o].index;
 }
 return -1;
 },
@@ -1896,7 +1896,7 @@ return this.$.swipeableComponents.controls.length !== 0;
 positionSwipeableContainer: function(e, t) {
 var n = this.$.generator.fetchRowNode(e);
 if (!n) return;
-var r = this.getRelativeOffset(n, this.hasNode()), i = this.getDimensions(n), s = t == 1 ? -1 * parseInt(i.width) : parseInt(i.width);
+var r = this.getRelativeOffset(n, this.hasNode()), i = this.getDimensions(n), s = t == 1 ? -1 * i.width : i.width;
 this.$.swipeableComponents.addStyles("top: " + r.top + "px; left: " + s + "px; height: " + i.height + "; width: " + i.width);
 },
 setSwipeDirection: function(e) {
@@ -1920,7 +1920,7 @@ this.swipeIndex = e === undefined ? this.swipeIndex : e;
 calcNewDragPosition: function(e) {
 var t = window.getComputedStyle(this.$.swipeableComponents.hasNode());
 if (!t) return !1;
-var n = parseInt(t.left), r = this.getDimensions(this.$.swipeableComponents.node), i = this.swipeDirection == 1 ? 0 : -1 * parseInt(r.width), s = this.swipeDirection == 1 ? n + e > i ? i : n + e : n + e < i ? i : n + e;
+var n = parseInt(t.left, 10), r = this.getDimensions(this.$.swipeableComponents.node), i = this.swipeDirection == 1 ? 0 : -1 * r.width, s = this.swipeDirection == 1 ? n + e > i ? i : n + e : n + e < i ? i : n + e;
 return s;
 },
 dragSwipeableComponents: function(e) {
@@ -1948,21 +1948,21 @@ setPersistentItemOrigin: function(e) {
 this.persistentItemOrigin = e == 1 ? "left" : "right";
 },
 calcPercentageDragged: function(e) {
-return Math.abs(e / parseInt(window.getComputedStyle(this.$.swipeableComponents.hasNode()).width));
+return Math.abs(e / parseInt(window.getComputedStyle(this.$.swipeableComponents.hasNode()).width, 10));
 },
 swipe: function(e) {
 this.setSwipeComplete(!0), this.animateSwipe(0, e);
 },
 backOutSwipe: function(e) {
-var t = this.getDimensions(this.$.swipeableComponents.node), n = this.swipeDirection == 1 ? -1 * parseInt(t.width) : parseInt(t.width);
+var t = this.getDimensions(this.$.swipeableComponents.node), n = this.swipeDirection == 1 ? -1 * t.width : t.width;
 this.animateSwipe(n, this.fastSwipeSpeedMS), this.setSwipeDirection(null), this.setFlicked(!0);
 },
 bounceItem: function(e) {
 var t = window.getComputedStyle(this.$.swipeableComponents.node);
-parseInt(t.left) != parseInt(t.width) && this.animateSwipe(0, this.normalSwipeSpeedMS);
+parseInt(t.left, 10) != parseInt(t.width, 10) && this.animateSwipe(0, this.normalSwipeSpeedMS);
 },
 slideAwayItem: function() {
-var e = this.$.swipeableComponents, t = window.getComputedStyle(e.node), n = this.persistentItemOrigin == "left" ? -1 * parseInt(t.width) : parseInt(t.width);
+var e = this.$.swipeableComponents, t = parseInt(window.getComputedStyle(e.node).width, 10), n = this.persistentItemOrigin == "left" ? -1 * t : t;
 this.animateSwipe(n, this.normalSwipeSpeedMS), this.persistentItemVisible = !1, this.setPersistSwipeableItem(!1);
 },
 clearSwipeables: function() {
@@ -2640,6 +2640,83 @@ e._fit = !0, e.applyStyle("width", this.containerBounds.width - t + "px"), e.res
 }
 });
 
+// DockRightArranger.js
+
+enyo.kind({
+name: "enyo.DockRightArranger",
+kind: "Arranger",
+basePanel: !1,
+overlap: 0,
+layoutWidth: 0,
+constructor: function() {
+this.inherited(arguments), this.overlap = this.container.overlap != null ? this.container.overlap : this.overlap, this.layoutWidth = this.container.layoutWidth != null ? this.container.layoutWidth : this.layoutWidth;
+},
+size: function() {
+var e = this.container.getPanels(), t = this.containerPadding = this.container.hasNode() ? enyo.dom.calcPaddingExtents(this.container.node) : {}, n = this.containerBounds, r, i, s;
+n.width -= t.left + t.right;
+var o = n.width, u = e.length;
+this.container.transitionPositions = {};
+for (r = 0; s = e[r]; r++) s.width = r === 0 && this.container.basePanel ? o : s.getBounds().width;
+for (r = 0; s = e[r]; r++) {
+r === 0 && this.container.basePanel && s.setBounds({
+width: o
+}), s.setBounds({
+top: t.top,
+bottom: t.bottom
+});
+for (j = 0; s = e[j]; j++) {
+var a;
+if (r === 0 && this.container.basePanel) a = 0; else if (j < r) a = o; else {
+if (r !== j) break;
+var f = o > this.layoutWidth ? this.overlap : 0;
+a = o - e[r].width + f;
+}
+this.container.transitionPositions[r + "." + j] = a;
+}
+if (j < u) {
+var l = !1;
+for (k = r + 1; k < u; k++) {
+var f = 0;
+if (l) f = 0; else if (e[r].width + e[k].width - this.overlap > o) f = 0, l = !0; else {
+f = e[r].width - this.overlap;
+for (i = r; i < k; i++) {
+var c = f + e[i + 1].width - this.overlap;
+if (!(c < o)) {
+f = o;
+break;
+}
+f = c;
+}
+f = o - f;
+}
+this.container.transitionPositions[r + "." + k] = f;
+}
+}
+}
+},
+arrange: function(e, t) {
+var n, r, i = this.container.getPanels(), s = this.container.clamp(t);
+for (n = 0; r = i[n]; n++) {
+var o = this.container.transitionPositions[n + "." + s];
+this.arrangeControl(r, {
+left: o
+});
+}
+},
+calcArrangementDifference: function(e, t, n, r) {
+var i = this.container.getPanels(), s = e < n ? i[n].width : i[e].width;
+return s;
+},
+destroy: function() {
+var e = this.container.getPanels();
+for (var t = 0, n; n = e[t]; t++) enyo.Arranger.positionControl(n, {
+left: null,
+top: null
+}), n.applyStyle("top", null), n.applyStyle("bottom", null), n.applyStyle("left", null), n.applyStyle("width", null);
+this.inherited(arguments);
+}
+});
+
 // OtherArrangers.js
 
 enyo.kind({
@@ -2764,71 +2841,6 @@ top: null
 }), n.applyStyle("left", null), n.applyStyle("top", null), n.applyStyle("height", null), n.applyStyle("width", null);
 this.inherited(arguments);
 }
-}), enyo.kind({
-name: "enyo.DockRightArranger",
-kind: "Arranger",
-basePanel: !1,
-size: function() {
-var e = this.container.getPanels(), t = this.containerPadding = this.container.hasNode() ? enyo.dom.calcPaddingExtents(this.container.node) : {}, n = this.containerBounds, r, i, s;
-n.width -= t.left + t.right;
-var o = n.width, u = e.length;
-this.container.transitionPositions = {};
-for (r = 0; s = e[r]; r++) s.width = r === 0 && this.container.basePanel ? o : s.getBounds().width;
-for (r = 0; s = e[r]; r++) {
-r === 0 && this.container.basePanel && s.setBounds({
-width: o
-}), s.setBounds({
-top: t.top,
-bottom: t.bottom
-});
-for (j = 0; s = e[j]; j++) {
-var a;
-if (r === 0 && this.container.basePanel) a = 0; else if (j < r) a = o; else {
-if (r !== j) break;
-a = o - e[r].width;
-}
-this.container.transitionPositions[r + "." + j] = a;
-}
-if (j < u) {
-var f = !1;
-for (k = r + 1; k < u; k++) {
-var l = 0;
-if (f) l = 0; else if (e[r].width + e[k].width > o) l = 0, f = !0; else {
-l = e[r].width;
-for (i = r; i < k; i++) {
-if (!(l + e[i + 1].width < o)) {
-l = o;
-break;
-}
-l += e[i + 1].width;
-}
-l = o - l;
-}
-this.container.transitionPositions[r + "." + k] = l;
-}
-}
-}
-},
-arrange: function(e, t) {
-var n, r, i = this.container.getPanels(), s = this.container.clamp(t);
-for (n = 0; r = i[n]; n++) {
-var o = this.container.transitionPositions[n + "." + s];
-this.arrangeControl(r, {
-left: o
-});
-}
-},
-calcArrangementDifference: function(e, t, n, r) {
-return this.containerBounds.width;
-},
-destroy: function() {
-var e = this.container.getPanels();
-for (var t = 0, n; n = e[t]; t++) enyo.Arranger.positionControl(n, {
-left: null,
-top: null
-}), n.applyStyle("top", null), n.applyStyle("bottom", null), n.applyStyle("left", null), n.applyStyle("width", null);
-this.inherited(arguments);
-}
 });
 
 // Panels.js
@@ -2861,7 +2873,10 @@ onEnd: "completed"
 } ],
 fraction: 0,
 create: function() {
-this.transitionPoints = [], this.inherited(arguments), this.arrangerKindChanged(), this.narrowFitChanged(), this.indexChanged(), this.setAttribute("onscroll", enyo.bubbler);
+this.transitionPoints = [], this.inherited(arguments), this.arrangerKindChanged(), this.narrowFitChanged(), this.indexChanged();
+},
+rendered: function() {
+this.inherited(arguments), enyo.makeBubble(this, "scroll");
 },
 domScroll: function(e, t) {
 this.hasNode() && this.node.scrollLeft > 0 && (this.node.scrollLeft = 0);
@@ -2896,7 +2911,7 @@ return e.children;
 },
 getActive: function() {
 var e = this.getPanels(), t = this.index % e.length;
-return t < 0 ? t += e.length : enyo.nop, e[t];
+return t < 0 && (t += e.length), e[t];
 },
 getAnimator: function() {
 return this.$.animator;
@@ -3183,10 +3198,10 @@ for (var t = 0; t < e.length; t++) e[t].applyStyle("position", "absolute");
 },
 positionClientControls: function() {
 var e = this.getClientControls();
-for (var t = 0; t < e.length; t++) for (p in this.position) e[t].applyStyle(p, this.position[p] + "px");
+for (var t = 0; t < e.length; t++) for (var n in this.position) e[t].applyStyle(n, this.position[n] + "px");
 },
 highlightAnchorPointChanged: function() {
-this.highlightAnchorPoint ? this.addClass("pinDebug") : this.removeClass("pinDebug");
+this.addRemoveClass("pinDebug", this.highlightAnchorPoint);
 },
 anchorChanged: function() {
 var e = null, t = null;
@@ -3269,7 +3284,7 @@ srcChanged: function() {
 this.src && this.src.length > 0 && this.bufferImage && this.src != this.bufferImage.src && (this.bufferImage.src = this.src);
 },
 imageLoaded: function(e) {
-this.originalWidth = this.bufferImage.width, this.originalHeight = this.bufferImage.height, this.scaleChanged(), this.$.image.setSrc(this.bufferImage.src), enyo.dom.transformValue(this.getStrategy().$.client, "translate3d", "0px, 0px, 0"), this.positionClientControls(this.scale);
+this.originalWidth = this.bufferImage.width, this.originalHeight = this.bufferImage.height, this.scaleChanged(), this.$.image.setSrc(this.bufferImage.src), enyo.dom.transformValue(this.getStrategy().$.client, "translate3d", "0px, 0px, 0"), this.positionClientControls(this.scale), this.alignImage();
 },
 resizeHandler: function() {
 this.inherited(arguments), this.$.image.src && this.scaleChanged();
@@ -3279,12 +3294,18 @@ var e = this.hasNode();
 if (e) {
 this.containerWidth = e.clientWidth, this.containerHeight = e.clientHeight;
 var t = this.containerWidth / this.originalWidth, n = this.containerHeight / this.originalHeight;
-this.minScale = Math.min(t, n), this.maxScale = this.minScale * 3 < 1 ? 1 : this.minScale * 3, this.scale == "auto" ? this.scale = this.minScale : this.scale == "width" ? this.scale = t : this.scale == "height" ? this.scale = n : (this.maxScale = Math.max(this.maxScale, this.scale), this.scale = this.limitScale(this.scale));
+this.minScale = Math.min(t, n), this.maxScale = this.minScale * 3 < 1 ? 1 : this.minScale * 3, this.scale == "auto" ? this.scale = this.minScale : this.scale == "width" ? this.scale = t : this.scale == "height" ? this.scale = n : this.scale == "fit" ? (this.fitAlignment = "center", this.scale = Math.max(t, n)) : (this.maxScale = Math.max(this.maxScale, this.scale), this.scale = this.limitScale(this.scale));
 }
 this.eventPt = this.calcEventLocation(), this.transformImage(this.scale);
 },
 imageError: function(e) {
 enyo.error("Error loading image: " + this.src), this.bubble("onerror", e);
+},
+alignImage: function() {
+if (this.fitAlignment && this.fitAlignment === "center") {
+var e = this.getScrollBounds();
+this.setScrollLeft(e.maxLeft / 2), this.setScrollTop(e.maxTop / 2);
+}
 },
 gestureTransform: function(e, t) {
 this.eventPt = this.calcEventLocation(t), this.transformImage(this.limitScale(this.scale * t.scale));
@@ -3425,10 +3446,25 @@ for (e = this.images.length; e < this.imageCount; e++) this.$["image" + e] && th
 this.imageCount = this.images.length;
 },
 loadNearby: function() {
-this.images.length > 0 && (this.loadImageView(this.index - 1), this.loadImageView(this.index), this.loadImageView(this.index + 1));
+var e = this.getBufferRange();
+for (var t in e) this.loadImageView(e[t]);
+},
+getBufferRange: function() {
+var e = [];
+if (this.layout.containerBounds) {
+var t = 1, n = this.layout.containerBounds, r, i, s, o, u, a;
+o = this.index - 1, u = 0, a = n.width * t;
+while (o >= 0 && u <= a) s = this.$["container" + o], u += s.width + s.marginWidth, e.unshift(o), o--;
+o = this.index, u = 0, a = n.width * (t + 1);
+while (o < this.images.length && u <= a) s = this.$["container" + o], u += s.width + s.marginWidth, e.push(o), o++;
+}
+return e;
+},
+reflow: function() {
+this.inherited(arguments), this.loadNearby();
 },
 loadImageView: function(e) {
-return this.wrap && (e = (e % this.images.length + this.images.length) % this.images.length), e >= 0 && e <= this.images.length - 1 && (this.$["image" + e] ? (this.$["image" + e].src != this.images[e] && this.$["image" + e].setSrc(this.images[e]), this.$["image" + e].setScale(this.defaultScale), this.$["image" + e].setDisableZoom(this.disableZoom)) : (this.$["container" + e].createComponent({
+return this.wrap && (e = (e % this.images.length + this.images.length) % this.images.length), e >= 0 && e <= this.images.length - 1 && (this.$["image" + e] ? this.$["image" + e].src != this.images[e] && (this.$["image" + e].setSrc(this.images[e]), this.$["image" + e].setScale(this.defaultScale), this.$["image" + e].setDisableZoom(this.disableZoom)) : (this.$["container" + e].createComponent({
 name: "image" + e,
 kind: "ImageView",
 scale: this.defaultScale,
@@ -3453,7 +3489,7 @@ transitionStart: function(e, t) {
 if (t.fromIndex == t.toIndex) return !0;
 },
 transitionFinish: function(e, t) {
-this.loadImageView(this.index - 1), this.loadImageView(this.index + 1), this.lowMemory && this.cleanupMemory();
+this.loadNearby(), this.lowMemory && this.cleanupMemory();
 },
 getActiveImage: function() {
 return this.getImageByIndex(this.index);
@@ -3462,7 +3498,8 @@ getImageByIndex: function(e) {
 return this.$["image" + e] || this.loadImageView(e);
 },
 cleanupMemory: function() {
-for (var e = 0; e < this.images.length; e++) (e < this.index - 1 || e > this.index + 1) && this.$["image" + e] && this.$["image" + e].destroy();
+var e = getBufferRange();
+for (var t = 0; t < this.images.length; t++) enyo.indexOf(t, e) === -1 && this.$["image" + t] && this.$["image" + t].destroy();
 }
 });
 
@@ -3849,21 +3886,21 @@ create: function() {
 this.inherited(arguments), this.maxHeightChanged();
 },
 initComponents: function() {
-this.scrolling ? this.createComponents(this.childComponents, {
+this.scrolling && this.createComponents(this.childComponents, {
 isChrome: !0
-}) : enyo.nop, this.inherited(arguments);
+}), this.inherited(arguments);
 },
 getScroller: function() {
 return this.$[this.scrollerName];
 },
 maxHeightChanged: function() {
-this.scrolling ? this.getScroller().setMaxHeight(this.maxHeight + "px") : enyo.nop;
+this.scrolling && this.getScroller().setMaxHeight(this.maxHeight + "px");
 },
 itemActivated: function(e, t) {
 return t.originator.setActive(!1), !0;
 },
 showingChanged: function() {
-this.inherited(arguments), this.scrolling ? this.getScroller().setShowing(this.showing) : enyo.nop, this.adjustPosition(!0);
+this.inherited(arguments), this.scrolling && this.getScroller().setShowing(this.showing), this.adjustPosition(!0);
 },
 requestMenuShow: function(e, t) {
 if (this.floating) {
@@ -3881,7 +3918,7 @@ return this.show(), !0;
 },
 applyPosition: function(e) {
 var t = "";
-for (n in e) t += n + ":" + e[n] + (isNaN(e[n]) ? "; " : "px; ");
+for (var n in e) t += n + ":" + e[n] + (isNaN(e[n]) ? "; " : "px; ");
 this.addStyles(t);
 },
 getPageOffset: function(e) {
@@ -3895,7 +3932,7 @@ width: s
 },
 adjustPosition: function() {
 if (this.showing && this.hasNode()) {
-this.scrolling && !this.showOnTop ? this.getScroller().setMaxHeight(this.maxHeight + "px") : enyo.nop, this.removeClass("onyx-menu-up"), this.floating ? enyo.nop : this.applyPosition({
+this.scrolling && !this.showOnTop && this.getScroller().setMaxHeight(this.maxHeight + "px"), this.removeClass("onyx-menu-up"), this.floating || this.applyPosition({
 left: "auto"
 });
 var e = this.node.getBoundingClientRect(), t = e.height === undefined ? e.bottom - e.top : e.height, n = window.innerHeight === undefined ? document.documentElement.clientHeight : window.innerHeight, r = window.innerWidth === undefined ? document.documentElement.clientWidth : window.innerWidth;
@@ -3943,7 +3980,8 @@ enyo.kind({
 name: "onyx.MenuItem",
 kind: "enyo.Button",
 events: {
-onSelect: ""
+onSelect: "",
+onItemContentChange: ""
 },
 classes: "onyx-menu-item",
 tag: "div",
@@ -3953,6 +3991,11 @@ this.inherited(arguments), this.active && this.bubble("onActivate");
 tap: function(e) {
 this.inherited(arguments), this.bubble("onRequestHideMenu"), this.doSelect({
 selected: this,
+content: this.content
+});
+},
+contentChanged: function(e) {
+this.inherited(arguments), this.doItemContentChange({
 content: this.content
 });
 }
@@ -3998,6 +4041,9 @@ selected: null
 events: {
 onChange: ""
 },
+handlers: {
+onItemContentChange: "itemContentChange"
+},
 floating: !0,
 showOnTop: !0,
 initComponents: function() {
@@ -4020,6 +4066,12 @@ e && e.removeClass("selected"), this.selected && (this.selected.addClass("select
 selected: this.selected,
 content: this.selected.content
 }));
+},
+itemContentChange: function(e, t) {
+t.originator == this.selected && this.doChange({
+selected: this.selected,
+content: this.selected.content
+});
 },
 resizeHandler: function() {
 this.inherited(arguments), this.adjustPosition();
@@ -4987,19 +5039,15 @@ if (t.horizontal) return t.preventDefault(), this.dragging = !0, !0;
 },
 drag: function(e, t) {
 if (this.dragging) {
-var n = this.calcKnobPosition(t);
+var n = this.calcKnobPosition(t), r, i, s;
 if (e.name === "startKnob" && n >= 0) {
 if (!(n <= this.endValue && t.xDirection === -1 || n <= this.endValue)) return this.drag(this.$.endKnob, t);
-this.setBeginValue(n);
-var r = this.calcRangeRatio(this.beginValue), i = this.increment ? this.calcIncrement(r + .5 * this.increment) : r, s = this.calcKnobPercent(i);
-this.updateKnobPosition(s, this.$.startKnob), this.setRangeStart(i), this.doChanging({
+this.setBeginValue(n), r = this.calcRangeRatio(this.beginValue), i = this.increment ? this.calcIncrement(r + .5 * this.increment) : r, s = this.calcKnobPercent(i), this.updateKnobPosition(s, this.$.startKnob), this.setRangeStart(i), this.doChanging({
 value: i
 });
 } else if (e.name === "endKnob" && n <= 100) {
 if (!(n >= this.beginValue && t.xDirection === 1 || n >= this.beginValue)) return this.drag(this.$.startKnob, t);
-this.setEndValue(n);
-var r = this.calcRangeRatio(this.endValue), i = this.increment ? this.calcIncrement(r + .5 * this.increment) : r, s = this.calcKnobPercent(i);
-this.updateKnobPosition(s, this.$.endKnob), this.setRangeEnd(i), this.doChanging({
+this.setEndValue(n), r = this.calcRangeRatio(this.endValue), i = this.increment ? this.calcIncrement(r + .5 * this.increment) : r, s = this.calcKnobPercent(i), this.updateKnobPosition(s, this.$.endKnob), this.setRangeEnd(i), this.doChanging({
 value: i
 });
 }
@@ -5008,20 +5056,14 @@ return !0;
 },
 dragfinish: function(e, t) {
 this.dragging = !1, t.preventTap();
-if (e.name === "startKnob") {
-var n = this.calcRangeRatio(this.beginValue);
-this.doChange({
+var n;
+return e.name === "startKnob" ? (n = this.calcRangeRatio(this.beginValue), this.doChange({
 value: n,
 startChanged: !0
-});
-} else if (e.name === "endKnob") {
-var n = this.calcRangeRatio(this.endValue);
-this.doChange({
+})) : e.name === "endKnob" && (n = this.calcRangeRatio(this.endValue), this.doChange({
 value: n,
 startChanged: !1
-});
-}
-return !0;
+})), !0;
 },
 rangeMinChanged: function() {
 this.refreshRangeSlider();
@@ -5063,27 +5105,18 @@ onhold: "hold",
 onrelease: "release"
 },
 hold: function(e, t) {
-this.tapHighlight && onyx.Item.addFlyweightClass(this.controlParent || this, "onyx-highlight", t);
+this.tapHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, "onyx-highlight", !0, t);
 },
 release: function(e, t) {
-this.tapHighlight && onyx.Item.removeFlyweightClass(this.controlParent || this, "onyx-highlight", t);
+this.tapHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, "onyx-highlight", !1, t);
 },
 statics: {
-addFlyweightClass: function(e, t, n, r) {
-var i = n.flyweight;
-if (i) {
-var s = r !== undefined ? r : n.index;
-i.performOnRow(s, function() {
-e.hasClass(t) ? e.setClassAttribute(e.getClassAttribute()) : e.addClass(t);
-}), e.removeClass(t);
-}
-},
-removeFlyweightClass: function(e, t, n, r) {
-var i = n.flyweight;
-if (i) {
-var s = r !== undefined ? r : n.index;
-i.performOnRow(s, function() {
-e.hasClass(t) ? e.removeClass(t) : e.setClassAttribute(e.getClassAttribute());
+addRemoveFlyweightClass: function(e, t, n, r, i) {
+var s = r.flyweight;
+if (s) {
+var o = i !== undefined ? i : r.index;
+s.performOnRow(o, function() {
+e.addRemoveClass(t, n);
 });
 }
 }
@@ -5315,13 +5348,13 @@ tapHandler: function(e, t) {
 return t.actionButton = !0, t.popup = this, this.bubble("ontap", t), !0;
 },
 maxHeightChanged: function() {
-this.scrolling ? this.getScroller().setMaxHeight(this.maxHeight + "px") : enyo.nop;
+this.scrolling && this.getScroller().setMaxHeight(this.maxHeight + "px");
 },
 itemActivated: function(e, t) {
 return t.originator.setActive(!1), !0;
 },
 showingChanged: function() {
-this.inherited(arguments), this.scrolling ? this.getScroller().setShowing(this.showing) : enyo.nop, this.adjustPosition();
+this.inherited(arguments), this.scrolling && this.getScroller().setShowing(this.showing), this.adjustPosition();
 },
 requestShow: function(e, t) {
 var n = t.activator.hasNode();
@@ -5329,7 +5362,7 @@ return n && (this.activatorOffset = this.getPageOffset(n)), this.show(), !0;
 },
 applyPosition: function(e) {
 var t = "";
-for (n in e) t += n + ":" + e[n] + (isNaN(e[n]) ? "; " : "px; ");
+for (var n in e) t += n + ":" + e[n] + (isNaN(e[n]) ? "; " : "px; ");
 this.addStyles(t);
 },
 getPageOffset: function(e) {
@@ -6890,7 +6923,7 @@ barTapped: function() {
 this.$["switch"].setValue(!this.getValue()), this.doChange(this.$["switch"]);
 },
 switchToggled: function(e, t) {
-return this.doChange(t), !0;
+return this.doChange(this.$["switch"]), !0;
 },
 switchChanged: function(e, t) {
 return !0;
@@ -7790,17 +7823,17 @@ onrelease: "release"
 startTap: function(e, t) {
 if (this.tapPulse) {
 if (this.preventTapDisplayTimer >= (new Date).getTime() - 50) return;
-onyx.Item.addFlyweightClass(this.controlParent || this, this.tapClass, t), enyo.job("endTap", enyo.bind(this, this.endTap, e, t), 250);
+onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.tapClass, !0, t), enyo.job("endTap", enyo.bind(this, this.endTap, e, t), 250);
 }
 },
 endTap: function(e, t) {
-this.tapPulse && onyx.Item.removeFlyweightClass(this.controlParent || this, this.tapClass, t);
+this.tapPulse && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.tapClass, !1, t);
 },
 hold: function(e, t) {
-this.tapHighlight && onyx.Item.addFlyweightClass(this.controlParent || this, this.highlightClass, t);
+this.tapHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.highlightClass, !0, t);
 },
 release: function(e, t) {
-this.tapHighlight && (this.preventTapDisplayTimer = (new Date).getTime(), onyx.Item.removeFlyweightClass(this.controlParent || this, this.highlightClass, t));
+this.tapHighlight && (this.preventTapDisplayTimer = (new Date).getTime(), onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.highlightClass, !1, t));
 }
 });
 
@@ -7834,6 +7867,8 @@ name: "display"
 name: "menu",
 kind: "GTS.SelectedMenu",
 floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
 style: "min-width: 200px;",
 onChange: "balanceSelectionChanged"
 } ],
@@ -8752,42 +8787,34 @@ value: this.$.pin1.getValue()
 var accountSortOptions = [ {
 content: "Custom Category",
 value: 0,
-menuParent: "accountSortOptions",
 query: "acctCatOrder, acctCategory COLLATE NOCASE, sect_order, acctName COLLATE NOCASE"
 }, {
 content: "Custom Account",
 value: 1,
-menuParent: "accountSortOptions",
 query: "sect_order, acctName COLLATE NOCASE, acctCatOrder, acctCategory COLLATE NOCASE"
 }, {
 content: "Alphabetical Name",
 value: 2,
-menuParent: "accountSortOptions",
 query: "acctName COLLATE NOCASE, acctCategory COLLATE NOCASE"
 }, {
 content: "Alphabetical Category",
 value: 3,
-menuParent: "accountSortOptions",
 query: "acctCategory COLLATE NOCASE, acctName COLLATE NOCASE"
 } ], budgetSortOptions = [ {
 content: "Custom",
 value: 0,
-menuParent: "budgetSortOptions",
 query: "budgetOrder ASC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 }, {
 content: "Alphabetical",
 value: 1,
-menuParent: "budgetSortOptions",
 query: "category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 }, {
 content: "Budget Remaining (Asc)",
 value: 2,
-menuParent: "budgetSortOptions",
 query: "( spent / spending_limit ) ASC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 }, {
 content: "Budget Remaining (Desc)",
 value: 3,
-menuParent: "budgetSortOptions",
 query: "( spent / spending_limit ) DESC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 } ], transactionSortOptions = [], defaultAcctTrsnSortOptn = [ {
 sortGroup: "Date",
@@ -9004,6 +9031,8 @@ content: "Checkbook"
 kind: "onyx.Menu",
 showOnTop: !0,
 floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
 components: [ {
 content: "Preferences",
 ontap: "openPreferences"
@@ -9319,7 +9348,7 @@ onError: enyo.bind(this, this.buildInitialDB)
 },
 checkDBSuccess: function(e) {
 var t = -1;
-e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer), this.versionCheck = 25, t == this.versionCheck ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), this.splashFinished()) : t >= 1 ? (this.log("DB out of date, preparing to update: " + t + " to " + this.versionCheck), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
+e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer), this.versionCheck = 26, t == this.versionCheck ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.alwaysFullCalendar = e[0].alwaysFullCalendar, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), this.splashFinished()) : t >= 1 ? (this.log("DB out of date, preparing to update: " + t + " to " + this.versionCheck), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
 },
 splashFinished: function() {
 this.log(), this.$.splashProgress.animateProgressTo(100), enyo.asyncMethod(this, this.doFinish);
@@ -9743,6 +9772,8 @@ gSheetPass: ""
 case 24:
 t.push("ALTER TABLE accounts ADD COLUMN payeeField INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE transactions ADD COLUMN payee TEXT;"), this.versionCheck = 25;
 case 25:
+t.push("ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;"), this.versionCheck = 26;
+case 26:
 }
 t.push(Checkbook.globals.gts_db.getUpdate("prefs", {
 dbVer: this.versionCheck
@@ -9842,6 +9873,22 @@ onContent: "Yes",
 offContent: "No",
 onChange: "updateTransPreview"
 }, {
+name: "dispColor",
+kind: "GTS.ToggleBar",
+label: "Account Colors",
+sublabel: "Add color in some areas based on account categories.",
+onContent: "Yes",
+offContent: "No",
+onChange: "updateDispColor"
+}, {
+name: "alwaysFullCalendar",
+kind: "GTS.ToggleBar",
+label: "Full Calendar",
+sublabel: "Set modify transaction system to always use a full calendar instead of a date picker for small screens.",
+onContent: "Yes",
+offContent: "No",
+onChange: "updateAlwaysFullCalendar"
+}, {
 name: "updateNotice",
 kind: "GTS.ToggleBar",
 label: "System Notifications",
@@ -9857,14 +9904,6 @@ sublabel: "Report errors to GlitchTech Science",
 onContent: "Yes",
 offContent: "No",
 onChange: "updateErrorReporting"
-}, {
-name: "dispColor",
-kind: "GTS.ToggleBar",
-label: "Account Colors",
-sublabel: "Add color in some areas based on account categories.",
-onContent: "Yes",
-offContent: "No",
-onChange: "updateDispColor"
 }, {
 showing: !1,
 content: "backswipe save (function cannot not used on touchpad)"
@@ -9998,6 +10037,11 @@ errorReporting: Checkbook.globals.prefs.errorReporting
 updateDispColor: function(e, t) {
 Checkbook.globals.prefs.dispColor = t.value ? 1 : 0, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
 dispColor: Checkbook.globals.prefs.dispColor
+}, {}));
+},
+updateAlwaysFullCalendar: function(e, t) {
+Checkbook.globals.prefs.alwaysFullCalendar = t.value ? 1 : 0, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
+alwaysFullCalendar: Checkbook.globals.prefs.alwaysFullCalendar
 }, {}));
 },
 setupRow: function(e, t) {
@@ -11131,10 +11175,19 @@ onError: t.onError
 });
 },
 fetchAccounts: function(e, t, n) {
-this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accounts.slice(GTS.Object.isNumber(n) ? n : 0, t)) : (e = this._getOptions(e), this.accountObject.processingQueue.push({
+if (this.accountObject.lastModified <= this.accountObject.lastBuild) {
+if (enyo.isFunction(e.onSuccess)) {
+var r = [];
+if (!e.showHidden) {
+n = GTS.Object.isNumber(n) ? n : 0, t = GTS.Object.isNumber(t) ? t : this.accountObject.accounts.length;
+for (var i = n; i < t; i++) this.accountObject.accounts[i].hidden !== 2 && r.push(this.accountObject.accounts[i]);
+} else r = this.accountObject.accounts.slice(GTS.Object.isNumber(n) ? n : 0, t);
+e.onSuccess(r);
+}
+} else e = this._getOptions(e), this.accountObject.processingQueue.push({
 source: "fetchAccounts",
 func: enyo.bind(this, this.fetchAccounts, e, t, n)
-}), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError)));
+}), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError));
 },
 fetchAccountsList: function(e, t, n) {
 this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accountsList.slice(GTS.Object.isNumber(n) ? n : 0, t)) : (this.accountObject.processingQueue.push({
@@ -11244,6 +11297,7 @@ published: {
 balanceView: 4,
 editMode: !1,
 reorderable: !0,
+showHidden: !1,
 horizontal: "hidden"
 },
 components: [ {
@@ -11353,8 +11407,18 @@ accountSortChanged: "renderAccountList",
 balanceChanged: "refresh",
 accountBalanceChanged: "accountBalanceChanged"
 } ],
+balanceViewChanged: function() {
+this.refresh();
+},
+reorderableChanged: function() {
+this.$.entries.setReorderable(this.reorderable);
+},
+showHiddenChanged: function() {
+this.renderAccountList();
+},
 renderAccountList: function() {
 this.log(), this.doLoadStart(), this.accounts = [], Checkbook.globals.accountManager.fetchAccounts({
+showHidden: this.showHidden,
 onSuccess: enyo.bind(this, this.dataResponse)
 });
 },
@@ -11455,7 +11519,7 @@ return enyo.isFunction(this.doSetupRow) && this.onSetupRow !== "" ? this.doSetup
 setupRow: function(e, t) {
 var n = t.index, r = this.accounts[n];
 if (r) {
-r.index = n, this.$.accountItem.addRemoveClass("alt-row", r.index % 2 === 0), this.$.accountItem.addRemoveClass("norm-row", r.index % 2 !== 0), this.$.accountItem.addRemoveClass("hiddenAccount", r.hidden === 2), this.$.accountItem.addRemoveClass("maskedAccount", r.hidden === 1), this.$.icon.setSrc("assets/" + r.acctCategoryIcon), this.$.iconLock.addRemoveClass("unlocked", r.acctLocked !== 1), this.$.name.setContent(r.acctName);
+r.index = n, this.$.accountItem.addRemoveClass("alt-row", r.index % 2 === 0), this.$.accountItem.addRemoveClass("norm-row", r.index % 2 !== 0), this.$.accountItem.addRemoveClass("hiddenAccount", r.hidden === 2 && this.showHidden), this.$.accountItem.addRemoveClass("maskedAccount", r.hidden === 1), this.$.icon.setSrc("assets/" + r.acctCategoryIcon), this.$.iconLock.addRemoveClass("unlocked", r.acctLocked !== 1), this.$.name.setContent(r.acctName);
 var i = this.balanceView === 4 ? r.bal_view : this.balanceView;
 switch (i) {
 case 0:
@@ -11473,9 +11537,7 @@ break;
 default:
 r.balance = 0;
 }
-r.balance = prepAmount(r.balance), this.$.balance.setContent(formatAmount(r.balance)), this.$.balance.addRemoveClass("positiveBalance", r.balance > 0), this.$.balance.addRemoveClass("negativeBalance", r.balance < 0), this.$.balance.addRemoveClass("neutralBalance", r["balance"] == 0), this.$.note.setContent(r.acctNotes.replace(/\n/, "<br />"));
-var s = (Checkbook.globals.prefs.custom_sort === 0 || Checkbook.globals.prefs.custom_sort === 3) && (r.index <= 0 || r.acctCategory !== this.accounts[r.index - 1].acctCategory);
-return this.$.catDivider.setContent(r.acctCategory), this.$.catDivider.canGenerate = s, !0;
+return r.balance = prepAmount(r.balance), this.$.balance.setContent(formatAmount(r.balance)), this.$.balance.addRemoveClass("positiveBalance", r.balance > 0), this.$.balance.addRemoveClass("negativeBalance", r.balance < 0), this.$.balance.addRemoveClass("neutralBalance", r["balance"] == 0), this.$.note.setContent(r.acctNotes.replace(/\n/, "<br />")), this.$.catDivider.setContent(r.acctCategory), this.$.catDivider.canGenerate = (Checkbook.globals.prefs.custom_sort === 0 || Checkbook.globals.prefs.custom_sort === 3) && (r.index <= 0 || r.acctCategory !== this.accounts[r.index - 1].acctCategory), !0;
 }
 },
 accountBalanceChanged: function(e, t) {
@@ -11539,6 +11601,11 @@ name: "balanceMenu",
 kind: "Checkbook.balanceMenu",
 onChange: "handleBalanceButton",
 style: "padding: 0 8px; margin: 0;"
+}, {
+name: "editOverlay",
+content: "Edit Accounts",
+classes: "enyo-fit text-center header-overlay",
+showing: !1
 } ]
 }, {
 name: "entries",
@@ -11546,6 +11613,7 @@ kind: "Checkbook.accounts.list",
 classes: "box-flex-1",
 balanceView: 4,
 editMode: !1,
+showHidden: !1,
 onLoadStart: "showLoading",
 onLoadStop: "hideLoading"
 }, {
@@ -11553,13 +11621,20 @@ kind: "onyx.MoreToolbar",
 classes: "rich-brown",
 components: [ {
 kind: "onyx.MenuDecorator",
+onSelect: "sortMenuSelected",
 components: [ {
-kind: "onyx.IconButton",
+kind: "onyx.Button",
+classes: "padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
 src: "assets/menu_icons/sort.png"
+} ]
 }, {
 name: "sortMenu",
 kind: "GTS.SelectedMenu",
 floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
 style: "min-width: 225px;",
 components: accountSortOptions
 } ]
@@ -11570,18 +11645,49 @@ components: [ {
 name: "addAccountButton",
 kind: "onyx.Button",
 ontap: "addAccount",
-classes: "padding-none transparent",
+classes: "margin-half-right padding-none transparent",
 components: [ {
 kind: "onyx.Icon",
 src: "assets/menu_icons/new.png"
 } ]
+}, {
+kind: "onyx.Button",
+ontap: "toggleLock",
+classes: "margin-half-left padding-none transparent",
+components: [ {
+name: "editModeButtonIcon",
+kind: "onyx.Icon",
+src: "assets/menu_icons/lock.png",
+classes: "onyx-icon-button onyx-icon-toggle"
+} ]
 } ]
 }, {
+kind: "onyx.MenuDecorator",
+onSelect: "searchMenuSelected",
 components: [ {
-name: "editModeToggle",
-kind: "onyx.ToggleIconButton",
-src: "assets/menu_icons/lock.png?1=2",
-ontap: "toggleLock"
+kind: "onyx.Button",
+classes: "padding-none transparent",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/search.png"
+} ]
+}, {
+kind: "onyx.Menu",
+floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
+components: [ {
+content: "Toggle Hidden"
+}, {
+showing: !1,
+content: "Reports"
+}, {
+showing: !1,
+content: "Budget"
+}, {
+showing: !1,
+content: "Search"
+} ]
 } ]
 } ]
 }, {
@@ -11629,25 +11735,6 @@ Checkbook.globals.accountManager.fetchOverallBalances({
 onSuccess: enyo.bind(this, this.buildBalanceButton, enyo.bind(this, this.renderBalanceButton))
 });
 },
-menuItemSelected: function(e, t) {
-if (!t.selected) return;
-var n = t.selected.menuParent.toLowerCase();
-if (n === "searchmenu") {
-var r = t.content.toLowerCase();
-return r === "search" ? this.log("launch search system (overlay like modify account)") : r === "budget" ? this.log("launch budget system (overlay like modify account)") : r === "reports" && this.log("launch report system (overlay like modify account)"), !0;
-}
-if (n === "accountsortoptions") {
-if (Checkbook.globals.prefs.custom_sort === t.selected.value) return;
-return Checkbook.globals.prefs.custom_sort = t.selected.value, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
-sql: "UPDATE prefs SET custom_sort = ?;",
-values: [ Checkbook.globals.prefs.custom_sort ]
-}), {
-onSuccess: function() {
-Checkbook.globals.accountManager.updateAccountModTime(), enyo.Signals.send("accountSortChanged");
-}
-}), !0;
-}
-},
 buildBalanceButton: function(e, t) {
 this.totalBalance = t, enyo.isFunction(e) && e();
 },
@@ -11680,6 +11767,17 @@ this.balanceView = t.value, this.$.entries.setBalanceView(this.balanceView), thi
 updateSortMenu: function() {
 this.$.sortMenu.setValue(Checkbook.globals.prefs.custom_sort);
 },
+sortMenuSelected: function(e, t) {
+if (!t.selected || Checkbook.globals.prefs.custom_sort === t.selected.value) return;
+return Checkbook.globals.prefs.custom_sort = t.selected.value, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+sql: "UPDATE prefs SET custom_sort = ?;",
+values: [ Checkbook.globals.prefs.custom_sort ]
+}), {
+onSuccess: function() {
+Checkbook.globals.accountManager.updateAccountModTime(), enyo.Signals.send("accountSortChanged");
+}
+}), !0;
+},
 addAccount: function() {
 this.$.addAccountButton.getDisabled() || (this.$.addAccountButton.setDisabled(!0), enyo.Signals.send("modifyAccount", {
 name: "newAccount",
@@ -11692,7 +11790,11 @@ addAccountComplete: function(e, t) {
 this.$.addAccountButton.setDisabled(!1), t.action === 1 && t.actionStatus === !0 && enyo.Signals.send("accountChanged");
 },
 toggleLock: function() {
-this.$.editModeToggle.getActive() ? this.$.entries.setEditMode(!0) : this.$.entries.setEditMode(!1);
+this.$.entries.getEditMode() ? this.$.entries.setEditMode(!1) : this.$.entries.setEditMode(!0), this.$.editModeButtonIcon.addRemoveClass("active", this.$.entries.getEditMode()), this.$.editOverlay.setShowing(this.$.entries.getEditMode());
+},
+searchMenuSelected: function(e, t) {
+var n = t.content.toLowerCase();
+return n === "search" ? this.log("launch search system (overlay like modify account)") : n === "budget" ? this.log("launch budget system (overlay like modify account)") : n === "reports" ? this.log("launch report system (overlay like modify account)") : n === "toggle hidden" && this.$.entries.setShowHidden(!this.$.entries.getShowHidden()), !0;
 }
 });
 
@@ -12134,7 +12236,7 @@ if (!e || typeof e == "undefined") {
 this.doFinish(0);
 return;
 }
-this.$.accountName.setValue(e.acctName), this.$.accountCategory.setValue(e.acctCategory), this.$.accountNotes.setValue(e.acctNotes), this.$.freezeAccount.setValue(e.frozen === 1), this.$.pinLock.setValue(e.acctLocked === 1), this.$.pinCode.setValue(e.lockedCode), this.$.transactionSorting.setValue(e.sort), this.$.accountDisplay.setValue(e.hidden), this.$.balance.setValue(e.bal_view), this.$.defaultAccount.setValue(e.defaultAccount === 1), this.$.showTransTime.setValue(e.showTransTime === 1), this.$.showRunningBal.setValue(e.runningBalance === 1), this.$.hideTransNotes.setValue(e.hideNotes === 1), this.$.descriptionMultilineMode.setValue(e.transDescMultiLine === 1), this.$.autoComplete.setValue(e.useAutoComplete === 1), this.$.atmMode.setValue(e.atmEntry === 1), this.$.autoTransfer.setValue(e.auto_savings), this.$.autoTransferLink.setValue(e.auto_savings_link), this.$.checkNumber.setValue(e.checkField === 1), this.$.expenseCategories.setValue(e.enableCategories === 1), this.$.payeeField.setValue(e.payeeField === 1), this.$.hideCleared.setValue(e.hide_cleared === 1), this.transactionSortingUpdateLabel(), this.accountDisplayUpdateLabel(), this.balanceUpdateLabel(), this.togglePINStatus(), this.toggleAutoTransferDrawer(), this.categoryChanged(), this.acctId < 0 && this.$.accountDeleteButton.hide(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.$.accountName.focus(), this.waterfall("onresize", "onresize", this);
+this.$.accountName.setValue(e.acctName), this.$.accountCategory.setValue(e.acctCategory), this.$.accountNotes.setValue(e.acctNotes), this.$.freezeAccount.setValue(e.frozen === 1), this.$.pinLock.setValue(e.acctLocked === 1), this.$.pinCode.setValue(e.lockedCode), this.$.transactionSorting.setValue(e.sort), this.$.accountDisplay.setValue(e.hidden), this.$.balance.setValue(e.bal_view), this.$.defaultAccount.setValue(e.defaultAccount === 1), this.$.showTransTime.setValue(e.showTransTime === 1), this.$.showRunningBal.setValue(e.runningBalance === 1), this.$.hideTransNotes.setValue(e.hideNotes === 1), this.$.descriptionMultilineMode.setValue(e.transDescMultiLine === 1), this.$.autoComplete.setValue(e.useAutoComplete === 1), this.$.atmMode.setValue(e.atmEntry === 1), this.$.autoTransfer.setValue(e.auto_savings), this.$.autoTransferLink.setValue(e.auto_savings_link), this.$.checkNumber.setValue(e.checkField === 1), this.$.expenseCategories.setValue(e.enableCategories === 1), this.$.payeeField.setValue(e.payeeField === 1), this.$.hideCleared.setValue(e.hide_cleared === 1), this.transactionSortingUpdateLabel(), this.accountDisplayUpdateLabel(), this.balanceUpdateLabel(), this.togglePINStatus(), this.toggleAutoTransferDrawer(), this.categoryChanged(), this.acctId < 0 && this.$.accountDeleteButton.hide(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.$.accountName.focus(), enyo.asyncMethod(this, this.waterfall, "onresize", "onresize", this);
 },
 saveAccount: function() {
 if (this.$.accountName.getValue().length <= 0) {
@@ -12365,6 +12467,7 @@ ontap: "createNew"
 }, {
 name: "modifyCat",
 kind: "Checkbook.accountCategory.modify",
+onHide: "modifyHidden",
 onChangeComplete: "modificationComplete"
 }, {
 name: "manager",
@@ -12406,6 +12509,9 @@ action: "delete"
 },
 modificationComplete: function(e, t) {
 this.fetchCategories(), t["action"] != "reorder" && this.$.modifyCat.hide();
+},
+modifyHidden: function() {
+enyo.asyncMethod(this, this.waterfall, "onresize", "onresize", this);
 },
 moveUp: function(e, t) {
 return this.reorder(e, t.index, t.index - 1), !0;
@@ -12994,6 +13100,8 @@ src: "assets/menu_icons/sort.png"
 name: "sortMenu",
 kind: "GTS.SelectedMenu",
 floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
 onChange: "transactionSortingChanged",
 style: "min-width: 225px;"
 } ]
@@ -13041,6 +13149,8 @@ src: "assets/menu_icons/search.png"
 }, {
 kind: "onyx.Menu",
 floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
 onSelect: "searchSelected",
 components: [ {
 content: "Reports"
@@ -13063,6 +13173,8 @@ src: "assets/menu_icons/config.png"
 }, {
 kind: "onyx.Menu",
 floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
 onSelect: "functionSelected",
 components: [ {
 content: "Purge Transactions",
@@ -13444,6 +13556,7 @@ onSuccess: enyo.bind(this, this.transactionFetchGroupHandler)
 }, t.pageSize, n), !0) : !1;
 },
 transactionFetchGroupHandler: function(e, t, n) {
+this.log(n.length, t.length);
 var r = 0;
 n.length > 0 && (e > 0 || this.account.sort !== "0" && this.account.sort !== "6" && this.account.sort !== "8") && (r = n[0].balanceToDate);
 var i = this.account.runningBalance === 1 && (this.account.sort === 0 || this.account.sort === 1 || this.account.sort === 6 || this.account.sort === 7 || this.account.sort === 8);
@@ -13564,6 +13677,7 @@ enyo.kind({
 name: "Checkbook.transactions.viewSingle",
 kind: "onyx.Popup",
 classes: "large-popup",
+modal: !0,
 centered: !0,
 floating: !0,
 scrim: !0,
@@ -14163,7 +14277,21 @@ create: function() {
 this.inherited(arguments), this.buildDateSystem();
 },
 buildDateSystem: function() {
-enyo.Panels.isScreenNarrow() ? this.$.dateDrawer.createComponents([ {
+!enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs.alwaysFullCalendar ? this.$.dateDrawer.createComponent({
+name: "date",
+kind: "GTS.DatePicker",
+onSelect: "dateChanged",
+components: [ {
+name: "time",
+kind: "GTS.TimePicker",
+label: "Time",
+minuteInterval: 5,
+is24HrMode: !1,
+onSelect: "dateChanged"
+} ]
+}, {
+owner: this
+}) : this.$.dateDrawer.createComponents([ {
 classes: "onyx-toolbar-inline",
 components: [ {
 name: "label",
@@ -14182,20 +14310,6 @@ minuteInterval: 5,
 is24HrMode: !1,
 onSelect: "dateChanged"
 } ], {
-owner: this
-}) : this.$.dateDrawer.createComponent({
-name: "date",
-kind: "GTS.DatePicker",
-onSelect: "dateChanged",
-components: [ {
-name: "time",
-kind: "GTS.TimePicker",
-label: "Time",
-minuteInterval: 5,
-is24HrMode: !1,
-onSelect: "dateChanged"
-} ]
-}, {
 owner: this
 });
 },

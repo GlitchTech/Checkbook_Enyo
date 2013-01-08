@@ -103,20 +103,20 @@ path: t
 }), this.loadScript(t);
 },
 decodePackagePath: function(e) {
-var t = "", n = "", r = "", i = "package.js", s = e.replace(/\\/g, "/").replace(/\/\//g, "/").replace(/:\//, "://").split("/");
+var t = "", n = "", r = "", i = "package.js", s = e.replace(/\\/g, "/").replace(/\/\//g, "/").replace(/:\//, "://").split("/"), o, u;
 if (s.length) {
-var o = s.pop() || s.pop() || "";
-o.slice(-i.length) !== i ? s.push(o) : i = o, r = s.join("/"), r = r ? r + "/" : "", i = r + i;
-for (var u = s.length - 1; u >= 0; u--) if (s[u] == "source") {
-s.splice(u, 1);
+var a = s.pop() || s.pop() || "";
+a.slice(-i.length) !== i ? s.push(a) : i = a, r = s.join("/"), r = r ? r + "/" : "", i = r + i;
+for (o = s.length - 1; o >= 0; o--) if (s[o] == "source") {
+s.splice(o, 1);
 break;
 }
 n = s.join("/");
-for (var u = s.length - 1, a; a = s[u]; u--) if (a == "lib" || a == "enyo") {
-s = s.slice(u + 1);
+for (o = s.length - 1; u = s[o]; o--) if (u == "lib" || u == "enyo") {
+s = s.slice(o + 1);
 break;
 }
-for (var u = s.length - 1, a; a = s[u]; u--) (a == ".." || a == ".") && s.splice(u, 1);
+for (o = s.length - 1; u = s[o]; o--) (u == ".." || u == ".") && s.splice(o, 1);
 t = s.join("-");
 }
 return {
@@ -201,6 +201,7 @@ var t = parseInt(this.levels[e], 0);
 return t <= this.level;
 },
 _log: function(e, t) {
+if (typeof console == "undefined") return;
 var n = enyo.isArray(t) ? t : enyo.cloneArray(t);
 enyo.dumbConsole && (n = [ n.join(" ") ]);
 var r = console[e];
@@ -568,7 +569,7 @@ return this._componentNameMap[t] = Number(r), e.name = n;
 },
 addComponent: function(e) {
 var t = e.getName();
-t || (t = this.nameComponent(e)), this.$[t] && this.warn('Duplicate component name "' + t + '" in owner "' + this.id + '" violates unique-name-under-owner rule, replacing existing component in the hash and continuing, but this is an error condition and should be fixed.'), this.$[t] = e;
+t || (t = this.nameComponent(e)), this.$[t] && this.warn('Duplicate component name "' + t + '" in owner "' + this.id + '" violates ' + "unique-name-under-owner rule, replacing existing component in the hash and continuing, " + "but this is an error condition and should be fixed."), this.$[t] = e;
 },
 removeComponent: function(e) {
 delete this.$[e.getName()];
@@ -3251,7 +3252,7 @@ return !t && this.startEdges.left || t && this.startEdges.right;
 },
 drag: function(e, t) {
 if (this.listReordering) return !1;
-this.dragging && (t.preventDefault(), this.scrollLeft = this.scrollHorizontal ? this.calculateDragDistance(parseInt(this.getScrollLeft()), -1 * (t.pageX - this.prevX), this.leftBoundary, this.rightBoundary) : this.getScrollLeft(), this.scrollTop = this.scrollVertical ? this.calculateDragDistance(this.getScrollTop(), -1 * (t.pageY - this.prevY), this.topBoundary, this.bottomBoundary) : this.getScrollTop(), this.effectScroll(), this.scroll(), this.prevY = t.pageY, this.prevX = t.pageX, this.resetBoundaryX(), this.resetBoundaryY());
+this.dragging && (t.preventDefault(), this.scrollLeft = this.scrollHorizontal ? this.calculateDragDistance(parseInt(this.getScrollLeft(), 10), -1 * (t.pageX - this.prevX), this.leftBoundary, this.rightBoundary) : this.getScrollLeft(), this.scrollTop = this.scrollVertical ? this.calculateDragDistance(this.getScrollTop(), -1 * (t.pageY - this.prevY), this.topBoundary, this.bottomBoundary) : this.getScrollTop(), this.effectScroll(), this.scroll(), this.prevY = t.pageY, this.prevX = t.pageX, this.resetBoundaryX(), this.resetBoundaryY());
 },
 calculateDragDistance: function(e, t, n, r) {
 var i = e + t;
@@ -3348,8 +3349,8 @@ this.setScrollTop(-1 * t), this.setScrollLeft(-1 * e), this.start();
 },
 getOverScrollBounds: function() {
 return {
-overleft: Math.min(this.leftBoundary - -1 * this.scrollLeft, 0) || Math.max(this.rightBoundary - -1 * this.scrollLeft, 0),
-overtop: Math.min(this.topBoundary - -1 * this.scrollTop, 0) || Math.max(this.bottomBoundary - -1 * this.scrollTop, 0)
+overleft: Math.min(this.leftBoundary + this.scrollLeft, 0) || Math.max(this.rightBoundary + this.scrollLeft, 0),
+overtop: Math.min(this.topBoundary + this.scrollTop, 0) || Math.max(this.bottomBoundary + this.scrollTop, 0)
 };
 }
 });
@@ -3412,7 +3413,7 @@ for (var e = 0, t, n; t = this.osInfo[e]; e++) if (enyo.platform[t.os] < t.versi
 return !0;
 },
 getTouchStrategy: function() {
-return enyo.platform.android >= 3 ? "TranslateScrollStrategy" : enyo.platform.ios >= 5 ? "TransitionScrollStrategy" : "TouchScrollStrategy";
+return enyo.platform.android >= 3 ? "TranslateScrollStrategy" : "TouchScrollStrategy";
 }
 },
 controlParentName: "strategy",
