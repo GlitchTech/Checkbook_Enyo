@@ -82,12 +82,12 @@ enyo.kind( {
 	 */
 	handleRecurrenceSystem: function( data, autoTransfer, autoTransferLink ) {
 
-		var sqlArray = [];
+		var sql = [];
 
 		if( data['rObj'] != false ) {
 
 			if( ( isNaN( data['repeatId'] ) || data['repeatId'] < 0 ) && data['rObj']['frequency'] != "none" ) {
-				//New repeating transactions (check/handle)
+				//New recurrence event (check/handle)
 
 				data['repeatId'] = data['maxRepeatId'];
 
@@ -126,37 +126,21 @@ enyo.kind( {
 						"autoTransferLink": autoTransferLink
 					};
 
-				sqlArray = sqlArray.concat( this.generateSeriesSQL( [ enyo.clone( repeatInsert ) ] ) );
+				sql = sql.concat( this.generateSeriesSQL( [ enyo.clone( repeatInsert ) ] ) );
 
 				//Delete temp data from object
 				delete repeatInsert['maxItemId'];
 				delete repeatInsert['autoTransfer'];
 				delete repeatInsert['autoTransferLink'];
 
-				sqlArray.unshift( Checkbook.globals.gts_db.getInsert( "repeats", repeatInsert ) );
+				sql.unshift( Checkbook.globals.gts_db.getInsert( "repeats", repeatInsert ) );
 			} else if( data['repeatUnlinked'] != 1 ) {
-				//If transaction is not 'unlinked' from repeating series
+				//Existing recurrence event
 
 				if( data['rObj']['frequency'] == "none" ) {
 					//Delete repeating entry
 
-					sqlArray.push( Checkbook.globals.gts_db.getDelete( "repeats", { "repeatId": data['repeatId'] } ) );
-
-					//Delete future (after curr date) transactions with repeat id except for this one
-					var endOfDay = new Date();
-					endOfDay.setHours( 23, 59, 59, 999 );
-
-					sqlArray.push(
-							new GTS.databaseQuery(
-									{
-										'sql': "DELETE FROM transactions WHERE itemId != ? AND repeatId = ? AND date > ?" ,
-										'values': [ data['itemId'], data['repeatId'], Date.parse( endOfDay ) ]
-									}
-								)
-						);
-
-					//Set repeatId to null
-					data['repeatId'] = null;
+					sql.push( this._getDeleteFutureSQL( data['itemId'], data['repeatId'], true ) );
 				} else {
 					//Do existing repeating transactions
 
@@ -164,13 +148,15 @@ enyo.kind( {
 
 					//remember to set lastUpdated to null
 				}
+
+				this.log( sql );
 			}
 		}
 
 		delete data['rObj'];
 		delete data['maxRepeatId'];
 
-		return sqlArray;
+		return sql;
 	},
 
 	/**
@@ -479,25 +465,28 @@ enyo.kind( {
 	 */
 	deleteFuture: function( transactionId, recurrenceId, options ) {
 
-		Checkbook.globals.gts_db.queries(
-				[
-					//Decrement recurrence count
-					new GTS.databaseQuery(
-							{
-								'sql': "UPDATE repeats SET terminated = 1, currCount = MAX( ( ( SELECT sub.currCount FROM repeats sub WHERE sub.repeatId = repeats.repeatId ) - ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId ) ), 0 ) WHERE repeatId = ?" ,
-								'values': [ recurrenceId ]
-							}
-						),
-					//Delete this and future transactions
-					new GTS.databaseQuery(
-							{
-								'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( itemId = ? OR itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date >= transactions.date ) )" ,
-								'values': [ recurrenceId, transactionId ]
-							}
-						)
-				],
-				options
-			);
+		Checkbook.globals.gts_db.queries( this._getDeleteFutureSQL( transactionId, recurrenceId ), options );
+	},
+
+	/** @protected */
+	_getDeleteFutureSQL: function( transactionId, recurrenceId, onlyFuture ) {
+
+		return( [
+				//Decrement recurrence count
+				new GTS.databaseQuery(
+						{
+							'sql': "UPDATE repeats SET terminated = 1, currCount = MAX( ( ( SELECT sub.currCount FROM repeats sub WHERE sub.repeatId = repeats.repeatId ) - ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date " + ( onlyFuture ? ">" : ">=" ) + " ( SELECT trsn.date FROM transactions trsn WHERE trsn.itemId = ? ) ) ), 0 ) WHERE repeatId = ?" ,
+							'values': [ transactionId, recurrenceId ]
+						}
+					),
+				//Delete this and future transactions
+				new GTS.databaseQuery(
+						{
+							'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( itemId = ? OR itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + ( onlyFuture ? ">" : ">=" ) + " transactions.date ) )" ,
+							'values': [ recurrenceId, transactionId ]
+						}
+					)
+			]);
 	},
 
 	/**
