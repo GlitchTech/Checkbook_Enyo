@@ -18,12 +18,6 @@ enyo.kind({
 		}
 	],
 
-	/**
-	 * @protected recurrence variables
-	 */
-	seriesCountLimit: 3,
-	seriesDayLimit: 45,
-
 	/** @protected */
 	constructor: function() {
 

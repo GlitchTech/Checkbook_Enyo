@@ -1190,8 +1190,6 @@ enyo.kind( {
 		//this.trsnObj['repeatUnlinked']//Not linked to rest of series
 		this.trsnObj['rObj'] = this.$['recurrenceSelect'].getValue();
 
-		this.log( "Recurrence:", this.trsnObj['rObj'], this.trsnObj['repeatId'], this.trsnObj['repeatUnlinked'] );
-
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );
 		this.trsnObj['autoTransferLink'] = this.accountObj['auto_savings_link'];
 	},
