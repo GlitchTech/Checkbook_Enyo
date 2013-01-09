@@ -13,8 +13,7 @@ enyo.kind({
 	components: [
 		{
 			name: "recurrence",
-			kind: "Checkbook.transactions.recurrence.manager",
-			onRequestInsertTransactionSQL: "generateInsertTransactionSQL"
+			kind: "Checkbook.transactions.recurrence.manager"
 		}
 	],
 
@@ -68,7 +67,7 @@ enyo.kind({
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
 		Checkbook.globals.gts_db.queries(
-				this.generateInsertTransactionSQL( null, { "data": data, "type": type } ),
+				this.generateInsertTransactionSQL( { "data": data, "type": type } ),
 				options
 			);
 	},
@@ -81,7 +80,7 @@ enyo.kind({
 	 * @param {object}	inEvent.data	Object to be readied; Source object is not modified by function
 	 * @param {string}	inEvent.type	Type of transaction; used to determine setting of amount;
 	 */
-	generateInsertTransactionSQL: function( inSender, inEvent ) {
+	generateInsertTransactionSQL: function( inEvent ) {
 
 		//Copy object to break pass by reference link
 		var data = enyo.clone( inEvent['data'] );
@@ -300,7 +299,7 @@ enyo.kind({
 		data['desc'] = ( ( data['desc'] === "" || data['desc'] === null ) ? "Description" : data['desc'] );
 		data['cleared'] = ( data['cleared'] ? 1 : 0 );
 
-		data['amount'] = ( GTS.Object.isNumber( data['amount'] ) ? 0 : Number( data['amount'] ).toFixed( 2 ).valueOf() );
+		data['amount'] = Number( data['amount'] ).toFixed( 2 ).valueOf();
 
 		data['date'] = Date.parse( data['date'] );
 

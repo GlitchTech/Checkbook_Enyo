@@ -10,6 +10,9 @@ enyo.kind( {
 	name: "Checkbook.transactions.recurrence.manager",
 	kind: "enyo.Component",
 
+	seriesCountLimit: 3,
+	seriesDayLimit: 45,
+
 	events: {
 		onRequestInsertTransactionSQL: ""
 	},
@@ -83,7 +86,7 @@ enyo.kind( {
 
 		if( data['rObj'] != false ) {
 
-			if( ( !data['repeatId'] || data['repeatId'] < 0 ) && data['rObj']['frequency'] != "none" ) {
+			if( ( isNaN( data['repeatId'] ) || data['repeatId'] < 0 ) && data['rObj']['frequency'] != "none" ) {
 				//New repeating transactions (check/handle)
 
 				data['repeatId'] = data['maxRepeatId'];
@@ -186,8 +189,6 @@ enyo.kind( {
 		var now = new Date();
 		var dayStart = new Date( now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0 );
 		var dayLimit = new Date( now.getFullYear(), now.getMonth(), ( now.getDate() + this.seriesDayLimit ), 23, 59, 59, 999 );
-
-		this.generateSeriesSQL( REPEAT_DATA_ARRAY );
 
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
@@ -360,33 +361,24 @@ enyo.kind( {
 						"desc": repeatArray[i]['rep_desc'],
 
 						"note": repeatArray[i]['rep_note'],
-						"date": Date.parse( serDate ),
+						"date": serDate,
 
 						"amount": repeatArray[i]['rep_amount'],
-
 						"amount_old": "NOT_A_VALUE",
 
-
 						"linkedRecord": -1,
-//set elsewhere
 						"linkedAccount": repeatArray[i]['rep_linkedAcctId'],
-
 
 						"cleared": false,
 
 						"checkNum": "",
 
-
 						"category": repeatArray[i]['rep_category'],
-
 						"category2": "",
 
-
 						"rObj": false,
-//do not calculate repeats for this event
 
 						"autoTransfer": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransfer'] : 0 ),
-
 						"autoTransferLink": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransferLink'] : -1 )
 					};
 
@@ -401,7 +393,7 @@ enyo.kind( {
 						type = "income";
 					}
 
-					sql = sql.concat( this.doRequestInsertTransactionSQL( { "data": trsnData, "type": type } ) );
+					sql = sql.concat( Checkbook.globals.transactionManager.generateInsertTransactionSQL( { "data": trsnData, "type": type } ) );
 
 					serCount++;
 					maxItemId += ( ( GTS.Object.validNumber( repeatArray[i]['linkedAccount'] ) && repeatArray[i]['linkedAccount'] >= 0 ) ? 2 : 1 );
