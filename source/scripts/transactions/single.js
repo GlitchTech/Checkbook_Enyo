@@ -525,7 +525,7 @@ enyo.kind( {
 					transactionId: this.transaction['itemId'],
 					recurrenceId: this.transaction['repeatId'],
 
-					onFinish: "deleteTransactionConfirmClose",
+					onFinish: "deleteTransactionHandler",
 					onCancel: "deleteTransactionConfirmClose"
 				});
 		} else {
