@@ -108,7 +108,7 @@ enyo.kind( {
 						"currCount": 1,
 
 						//Original data
-						"origDate": data['rObj']['startDate'],
+						"origDate": data['rObj']['origDate'],
 						"rep_desc": data['desc'],
 						"rep_amount": data['amount'],
 						"rep_note": data['note'],

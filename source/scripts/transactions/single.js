@@ -563,7 +563,7 @@ enyo.kind( {
 
 		this.deleteTransactionConfirmClose();
 
-		this.doDelete( { "rowIndex": this.index } );
+		this.doDelete( { "rowIndex": this.index, "recurrence": ( this.transaction['repeatId'] > 0 || this.transaction['repeatId'] === 0 ) } );
 		enyo.asyncMethod( this, this.hide );
 	}
 });

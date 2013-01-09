@@ -765,6 +765,14 @@ results = {
 		//update database;
 		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
 
+		if( inEvent['recurrence'] ) {
+
+			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
+
+			this.reloadTransactionList();
+			return;
+		}
+
 		var balChanged = this.transactions[rowIndex]['amount'];
 		this.transactions.splice( rowIndex, 1 );
 
