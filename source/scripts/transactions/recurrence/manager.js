@@ -115,34 +115,31 @@ enyo.kind( {
 						"rep_category": enyo.json.stringify( data['category'] ),
 						"rep_acctId": data['account'],
 						"rep_linkedAcctId": data['linkedAccount'],
-						"rep_autoTrsnLink": ( ( autoTransfer > 0 && autoTransferLink >= 0 ) ? 1 : 0 ),
+						"rep_autoTrsnLink": ( ( autoTransfer > 0 && autoTransferLink >= 0 ) ? autoTransfer : 0 ),
+						"rep_autoTrsnLinkAcct": ( ( autoTransfer > 0 && autoTransferLink >= 0 ) ? autoTransferLink : "" ),
 
 						//Sync system information
 						"last_sync": "",
 
 						//Temp data
-						"maxItemId": ( ( GTS.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['itemId'] + 2 : data['itemId'] + 1 ),
-						"autoTransfer": autoTransfer,
-						"autoTransferLink": autoTransferLink
+						"maxItemId": ( ( GTS.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['itemId'] + 2 : data['itemId'] + 1 )
 					};
 
 				sql = sql.concat( this.generateSeriesSQL( [ enyo.clone( repeatInsert ) ] ) );
 
 				//Delete temp data from object
 				delete repeatInsert['maxItemId'];
-				delete repeatInsert['autoTransfer'];
-				delete repeatInsert['autoTransferLink'];
 
 				sql.unshift( Checkbook.globals.gts_db.getInsert( "repeats", repeatInsert ) );
 			} else if( data['repeatUnlinked'] != 1 ) {
 				//Existing recurrence event
 
 				if( data['rObj']['frequency'] == "none" ) {
-					//Delete repeating entry
+					//End recurrence event
 
 					sql.push( this._getDeleteFutureSQL( data['itemId'], data['repeatId'], true ) );
 				} else {
-					//Do existing repeating transactions
+					//Modify recurrence event
 
 					//TODO
 
@@ -179,6 +176,8 @@ enyo.kind( {
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 					{
+						//Need max trsn ID
+						//SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId
 						'sql': "SELECT * " +
 							"FROM repeats " +
 							"WHERE " +
@@ -214,7 +213,10 @@ enyo.kind( {
 									"lastUpdated < ? OR " +
 									"lastUpdate IS NULL OR " +
 									"lastUpdate = '' " +
-								")",
+								")" +
+
+								//Terminated Check
+								"AND terminated != 1",
 						'values': [
 							acctId,
 							Date.parse( dayLimit ),
@@ -228,13 +230,7 @@ enyo.kind( {
 
 						Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
 					},
-					"onError": function() {
-
-						if( enyo.isFunction( options['onError'] ) ) {
-
-							options['onError']();
-						}
-					}
+					"onError": options['onError']
 				}
 			);
 	},
@@ -364,8 +360,8 @@ enyo.kind( {
 
 						"rObj": false,
 
-						"autoTransfer": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransfer'] : 0 ),
-						"autoTransferLink": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransferLink'] : -1 )
+						"autoTransfer": repeatArray[i]['rep_autoTrsnLink'],
+						"autoTransferLink": ( repeatArray[i]['rep_autoTrsnLink'] > 0 ? repeatArray[i]['rep_autoTrsnLinkAcct'] : -1 )
 					};
 
 					if( GTS.Object.validNumber( repeatArray[i]['rep_linkedAcctId'] ) && repeatArray[i]['rep_linkedAcctId'] >= 0 ) {

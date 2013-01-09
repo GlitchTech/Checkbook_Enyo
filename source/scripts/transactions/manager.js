@@ -92,7 +92,7 @@ enyo.kind({
 		//Prepare data
 		var sql = this._prepareData( data, inEvent['type'] );
 
-		//Handle repeating system
+		//Handle recurrence events
 		sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data, autoTransfer, autoTransferLink ) );
 
 		//Handle split transactions
@@ -249,17 +249,13 @@ enyo.kind({
 
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
-		//Save data about auto transfer system
-		var autoTransfer = data['autoTransfer'];
-		var autoTransferLink = data['autoTransferLink'];
-
 		//Prepare data
 		var sql = this._prepareData( data, type );
 
-		if( options['changes'] ) {
+		if( options['changes'] && data['repeatUnlinked'] != 1 ) {
+			//Handle recurrence events
 
-			//Handle repeating system
-			sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data, autoTransfer, autoTransferLink ) );
+			sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data ) );
 		}
 
 		//Handle split transactions

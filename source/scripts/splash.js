@@ -160,7 +160,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 29;
+		this.versionCheck = 30;
 
 		if( currVersion == this.versionCheck ) {
 
@@ -825,7 +825,11 @@ enyo.kind({
 				querySet.push( "ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;" );
 
 				this.versionCheck = 29;
-			case 28:
+			case 29:
+				querySet.push( "ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;" );
+
+				this.versionCheck = 30;
+			case 30:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );
