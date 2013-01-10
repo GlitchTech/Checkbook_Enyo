@@ -88,6 +88,12 @@ enyo.kind( {
 
 				data['repeatId'] = data['maxRepeatId'];
 
+				if( data['rObj']['frequency'] == "weekly" && data['rObj']['daysOfWeek'].length == 0 ) {
+					//Bad data, abort
+
+					return [];
+				}
+
 				var repeatInsert = {
 						"repeatId": data['repeatId'],
 
@@ -164,29 +170,28 @@ enyo.kind( {
 	 */
 	updateSeriesTransactions: function( acctId, options ) {
 
-		acctId = acctId || -1;
-
 		var now = new Date();
-		var dayStart = new Date( now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0 );
 		var dayLimit = new Date( now.getFullYear(), now.getMonth(), ( now.getDate() + Checkbook.globals.prefs['seriesDayLimit'] ), 23, 59, 59, 999 );
+
+		acctId = acctId || -1;
 
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 					{
-						'sql': "SELECT SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * " +
+						'sql': "SELECT ( SELECT IFNULL( ( MAX( itemId ) + 1 ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * " +
 							"FROM repeats " +
 							"WHERE " +
 								//Account ID
 								"( " +
 									"rep_acctId = ? " +
-									( acctId >= 0 ? "OR 1 = 1 " : "" ) +//Ignore account id if not set
+									( acctId < 0 ? "OR 1 = 1 " : "" ) +//Ignore account id if not set
 								") " +
 
 								//Under date limit
-								"lastOccurrence < ? " +
+								"AND lastOccurrence < ? " +
 
 								//Under count limit
-								" AND currCount < ? " +
+								"AND ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date > ? ) < ? " +
 
 								//Ending condition checks
 								"AND ( " +
@@ -203,31 +208,35 @@ enyo.kind( {
 										") " +
 									") " +
 
-								//Last data update check
-								"AND ( " +
-									"lastUpdated < ? OR " +
-									"lastUpdate IS NULL OR " +
-									"lastUpdate = '' " +
-								")" +
-
 								//Terminated Check
 								"AND terminated != 1",
 						'values': [
 							acctId,
 							Date.parse( dayLimit ),
-							Checkbook.globals.prefs['seriesCountLimit'],
-							Date.parse( dayStart )
+							Date.parse( now ),
+							Checkbook.globals.prefs['seriesCountLimit']
 						]
 					}
 				),
 				{
-					"onSuccess": function( results ) {
-
-						Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
-					},
+					"onSuccess": enyo.bind( this, this._updateSeriesTransactionsHandler, options ),
 					"onError": options['onError']
 				}
 			);
+	},
+
+	/** @protected */
+	_updateSeriesTransactionsHandler: function( options, results ) {
+
+		if( results.length > 0 ) {
+
+			this.log( this.generateSeriesSQL( results ) );
+
+			Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
+		} else if( enyo.isFunction( options['onSuccess'] ) ) {
+
+			options['onSuccess']();
+		}
 	},
 
 	/**
@@ -259,16 +268,17 @@ enyo.kind( {
 			//Cycle and create SQL
 			for( var i = 0; i < repeatArray.length; i++ ) {
 
-				serDate = new Date( repeatArray[i]['lastOccurrence'] );
+				lastOccurrence = new Date( parseInt( repeatArray[i]['lastOccurrence'] ) );
+				serDate = new Date( parseInt( repeatArray[i]['lastOccurrence'] ) );
 				serCount = repeatArray[i]['currCount'];
 
 				//Reduce calls to parse function
-				repeatArray[i]['rep_category'] = enyo.json.parse( repeatArray[i]['rep_category'] );
-				repeatArray[i]['daysOfWeek'] = enyo.json.parse( repeatArray[i]['daysOfWeek'] );
+				var category = enyo.json.parse( repeatArray[i]['rep_category'] );
+				var daysOfWeek = enyo.json.parse( repeatArray[i]['daysOfWeek'] );
 
 				while(
 						//Under date limit
-						Math.floor( ( serDate - new Date( repeatArray[i]['lastOccurrence'] ) ) / ( 1000 * 60 * 60 * 24 ) ) < Checkbook.globals.prefs['seriesDayLimit']
+						Math.floor( ( serDate - lastOccurrence ) / ( 1000 * 60 * 60 * 24 ) ) < Checkbook.globals.prefs['seriesDayLimit']
 
 						//Under count limit
 						&& ( serCount - repeatArray[i]['currCount'] ) < Checkbook.globals.prefs['seriesCountLimit']
@@ -295,11 +305,9 @@ enyo.kind( {
 						serDate.setDate( serDate.getDate() + 1 * repeatArray[i]['itemSpan'] );
 					} else if( repeatArray[i]['frequency'] == "weekly" ) {
 
-						//repeatArray[i]['daysOfWeek'] -- array of days repeat occurs on
+						var day = daysOfWeek.indexOf( serDate.getDay() );
 
-						var day = repeatArray[i]['daysOfWeek'].indexOf( serDate.getDay() );
-
-						if( day < 0 || ( day + 1 ) >= repeatArray[i]['daysOfWeek'].length ) {
+						if( day < 0 || ( day + 1 ) >= daysOfWeek.length ) {
 
 							while( serDate.getDay() > 0 ) {
 								//Increment date until next week (0)
@@ -307,7 +315,7 @@ enyo.kind( {
 								serDate.setDate( serDate.getDate() + 1 );
 							}
 
-							while( serDate.getDay() < 7 && serDate.getDay() != repeatArray[i]['daysOfWeek'][0] ) {
+							while( serDate.getDay() < 7 && serDate.getDay() != daysOfWeek[0] ) {
 								//Increment date until first event of next week
 
 								serDate.setDate( serDate.getDate() + 1 );
@@ -318,8 +326,7 @@ enyo.kind( {
 						} else {
 
 							//Now + ( number of days between now and next event day )
-							serDate.setDate( serDate.getDate() + ( repeatArray[i]['daysOfWeek'][day + 1] - repeatArray[i]['daysOfWeek'][day] ) );
-							day++
+							serDate.setDate( serDate.getDate() + ( daysOfWeek[day + 1] - daysOfWeek[day] ) );
 						}
 					} else if( repeatArray[i]['frequency'] == "monthly" ) {
 
@@ -350,7 +357,7 @@ enyo.kind( {
 
 						"checkNum": "",
 
-						"category": repeatArray[i]['rep_category'],
+						"category": category,
 						"category2": "",
 
 						"rObj": false,
@@ -389,6 +396,11 @@ enyo.kind( {
 								}
 							)
 					);
+			}
+
+			if( sql.length > 0 ) {
+
+				Checkbook.globals.accountManager.updateAccountModTime();
 			}
 		}
 

@@ -165,7 +165,6 @@ enyo.kind( {
 						}
 					]
 				}, {
-					showing: false,
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
@@ -185,12 +184,18 @@ enyo.kind( {
 							onSelect: "functionSelected",
 							components: [
 								{
+									content: "Refresh",
+									value: "refresh"
+								}, {
+									showing: false,
 									content: "Purge Transactions",
 									value: "purge"
 								}, {
+									showing: false,
 									content: "Combine Transactions",
 									value: "combine"
 								}, {
+									showing: false,
 									content: "Clear Multiple Transactions",
 									value: "clear"
 								}
@@ -253,8 +258,6 @@ enyo.kind( {
 	},
 
 	viewAccount: function( inSender, inEvent ) {
-
-		inEvent['force'] = typeof( inEvent['force'] ) !== 'undefined' ? inEvent['force'] : false;
 
 		if( !inEvent['account'] || !inEvent['account']['acctId'] ) {
 
@@ -347,7 +350,7 @@ enyo.kind( {
 
 		this.account = {};
 
-		this.$['entries'].reloadSystem();
+		this.$['entries'].unloadSystem();
 
 		this.$['header'].hide();
 		this.$['footer'].hide();
@@ -605,7 +608,34 @@ enyo.kind( {
 
 	functionSelected: function( inSender, inEvent ) {
 
-		this.log( inEvent.selected );
+		if( inEvent.content.toLowerCase() === "refresh" ) {
+
+			var acctId = this.account['acctId'];
+
+			Checkbook.globals.transactionManager.$['recurrence'].updateSeriesTransactions(
+					acctId,
+					{
+						"onSuccess": function() {
+
+							Checkbook.globals.accountManager.fetchAccount(
+									acctId,
+									{
+										"onSuccess": function( account ) {
+
+											enyo.Signals.send( "viewAccount", { "account": account, "force": true } );
+										}
+									}
+								);
+						}
+					}
+				);
+
+			return true;
+		} else {
+
+			this.log( inEvent.selected );
+			return true;
+		}
 	},
 
 	/* Transaction & List Control */

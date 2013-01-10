@@ -189,12 +189,13 @@ enyo.kind({
 
 			Checkbook.globals.prefs['custom_sort'] = results[0]['custom_sort'];
 
-			//Check for recurring updates using the repeating system
 			this.$['message'].setContent( "Updating transaction data..." );
 			this.$['splashProgress'].animateProgressTo( 85 );
-			//this.repeat_updateAll( enyo.bind( this, this.splashFinished ) );
 
-			this.splashFinished();//Temp until repeat system is in place
+			enyo.asyncMethod(
+					this,
+					this.doFinish
+				);
 		} else if( currVersion >= 1 ) {
 
 			this.log( "DB out of date, preparing to update: " + currVersion + " to " + this.versionCheck );
@@ -206,19 +207,6 @@ enyo.kind({
 
 			this.buildInitialDB();
 		}
-	},
-
-	splashFinished: function() {
-
-		this.log();
-
-		this.$['splashProgress'].animateProgressTo( 100 );
-
-		//Slight delay to allow for system lag
-		enyo.asyncMethod(
-				this,
-				this.doFinish
-			);
 	},
 
 	buildInitialDB: function() {

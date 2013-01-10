@@ -188,7 +188,8 @@ enyo.kind( {
 		this.log();
 
 		this.account = {};
-		this.$['list'].empty();
+		this.$['list'].setCount( 0 );
+		this.$['list'].reset();
 	},
 
 	reloadSystem: function() {
