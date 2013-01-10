@@ -10,9 +10,6 @@ enyo.kind( {
 	name: "Checkbook.transactions.recurrence.manager",
 	kind: "enyo.Component",
 
-	seriesCountLimit: 3,
-	seriesDayLimit: 45,
-
 	events: {
 		onRequestInsertTransactionSQL: ""
 	},
@@ -171,14 +168,12 @@ enyo.kind( {
 
 		var now = new Date();
 		var dayStart = new Date( now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0 );
-		var dayLimit = new Date( now.getFullYear(), now.getMonth(), ( now.getDate() + this.seriesDayLimit ), 23, 59, 59, 999 );
+		var dayLimit = new Date( now.getFullYear(), now.getMonth(), ( now.getDate() + Checkbook.globals.prefs['seriesDayLimit'] ), 23, 59, 59, 999 );
 
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 					{
-						//Need max trsn ID
-						//SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId
-						'sql': "SELECT * " +
+						'sql': "SELECT SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * " +
 							"FROM repeats " +
 							"WHERE " +
 								//Account ID
@@ -220,7 +215,7 @@ enyo.kind( {
 						'values': [
 							acctId,
 							Date.parse( dayLimit ),
-							this.seriesCountLimit,
+							Checkbook.globals.prefs['seriesCountLimit'],
 							Date.parse( dayStart )
 						]
 					}
@@ -273,10 +268,10 @@ enyo.kind( {
 
 				while(
 						//Under date limit
-						Math.floor( ( serDate - new Date( repeatArray[i]['lastOccurrence'] ) ) / ( 1000 * 60 * 60 * 24 ) ) < this.seriesDayLimit
+						Math.floor( ( serDate - new Date( repeatArray[i]['lastOccurrence'] ) ) / ( 1000 * 60 * 60 * 24 ) ) < Checkbook.globals.prefs['seriesDayLimit']
 
 						//Under count limit
-						&& ( serCount - repeatArray[i]['currCount'] ) < this.seriesCountLimit
+						&& ( serCount - repeatArray[i]['currCount'] ) < Checkbook.globals.prefs['seriesCountLimit']
 
 						//Ending condition checks
 						&& (

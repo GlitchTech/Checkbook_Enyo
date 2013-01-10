@@ -26,6 +26,7 @@ enyo.depends(
 	"$lib/gts-plugins/SelectedMenu",
 	"$lib/gts-plugins/InlineNotification",
 	"$lib/gts-plugins/IntegerPicker",
+	"$lib/gts-plugins/IntegerPickerBar",
 	"$lib/gts-plugins/DatePicker",
 	"$lib/gts-plugins/TimePicker",
 	"$lib/gts-plugins/DecimalInput",

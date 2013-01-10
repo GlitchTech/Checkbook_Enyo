@@ -184,6 +184,9 @@ enyo.kind({
 
 			Checkbook.globals.prefs['alwaysFullCalendar'] = results[0]['alwaysFullCalendar'];
 
+			Checkbook.globals.prefs['seriesCountLimit'] = results[0]['seriesCountLimit'];
+			Checkbook.globals.prefs['seriesDayLimit'] = results[0]['seriesDayLimit'];
+
 			Checkbook.globals.prefs['custom_sort'] = results[0]['custom_sort'];
 
 			//Check for recurring updates using the repeating system
@@ -823,10 +826,12 @@ enyo.kind({
 				this.versionCheck = 28;
 			case 28:
 				querySet.push( "ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;" );
+				querySet.push( "ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;" );
 
 				this.versionCheck = 29;
 			case 29:
-				querySet.push( "ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;" );
+				querySet.push( "ALTER TABLE prefs ADD COLUMN seriesCountLimit INTEGER NOT NULL DEFAULT 3;" );
+				querySet.push( "ALTER TABLE prefs ADD COLUMN seriesDayLimit INTEGER NOT NULL DEFAULT 45;" );
 
 				this.versionCheck = 30;
 			case 30:
