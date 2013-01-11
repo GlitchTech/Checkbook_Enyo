@@ -432,8 +432,7 @@ enyo.kind( {
 			return false;
 		}
 
-
-		if( index >= 0 && this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
+		if( index >= 0 && this.account['itemCount'] >= this.$['list'].getCount() && !this.transactions[index] ) {
 
 			this.doLoadingStart();
 
