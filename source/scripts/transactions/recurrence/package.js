@@ -2,6 +2,7 @@
 
 enyo.depends(
 	"manager.js",
+	"confirm.js",
 	"delete.js",
 	"select.js"
 );

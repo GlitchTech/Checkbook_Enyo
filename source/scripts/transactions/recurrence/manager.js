@@ -461,7 +461,7 @@ enyo.kind( {
 
 	/**
 	 * @public
-	 * Deletes single recurring event item
+	 * Deletes single recurring event item and all that follow it
 	 *
 	 * @param int	transactionId	ID of transaction
 	 * @param int	recurrenceId	ID of recurrence event
@@ -473,6 +473,22 @@ enyo.kind( {
 	deleteFuture: function( transactionId, recurrenceId, options ) {
 
 		Checkbook.globals.gts_db.queries( this._getDeleteFutureSQL( transactionId, recurrenceId ), options );
+	},
+
+	/**
+	 * @public
+	 * Deletes all following event items
+	 *
+	 * @param int	transactionId	ID of transaction
+	 * @param int	recurrenceId	ID of recurrence event
+	 *
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 */
+	deleteOnlyFuture: function( transactionId, recurrenceId, options ) {
+
+		Checkbook.globals.gts_db.queries( this._getDeleteFutureSQL( transactionId, recurrenceId, true ), options );
 	},
 
 	/** @protected */
@@ -498,7 +514,7 @@ enyo.kind( {
 
 	/**
 	 * @public
-	 * Deletes single recurring event item
+	 * Deletes all recurring event items
 	 *
 	 * @param int	id	ID of recurrence event
 	 *
