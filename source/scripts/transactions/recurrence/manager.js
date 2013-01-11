@@ -230,8 +230,6 @@ enyo.kind( {
 
 		if( results.length > 0 ) {
 
-			this.log( this.generateSeriesSQL( results ) );
-
 			Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
 		} else if( enyo.isFunction( options['onSuccess'] ) ) {
 
@@ -260,14 +258,12 @@ enyo.kind( {
 			var now = new Date();
 
 			//Cycle variables for content
-			var trsnData;
-			var serDate;
-			var serCount;
-			var type;
+			var trsnData, origDate, lastOccurrence, serDate, serCount, type;
 
 			//Cycle and create SQL
 			for( var i = 0; i < repeatArray.length; i++ ) {
 
+				origDate = new Date( parseInt( repeatArray[i]['origDate'] ) );
 				lastOccurrence = new Date( parseInt( repeatArray[i]['lastOccurrence'] ) );
 				serDate = new Date( parseInt( repeatArray[i]['lastOccurrence'] ) );
 				serCount = repeatArray[i]['currCount'];
@@ -330,7 +326,15 @@ enyo.kind( {
 						}
 					} else if( repeatArray[i]['frequency'] == "monthly" ) {
 
+						//Get larger day of month
+						var dom = Math.max( serDate.getDate(), origDate.getDate() );
+
+						//Advance month by itemSpan
+						serDate.setDate( 1 );
 						serDate.setMonth( serDate.getMonth() + 1 * repeatArray[i]['itemSpan'] );
+
+						//Restore day of month
+						serDate.setDate( Math.min( dom, serDate.daysInMonth() ) );
 					} else if( repeatArray[i]['frequency'] == "yearly" ) {
 
 						serDate.setYear( serDate.getFullYear() + 1 * repeatArray[i]['itemSpan'] );
