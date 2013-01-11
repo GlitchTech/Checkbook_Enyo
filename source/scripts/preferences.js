@@ -7,6 +7,8 @@ enyo.kind({
 
 	style: "height: 100%;",
 
+	systemReady: false,
+
 	events: {
 		onFinish: ""
 	},
@@ -195,21 +197,16 @@ enyo.kind({
 									]
 								}, {
 									*/
-									kind: "onyx.Item",
-									components: [
-										{
-											name: "defaultAccount",
-											kind: "GTS.SelectorBar",
+									name: "defaultAccount",
+									kind: "GTS.SelectorBar",
 
-											disabled: true,
+									disabled: true,
 
-											label: "Default Account",
-											onChange: "updateDefaultAccount",
+									label: "Default Account",
+									onChange: "updateDefaultAccount",
 
-											value: 0,
-											choices: []
-										}
-									]
+									value: 0,
+									choices: []
 								}, {
 									kind: "onyx.Item",
 									components: [
@@ -224,6 +221,38 @@ enyo.kind({
 											ontap: "addAccount"
 										}
 									]
+								}
+							]
+						}, {
+							kind: "onyx.Groupbox",
+							classes: "margin-top",
+							components: [
+								{
+									kind: "onyx.GroupboxHeader",
+									content: "Recurrence Options"
+								}, {
+									name: "seriesCountLimit",
+									kind: "GTS.IntegerPickerBar",
+
+									min: 1,
+									max: 15,
+
+									label: "Series Occurrence Limit",
+									sublabel: "Maximum number of times an event will be created within the date limit.",
+
+									onChange: "updateSeriesCountLimit"
+								}, {
+									name: "seriesDayLimit",
+									kind: "GTS.IntegerPickerBar",
+
+									min: 5,
+									max: 150,
+									step: 5,
+
+									label: "Series Day Limit",
+									sublabel: "Maximum number of days from today a recurrence event will be created..",
+
+									onChange: "updateSeriesDayLimit"
 								}
 							]
 						}, {
@@ -322,10 +351,15 @@ enyo.kind({
 
 		//this.$['entries'].renderAccountList();
 
+		this.$['seriesDayLimit'].setValue( Checkbook.globals.prefs['seriesDayLimit'] );
+		this.$['seriesCountLimit'].setValue( Checkbook.globals.prefs['seriesCountLimit'] );
+
 		this.inherited( arguments );
 
 		this.$['header'].addRemoveClass( "text-left", enyo.Panels.isScreenNarrow() );
 		this.$['header'].addRemoveClass( "text-center", !enyo.Panels.isScreenNarrow() );
+
+		this.systemReady = true;
 	},
 
 	/** PIN Controls **/
@@ -392,11 +426,15 @@ enyo.kind({
 
 	updateTransPreview: function( inSender, inEvent ) {
 
+		if( !this.systemReady ) { return true; }
+
 		Checkbook.globals.prefs['transPreview'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "previewTransaction": Checkbook.globals.prefs['transPreview'] }, {} ) );
 	},
 
 	updateUpdateNotice: function( inSender, inEvent ) {
+
+		if( !this.systemReady ) { return true; }
 
 		Checkbook.globals.prefs['updateCheckNotification'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "updateCheckNotification": Checkbook.globals.prefs['updateCheckNotification'] }, {} ) );
@@ -404,11 +442,15 @@ enyo.kind({
 
 	updateErrorReporting: function( inSender, inEvent ) {
 
+		if( !this.systemReady ) { return true; }
+
 		Checkbook.globals.prefs['errorReporting'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "errorReporting": Checkbook.globals.prefs['errorReporting'] }, {} ) );
 	},
 
 	updateDispColor: function( inSender, inEvent ) {
+
+		if( !this.systemReady ) { return true; }
 
 		Checkbook.globals.prefs['dispColor'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "dispColor": Checkbook.globals.prefs['dispColor'] }, {} ) );
@@ -416,8 +458,28 @@ enyo.kind({
 
 	updateAlwaysFullCalendar: function( inSender, inEvent ) {
 
+		if( !this.systemReady ) { return true; }
+
 		Checkbook.globals.prefs['alwaysFullCalendar'] = ( inEvent.value ? 1 : 0 );
 		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "alwaysFullCalendar": Checkbook.globals.prefs['alwaysFullCalendar'] }, {} ) );
+	},
+
+	/** Recurrence Controls **/
+
+	updateSeriesCountLimit: function( inSender, inEvent ) {
+
+		if( !this.systemReady ) { return true; }
+
+		Checkbook.globals.prefs['seriesCountLimit'] = inEvent.value;
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "seriesCountLimit": Checkbook.globals.prefs['seriesCountLimit'] }, {} ) );
+	},
+
+	updateSeriesDayLimit: function( inSender, inEvent ) {
+
+		if( !this.systemReady ) { return true; }
+
+		Checkbook.globals.prefs['seriesDayLimit'] = inEvent.value;
+		Checkbook.globals.gts_db.query( Checkbook.globals.gts_db.getUpdate( "prefs", { "seriesDayLimit": Checkbook.globals.prefs['seriesDayLimit'] }, {} ) );
 	},
 
 	/** Account Controls **/

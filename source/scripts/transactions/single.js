@@ -516,22 +516,37 @@ enyo.kind( {
 
 	deleteClicked: function() {
 
-		this.createComponent( {
-				name: "deleteTransactionConfirm",
-				kind: "gts.ConfirmDialog",
+		if( this.transaction['repeatId'] > 0 || this.transaction['repeatId'] === 0 ) {
 
-				title: "Delete Transaction",
-				message: "Are you sure you want to delete this transaction?",
+			this.createComponent( {
+					name: "deleteTransactionConfirm",
+					kind: "Checkbook.transactions.recurrence.delete",
 
-				confirmText: "Delete",
-				confirmClass: "onyx-negative",
+					transactionId: this.transaction['itemId'],
+					recurrenceId: this.transaction['repeatId'],
 
-				cancelText: "Cancel",
-				cancelClass: "",
+					onFinish: "deleteTransactionHandler",
+					onCancel: "deleteTransactionConfirmClose"
+				});
+		} else {
 
-				onConfirm: "deleteTransactionHandler",
-				onCancel: "deleteTransactionConfirmClose"
-			});
+			this.createComponent( {
+					name: "deleteTransactionConfirm",
+					kind: "gts.ConfirmDialog",
+
+					title: "Delete Transaction",
+					message: "Are you sure you want to delete this transaction?",
+
+					confirmText: "Delete",
+					confirmClass: "onyx-negative",
+
+					cancelText: "Cancel",
+					cancelClass: "",
+
+					onConfirm: "deleteTransactionHandler",
+					onCancel: "deleteTransactionConfirmClose"
+				});
+		}
 
 		this.hide( true );
 		this.$['deleteTransactionConfirm'].show();
@@ -548,7 +563,7 @@ enyo.kind( {
 
 		this.deleteTransactionConfirmClose();
 
-		this.doDelete( { "rowIndex": this.index } );
+		this.doDelete( { "rowIndex": this.index, "recurrence": ( this.transaction['repeatId'] > 0 || this.transaction['repeatId'] === 0 ) } );
 		enyo.asyncMethod( this, this.hide );
 	}
 });
