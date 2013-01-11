@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class GTSCBDBHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 16;
+	private static final int DATABASE_VERSION = 25;
 	private static final String DATABASE_NAME = "glitchtechsciencecheckbook";
 
 	public GTSCBDBHelper( Context context ) {

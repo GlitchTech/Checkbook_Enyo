@@ -7096,6 +7096,137 @@ this.addRemoveClass("no-image", !this.icon);
 }
 });
 
+// IntegerPicker.js
+
+enyo.kind({
+name: "GTS.IntegerPicker",
+kind: "onyx.Picker",
+classes: "gts-integer-picker",
+published: {
+min: 1,
+max: 10,
+step: 1,
+value: null
+},
+events: {
+onChange: ""
+},
+handlers: {
+onChange: "selectionChanged"
+},
+create: function() {
+this.inherited(arguments), this.generateValues();
+},
+minChanged: function() {
+this.generateValues();
+},
+maxChanged: function() {
+this.generateValues();
+},
+stepChanged: function() {
+this.generateValues();
+},
+generateValues: function() {
+this.destroyClientControls();
+if (this.value == null || isNaN(this.value)) this.value = this.min;
+var e = [];
+for (var t = this.min; t <= this.max; ) e.push({
+content: t,
+active: t == this.value
+}), t += this.step;
+this.createComponents(e, {
+owner: this
+}), this.render();
+},
+selectionChanged: function(e, t) {
+this.setValue(t.selected.content);
+}
+});
+
+// IntegerPickerBar.js
+
+enyo.kind({
+name: "GTS.IntegerPickerBar",
+kind: "onyx.Item",
+classes: "gts-integerPickerBar",
+published: {
+label: "Pick a value",
+sublabel: "",
+min: 1,
+max: 10,
+step: 1,
+value: "",
+disabled: !1,
+maxHeight: 200,
+pickerWidth: null
+},
+events: {
+onChange: ""
+},
+components: [ {
+name: "base",
+kind: "enyo.FittableColumns",
+components: [ {
+name: "label",
+fit: !0
+}, {
+kind: "onyx.PickerDecorator",
+components: [ {
+name: "pickerButton",
+classes: "arrow"
+}, {
+name: "integer",
+kind: "GTS.IntegerPicker",
+min: 1,
+max: 25,
+classes: "gts-IntegerPickerBar",
+onChange: "selectionChanged"
+} ]
+} ]
+}, {
+name: "sublabel",
+classes: "sub-label"
+} ],
+rendered: function() {
+this.inherited(arguments), this.labelChanged(), this.sublabelChanged(), this.minChanged(), this.maxChanged(), this.stepChanged(), this.valueChanged(), this.disabledChanged(), this.pickerWidthChanged(), this.maxHeightChanged(), enyo.asyncMethod(this, this.reflow);
+},
+reflow: function() {
+enyo.asyncMethod(this, this.waterfallDown, "onresize", "onresize", this);
+},
+labelChanged: function() {
+this.$.label.setContent(this.label);
+},
+sublabelChanged: function() {
+this.$.sublabel.setContent(this.sublabel), this.sublabel === "" ? this.$.sublabel.hide() : this.$.sublabel.show();
+},
+disabledChanged: function() {
+this.$.pickerButton.setDisabled(this.disabled);
+},
+maxHeightChanged: function() {
+this.$.integer.setMaxHeight(this.maxHeight);
+},
+pickerWidthChanged: function() {
+this.$.pickerButton.applyStyle("width", this.pickerWidth);
+},
+minChanged: function() {
+this.$.integer.setMin(this.getMin());
+},
+maxChanged: function() {
+this.$.integer.setMax(this.getMax());
+},
+stepChanged: function() {
+this.$.integer.setStep(this.getStep());
+},
+valueChanged: function() {
+this.$.integer.setValue(this.getValue()), this.$.pickerButton.setContent(this.getValue()), this.reflow();
+},
+selectionChanged: function(e, t) {
+return this.value = this.$.integer.getValue(), this.$.pickerButton.setContent(this.getValue()), this.reflow(), this.doChange(enyo.mixin(t, {
+value: this.getValue()
+})), !0;
+}
+});
+
 // DatePicker.js
 
 enyo.kind({
@@ -7382,9 +7513,15 @@ this.$.sunday.setContent(this.days[this.dowFormat][0]), this.$.monday.setContent
 rendered: function() {
 this.inherited(arguments), this.renderDoW(), this.valueChanged();
 },
+setValue: function(e) {
+enyo.isString(e) && (e = new Date(e)), this.value = e, this.valueChanged();
+},
 valueChanged: function() {
 if (Object.prototype.toString.call(this.value) !== "[object Date]" || isNaN(this.value.getTime())) this.value = new Date;
-this.viewDate.setTime(this.value.getTime()), this.renderCalendar();
+this.setViewDate(this.value);
+},
+setViewDate: function(e) {
+enyo.isString(e) && (e = new Date(e)), this.viewDate = e, this.viewDateChanged();
 },
 viewDateChanged: function() {
 this.renderCalendar();
@@ -7406,7 +7543,10 @@ var n = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), 0), r = 
 n.setDate(n.getDate() - r.getDay() + 1), n.getTime() === r.getTime() && n.setDate(n.getDate() - 7);
 var i = 0, s;
 while (i < 6) n.getDate() === this.value.getDate() && n.getMonth() === this.value.getMonth() && n.getFullYear() === this.value.getFullYear() ? s = "onyx-blue" : n.getDate() === t.getDate() && n.getMonth() === t.getMonth() && n.getFullYear() === t.getFullYear() ? s = "onyx-affirmative" : n.getMonth() !== r.getMonth() ? s = "onyx-dark" : s = "", this.$["row" + i + "col" + n.getDay()].applyStyle("width", e + "px"), this.$["row" + i + "col" + n.getDay()].removeClass("onyx-affirmative"), this.$["row" + i + "col" + n.getDay()].removeClass("onyx-blue"), this.$["row" + i + "col" + n.getDay()].removeClass("onyx-dark"), this.$["row" + i + "col" + n.getDay()].addClass(s), this.$["row" + i + "col" + n.getDay()].setContent(n.getDate()), this.$["row" + i + "col" + n.getDay()].ts = n.getTime(), n.setDate(n.getDate() + 1), n.getDay() === 0 && i < 6 && i++;
-this.$.monthLabel.setContent(r.format(this.monthFormat));
+if (enyo.g11n) {
+var o = new enyo.g11n.DateFmt(this.monthFormat);
+this.$.monthLabel.setContent(o.format(r));
+} else this.$.monthLabel.setContent(r.getMonth() + " - " + r.getFullYear());
 },
 monthBack: function() {
 this.viewDate.setMonth(this.viewDate.getMonth() - 1), this.renderCalendar();
@@ -7421,7 +7561,7 @@ date: this.value
 },
 dateHandler: function(e, t) {
 var n = new Date;
-n.setTime(e.ts), this.value.setFullYear(n.getFullYear()), this.value.setMonth(n.getMonth()), this.value.setDate(n.getDate()), this.value.getMonth() != this.viewDate.getMonth() && (this.viewDate = new Date(this.value.getFullYear(), this.value.getMonth(), 1)), this.doSelect({
+n.setTime(e.ts), this.value.setDate(n.getDate()), this.value.setMonth(n.getMonth()), this.value.setFullYear(n.getFullYear()), this.value.getMonth() != this.viewDate.getMonth() && (this.viewDate = new Date(this.value.getFullYear(), this.value.getMonth(), 1)), this.doSelect({
 date: this.value
 }), this.renderCalendar();
 }
@@ -9182,7 +9322,9 @@ name: "transactions",
 kind: "Checkbook.transactions.view"
 } ], {
 owner: this
-}), this.$.mainViews.render(), this.$.container.show(), this.$.container.render(), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, enyo.asyncMethod(this, this.loadCheckbookStage2);
+}), this.$.mainViews.render(), this.$.container.show(), this.$.container.render(), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, Checkbook.globals.transactionManager.$.recurrence.updateSeriesTransactions(-1, {
+onSuccess: enyo.bind(this, this.loadCheckbookStage2)
+});
 },
 loadCheckbookStage2: function() {
 Checkbook.globals.accountManager.fetchDefaultAccount({
@@ -9348,10 +9490,7 @@ onError: enyo.bind(this, this.buildInitialDB)
 },
 checkDBSuccess: function(e) {
 var t = -1;
-e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer), this.versionCheck = 26, t == this.versionCheck ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.alwaysFullCalendar = e[0].alwaysFullCalendar, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), this.splashFinished()) : t >= 1 ? (this.log("DB out of date, preparing to update: " + t + " to " + this.versionCheck), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
-},
-splashFinished: function() {
-this.log(), this.$.splashProgress.animateProgressTo(100), enyo.asyncMethod(this, this.doFinish);
+e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer), this.versionCheck = 30, t == this.versionCheck ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.alwaysFullCalendar = e[0].alwaysFullCalendar, Checkbook.globals.prefs.seriesCountLimit = e[0].seriesCountLimit, Checkbook.globals.prefs.seriesDayLimit = e[0].seriesDayLimit, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), enyo.asyncMethod(this, this.doFinish)) : t >= 1 ? (this.log("DB out of date, preparing to update: " + t + " to " + this.versionCheck), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
 },
 buildInitialDB: function() {
 this.log(), this.firstRun = !0, this.$.message.setContent("Creating application database..."), this.$.splashProgress.animateProgressTo(50);
@@ -9772,8 +9911,16 @@ gSheetPass: ""
 case 24:
 t.push("ALTER TABLE accounts ADD COLUMN payeeField INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE transactions ADD COLUMN payee TEXT;"), this.versionCheck = 25;
 case 25:
-t.push("ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;"), this.versionCheck = 26;
+t.push("ALTER TABLE transactions RENAME TO expenses;"), t.push("ALTER TABLE transactionCategories RENAME TO expenseCategories;"), this.versionCheck = 26;
 case 26:
+t.push("ALTER TABLE expenses RENAME TO transactions;"), t.push("ALTER TABLE expenseCategories RENAME TO transactionCategories;"), this.versionCheck = 27;
+case 27:
+t.push("ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;"), this.versionCheck = 28;
+case 28:
+t.push("ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;"), this.versionCheck = 29;
+case 29:
+t.push("ALTER TABLE prefs ADD COLUMN seriesCountLimit INTEGER NOT NULL DEFAULT 3;"), t.push("ALTER TABLE prefs ADD COLUMN seriesDayLimit INTEGER NOT NULL DEFAULT 45;"), this.versionCheck = 30;
+case 30:
 }
 t.push(Checkbook.globals.gts_db.getUpdate("prefs", {
 dbVer: this.versionCheck
@@ -9791,6 +9938,7 @@ name: "Checkbook.preferences",
 kind: "FittableRows",
 classes: "enyo-fit",
 style: "height: 100%;",
+systemReady: !1,
 events: {
 onFinish: ""
 },
@@ -9915,8 +10063,6 @@ components: [ {
 kind: "onyx.GroupboxHeader",
 content: "Accounts"
 }, {
-kind: "onyx.Item",
-components: [ {
 name: "defaultAccount",
 kind: "GTS.SelectorBar",
 disabled: !0,
@@ -9924,7 +10070,6 @@ label: "Default Account",
 onChange: "updateDefaultAccount",
 value: 0,
 choices: []
-} ]
 }, {
 kind: "onyx.Item",
 components: [ {
@@ -9935,6 +10080,30 @@ content: "Add Account",
 classes: "full-width",
 ontap: "addAccount"
 } ]
+} ]
+}, {
+kind: "onyx.Groupbox",
+classes: "margin-top",
+components: [ {
+kind: "onyx.GroupboxHeader",
+content: "Recurrence Options"
+}, {
+name: "seriesCountLimit",
+kind: "GTS.IntegerPickerBar",
+min: 1,
+max: 15,
+label: "Series Occurrence Limit",
+sublabel: "Maximum number of times an event will be created within the date limit.",
+onChange: "updateSeriesCountLimit"
+}, {
+name: "seriesDayLimit",
+kind: "GTS.IntegerPickerBar",
+min: 5,
+max: 150,
+step: 5,
+label: "Series Day Limit",
+sublabel: "Maximum number of days from today a recurrence event will be created..",
+onChange: "updateSeriesDayLimit"
 } ]
 }, {
 kind: "onyx.Groupbox",
@@ -9994,7 +10163,7 @@ kind: "Checkbook.encryption"
 rendered: function() {
 this.$.pinLock.setValue(Checkbook.globals.prefs.useCode === 1), this.$.pinCode.setValue(Checkbook.globals.prefs.code), this.$.pinLockDrawer.setOpen(this.$.pinLock.getValue()), this.$.transPreview.setValue(Checkbook.globals.prefs.transPreview === 1), this.$.updateNotice.setValue(Checkbook.globals.prefs.updateCheckNotification === 1), this.$.errorReporting.setValue(Checkbook.globals.prefs.errorReporting === 1), this.$.dispColor.setValue(Checkbook.globals.prefs.dispColor === 1), Checkbook.globals.accountManager.fetchAccountsList({
 onSuccess: enyo.bind(this, this.buildDefaultAccountList)
-}), this.inherited(arguments), this.$.header.addRemoveClass("text-left", enyo.Panels.isScreenNarrow()), this.$.header.addRemoveClass("text-center", !enyo.Panels.isScreenNarrow());
+}), this.$.seriesDayLimit.setValue(Checkbook.globals.prefs.seriesDayLimit), this.$.seriesCountLimit.setValue(Checkbook.globals.prefs.seriesCountLimit), this.inherited(arguments), this.$.header.addRemoveClass("text-left", enyo.Panels.isScreenNarrow()), this.$.header.addRemoveClass("text-center", !enyo.Panels.isScreenNarrow()), this.systemReady = !0;
 },
 togglePINStatus: function() {
 Checkbook.globals.prefs.useCode = this.$.pinLock.getValue() ? 1 : 0, this.$.pinLockDrawer.setOpen(this.$.pinLock.getValue()), this.saveAppPin();
@@ -10020,28 +10189,45 @@ code: Checkbook.globals.prefs.code
 }, {}));
 },
 updateTransPreview: function(e, t) {
+if (!this.systemReady) return !0;
 Checkbook.globals.prefs.transPreview = t.value ? 1 : 0, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
 previewTransaction: Checkbook.globals.prefs.transPreview
 }, {}));
 },
 updateUpdateNotice: function(e, t) {
+if (!this.systemReady) return !0;
 Checkbook.globals.prefs.updateCheckNotification = t.value ? 1 : 0, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
 updateCheckNotification: Checkbook.globals.prefs.updateCheckNotification
 }, {}));
 },
 updateErrorReporting: function(e, t) {
+if (!this.systemReady) return !0;
 Checkbook.globals.prefs.errorReporting = t.value ? 1 : 0, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
 errorReporting: Checkbook.globals.prefs.errorReporting
 }, {}));
 },
 updateDispColor: function(e, t) {
+if (!this.systemReady) return !0;
 Checkbook.globals.prefs.dispColor = t.value ? 1 : 0, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
 dispColor: Checkbook.globals.prefs.dispColor
 }, {}));
 },
 updateAlwaysFullCalendar: function(e, t) {
+if (!this.systemReady) return !0;
 Checkbook.globals.prefs.alwaysFullCalendar = t.value ? 1 : 0, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
 alwaysFullCalendar: Checkbook.globals.prefs.alwaysFullCalendar
+}, {}));
+},
+updateSeriesCountLimit: function(e, t) {
+if (!this.systemReady) return !0;
+Checkbook.globals.prefs.seriesCountLimit = t.value, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
+seriesCountLimit: Checkbook.globals.prefs.seriesCountLimit
+}, {}));
+},
+updateSeriesDayLimit: function(e, t) {
+if (!this.systemReady) return !0;
+Checkbook.globals.prefs.seriesDayLimit = t.value, Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("prefs", {
+seriesDayLimit: Checkbook.globals.prefs.seriesDayLimit
 }, {}));
 },
 setupRow: function(e, t) {
@@ -12703,9 +12889,11 @@ action: "edit"
 
 enyo.kind({
 name: "Checkbook.transactions.manager",
-kind: enyo.Component,
-seriesCountLimit: 3,
-seriesDayLimit: 45,
+kind: "enyo.Component",
+components: [ {
+name: "recurrence",
+kind: "Checkbook.transactions.recurrence.manager"
+} ],
 constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
@@ -12722,16 +12910,19 @@ onSuccess: enyo.bind(this, this.createTransactionFollower, e, t, n)
 });
 },
 createTransactionFollower: function(e, t, n, r) {
-e.itemId = parseInt(r[0].maxItemId) + 1, e.maxRepeatId = parseInt(r[0].maxRepeatId) + 1, Checkbook.globals.gts_db.queries(this.generateInsertTransactionSQL(e, t), n);
+e.itemId = parseInt(r[0].maxItemId) + 1, e.maxRepeatId = parseInt(r[0].maxRepeatId) + 1, Checkbook.globals.gts_db.queries(this.generateInsertTransactionSQL({
+data: e,
+type: t
+}), n);
 },
-generateInsertTransactionSQL: function(e, t) {
-var n = enyo.clone(e), r = n.autoTransfer, i = n.autoTransferLink, s = this._prepareData(n, t);
-s = s.concat(this._handleRepeatSystem(n, r, i)), s = s.concat(this.handleCategoryData(n)), s.push(Checkbook.globals.gts_db.getInsert("transactions", n));
-if (GTS.Object.validNumber(n.linkedRecord) && n.linkedRecord >= 0) {
-var o = enyo.clone(n);
-GTS.Object.swap(o, "linkedRecord", "itemId"), GTS.Object.swap(o, "linkedAccount", "account"), o.amount = -o.amount, s.push(Checkbook.globals.gts_db.getInsert("transactions", o));
+generateInsertTransactionSQL: function(e) {
+var t = enyo.clone(e.data), n = t.autoTransfer, r = t.autoTransferLink, i = this._prepareData(t, e.type);
+i = i.concat(this.$.recurrence.handleRecurrenceSystem(t, n, r)), i = i.concat(this.handleCategoryData(t)), i.push(Checkbook.globals.gts_db.getInsert("transactions", t));
+if (GTS.Object.validNumber(t.linkedRecord) && t.linkedRecord >= 0) {
+var s = enyo.clone(t);
+GTS.Object.swap(s, "linkedRecord", "itemId"), GTS.Object.swap(s, "linkedAccount", "account"), s.amount = -s.amount, i.push(Checkbook.globals.gts_db.getInsert("transactions", s));
 }
-return r > 0 && i >= 0 && (s = s.concat(this.createAutoTransfer(n, r, i))), s;
+return n > 0 && r >= 0 && (i = i.concat(this.createAutoTransfer(t, n, r))), i;
 },
 createAutoTransfer: function(e, t, n) {
 if (t <= 0 || n < 0) return [];
@@ -12744,7 +12935,7 @@ return i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), GTS.Object
 },
 updateTransaction: function(e, t, n) {
 Checkbook.globals.gts_db.query(new GTS.databaseQuery({
-sql: "SELECT ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;",
+sql: "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;",
 values: []
 }), {
 onSuccess: enyo.bind(this, this.updateTransactionFollower, e, t, n)
@@ -12755,9 +12946,9 @@ if (!e.hasOwnProperty("itemId") || isNaN(e.itemId) || !isFinite(e.itemId) || e.i
 enyo.isFunction(n.onError) ? n.onError(!1) : enyo.isFunction(n.onSuccess) && n.onSuccess(!1);
 return;
 }
-e.maxRepeatId = parseInt(r[0].maxRepeatId) + 1;
+e.maxItemId = parseInt(r[0].maxItemId) + 1, e.maxRepeatId = parseInt(r[0].maxRepeatId) + 1;
 var i = this._prepareData(e, t);
-i = i.concat(this._handleRepeatSystem(e, -1)), i = i.concat(this.handleCategoryData(e)), i.push(Checkbook.globals.gts_db.getUpdate("transactions", e, {
+e["repeatUnlinked"] != 1 && e["terminated"] != 1 ? i = i.concat(this.$.recurrence.handleRecurrenceSystem(e)) : (delete e.rObj, delete e.maxItemId, delete e.maxRepeatId), i = i.concat(this.handleCategoryData(e)), i.push(Checkbook.globals.gts_db.getUpdate("transactions", e, {
 itemId: e.itemId
 }));
 if (GTS.Object.validNumber(e.linkedRecord)) {
@@ -12769,7 +12960,7 @@ itemId: s.itemId
 Checkbook.globals.gts_db.queries(i, n);
 },
 _prepareData: function(e, t) {
-return e.desc = e.desc === "" || e.desc === null ? "Description" : e.desc, e.cleared = e.cleared ? 1 : 0, e.amount = GTS.Object.isNumber(e.amount) ? 0 : Number(e.amount).toFixed(2).valueOf(), e.date = Date.parse(e.date), t == "transfer" ? e.amount_old !== "NOT_A_VALUE" && e.amount_old < 0 ? e.amount = -Math.abs(e.amount) : e.amount_old !== "NOT_A_VALUE" && e.amount_old >= 0 ? e.amount = Math.abs(e.amount) : (e.linkedRecord = e.itemId + 1, e.amount = -Math.abs(e.amount)) : t == "income" ? (e.amount = Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null) : (e.amount = -Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null), delete e.amount_old, delete e.autoTransfer, delete e.autoTransferLink, [];
+return e.desc = e.desc === "" || e.desc === null ? "Description" : e.desc, e.cleared = e.cleared ? 1 : 0, e.amount = Number(e.amount).toFixed(2).valueOf(), e.date = Date.parse(e.date), t == "transfer" ? e.amount_old !== "NOT_A_VALUE" && e.amount_old < 0 ? e.amount = -Math.abs(e.amount) : e.amount_old !== "NOT_A_VALUE" && e.amount_old >= 0 ? e.amount = Math.abs(e.amount) : (e.linkedRecord = e.itemId + 1, e.amount = -Math.abs(e.amount)) : t == "income" ? (e.amount = Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null) : (e.amount = -Math.abs(e.amount), e.linkedAccount = null, e.linkedRecord = null), delete e.amount_old, delete e.autoTransfer, delete e.autoTransferLink, [];
 },
 handleCategoryData: function(e) {
 var t = [];
@@ -12799,107 +12990,6 @@ transId: e.linkedRecord
 }
 e.category = "||~SPLIT~||", e.category2 = "";
 } else e.category.length === 1 ? (e.category2 = e.category[0].category2, e.category = e.category[0].category) : (e.category = "Uncategorized", e.category2 = "Other");
-return t;
-},
-_handleRepeatSystem: function(e, t, n) {
-var r = [];
-if (e["rObj"] != 0) if ((!e.repeatId || e.repeatId < 0) && e["rObj"]["pattern"] != "none") {
-e.repeatId = e.maxRepeatId;
-var i = {
-repeatId: e.repeatId,
-frequency: e.rObj.pattern,
-itemSpan: e.rObj.frequency,
-daysOfWeek: enyo.json.stringify(e["rObj"]["pattern"] == "weekly" ? e.rObj.dow : ""),
-endingCondition: e.rObj.endCondition,
-endDate: e["rObj"]["endCondition"] == "date" ? e.rObj.endDate : "",
-endCount: e["rObj"]["endCondition"] == "occurences" ? e.rObj.endCount : "",
-lastOccurrence: e.date,
-currCount: 1,
-origDate: e.rObj.startDate,
-rep_desc: e.desc,
-rep_amount: e.amount,
-rep_note: e.note,
-rep_category: enyo.json.stringify(e.category),
-rep_acctId: e.account,
-rep_linkedAcctId: e.linkedAccount,
-rep_autoTrsnLink: t > 0 && n >= 0 ? 1 : 0,
-last_sync: "",
-maxItemId: GTS.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.itemId + 2 : e.itemId + 1,
-autoTransfer: t,
-autoTransferLink: n
-};
-r = r.concat(this.generateSeriesSQL([ enyo.clone(i) ])), delete i.maxItemId, delete i.autoTransfer, delete i.autoTransferLink, r.unshift(Checkbook.globals.gts_db.getInsert("repeats", i));
-} else if (e["repeatUnlinked"] != 1 && e["rObj"]["pattern"] == "none") {
-r.push(Checkbook.globals.gts_db.getDelete("repeats", {
-repeatId: e.repeatId
-}));
-var s = new Date;
-s.setHours(23, 59, 59, 999), r.push(new GTS.databaseQuery({
-sql: "DELETE FROM transactions WHERE itemId != ? AND repeatId = ? AND date > ?",
-values: [ e.itemId, e.repeatId, Date.parse(s) ]
-})), e.repeatId = null;
-}
-return delete e.rObj, delete e.maxRepeatId, e.repeatId = null, this.log(r), [];
-},
-updateSeriesTransactions: function(e, t) {
-e = e || -1;
-var n = new Date, r = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 0, 0, 0, 0), i = new Date(n.getFullYear(), n.getMonth(), n.getDate() + this.seriesDayLimit, 23, 59, 59, 999);
-this.generateSeriesSQL(REPEAT_DATA_ARRAY), Checkbook.globals.gts_db.query(new GTS.databaseQuery({
-sql: "SELECT * FROM repeats WHERE ( rep_acctId = ? " + (e >= 0 ? "OR 1 = 1 " : "") + ") " + "lastOccurrence < ? " + " AND currCount < ? " + "AND ( " + "( " + "endingCondition = 'none' " + ") OR ( " + "endingCondition = 'date' " + "AND endDate != '' " + "AND endDate > lastOccurrence " + ") OR ( " + "endingCondition = 'occurences' " + "AND endCount != '' " + "AND endCount > currCount " + ") " + ") " + "AND ( " + "lastUpdated < ? OR " + "lastUpdate IS NULL OR " + "lastUpdate = '' " + ")",
-values: [ e, Date.parse(i), this.seriesCountLimit, Date.parse(r) ]
-}), {
-onSuccess: function(e) {
-Checkbook.globals.gts_db.queries(this.generateSeriesSQL(e), t);
-},
-onError: function() {
-enyo.isFunction(t.onError) && t.onError();
-}
-});
-},
-generateSeriesSQL: function(e) {
-var t = [];
-if (e.length > 0) {
-var n = e[0].maxItemId, r = new Date, i, s, o, u;
-for (var a = 0; a < e.length; a++) {
-s = new Date(e[a].lastOccurrence), o = e[a].currCount, e[a].rep_category = enyo.json.parse(e[a].rep_category), e[a].daysOfWeek = enyo.json.parse(e[a].daysOfWeek);
-while (Math.floor((s - new Date(e[a].lastOccurrence)) / 864e5) < this.seriesDayLimit && o - e[a].currCount < this.seriesCountLimit && (e[a]["endingCondition"] == "none" || e[a]["endingCondition"] == "date" && e[a].endDate && Date.parse(s) <= e[a].endDate || e[a]["endingCondition"] == "occurences" && e[a].endCount && o <= e[a].endCount)) {
-if (e[a]["frequency"] == "daily") s.setDate(s.getDate() + 1 * e[a].itemSpan); else if (e[a]["frequency"] == "weekly") {
-var f = e[a].daysOfWeek.indexOf(s.getDay());
-if (f < 0 || f + 1 >= e[a].daysOfWeek.length) {
-while (s.getDay() > 0) s.setDate(s.getDate() + 1);
-while (s.getDay() < 7 && s.getDay() != e[a]["daysOfWeek"][0]) s.setDate(s.getDate() + 1);
-s.setDate(s.getDate() + 7 * (e[a].itemSpan - 1));
-} else s.setDate(s.getDate() + (e[a].daysOfWeek[f + 1] - e[a].daysOfWeek[f])), f++;
-} else e[a]["frequency"] == "monthly" ? s.setMonth(s.getMonth() + 1 * e[a].itemSpan) : e[a]["frequency"] == "yearly" && s.setYear(s.getFullYear() + 1 * e[a].itemSpan);
-i = {
-itemId: n,
-account: e[a].rep_acctId,
-repeatId: e[a].repeatId,
-desc: e[a].rep_desc,
-note: e[a].rep_note,
-date: Date.parse(s),
-amount: e[a].rep_amount,
-amount_old: "NOT_A_VALUE",
-linkedRecord: -1,
-linkedAccount: e[a].rep_linkedAcctId,
-cleared: !1,
-checkNum: "",
-category: e[a].rep_category,
-category2: "",
-rObj: !1,
-autoTransfer: e[a]["rep_autoTrsnLink"] == 1 ? e[a].autoTransfer : 0,
-autoTransferLink: e[a]["rep_autoTrsnLink"] == 1 ? e[a].autoTransferLink : -1
-}, GTS.Object.validNumber(e[a].rep_linkedAcctId) && e[a].rep_linkedAcctId >= 0 ? u = "transfer" : e[a].rep_amount < 0 ? u = "expense" : u = "income", t = t.concat(this.generateInsertTransactionSQL(i, u)), o++, n += GTS.Object.validNumber(e[a].linkedAccount) && e[a].linkedAccount >= 0 ? 2 : 1;
-}
-t.push(Checkbook.globals.gts_db.getUpdate("repeats", {
-lastOccurrence: Date.parse(s),
-currCount: o,
-lastUpdated: Date.parse(new Date)
-}, {
-repeatId: e[a].repeatId
-}));
-}
-}
 return t;
 },
 clearTransaction: function(e, t, n) {
@@ -12933,7 +13023,7 @@ onError: t.onError
 },
 fetchTransactions: function(e, t, n, r) {
 var i = new GTS.databaseQuery({
-sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE account = ? ORDER BY ' + e.sortQry,
+sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.repeatUnlinked, main.checkNum, main.payee, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE account = ? ORDER BY ' + e.sortQry,
 values: [ e.acctId ]
 });
 n && (i.sql += " LIMIT ?", i.values.push(n)), r && (i.sql += " OFFSET ?", i.values.push(r)), Checkbook.globals.gts_db.query(i, {
@@ -13161,7 +13251,6 @@ content: "Search"
 } ]
 } ]
 }, {
-showing: !1,
 kind: "onyx.MenuDecorator",
 components: [ {
 kind: "onyx.Button",
@@ -13177,12 +13266,18 @@ scrim: !0,
 scrimclasses: "onyx-scrim-translucent",
 onSelect: "functionSelected",
 components: [ {
+content: "Refresh",
+value: "refresh"
+}, {
+showing: !1,
 content: "Purge Transactions",
 value: "purge"
 }, {
+showing: !1,
 content: "Combine Transactions",
 value: "combine"
 }, {
+showing: !1,
 content: "Clear Multiple Transactions",
 value: "clear"
 } ]
@@ -13204,7 +13299,6 @@ accountChanged: function(e, t) {
 t && t.deleted && this.getAccountId() === t.accountId ? this.unloadSystem() : this.reloadSystem();
 },
 viewAccount: function(e, t) {
-t.force = typeof t.force != "undefined" ? t.force : !1;
 if (!t.account || !t.account.acctId) {
 this.unloadSystem();
 return;
@@ -13220,7 +13314,7 @@ setAccountIndex: function(e) {
 this.account.index = e;
 },
 unloadSystem: function() {
-this.account = {}, this.$.entries.reloadSystem(), this.$.header.hide(), this.$.footer.hide();
+this.account = {}, this.$.entries.unloadSystem(), this.$.header.hide(), this.$.footer.hide();
 },
 reloadSystem: function() {
 if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
@@ -13324,7 +13418,22 @@ if (t.content.toLowerCase() === "reports") return this.log("Report system go"), 
 if (t.content.toLowerCase() === "search") return this.log("Search system go"), !0;
 },
 functionSelected: function(e, t) {
-this.log(t.selected);
+if (t.content.toLowerCase() === "refresh") {
+var n = this.account.acctId;
+return this.$.entries.rememberScrollPosition(), Checkbook.globals.transactionManager.$.recurrence.updateSeriesTransactions(n, {
+onSuccess: function() {
+Checkbook.globals.accountManager.fetchAccount(n, {
+onSuccess: function(e) {
+enyo.Signals.send("viewAccount", {
+account: e,
+force: !0
+});
+}
+});
+}
+}), !0;
+}
+return this.log(t.selected), !0;
 },
 newTransaction: function(e) {
 this.$.addIncomeButton.getDisabled() || this.$.addTransferButton.getDisabled() || this.$.addExpenseButton.getDisabled() || (this.toggleCreateButtons(), enyo.Signals.send("modifyTransaction", {
@@ -13350,6 +13459,8 @@ enyo.kind({
 name: "Checkbook.transactions.list",
 transactions: [],
 account: {},
+initialScrollCompleted: !1,
+savedScrollPosition: !1,
 events: {
 onLoadingStart: "",
 onLoadingFinish: ""
@@ -13467,12 +13578,12 @@ accountChanged: function(e, t) {
 this.log(), t && t.deleted && this.getAccountId() === t.accountId ? this.unloadSystem() : this.reloadSystem();
 },
 unloadSystem: function() {
-this.log(), this.account = {}, this.$.list.empty();
+this.log(), this.account = {}, this.$.list.setCount(0), this.$.list.reset();
 },
 reloadSystem: function() {
 this.log();
 if (!this.account.acctId || this.account.acctId < 0) return this.log("System not ready yet"), !1;
-this.initialScrollCompleted = !1, this.reloadTransactionList();
+this.savedScrollPosition === !1 && (this.initialScrollCompleted = !1), this.reloadTransactionList();
 },
 setItemCount: function(e) {
 Number.isFinite(e) && (this.account.itemCount = e);
@@ -13533,6 +13644,12 @@ initialScrollHandler: function(e) {
 var t = 0;
 this.account.sort === 1 ? t = this.account.itemCount - e[0].itemIndex - 3 : t = e[0].itemIndex - 3, t = t >= 0 ? t : 0, this.$.list.scrollToRow(t);
 },
+rememberScrollPosition: function() {
+this.savedScrollPosition = this.$.list.getScrollPosition();
+},
+moveToSavedScrollPosition: function() {
+this.$.list.setScrollPosition(this.savedScrollPosition), this.savedScrollPosition = !1;
+},
 transactionBuildRow: function(e, t) {
 var n = t.index, r = this.transactions[n];
 if (r) {
@@ -13544,14 +13661,14 @@ time: this.account.showTransTime === 1 ? "short" : ""
 }));
 var s = new Date;
 this.account.showTransTime !== 1 && s.setHours(23, 59, 59, 999), this.$.transactionWrapper.addRemoveClass("futureTransaction", r.date > Date.parse(s)), this.$.amount.setContent(formatAmount(r.amount)), r.dispRunningBalance ? (this.$.runningBal.setContent(formatAmount(r.runningBalance)), this.$.runningBal.addRemoveClass("positiveBalance", r.runningBalance > 0), this.$.runningBal.addRemoveClass("negativeBalance", r.runningBalance < 0), this.$.runningBal.addRemoveClass("neutralBalance", r["runningBalance"] == 0), this.$.amount.setClassAttribute("")) : (this.$.runningBal.setContent(""), this.$.amount.addRemoveClass("positiveBalance", r.amount > 0), this.$.amount.addRemoveClass("negativeBalance", r.amount < 0), this.$.amount.addRemoveClass("neutralBalance", r["amount"] == 0)), this.$.cleared.addRemoveClass("checked", r.cleared === 1), this.account.enableCategories === 1 ? (this.$.category.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(r.category, r.category2, !0, "smaller"))) : this.$.category.hide(), this.$.checkNum.setContent(this.account.checkField === 1 && r.checkNum && r.checkNum !== "" ? "Check #" + r.checkNum : ""), this.$.payee.setContent(this.account.payeeField === 1 && r.payee && r.payee !== "" ? "Payee: " + r.payee : ""), this.$.note.setContent((this.account.hideNotes === 1 ? "" : r.note).replace(/\n/g, "<br />"));
-var o = r.linkedRecord && !isNaN(r.linkedRecord) && r["linkedRecord"] != "", u = r.repeatId && !isNaN(r.repeatId) && r["repeatId"] != "";
+var o = r.linkedRecord && !isNaN(r.linkedRecord) && r["linkedRecord"] != "", u = r.repeatId && !isNaN(r.repeatId) && r["repeatId"] != "" && r.repeatId >= 0;
 return this.$.mainBody.addRemoveClass("repeatTransferIcon", o && u), this.$.mainBody.addRemoveClass("transferIcon", o && !u), this.$.mainBody.addRemoveClass("repeatIcon", !o && u), !0;
 }
 },
 transactionFetchGroup: function(e, t) {
 this.log(e, "|", t);
 var n = t.page * t.pageSize;
-return !this.account.acctId || this.account.acctId < 0 ? (this.log("System not ready yet"), !1) : n >= 0 && this.account.itemCount > this.$.list.getCount() && !this.transactions[n] ? (this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
+return !this.account.acctId || this.account.acctId < 0 ? (this.log("System not ready yet"), !1) : n >= 0 && this.account.itemCount >= this.$.list.getCount() && !this.transactions[n] ? (this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
 onSuccess: enyo.bind(this, this.transactionFetchGroupHandler)
 }, t.pageSize, n), !0) : !1;
 },
@@ -13568,7 +13685,7 @@ runningBalance: prepAmount(r),
 amount: prepAmount(t[s].amount)
 }, t[s]), this.transactions[e + s].desc = GTS.String.dirtyString(this.transactions[e + s].desc), this.transactions[e + s].category = GTS.String.dirtyString(this.transactions[e + s].category), this.transactions[e + s].category2 = GTS.String.dirtyString(this.transactions[e + s].category2), this.transactions[e + s].note = GTS.String.dirtyString(this.transactions[e + s].note), this.account.sort !== 0 && this.account.sort !== 6 && this.account.sort !== 8 && (r -= this.transactions[e + s].amount);
 }
-this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted || (this.initialScrollCompleted = !0, this.initialScroll()), enyo.asyncMethod(this, this.doLoadingFinish);
+this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted ? this.savedScrollPosition && enyo.job("moveToSavedScrollPosition", enyo.bind(this, "moveToSavedScrollPosition"), 1e3) : (this.initialScrollCompleted = !0, this.initialScroll()), enyo.asyncMethod(this, this.doLoadingFinish);
 },
 duplicateTransaction: function(e) {
 this.log(), this.toggleCreateButtons();
@@ -13648,6 +13765,12 @@ account: this.transactions[n].account,
 linkedAccount: this.transactions[n].linkedAccount
 };
 Checkbook.globals.transactionManager.deleteTransaction(this.transactions[n].itemId);
+if (t.recurrence) {
+enyo.Signals.send("accountBalanceChanged", {
+accounts: r
+}), this.reloadTransactionList();
+return;
+}
 var i = this.transactions[n].amount;
 this.transactions.splice(n, 1);
 if (this.account.runningBalance === 1 && (this.account.sort === 0 || this.account.sort === 1 || this.account.sort === 6 || this.account.sort === 7 || this.account.sort === 8)) {
@@ -13927,7 +14050,14 @@ rowIndex: this.index
 }), enyo.asyncMethod(this, this.hide);
 },
 deleteClicked: function() {
-this.createComponent({
+this.transaction.repeatId > 0 || this.transaction.repeatId === 0 ? this.createComponent({
+name: "deleteTransactionConfirm",
+kind: "Checkbook.transactions.recurrence.delete",
+transactionId: this.transaction.itemId,
+recurrenceId: this.transaction.repeatId,
+onFinish: "deleteTransactionHandler",
+onCancel: "deleteTransactionConfirmClose"
+}) : this.createComponent({
 name: "deleteTransactionConfirm",
 kind: "gts.ConfirmDialog",
 title: "Delete Transaction",
@@ -13945,7 +14075,8 @@ this.$.deleteTransactionConfirm.hide(), this.$.deleteTransactionConfirm.destroy(
 },
 deleteTransactionHandler: function() {
 this.deleteTransactionConfirmClose(), this.doDelete({
-rowIndex: this.index
+rowIndex: this.index,
+recurrence: this.transaction.repeatId > 0 || this.transaction.repeatId === 0
 }), enyo.asyncMethod(this, this.hide);
 }
 });
@@ -14124,7 +14255,7 @@ style: "min-width: 25%;"
 } ]
 } ]
 }, {
-showing: !1,
+name: "recurrenceWrapper",
 kind: "onyx.Groupbox",
 classes: "padding-half-top padding-half-bottom",
 components: [ {
@@ -14154,9 +14285,9 @@ name: "recurrenceDrawer",
 kind: "onyx.Drawer",
 open: !1,
 components: [ {
-name: "recurrence",
-content: "Checkbook.transactions.repeat.select",
-onChange: "recurrenceChanged"
+name: "recurrenceSelect",
+kind: "Checkbook.transactions.recurrence.select",
+onRecurrenceChange: "recurrenceChanged"
 } ]
 } ]
 }, {
@@ -14326,6 +14457,7 @@ linkedRecord: -1,
 linkedAccount: -1,
 cleared: 0,
 repeatId: -1,
+repeatUnlinked: 0,
 checkNum: "",
 category: "Uncategorized",
 category2: "Other",
@@ -14346,7 +14478,9 @@ initialAccountLoadHandler: function(e) {
 this.$.account.removeClass(this.accountObj.acctCategoryColor), this.accountObj = e, this.$.categorySystem.loadCategories(enyo.bind(this, this.loadTransactionData));
 },
 loadTransactionData: function() {
-this.log(), GTS.Object.validNumber(this.trsnObj.amount) && (this.trsnObj.amount_old = this.trsnObj.amount), this.trsnObj.itemId >= 0 && (GTS.Object.validNumber(this.trsnObj.linkedRecord) && this.trsnObj.linkedRecord >= 0 ? this.transactionType = "transfer" : this.trsnObj.amount < 0 ? this.transactionType = "expense" : this.transactionType = "income"), this.trsnObj.amount = Math.abs(this.trsnObj.amount).toFixed(2), this.trsnObj.date = new Date(parseInt(this.trsnObj.date)), this.trsnObj.cleared = this.trsnObj.cleared === 1, this.$.desc.setValue(this.trsnObj.desc), this.$.amount.setValue(this.trsnObj.amount), this.$.account.setValue(this.trsnObj.account), this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.$.date.setValue(this.trsnObj.date), this.$.time.setValue(this.trsnObj.date), this.$.checkNum.setValue(this.trsnObj.checkNum), this.$.payeeField.setValue(this.trsnObj.payee), this.$.cleared.setValue(this.trsnObj.cleared), this.$.notes.setValue(this.trsnObj.note), this.trsnObj.category = Checkbook.globals.transactionManager.parseCategoryDB(this.trsnObj.category, this.trsnObj.category2), this.renderCategories = !0, this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.adjustSystemViews(), this.dateChanged(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.reflow();
+this.log(), GTS.Object.validNumber(this.trsnObj.amount) && (this.trsnObj.amount_old = this.trsnObj.amount), this.trsnObj.itemId >= 0 && (GTS.Object.validNumber(this.trsnObj.linkedRecord) && this.trsnObj.linkedRecord >= 0 ? this.transactionType = "transfer" : this.trsnObj.amount < 0 ? this.transactionType = "expense" : this.transactionType = "income"), this.trsnObj.amount = Math.abs(this.trsnObj.amount).toFixed(2), this.trsnObj.date = new Date(parseInt(this.trsnObj.date)), this.trsnObj.cleared = this.trsnObj.cleared === 1, this.$.desc.setValue(this.trsnObj.desc), this.$.amount.setValue(this.trsnObj.amount), this.$.account.setValue(this.trsnObj.account), this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.$.date.setValue(this.trsnObj.date), this.$.time.setValue(this.trsnObj.date), this.$.checkNum.setValue(this.trsnObj.checkNum), this.$.payeeField.setValue(this.trsnObj.payee), this.$.cleared.setValue(this.trsnObj.cleared), this.$.notes.setValue(this.trsnObj.note), (this.trsnObj.repeatId > 0 || this.trsnObj.repeatId === 0) && this.trsnObj["repeatUnlinked"] != 1 ? Checkbook.globals.transactionManager.$.recurrence.fetch(this.trsnObj.repeatId, {
+onSuccess: enyo.bind(this, this.loadRecurrenceData)
+}) : this.trsnObj["repeatUnlinked"] == 1 && this.$.recurrenceWrapper.hide(), this.trsnObj.category = Checkbook.globals.transactionManager.parseCategoryDB(this.trsnObj.category, this.trsnObj.category2), this.trsnObj.categoryOriginal = this.trsnObj.category, this.renderCategories = !0, this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.adjustSystemViews(), this.dateChanged(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.reflow();
 },
 adjustSystemViews: function() {
 this.$.linkedAccount.setShowing(this.transactionType === "transfer"), this.$.autocomplete.setEnabled(this.accountObj.useAutoComplete === 1), this.$.autoTrans.setShowing(this.trsnObj.itemId < 0 && this.transactionType !== "transfer" && this.accountObj.auto_savings > 0 && this.accountObj.auto_savings_link > -1), this.accountObj["atmEntry"] == 1 ? (this.$.amount.setAtm(!0), this.$.amount.setSelectAllOnFocus(!1)) : (this.$.amount.setAtm(!1), this.$.amount.setSelectAllOnFocus(!0)), this.accountObj["enableCategories"] == 1 ? (this.categoryChanged(), this.$.categoryHolder.show()) : this.$.categoryHolder.hide(), this.accountObj["checkField"] == 1 ? (this.$.checkNumHolder.show(), Checkbook.globals.transactionManager.fetchMaxCheckNumber(this.$.account.getValue(), {
@@ -14399,7 +14533,7 @@ var n = this.$.date.getValue(), r = this.$.time.getValue();
 return n.setHours(r.getHours()), n.setMinutes(r.getMinutes()), this.$.dateDisplay.setContent(n.format({
 date: "long",
 time: this.accountObj.showTransTime === 1 ? "short" : ""
-})), !0;
+})), this.$.recurrenceSelect.setDate(n), this.$.recurrenceSelect.dateChanged(), !0;
 },
 getCategoryItem: function(e, t) {
 if (!this.renderCategories) return;
@@ -14439,6 +14573,13 @@ this.trsnObj.category.splice(t.index, 1), this.categoryChanged();
 categoryChanged: function() {
 this.$.fillValueButton.setShowing(this.trsnObj.category.length > 1), this.$.categoryFooter.reflow(), this.$.categoryList.setCount(this.trsnObj.category.length);
 },
+loadRecurrenceData: function(e) {
+if (e["terminated"] == 1) {
+this.$.recurrenceWrapper.hide();
+return;
+}
+this.trsnObj.rObj = enyo.clone(e), this.trsnObj.rObj.endDate = new Date(parseInt(e.endDate)), this.trsnObj.rObj.origDate = new Date(parseInt(e.origDate)), this.trsnObj.rObj.lastUpdated = new Date(parseInt(e.lastUpdated)), this.trsnObj.rObj.lastOccurrence = new Date(parseInt(e.lastOccurrence)), this.$.recurrenceSelect.setValue(this.trsnObj.rObj);
+},
 toggleRecurrenceDrawer: function() {
 this.$.recurrenceArrow.addRemoveClass("invert", !this.$.recurrenceDrawer.getOpen()), this.$.recurrenceDrawer.setOpen(!this.$.recurrenceDrawer.getOpen());
 },
@@ -14452,12 +14593,66 @@ autofillCheckNo: function() {
 this.accountObj["checkField"] == 1 && this.$.checkNum.getValue().length <= 0 && this.$.checkNum.setValue(this.$.checkNum.autofillValue);
 },
 saveTransaction: function() {
-this.trsnObj.desc = this.$.desc.getValue(), this.trsnObj.amount = this.$.amount.getValue(), this.trsnObj.account = this.$.account.getValue(), this.trsnObj.linkedAccount = this.$.linkedAccount.getValue();
-var e = this.$.time.getValue();
-this.trsnObj.date = this.$.date.getValue(), this.trsnObj.date.setHours(e.getHours()), this.trsnObj.date.setMinutes(e.getMinutes()), this.trsnObj.checkNum = this.$.checkNum.getValue(), this.trsnObj.payee = this.$.payeeField.getValue(), this.trsnObj.cleared = this.$.cleared.getValue(), this.trsnObj.note = this.$.notes.getValue(), this.trsnObj.rObj = {
-pattern: "none"
-}, this.log(this.trsnObj.rObj, this.trsnObj.repeatId, this.trsnObj.repeatUnlinked), this.trsnObj.autoTransfer = this.$.autoTrans.getShowing() && this.$.autoTrans.getValue() ? this.accountObj.auto_savings : 0, this.trsnObj.autoTransferLink = this.accountObj.auto_savings_link;
-var t = {
+if (this.trsnObj.itemId < 0) this.saveNewTransaction(); else {
+var e = this.$.recurrenceSelect.getValue();
+if ((this.trsnObj.repeatId > 0 || this.trsnObj.repeatId === 0 || e.frequency !== "none") && this.trsnObj["repeatUnlinked"] != 1 && this.trsnObj["terminated"] != 1) {
+var t = this.checkForChanges();
+if (!t.major && !t.minor && !t.recurrence) {
+this.doFinish({
+status: 0
+});
+return;
+}
+if (this.trsnObj.repeatId > 0 || this.trsnObj.repeatId === 0) {
+if (e["frequency"] == "none") {
+this.createComponent({
+name: "recurrenceEventDialog",
+kind: "gts.ConfirmDialog",
+title: "End Transaction Series",
+message: "This will end the series and delete all following transactions.",
+confirmText: "Continue",
+confirmClass: "onyx-negative",
+cancelText: "Cancel",
+cancelClass: "",
+onConfirm: "endRecurrenceEvent",
+onCancel: "closeRecurrenceEventDialog"
+}), this.$.recurrenceEventDialog.show();
+return;
+}
+if (t.major) {
+this.createComponent({
+name: "recurrenceEventDialog",
+kind: "Checkbook.transactions.recurrence.confirm",
+onOne: "updateSingle",
+onFuture: "updateFuture",
+onAll: "updateAll",
+onCancel: "closeRecurrenceEventDialog"
+}), this.$.recurrenceEventDialog.show();
+return;
+}
+if (t.recurrence) {
+this.createComponent({
+name: "recurrenceEventDialog",
+kind: "gts.ConfirmDialog",
+title: "Transaction Series",
+message: "This will change this and all following transactions.",
+confirmText: "Continue",
+confirmClass: "",
+cancelText: "Cancel",
+cancelClass: "",
+onConfirm: "updateFuture",
+onCancel: "closeRecurrenceEventDialog"
+}), this.$.recurrenceEventDialog.show();
+return;
+}
+this.updateTransactionObject(t.minor);
+} else this.updateTransactionObject();
+Checkbook.globals.transactionManager.updateTransaction(this.trsnObj, this.transactionType, this.getSaveOptions());
+} else this.saveModifiedTransaction();
+}
+},
+getSaveOptions: function() {
+return {
 onSuccess: enyo.bind(this, this.saveCompleteHandler, {
 modifyStatus: 1,
 account: this.trsnObj.account,
@@ -14466,15 +14661,63 @@ atAccount: this.trsnObj.autoTransfer > 0 && this.trsnObj.autoTransferLink >= 0 ?
 }),
 onFailure: null
 };
-this.trsnObj.itemId < 0 ? Checkbook.globals.transactionManager.createTransaction(this.trsnObj, this.transactionType, t) : Checkbook.globals.transactionManager.updateTransaction(this.trsnObj, this.transactionType, t);
+},
+checkForChanges: function() {
+var e = {
+minor: !1,
+major: !1,
+recurrence: !1
+}, t = this.$.date.getValue();
+t.setHours(this.$.time.getValue().getHours()), t.setMinutes(this.$.time.getValue().getMinutes());
+if (this.trsnObj.desc !== this.$.desc.getValue() || this.trsnObj["amount_old"] != this.$["amount"].getValue() || this.trsnObj.date !== t || this.trsnObj.account !== this.$.account.getValue() || this.$.linkedAccount.getShowing() && this.trsnObj.linkedAccount !== this.$.linkedAccount.getValue() || enyo.json.stringify(this.trsnObj.categoryOriginal) !== enyo.json.stringify(this.trsnObj.category) || this.trsnObj.payee !== this.$.payeeField.getValue() || this.trsnObj.note !== this.$.notes.getValue()) e.major = !0;
+if (this.trsnObj.checkNum !== this.$.checkNum.getValue() || this.trsnObj.cleared !== this.$.cleared.getValue()) e.minor = !0;
+return Checkbook.globals.transactionManager.$.recurrence.compare(this.trsnObj.rObj, this.$.recurrenceSelect.getValue()) || (e.recurrence = !0), e;
+},
+updateTransactionObject: function(e) {
+this.trsnObj.desc = this.$.desc.getValue(), this.trsnObj.amount = this.$.amount.getValue(), this.trsnObj.account = this.$.account.getValue(), this.trsnObj.linkedAccount = this.$.linkedAccount.getValue();
+var t = this.$.time.getValue();
+this.trsnObj.date = this.$.date.getValue(), this.trsnObj.date.setHours(t.getHours()), this.trsnObj.date.setMinutes(t.getMinutes()), delete this.trsnObj.categoryOriginal, this.trsnObj.checkNum = this.$.checkNum.getValue(), this.trsnObj.payee = this.$.payeeField.getValue(), this.trsnObj.cleared = this.$.cleared.getValue(), this.trsnObj.note = this.$.notes.getValue(), e ? this.trsnObj.rObj = !1 : (this.trsnObj.rObj || (this.trsnObj.rObj = {}), enyo.mixin(this.trsnObj.rObj, enyo.clone(this.$.recurrenceSelect.getValue()))), this.trsnObj.autoTransfer = this.$.autoTrans.getShowing() && this.$.autoTrans.getValue() ? this.accountObj.auto_savings : 0, this.trsnObj.autoTransferLink = this.accountObj.auto_savings_link;
+},
+saveNewTransaction: function() {
+this.updateTransactionObject(), Checkbook.globals.transactionManager.createTransaction(this.trsnObj, this.transactionType, this.getSaveOptions());
+},
+saveModifiedTransaction: function(e) {
+this.updateTransactionObject(e), Checkbook.globals.transactionManager.updateTransaction(this.trsnObj, this.transactionType, this.getSaveOptions());
 },
 saveCompleteHandler: function(e) {
 enyo.asyncMethod(this, this.doFinish, e);
 },
+closeRecurrenceEventDialog: function() {
+this.$.recurrenceEventDialog.hide(), this.$.recurrenceEventDialog.destroy();
+},
+endRecurrenceEvent: function() {
+this.closeRecurrenceEventDialog(), Checkbook.globals.transactionManager.$.recurrence.deleteOnlyFuture(this.trsnObj.itemId, this.trsnObj.repeatId, {
+onSuccess: enyo.bind(this, this.saveModifiedTransaction, !0)
+});
+},
+updateSingle: function() {
+this.closeRecurrenceEventDialog(), this.trsnObj.repeatUnlinked = 1, this.saveModifiedTransaction(!0);
+},
+updateFuture: function() {
+this.closeRecurrenceEventDialog(), this.saveModifiedTransaction();
+},
+updateAll: function() {
+var e = this, t = this.trsnObj.repeatId;
+this.closeRecurrenceEventDialog(), this.updateTransactionObject(), this.trsnObj.repeatId = -1, this.$.date.setValue(GTS.Object.isDate(this.trsnObj.rObj.origDate) ? this.trsnObj.rObj.origDate.getTime() : this.trsnObj.rObj.origDate), Checkbook.globals.transactionManager.$.recurrence.deleteAll(t, {
+onSuccess: enyo.bind(this, this.saveNewTransaction)
+});
+},
 deleteTransaction: function() {
 this.trsnObj.itemId < 0 ? this.doFinish({
 status: 0
-}) : (this.createComponent({
+}) : (this.trsnObj.repeatId > 0 || this.trsnObj.repeatId === 0 ? this.createComponent({
+name: "deleteTransactionConfirm",
+kind: "Checkbook.transactions.recurrence.delete",
+transactionId: this.trsnObj.itemId,
+recurrenceId: this.trsnObj.repeatId,
+onFinish: "deleteTransactionConfirmClose",
+onCancel: "deleteTransactionConfirmClose"
+}) : this.createComponent({
 name: "deleteTransactionConfirm",
 kind: "gts.ConfirmDialog",
 title: "Delete Transaction",
@@ -14499,149 +14742,653 @@ modifyStatus: 2
 }
 });
 
-// recurrenceSelect.js
+// manager.js
 
 enyo.kind({
-name: "Checkbook.transactions.repeat.select",
-kind: enyo.Control,
+name: "Checkbook.autocompleteprefs.manager",
+kind: enyo.Component,
+constructor: function() {
+this.inherited(arguments);
+if (!Checkbook.globals.gts_db) {
+this.log("creating database object.");
+var e = new GTS.database(getDBArgs());
+}
+}
+});
+
+// view.js
+
+enyo.kind({
+name: "Checkbook.autocompleteprefs.view",
+style: "height: 100%;",
+flex: 1,
+events: {
+onFinish: ""
+},
+components: [ {
+kind: enyo.PageHeader,
+className: "enyo-header-dark",
+components: [ {
+kind: enyo.Spacer
+}, {
+content: "Auto-Complete Preferences",
+className: "bigger"
+}, {
+kind: enyo.Spacer
+} ]
+}, {
+name: "entries",
+kind: enyo.VirtualList,
+flex: 1,
+onSetupRow: "buildRow",
+components: [ {
+kind: enyo.SwipeableItem,
+layoutKind: enyo.HFlexLayout,
+className: "light narrow-column",
+tapHighlight: !0,
+ontap: "itemTapped",
+onConfirm: "itemDeleted",
+components: [ {
+name: "desc",
+className: "enyo-text-ellipsis",
+flex: 1
+}, {
+name: "icon",
+kind: enyo.Image,
+className: "img-icon"
+} ]
+} ]
+}, {
+kind: enyo.Toolbar,
+className: "tardis-blue",
+components: [ {
+kind: enyo.ToolButtonGroup,
+components: [ {
+caption: "Close",
+className: "enyo-grouped-toolbutton-dark",
+ontap: "doFinish"
+}, {
+icon: "assets/menu_icons/sort.png",
+className: "enyo-grouped-toolbutton-dark",
+ontap: ""
+} ]
+}, {
+kind: enyo.Spacer,
+flex: 1
+}, {
+kind: enyo.ToolButtonGroup,
+components: [ {
+icon: "assets/menu_icons/new.png",
+className: "enyo-grouped-toolbutton-dark",
+ontap: ""
+} ]
+} ]
+} ],
+itemTapped: function() {
+this.log(arguments);
+},
+itemDeleted: function() {
+this.log(arguments);
+},
+buildRow: function(e, t) {
+if (t >= 0 && t < 100) return this.$.desc.setContent("description name: " + t), this.$.icon.setSrc("assets/" + (t % 2 == 0 ? "green-plus.png" : "red-cross.png")), !0;
+},
+fetchGroup: function(e, t) {
+var n = t * e.getPageSize();
+if (n < 0) return;
+}
+});
+
+// modify.js
+
+enyo.kind({
+name: "Checkbook.autocompleteprefs.modify",
+kind: enyo.Component
+});
+
+// autocomplete.js
+
+enyo.kind({
+name: "Checkbook.transactions.autocomplete",
+events: {
+onValueChanged: ""
+},
+published: {
+enabled: !0
+},
+components: [ {
+name: "ac",
+kind: "GTS.AutoComplete",
+onValueSelected: "handleSuggestion",
+onDataRequested: "fetchData",
+components: [ {
+tag: "",
+name: "client"
+} ]
+} ],
+rendered: function() {
+this.inherited(arguments), this.enabledChanged();
+},
+enabledChanged: function() {
+this.$.ac.setEnabled(this.enabled);
+},
+fetchData: function(e, t) {
+if (t.value.length <= 0) {
+t.callback([]);
+return;
+}
+Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+sql: "SELECT DISTINCT desc FROM transactions WHERE desc LIKE ? ORDER BY desc ASC LIMIT ?;",
+values: [ t.value + "%", e.getLimit() ]
+}), {
+onSuccess: enyo.bind(this, this.buildSuggestionList)
+});
+},
+buildSuggestionList: function(e) {
+var t = [];
+for (var n = 0; n < e.length; n++) t.push(e[n].desc);
+this.$.ac.setValues(t);
+},
+handleSuggestion: function(e, t) {
+return Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+sql: "SELECT ( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct,  ( CASE WHEN a.category = '||~SPLIT~||' THEN ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = a.itemId ORDER BY ts.amount DESC ) ) || ']' ) ELSE a.category END ) AS category, ( CASE WHEN a.category = '||~SPLIT~||' THEN 'PARSE_CATEGORY' ELSE a.category2 END ) AS category2, COUNT( desc ) AS count FROM transactions a WHERE desc = ? AND category != '' GROUP BY category ORDER BY count DESC LIMIT 1;",
+values: [ this.getOwner().$.account.getValue(), t.value ]
+}), {
+onSuccess: enyo.bind(this, this.dataHandler, t.value)
+}), !0;
+},
+dataHandler: function(e, t) {
+var n = {
+data: !1
+};
+if (t.length > 0) var n = {
+data: !0,
+desc: e,
+linkedAccount: t[0].linkedAccount,
+category: Checkbook.globals.transactionManager.parseCategoryDB(GTS.String.dirtyString(t[0].category), GTS.String.dirtyString(t[0].category2))
+};
+this.doValueChanged(n);
+}
+});
+
+// manager.js
+
+enyo.kind({
+name: "Checkbook.transactions.recurrence.manager",
+kind: "enyo.Component",
+events: {
+onRequestInsertTransactionSQL: ""
+},
+compare: function(e, t) {
+var n = !0;
+n = n && e.frequency === t.frequency, n = n && e.itemSpan === t.itemSpan, n = n && enyo.json.stringify(e.daysOfWeek) === enyo.json.stringify(t.daysOfWeek), n = n && e.endingCondition === t.endingCondition;
+if (n && (e["endingCondition"] == "date" || t["endingCondition"] == "date")) {
+var r = GTS.Object.isDate(e.endDate) ? e.endDate : new Date(e.endDate), i = GTS.Object.isDate(t.endDate) ? t.endDate : new Date(t.endDate);
+n = n && r === i;
+}
+return n && (e["endingCondition"] == "occurences" || t["endingCondition"] == "occurences") && (n = n && e.endCount === t.endCount), n;
+},
+fetch: function(e, t) {
+if (isNaN(e) || e < 0) {
+enyo.isFunction(t.onSuccess) && t.onSuccess({});
+return;
+}
+Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("repeats", "*", {
+repeatId: e
+}), {
+onSuccess: function(e) {
+enyo.isFunction(t.onSuccess) && t.onSuccess(e[0]);
+},
+onError: t.onError
+});
+},
+handleRecurrenceSystem: function(e, t, n) {
+var r = [];
+if (e["rObj"] != 0) if ((isNaN(e.repeatId) || e.repeatId < 0) && e["rObj"]["frequency"] != "none") {
+e.repeatId = e.maxRepeatId;
+if (e["rObj"]["frequency"] == "weekly" && e["rObj"]["daysOfWeek"].length == 0) return [];
+var i = {
+repeatId: e.repeatId,
+frequency: e.rObj.frequency,
+itemSpan: e.rObj.itemSpan,
+daysOfWeek: enyo.json.stringify(e["rObj"]["frequency"] == "weekly" ? e.rObj.daysOfWeek : ""),
+endingCondition: e.rObj.endingCondition,
+endDate: e["rObj"]["endingCondition"] == "date" ? e.rObj.endDate : "",
+endCount: e["rObj"]["endingCondition"] == "occurences" ? e.rObj.endCount : "",
+lastOccurrence: e.date,
+currCount: 1,
+origDate: e.rObj.origDate,
+rep_desc: e.desc,
+rep_amount: e.amount,
+rep_note: e.note,
+rep_category: enyo.json.stringify(e.category),
+rep_acctId: e.account,
+rep_linkedAcctId: e.linkedAccount,
+rep_autoTrsnLink: t > 0 && n >= 0 ? t : 0,
+rep_autoTrsnLinkAcct: t > 0 && n >= 0 ? n : "",
+last_sync: "",
+maxItemId: GTS.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.itemId + 2 : e.itemId + 1
+};
+r = r.concat(this.generateSeriesSQL([ enyo.clone(i) ])), delete i.maxItemId, r.unshift(Checkbook.globals.gts_db.getInsert("repeats", i));
+} else if (!(isNaN(e.repeatId) || e.repeatId < 0) && e["repeatUnlinked"] != 1 && e["terminated"] != 1) if (e["rObj"]["frequency"] == "none") r.push(this._getDeleteFutureSQL(e.itemId, e.repeatId, !0)); else {
+var s = {
+repeatId: e.repeatId,
+frequency: e.rObj.frequency,
+itemSpan: e.rObj.itemSpan,
+daysOfWeek: enyo.json.stringify(e["rObj"]["frequency"] == "weekly" ? e.rObj.daysOfWeek : ""),
+endingCondition: e.rObj.endingCondition,
+endDate: e["rObj"]["endingCondition"] == "date" ? e.rObj.endDate : "",
+endCount: e["rObj"]["endingCondition"] == "occurences" ? e.rObj.endCount : "",
+lastOccurrence: e.date,
+currCount: e.rObj.currCount,
+origDate: e.rObj.origDate,
+rep_desc: e.desc,
+rep_amount: e.amount,
+rep_note: e.note,
+rep_category: enyo.json.stringify(e.category),
+rep_acctId: e.account,
+rep_linkedAcctId: e.linkedAccount,
+rep_autoTrsnLink: t > 0 && n >= 0 ? t : 0,
+rep_autoTrsnLinkAcct: t > 0 && n >= 0 ? n : "",
+last_sync: "",
+terminated: 0,
+maxItemId: GTS.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.maxItemId + 1 : e.maxItemId
+};
+r = r.concat(this._getDeleteFutureSQL(e.itemId, s.repeatId, !0)), r = r.concat(this.generateSeriesSQL([ enyo.clone(s) ])), delete s.maxItemId, delete s.lastOccurrence, delete s.currCount, r.push(Checkbook.globals.gts_db.getUpdate("repeats", s, {
+repeatId: s.repeatId
+}));
+}
+return delete e.rObj, delete e.maxItemId, delete e.maxRepeatId, r;
+},
+updateSeriesTransactions: function(e, t) {
+var n = new Date, r = new Date(n.getFullYear(), n.getMonth(), n.getDate() + Checkbook.globals.prefs.seriesDayLimit, 23, 59, 59, 999);
+e = e || -1, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+sql: "SELECT ( SELECT IFNULL( ( MAX( itemId ) + 1 ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * FROM repeats WHERE ( rep_acctId = ? " + (e < 0 ? "OR 1 = 1 " : "") + ") " + "AND lastOccurrence < ? " + "AND ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date > ? ) < ? " + "AND ( " + "( " + "endingCondition = 'none' " + ") OR ( " + "endingCondition = 'date' " + "AND endDate != '' " + "AND endDate > lastOccurrence " + ") OR ( " + "endingCondition = 'occurences' " + "AND endCount != '' " + "AND endCount > currCount " + ") " + ") " + "AND terminated != 1",
+values: [ e, Date.parse(r), Date.parse(n), Checkbook.globals.prefs.seriesCountLimit ]
+}), {
+onSuccess: enyo.bind(this, this._updateSeriesTransactionsHandler, t),
+onError: t.onError
+});
+},
+_updateSeriesTransactionsHandler: function(e, t) {
+t.length > 0 ? Checkbook.globals.gts_db.queries(this.generateSeriesSQL(t), e) : enyo.isFunction(e.onSuccess) && e.onSuccess();
+},
+generateSeriesSQL: function(e) {
+var t = [];
+if (e.length > 0) {
+var n = e[0].maxItemId, r = new Date, i, s, o, u, a, f;
+for (var l = 0; l < e.length; l++) {
+s = new Date(parseInt(e[l].origDate)), o = new Date(parseInt(e[l].lastOccurrence)), u = new Date(parseInt(e[l].lastOccurrence)), a = e[l].currCount;
+var c = enyo.json.parse(e[l].rep_category), h = enyo.json.parse(e[l].daysOfWeek);
+while (Math.floor((u - o) / 864e5) < Checkbook.globals.prefs.seriesDayLimit && a - e[l].currCount < Checkbook.globals.prefs.seriesCountLimit && (e[l]["endingCondition"] == "none" || e[l]["endingCondition"] == "date" && e[l].endDate && Date.parse(u) <= e[l].endDate || e[l]["endingCondition"] == "occurences" && e[l].endCount && a <= e[l].endCount)) {
+if (e[l]["frequency"] == "daily") u.setDate(u.getDate() + 1 * e[l].itemSpan); else if (e[l]["frequency"] == "weekly") {
+var p = h.indexOf(u.getDay());
+if (p < 0 || p + 1 >= h.length) {
+while (u.getDay() > 0) u.setDate(u.getDate() + 1);
+while (u.getDay() < 7 && u.getDay() != h[0]) u.setDate(u.getDate() + 1);
+u.setDate(u.getDate() + 7 * (e[l].itemSpan - 1));
+} else u.setDate(u.getDate() + (h[p + 1] - h[p]));
+} else if (e[l]["frequency"] == "monthly") {
+var d = Math.max(u.getDate(), s.getDate());
+u.setDate(1), u.setMonth(u.getMonth() + 1 * e[l].itemSpan), u.setDate(Math.min(d, u.daysInMonth()));
+} else e[l]["frequency"] == "yearly" && u.setYear(u.getFullYear() + 1 * e[l].itemSpan);
+i = {
+itemId: n,
+account: e[l].rep_acctId,
+repeatId: e[l].repeatId,
+desc: e[l].rep_desc,
+note: e[l].rep_note,
+date: u,
+amount: e[l].rep_amount,
+amount_old: "NOT_A_VALUE",
+linkedRecord: -1,
+linkedAccount: e[l].rep_linkedAcctId,
+cleared: !1,
+checkNum: "",
+category: c,
+category2: "",
+rObj: !1,
+autoTransfer: e[l].rep_autoTrsnLink,
+autoTransferLink: e[l].rep_autoTrsnLink > 0 ? e[l].rep_autoTrsnLinkAcct : -1
+}, GTS.Object.validNumber(e[l].rep_linkedAcctId) && e[l].rep_linkedAcctId >= 0 ? f = "transfer" : e[l].rep_amount < 0 ? f = "expense" : f = "income", t = t.concat(Checkbook.globals.transactionManager.generateInsertTransactionSQL({
+data: i,
+type: f
+})), a++, n += GTS.Object.validNumber(e[l].linkedAccount) && e[l].linkedAccount >= 0 ? 2 : 1;
+}
+t.push(Checkbook.globals.gts_db.getUpdate("repeats", {
+lastOccurrence: Date.parse(u),
+currCount: a,
+lastUpdated: Date.parse(new Date)
+}, {
+repeatId: e[l].repeatId
+}));
+}
+t.length > 0 && Checkbook.globals.accountManager.updateAccountModTime();
+}
+return t;
+},
+setTermination: function(e, t, n) {
+Checkbook.globals.gts_db.queries(Checkbook.globals.gts_db.getUpdate("repeats", {
+terminated: t ? 1 : 0
+}, {
+repeatId: e
+}), n);
+},
+deleteOne: function(e, t, n) {
+Checkbook.globals.gts_db.queries([ Checkbook.globals.gts_db.getDelete("transactions", {
+itemId: e
+}), Checkbook.globals.gts_db.getDelete("transactions", {
+linkedRecord: e
+}), new GTS.databaseQuery({
+sql: "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )",
+values: [ e, e ]
+}), new GTS.databaseQuery({
+sql: "UPDATE repeats SET currCount = MAX( IFNULL( ( SELECT ( sub.currCount - 1 ) FROM repeats sub WHERE sub.repeatId = repeats.repeatId ), 0 ), 0 ) WHERE repeatId = ?",
+values: [ t ]
+}) ], n);
+},
+deleteFuture: function(e, t, n) {
+Checkbook.globals.gts_db.queries(this._getDeleteFutureSQL(e, t), n);
+},
+deleteOnlyFuture: function(e, t, n) {
+Checkbook.globals.gts_db.queries(this._getDeleteFutureSQL(e, t, !0), n);
+},
+_getDeleteFutureSQL: function(e, t, n) {
+var r;
+return n ? r = [ t, e ] : r = [ t, e, e ], [ new GTS.databaseQuery({
+sql: "UPDATE repeats SET terminated = 1, currCount = MAX( ( ( SELECT sub.currCount FROM repeats sub WHERE sub.repeatId = repeats.repeatId ) - ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date " + (n ? ">" : ">=") + " ( SELECT trsn.date FROM transactions trsn WHERE trsn.itemId = ? ) ) ), 0 ) WHERE repeatId = ?",
+values: [ e, t ]
+}), new GTS.databaseQuery({
+sql: "DELETE FROM transactions WHERE repeatId = ? AND ( " + (n ? "" : "itemId = ? OR ") + "itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + (n ? ">" : ">=") + " ( SELECT sub2.date FROM transactions sub2 WHERE sub2.itemId = ? ) ) )",
+values: r
+}) ];
+},
+deleteAll: function(e, t) {
+Checkbook.globals.gts_db.queries([ Checkbook.globals.gts_db.getDelete("transactions", {
+repeatId: e
+}), Checkbook.globals.gts_db.getDelete("repeats", {
+repeatId: e
+}) ], t);
+}
+});
+
+// confirm.js
+
+enyo.kind({
+name: "Checkbook.transactions.recurrence.confirm",
+kind: "onyx.Popup",
+classes: "gts-confirm-dialog",
+centered: !0,
+floating: !0,
+modal: !0,
+autoDismiss: !1,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
+style: "max-width: 325px;",
+events: {
+onOne: "",
+onFuture: "",
+onAll: "",
+onCancel: ""
+},
+components: [ {
+name: "title",
+classes: "title-wrapper",
+content: " Recurring Transaction"
+}, {
+name: "message",
+classes: "message-wrapper",
+content: "Would you like to change only this transaction, all transactions in the series, or this and all following transactions in the series?"
+}, {
+classes: "block-buttons text-center",
+components: [ {
+kind: "onyx.Button",
+content: "Only this instance",
+ontap: "doOne"
+}, {
+kind: "onyx.Button",
+content: "This and all following",
+ontap: "doFuture"
+}, {
+kind: "onyx.Button",
+content: "All transactions in the series",
+ontap: "doAll"
+}, {
+kind: "onyx.Button",
+content: "Cancel",
+ontap: "doCancel"
+} ]
+} ]
+});
+
+// delete.js
+
+enyo.kind({
+name: "Checkbook.transactions.recurrence.delete",
+kind: "onyx.Popup",
+classes: "gts-confirm-dialog",
+centered: !0,
+floating: !0,
+modal: !0,
+autoDismiss: !1,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
+style: "max-width: 325px;",
+published: {
+transactionId: -1,
+recurrenceId: -1
+},
+events: {
+onDeleteOne: "",
+onDeleteFuture: "",
+onDeleteAll: "",
+onFinish: "",
+onCancel: ""
+},
+components: [ {
+name: "title",
+classes: "title-wrapper",
+content: "Delete Recurring Transaction"
+}, {
+name: "message",
+classes: "message-wrapper",
+content: "Would you like to delete only this transaction, this and all following transactions in the series, or all transactions in the series?"
+}, {
+classes: "block-buttons text-center",
+components: [ {
+kind: "onyx.Button",
+content: "Only this instance",
+classes: "onyx-negative",
+ontap: "deleteOne"
+}, {
+kind: "onyx.Button",
+content: "This and all following",
+classes: "onyx-negative",
+ontap: "deleteFuture"
+}, {
+kind: "onyx.Button",
+content: "All transactions in the series",
+classes: "onyx-negative",
+ontap: "deleteAll"
+}, {
+kind: "onyx.Button",
+content: "Cancel",
+ontap: "doCancel"
+} ]
+} ],
+deleteOne: function() {
+Checkbook.globals.transactionManager.$.recurrence.deleteOne(this.transactionId, this.recurrenceId, {
+onSuccess: enyo.bind(this, this.deleteCompleted, "one")
+});
+},
+deleteFuture: function() {
+Checkbook.globals.transactionManager.$.recurrence.deleteFuture(this.transactionId, this.recurrenceId, {
+onSuccess: enyo.bind(this, this.deleteCompleted, "future")
+});
+},
+deleteAll: function() {
+Checkbook.globals.transactionManager.$.recurrence.deleteAll(this.recurrenceId, {
+onSuccess: enyo.bind(this, this.deleteCompleted, "all")
+});
+},
+deleteCompleted: function(e) {
+switch (e) {
+case "all":
+this.doDeleteAll();
+break;
+case "future":
+this.doDeleteFuture();
+break;
+case "one":
+this.doDeleteOne();
+}
+this.doFinish();
+}
+});
+
+// select.js
+
+enyo.kind({
+name: "Checkbook.transactions.recurrence.select",
 recurrenceOptions: [],
+systemActive: !1,
 published: {
 date: ""
 },
 events: {
-onChange: ""
+onRecurrenceChange: ""
 },
 components: [ {
 name: "recurrenceNode",
-kind: "GTS.ListSelectorBar",
-labelText: "Recurrence",
+kind: "GTS.SelectorBar",
+label: "Recurrence",
 onChange: "recurrenceNodeChanged",
-className: "force-left-padding",
+classes: "force-left-padding",
 value: 0
 }, {
 name: "weeklyOptions",
-kind: enyo.RowItem,
-layoutKind: enyo.HFlexLayout,
+classes: "h-box bo",
 showing: !1,
 components: []
 }, {
 name: "durationWrapper",
 showing: !1,
 components: [ {
-kind: enyo.RowItem,
-layoutKind: enyo.HFlexLayout,
-align: "center",
+kind: "onyx.Item",
+classes: "text-center bordered h-box box-pack-center box-align-center",
 components: [ {
-content: "Every "
+content: "Every"
 }, {
-name: "frequency",
-kind: enyo.IntegerPicker,
-label: "",
+kind: "onyx.PickerDecorator",
+components: [ {
+classes: "margin-half-left margin-half-right"
+}, {
+name: "itemSpan",
+kind: "GTS.IntegerPicker",
 min: 1,
 max: 64,
 style: "margin-right: 3px;",
 onChange: "sendSummary"
+} ]
 }, {
-name: "frequencyUnits"
+name: "itemSpanUnits"
 }, {
 content: "Frequency",
-flex: 1,
-className: "enyo-label",
-style: "text-align: right;"
+classes: "label box-flex-1 text-right"
 } ]
 }, {
 name: "endingCondition",
-kind: "GTS.ListSelectorBar",
-labelText: "Ending Condition",
-className: "force-left-padding enyo-last",
+kind: "GTS.SelectorBar",
+label: "Ending Condition",
+classes: "bordered",
 onChange: "endingConditionChanged",
 choices: [ {
-caption: "Forever",
-value: "f"
+content: "Forever",
+value: "f",
+active: !0
 }, {
-caption: "Until Date",
+content: "Until Date",
 value: "d"
 }, {
-caption: "Occurrences",
+content: "Occurrences",
 value: "o"
 } ],
 value: "f"
 }, {
 name: "endingDateWrapper",
-kind: enyo.RowItem,
-className: "enyo-single",
+kind: "onyx.Item",
+classes: "bordered",
 showing: !1,
-components: [ {
-name: "endingDate",
-kind: "GTS.DateTimePicker",
-onChange: "sendSummary"
-} ]
+components: []
 }, {
 name: "endingCountWrapper",
-kind: enyo.RowItem,
-layoutKind: enyo.HFlexLayout,
-align: "center",
-className: "enyo-single",
+kind: "onyx.Item",
+classes: "text-center bordered h-box box-pack-center box-align-center",
 showing: !1,
 components: [ {
+kind: "onyx.PickerDecorator",
+components: [ {
+classes: "margin-half-left margin-half-right"
+}, {
 name: "endingCount",
-kind: enyo.IntegerPicker,
-label: "",
+kind: "GTS.IntegerPicker",
 min: 1,
 max: 100,
 onChange: "sendSummary"
+} ]
 }, {
 content: "Occurrences",
-flex: 1,
-className: "enyo-label",
-style: "text-align: right;"
+classes: "label box-flex-1 text-right"
 } ]
 } ]
 } ],
+create: function() {
+this.inherited(arguments), this.date == "" && (this.date = new Date), this.buildRecurrenceOptions(), this.buildDateSystem(), this.buildDayOfWeekSystem(), this.recurrenceNodeChanged(), this.systemActive = !0;
+},
 getValue: function() {
 var e = {};
-if (this.$["recurrenceNode"].getValue() == 0) e.pattern = "none"; else {
-e.startDate = Date.parse(this.date), e.frequency = this.$.frequency.getValue();
+if (this.$["recurrenceNode"].getValue() == 0) e.frequency = "none"; else {
+e.origDate = Date.parse(this.date), e.itemSpan = this.$.itemSpan.getValue();
 switch (this.$.recurrenceNode.getValue()) {
 case 1:
-e.pattern = "daily";
+e.frequency = "daily";
 break;
 case 2:
-e.pattern = "weekly", e.dow = [];
-for (i = 0; i < 7; i++) this.$["weekly" + i].getChecked() && e.dow.push(i);
+e.frequency = "weekly", e.daysOfWeek = [];
+for (i = 0; i < 7; i++) this.$["weekly" + i].getChecked() && e.daysOfWeek.push(i);
 break;
 case 3:
-e.pattern = "monthly";
+e.frequency = "monthly";
 break;
 case 4:
 default:
-e.pattern = "yearly";
+e.frequency = "yearly";
 }
 switch (this.$.endingCondition.getValue()) {
 case "d":
-e.endCondition = "date", e.endDate = Date.parse(this.$.endingDate.getValue());
+e.endingCondition = "date", e.endDate = Date.parse(this.$.endingDate.getValue());
 break;
 case "o":
-e.endCondition = "occurences", e.endCount = this.$.endingCount.getValue();
+e.endingCondition = "occurences", e.endCount = this.$.endingCount.getValue();
 break;
 case "f":
 default:
-e.endCondition = "none";
+e.endingCondition = "none";
 }
 }
 return e;
 },
 setValue: function(e) {
 if (e == null || typeof e == "undefined") this.$.recurrenceNode.setValue(0); else {
-this.date = e.startDate, this.$.frequency.setValue(e.frequency);
+this.date = e.origDate, this.$.itemSpan.setValue(e.itemSpan);
 for (i = 0; i < 7; i++) this.$["weekly" + i].setChecked(!1);
-switch (e.pattern) {
+switch (e.frequency) {
 case "daily":
 this.$.recurrenceNode.setValue(1);
 break;
 case "weekly":
-this.$.recurrenceNode.setValue(2);
-for (i = 0; i < e.dow.length; i++) this.$["weekly" + e.dow[i]].setChecked(!0);
+this.$.recurrenceNode.setValue(2), e.daysOfWeek = enyo.json.parse(e.daysOfWeek);
+for (i = 0; i < e.daysOfWeek.length; i++) this.$["weekly" + e.daysOfWeek[i]].setChecked(!0);
 break;
 case "monthly":
 this.$.recurrenceNode.setValue(3);
@@ -14652,7 +15399,7 @@ break;
 default:
 this.$.recurrenceNode.setValue(0);
 }
-switch (e.endCondition) {
+switch (e.endingCondition) {
 case "date":
 this.$.endingCondition.setValue("d"), this.$.endingDate.setValue(e.endDate);
 break;
@@ -14666,39 +15413,10 @@ this.$.endingCondition.setValue("f");
 }
 this.buildRecurrenceOptions(), this.recurrenceNodeChanged();
 },
-rendered: function() {
-this.inherited(arguments), this.date == "" && (this.date = new Date);
-var e = new Date(2011, 4, 1), t = [];
-for (i = 0; i < 7; i++) t.push({
-flex: 1,
-style: "text-align: center;",
-components: [ {
-content: e.format({
-format: "EEE"
-}),
-className: "enyo-label"
-}, {
-name: "weekly" + i,
-kind: enyo.CheckBox,
-onChange: "sendSummary",
-checked: this.date.getDay() == i,
-dayName: e.format({
-format: "EEEE"
-})
-} ]
-}), e.setDate(e.getDate() + 1);
-this.$.weeklyOptions.createComponents(t, {
-owner: this
-}), this.$.weeklyOptions.render(), this.buildRecurrenceOptions(), this.recurrenceNodeChanged();
-},
-dateChanged: function() {
-this.buildRecurrenceOptions();
-if (this.$["recurrenceNode"].getValue() != 2) for (i = 0; i < 7; i++) this.$["weekly" + i].setChecked(this.date.getDay() == i);
-},
 sendSummary: function() {
 var e = "";
 if (this.$["recurrenceNode"].getValue() == 0) e = "No Recurrence"; else {
-e = "Repeats every " + this.$.frequency.getValue() + " ";
+e = "Repeats every " + this.$.itemSpan.getValue() + " ";
 switch (this.$.recurrenceNode.getValue()) {
 case 1:
 e += "day(s)";
@@ -14722,26 +15440,26 @@ default:
 e += "span(s)";
 }
 }
-this.doChange({
+this.systemActive && this.doRecurrenceChange({
 summary: e,
 value: this.getValue()
 });
 },
 buildRecurrenceOptions: function() {
 this.recurrenceOptions = [ {
-caption: "No Recurrence",
+content: "No Recurrence",
 value: 0
 }, {
-caption: "Daily",
+content: "Daily",
 value: 1
 }, {
-caption: "Weekly",
+content: "Weekly",
 value: 2
 }, {
-caption: "Monthly on the " + this.dateSuffix(this.date.getDate()),
+content: "Monthly on the " + this.dateSuffix(this.date.getDate()),
 value: 3
 }, {
-caption: "Yearly on " + this.date.format({
+content: "Yearly on " + this.date.format({
 format: "MMMM"
 }) + " " + this.dateSuffix(this.date.getDate()),
 value: 4
@@ -14749,28 +15467,93 @@ value: 4
 var e = this.$.recurrenceNode.getValue();
 this.$.recurrenceNode.setChoices(this.recurrenceOptions), this.$.recurrenceNode.render(), this.$.recurrenceNode.setValue(e);
 },
+buildDateSystem: function() {
+!enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs.alwaysFullCalendar ? this.$.endingDateWrapper.createComponent({
+name: "endingDate",
+kind: "GTS.DatePicker",
+onSelect: "sendSummary",
+components: [ {
+name: "endingTime",
+kind: "GTS.TimePicker",
+label: "Time",
+minuteInterval: 5,
+is24HrMode: !1,
+onSelect: "sendSummary"
+} ]
+}, {
+owner: this
+}) : this.$.endingDateWrapper.createComponents([ {
+classes: "onyx-toolbar-inline",
+components: [ {
+name: "label",
+classes: "label",
+content: "Date"
+}, {
+name: "endingDate",
+kind: "onyx.DatePicker",
+onSelect: "sendSummary"
+} ]
+}, {
+name: "endingTime",
+kind: "GTS.TimePicker",
+label: "Time",
+minuteInterval: 5,
+is24HrMode: !1,
+onSelect: "sendSummary"
+} ], {
+owner: this
+});
+},
+buildDayOfWeekSystem: function() {
+var e = new Date(2011, 4, 1), t = [];
+for (i = 0; i < 7; i++) t.push({
+classes: "text-center box-flex-1",
+components: [ {
+content: e.format({
+format: "EEE"
+}),
+classes: "label"
+}, {
+name: "weekly" + i,
+kind: "onyx.Checkbox",
+onchange: "sendSummary",
+checked: this.date.getDay() == i,
+dayName: e.format({
+format: "EEEE"
+})
+} ]
+}), e.setDate(e.getDate() + 1);
+this.$.weeklyOptions.createComponents(t, {
+owner: this
+}), this.$.weeklyOptions.render();
+},
 recurrenceNodeChanged: function() {
 this.$.recurrenceNode.addRemoveClass("enyo-single", this.$["recurrenceNode"].getValue() == 0), this.$.durationWrapper.setShowing(this.$["recurrenceNode"].getValue() != 0), this.$.weeklyOptions.setShowing(this.$["recurrenceNode"].getValue() == 2);
 switch (this.$.recurrenceNode.getValue()) {
 case 1:
-this.$.frequencyUnits.setContent("day(s)");
+this.$.itemSpanUnits.setContent("day(s)");
 break;
 case 2:
-this.$.frequencyUnits.setContent("week(s)");
+this.$.itemSpanUnits.setContent("week(s)");
 break;
 case 3:
-this.$.frequencyUnits.setContent("month(s)");
+this.$.itemSpanUnits.setContent("month(s)");
 break;
 case 4:
-this.$.frequencyUnits.setContent("year(s)");
+this.$.itemSpanUnits.setContent("year(s)");
 break;
 default:
-this.$.frequencyUnits.setContent("span(s)");
+this.$.itemSpanUnits.setContent("span(s)");
 }
-this.sendSummary();
+return this.sendSummary(), !0;
+},
+dateChanged: function() {
+this.buildRecurrenceOptions();
+if (this.$["recurrenceNode"].getValue() != 2) for (i = 0; i < 7; i++) this.$["weekly" + i].setChecked(this.date.getDay() == i);
+this.buildRecurrenceOptions(), this.sendSummary();
 },
 endingConditionChanged: function() {
-this.$.endingDateWrapper.setShowing(this.$["endingCondition"].getValue() == "d"), this.$.endingCountWrapper.setShowing(this.$["endingCondition"].getValue() == "o"), this.sendSummary();
+return this.$.endingDateWrapper.setShowing(this.$["endingCondition"].getValue() == "d"), this.$.endingCountWrapper.setShowing(this.$["endingCondition"].getValue() == "o"), this.$.endingDateWrapper.getShowing() && (this.$.endingDate.render(), this.$.endingTime.render()), this.sendSummary(), !0;
 },
 dateSuffix: function(e) {
 return e + [ "th", "st", "nd", "rd" ][e % 10 > 3 ? 0 : (e % 100 - e % 10 != 10) * e % 10];
@@ -15294,175 +16077,6 @@ onSuccess: enyo.bind(this, this.doChangeComplete, {
 action: "group"
 })
 }) : this.hide();
-}
-});
-
-// manager.js
-
-enyo.kind({
-name: "Checkbook.autocompleteprefs.manager",
-kind: enyo.Component,
-constructor: function() {
-this.inherited(arguments);
-if (!Checkbook.globals.gts_db) {
-this.log("creating database object.");
-var e = new GTS.database(getDBArgs());
-}
-}
-});
-
-// view.js
-
-enyo.kind({
-name: "Checkbook.autocompleteprefs.view",
-style: "height: 100%;",
-flex: 1,
-events: {
-onFinish: ""
-},
-components: [ {
-kind: enyo.PageHeader,
-className: "enyo-header-dark",
-components: [ {
-kind: enyo.Spacer
-}, {
-content: "Auto-Complete Preferences",
-className: "bigger"
-}, {
-kind: enyo.Spacer
-} ]
-}, {
-name: "entries",
-kind: enyo.VirtualList,
-flex: 1,
-onSetupRow: "buildRow",
-components: [ {
-kind: enyo.SwipeableItem,
-layoutKind: enyo.HFlexLayout,
-className: "light narrow-column",
-tapHighlight: !0,
-ontap: "itemTapped",
-onConfirm: "itemDeleted",
-components: [ {
-name: "desc",
-className: "enyo-text-ellipsis",
-flex: 1
-}, {
-name: "icon",
-kind: enyo.Image,
-className: "img-icon"
-} ]
-} ]
-}, {
-kind: enyo.Toolbar,
-className: "tardis-blue",
-components: [ {
-kind: enyo.ToolButtonGroup,
-components: [ {
-caption: "Close",
-className: "enyo-grouped-toolbutton-dark",
-ontap: "doFinish"
-}, {
-icon: "assets/menu_icons/sort.png",
-className: "enyo-grouped-toolbutton-dark",
-ontap: ""
-} ]
-}, {
-kind: enyo.Spacer,
-flex: 1
-}, {
-kind: enyo.ToolButtonGroup,
-components: [ {
-icon: "assets/menu_icons/new.png",
-className: "enyo-grouped-toolbutton-dark",
-ontap: ""
-} ]
-} ]
-} ],
-itemTapped: function() {
-this.log(arguments);
-},
-itemDeleted: function() {
-this.log(arguments);
-},
-buildRow: function(e, t) {
-if (t >= 0 && t < 100) return this.$.desc.setContent("description name: " + t), this.$.icon.setSrc("assets/" + (t % 2 == 0 ? "green-plus.png" : "red-cross.png")), !0;
-},
-fetchGroup: function(e, t) {
-var n = t * e.getPageSize();
-if (n < 0) return;
-}
-});
-
-// modify.js
-
-enyo.kind({
-name: "Checkbook.autocompleteprefs.modify",
-kind: enyo.Component
-});
-
-// autocomplete.js
-
-enyo.kind({
-name: "Checkbook.transactions.autocomplete",
-events: {
-onValueChanged: ""
-},
-published: {
-enabled: !0
-},
-components: [ {
-name: "ac",
-kind: "GTS.AutoComplete",
-onValueSelected: "handleSuggestion",
-onDataRequested: "fetchData",
-components: [ {
-tag: "",
-name: "client"
-} ]
-} ],
-rendered: function() {
-this.inherited(arguments), this.enabledChanged();
-},
-enabledChanged: function() {
-this.$.ac.setEnabled(this.enabled);
-},
-fetchData: function(e, t) {
-if (t.value.length <= 0) {
-t.callback([]);
-return;
-}
-Checkbook.globals.gts_db.query(new GTS.databaseQuery({
-sql: "SELECT DISTINCT desc FROM transactions WHERE desc LIKE ? ORDER BY desc ASC LIMIT ?;",
-values: [ t.value + "%", e.getLimit() ]
-}), {
-onSuccess: enyo.bind(this, this.buildSuggestionList)
-});
-},
-buildSuggestionList: function(e) {
-var t = [];
-for (var n = 0; n < e.length; n++) t.push(e[n].desc);
-this.$.ac.setValues(t);
-},
-handleSuggestion: function(e, t) {
-return Checkbook.globals.gts_db.query(new GTS.databaseQuery({
-sql: "SELECT ( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct,  ( CASE WHEN a.category = '||~SPLIT~||' THEN ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = a.itemId ORDER BY ts.amount DESC ) ) || ']' ) ELSE a.category END ) AS category, ( CASE WHEN a.category = '||~SPLIT~||' THEN 'PARSE_CATEGORY' ELSE a.category2 END ) AS category2, COUNT( desc ) AS count FROM transactions a WHERE desc = ? AND category != '' GROUP BY category ORDER BY count DESC LIMIT 1;",
-values: [ this.getOwner().$.account.getValue(), t.value ]
-}), {
-onSuccess: enyo.bind(this, this.dataHandler, t.value)
-}), !0;
-},
-dataHandler: function(e, t) {
-var n = {
-data: !1
-};
-if (t.length > 0) var n = {
-data: !0,
-desc: e,
-linkedAccount: t[0].linkedAccount,
-category: Checkbook.globals.transactionManager.parseCategoryDB(GTS.String.dirtyString(t[0].category), GTS.String.dirtyString(t[0].category2))
-};
-this.doValueChanged(n);
 }
 });
 

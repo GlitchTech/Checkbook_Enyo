@@ -2317,6 +2317,10 @@ body {
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   padding: 10px;
 }
+.block-buttons .onyx-button {
+  width: 75%;
+  margin: 0.5em;
+}
 
 
 /* /home/ryltar/git/gutoc/enyo/tools/../../lib/gts-plugins/SelectorBar/SelectorBar.css */
@@ -2665,6 +2669,79 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 .inline-notification.no-image {
 	background-image: none;
 	padding-left: 10px;
+}
+
+
+/* /home/ryltar/git/gutoc/enyo/tools/../../lib/gts-plugins/IntegerPicker/IntegerPicker.css */
+
+.gts-integer-picker {
+}
+
+
+/* /home/ryltar/git/gutoc/enyo/tools/../../lib/gts-plugins/IntegerPickerBar/IntegerPickerBar.css */
+
+/*
+Copyright © 2012, GlitchTech Science
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+	Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+	Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+.gts-integerPickerBar {
+}
+
+.gts-integerPickerBar .enyo-fittable-columns-layout > * {
+	vertical-align: middle;
+}
+
+.gts-integerPickerBar img {
+	margin-right: 0.25em;
+	height: 32px !important;
+}
+
+.gts-integerPickerBar .sub-label {
+	font-size: 75%;
+	margin-top: 0.5em;
+}
+
+.gts-integerPickerBar .arrow,
+.gts-integerPickerBar .arrow:active:hover:not( [disabled] ),
+.gts-integerPickerBar .arrow.active {
+	padding: 6px 32px 6px 18px;
+
+	background-repeat: no-repeat;
+	background-position: center right;
+
+	background-image: url(../lib/gts-plugins/IntegerPickerBar/assets/menu-arrow.png);
+}
+
+.gts-integerPickerBar.dark .arrow,
+.gts-integerPickerBar.dark .arrow:active:hover:not( [disabled] ),
+.gts-integerPickerBar.dark .arrow {
+	background-image: url(../lib/gts-plugins/IntegerPickerBar/assets/menu-arrow-light.png);
+}
+
+.gts-integerPickerBar .onyx-menu-item {
+	text-align: left;
+}
+
+@media all and ( max-width: 350px ) {
+
+	.gts-integerPickerBar .enyo-fittable-columns-layout > div:first-child {
+		width: 90% !important;
+	}
+
+	.gts-integerPickerBar .enyo-fittable-columns-layout > div:last-child {
+		display: block;
+
+		margin-top: 10px;
+		text-align: right;
+	}
 }
 
 
