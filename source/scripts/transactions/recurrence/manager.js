@@ -435,6 +435,22 @@ enyo.kind( {
 
 	/**
 	 * @public
+	 * Adjusts termination status
+	 *
+	 * @param int	recurrenceId	ID of recurrence event
+	 * @param boolean	terminated	Is recurrence terminated
+	 *
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 */
+	setTermination: function( recurrenceId, terminated, options ) {
+
+		Checkbook.globals.gts_db.queries( Checkbook.globals.gts_db.getUpdate( "repeats", { "terminated": ( terminated ? 1 : 0 ) }, { "repeatId": recurrenceId } ), options );
+	},
+
+	/**
+	 * @public
 	 * Deletes single recurring event item
 	 *
 	 * @param int	transactionId	ID of transaction

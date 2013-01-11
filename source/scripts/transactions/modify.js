@@ -1071,9 +1071,7 @@ enyo.kind( {
 		if( this.trsnObj['itemId'] < 0 ) {
 			//New transaction
 
-			this.updateTransactionObject();
-
-			Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
+			this.saveNewTransaction();
 		} else {
 			//Modofied transaction
 
@@ -1127,9 +1125,9 @@ enyo.kind( {
 								name: "recurrenceEventDialog",
 								kind: "Checkbook.transactions.recurrence.confirm",
 
-								onOne: "",
-								onFuture: "",
-								onAll: "",
+								onOne: "updateSingle",
+								onFuture: "updateFuture",
+								onAll: "updateAll",
 								onCancel: "closeRecurrenceEventDialog"
 							});
 
@@ -1144,7 +1142,7 @@ enyo.kind( {
 								kind: "gts.ConfirmDialog",
 
 								title: "Transaction Series",
-								message: "This will change all future events.",
+								message: "This will change this and all following transactions.",
 
 								confirmText: "Continue",
 								confirmClass: "",
@@ -1152,17 +1150,22 @@ enyo.kind( {
 								cancelText: "Cancel",
 								cancelClass: "",
 
-								onConfirm: "",
+								onConfirm: "updateFuture",
 								onCancel: "closeRecurrenceEventDialog"
 							});
 
 						this.$['recurrenceEventDialog'].show();
 
 						return;
+					} else {
+
+						this.updateTransactionObject( changes['minor'] );
 					}
+				} else {
+
+					this.updateTransactionObject();
 				}
 
-				this.updateTransactionObject( changes['minor'] );
 				Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
 			} else {
 				//Nonrepeating or single instance
@@ -1272,6 +1275,12 @@ enyo.kind( {
 		this.trsnObj['autoTransferLink'] = this.accountObj['auto_savings_link'];
 	},
 
+	saveNewTransaction: function() {
+
+		this.updateTransactionObject();
+		Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
+	},
+
 	saveModifiedTransaction: function( killRObj ) {
 
 		this.updateTransactionObject( killRObj );
@@ -1298,6 +1307,46 @@ enyo.kind( {
 				this.trsnObj['repeatId'],
 				{
 					"onSuccess": enyo.bind( this, this.saveModifiedTransaction, true )
+				}
+			);
+	},
+
+	updateSingle: function() {
+
+		this.closeRecurrenceEventDialog();
+
+		this.trsnObj['repeatUnlinked'] = 1;
+		this.saveModifiedTransaction( true );
+	},
+
+	updateFuture: function() {
+
+		this.closeRecurrenceEventDialog();
+
+		this.log();
+		//Checkbook.globals.transactionManager.$['recurrence'].deleteFuture( transactionId, recurrenceId, options )
+		//Checkbook.globals.transactionManager.$['recurrence'].setTermination( recurrenceId, false, options )
+		//update recurrence object
+		//check for unmade recurrence items
+	},
+
+	updateAll: function() {
+
+		var self = this;
+		var repeatId = this.trsnObj['repeatId'];
+
+		this.closeRecurrenceEventDialog();
+
+		this.updateTransactionObject();
+
+		//Adjust as if new transaction
+		this.trsnObj['repeatId'] = -1;
+		this.$['date'].setValue( GTS.Object.isDate( this.trsnObj['rObj']['origDate'] ) ? this.trsnObj['rObj']['origDate'].getTime() : this.trsnObj['rObj']['origDate'] );
+
+		Checkbook.globals.transactionManager.$['recurrence'].deleteAll(
+				repeatId,
+				{
+					"onSuccess": enyo.bind( this, this.saveNewTransaction )
 				}
 			);
 	},

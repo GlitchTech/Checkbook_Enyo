@@ -230,9 +230,6 @@ enyo.kind( {
 		} else {
 			//Recurrence
 
-			this.log( robj );
-			this.log( this.$['recurrenceNode'].getValue() );
-
 			this.date = robj['origDate'];
 			this.$['itemSpan'].setValue( robj['itemSpan'] );
 

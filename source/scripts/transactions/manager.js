@@ -571,7 +571,7 @@ enyo.kind({
 					"sql": "SELECT" +
 						//Expense table data
 						" DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account," +
-						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee," +
+						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.repeatUnlinked, main.checkNum, main.payee," +
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +
