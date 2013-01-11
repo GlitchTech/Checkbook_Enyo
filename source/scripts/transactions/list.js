@@ -6,6 +6,9 @@ enyo.kind( {
 	transactions: [],
 	account: {},
 
+	initialScrollCompleted: false,
+	savedScrollPosition: false,
+
 	events: {
 		onLoadingStart: "",
 		onLoadingFinish: ""
@@ -203,7 +206,11 @@ enyo.kind( {
 			return false;
 		}
 
-		this.initialScrollCompleted = false;
+		if( this.savedScrollPosition === false ) {
+
+			this.initialScrollCompleted = false;
+		}
+
 		this.reloadTransactionList();
 	},
 
@@ -314,6 +321,17 @@ enyo.kind( {
 		scrollToIndex = ( scrollToIndex >= 0 ? scrollToIndex : 0 );
 
 		this.$['list'].scrollToRow( scrollToIndex );
+	},
+
+	rememberScrollPosition: function() {
+
+		this.savedScrollPosition = this.$['list'].getScrollPosition();
+	},
+
+	moveToSavedScrollPosition: function() {
+
+		this.$['list'].setScrollPosition( this.savedScrollPosition );
+		this.savedScrollPosition = false;
 	},
 
 	/** List Display **/
@@ -510,6 +528,9 @@ results = {
 
 			this.initialScrollCompleted = true;
 			this.initialScroll();
+		} else if( this.savedScrollPosition ) {
+
+			enyo.job( "moveToSavedScrollPosition", enyo.bind( this, "moveToSavedScrollPosition" ), 1000 );
 		}
 
 		enyo.asyncMethod( this, this.doLoadingFinish );

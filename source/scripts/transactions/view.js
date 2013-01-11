@@ -611,6 +611,7 @@ enyo.kind( {
 		if( inEvent.content.toLowerCase() === "refresh" ) {
 
 			var acctId = this.account['acctId'];
+			this.$['entries'].rememberScrollPosition();
 
 			Checkbook.globals.transactionManager.$['recurrence'].updateSeriesTransactions(
 					acctId,
