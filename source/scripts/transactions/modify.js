@@ -1027,14 +1027,14 @@ enyo.kind( {
 			return;
 		}
 
-		var data = enyo.clone( results );
+		this.trsnObj['rObj'] = enyo.clone( results );
 
-		data['endDate'] = new Date( parseInt( results['endDate'] ) );
-		data['origDate'] = new Date( parseInt( results['origDate'] ) );
-		data['lastUpdated'] = new Date( parseInt( results['lastUpdated'] ) );
-		data['lastOccurrence'] = new Date( parseInt( results['lastOccurrence'] ) );
+		this.trsnObj['rObj']['endDate'] = new Date( parseInt( results['endDate'] ) );
+		this.trsnObj['rObj']['origDate'] = new Date( parseInt( results['origDate'] ) );
+		this.trsnObj['rObj']['lastUpdated'] = new Date( parseInt( results['lastUpdated'] ) );
+		this.trsnObj['rObj']['lastOccurrence'] = new Date( parseInt( results['lastOccurrence'] ) );
 
-		this.$['recurrenceSelect'].setValue( data );
+		this.$['recurrenceSelect'].setValue( this.trsnObj['rObj'] );
 	},
 
 	toggleRecurrenceDrawer: function() {
@@ -1147,31 +1147,23 @@ enyo.kind( {
 								message: "This will change all future events.",
 
 								confirmText: "Continue",
-								confirmClass: "onyx-negative",
+								confirmClass: "",
 
 								cancelText: "Cancel",
 								cancelClass: "",
 
-								onConfirm: "endRecurrenceEvent",
+								onConfirm: "",
 								onCancel: "closeRecurrenceEventDialog"
 							});
 
 						this.$['recurrenceEventDialog'].show();
 
 						return;
-					} else if( changes['minor'] ) {
-						//Only small changes, don't touch recurrence system
-
-						this.updateTransactionObject( true );
 					}
 				}
 
-				var options = this.getSaveOptions();
-				options['changes'] = ( changes['major'] || changes['recurrence'] );
-
-				this.updateTransactionObject();
-
-				Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
+				this.updateTransactionObject( changes['minor'] );
+				Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
 			} else {
 				//Nonrepeating or single instance
 
@@ -1211,10 +1203,10 @@ enyo.kind( {
 
 		if(
 			this.trsnObj['desc'] !== this.$['desc'].getValue() ||
-			this.trsnObj['amount_old'] !== this.$['amount'].getValue() ||
+			this.trsnObj['amount_old'] != this.$['amount'].getValue() ||
 			this.trsnObj['date'] !== time ||
 			this.trsnObj['account'] !== this.$['account'].getValue() ||
-			this.trsnObj['linkedAccount'] !== this.$['linkedAccount'].getValue() ||
+			( this.$['linkedAccount'].getShowing() && this.trsnObj['linkedAccount'] !== this.$['linkedAccount'].getValue() ) ||
 			enyo.json.stringify( this.trsnObj['categoryOriginal'] ) !== enyo.json.stringify( this.trsnObj['category'] ) ||
 			this.trsnObj['payee'] !== this.$['payeeField'].getValue() ||
 			this.trsnObj['note'] !== this.$['notes'].getValue() ) {
@@ -1229,7 +1221,7 @@ enyo.kind( {
 			changes['minor'] = true;
 		}
 
-		if( Checkbook.globals.transactionManager.$['recurrence'].compare( this.trsnObj['rObj'], this.$['recurrenceSelect'].getValue() ) ) {
+		if( !Checkbook.globals.transactionManager.$['recurrence'].compare( this.trsnObj['rObj'], this.$['recurrenceSelect'].getValue() ) ) {
 
 			changes['recurrence'] = true;
 		}
@@ -1273,7 +1265,7 @@ enyo.kind( {
 			this.trsnObj['rObj'] = false;
 		} else {
 
-			this.trsnObj['rObj'] = this.$['recurrenceSelect'].getValue();
+			this.trsnObj['rObj'] = enyo.clone( this.$['recurrenceSelect'].getValue() );
 		}
 
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );

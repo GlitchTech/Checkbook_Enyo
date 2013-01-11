@@ -202,16 +202,16 @@ enyo.kind( {
 			//ending conditions
 			switch( this.$['endingCondition'].getValue() ) {
 				case 'd':
-					robj['endCondition'] = "date";
+					robj['endingCondition'] = "date";
 					robj['endDate'] = Date.parse( this.$['endingDate'].getValue() );
 					break;
 				case 'o':
-					robj['endCondition'] = "occurences";
+					robj['endingCondition'] = "occurences";
 					robj['endCount'] = this.$['endingCount'].getValue();
 					break;
 				case 'f':
 				default:
-					robj['endCondition'] = "none";
+					robj['endingCondition'] = "none";
 			}
 		}
 
@@ -266,7 +266,7 @@ enyo.kind( {
 			}
 
 			//ending conditions
-			switch( robj['endCondition'] ) {
+			switch( robj['endingCondition'] ) {
 				case "date":
 					this.$['endingCondition'].setValue( 'd' );
 					this.$['endingDate'].setValue( robj['endDate'] );

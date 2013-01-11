@@ -252,10 +252,14 @@ enyo.kind({
 		//Prepare data
 		var sql = this._prepareData( data, type );
 
-		if( options['changes'] && data['repeatUnlinked'] != 1 ) {
+		if( options['changes'] && data['repeatUnlinked'] != 1 && data['terminated'] != 1 ) {
 			//Handle recurrence events
 
 			sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data ) );
+		} else {
+
+			delete data['rObj'];
+			delete data['maxRepeatId'];
 		}
 
 		//Handle split transactions

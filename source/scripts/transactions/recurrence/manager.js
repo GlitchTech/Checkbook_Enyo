@@ -25,7 +25,27 @@ enyo.kind( {
 	 */
 	compare: function( r1, r2 ) {
 
-		return( enyo.json.stringify( r1 ) !== enyo.json.stringify( r2 ) );
+		var match = true;
+
+		match = match && ( r1['frequency'] === r2['frequency'] );
+		match = match && ( r1['itemSpan'] === r2['itemSpan'] );
+		match = match && ( enyo.json.stringify( r1['daysOfWeek'] ) === enyo.json.stringify( r2['daysOfWeek'] ) );
+		match = match && ( r1['endingCondition'] === r2['endingCondition'] );
+
+		if( match && ( r1['endingCondition'] == "date" || r2['endingCondition'] == "date" ) ) {
+
+			var d1 = GTS.Object.isDate( r1['endDate'] ) ? r1['endDate'] : new Date( r1['endDate'] );
+			var d2 = GTS.Object.isDate( r2['endDate'] ) ? r2['endDate'] : new Date( r2['endDate'] );
+
+			match = match && ( d1 === d2 );
+		}
+
+		if( match && ( r1['endingCondition'] == "occurences" || r2['endingCondition'] == "occurences" ) ) {
+
+			match = match && ( r1['endCount'] === r2['endCount'] );
+		}
+
+		return match;
 	},
 
 	/**
@@ -102,9 +122,9 @@ enyo.kind( {
 						"itemSpan": data['rObj']['itemSpan'],//Time between events (every 2 months)
 						"daysOfWeek": enyo.json.stringify( ( data['rObj']['frequency'] == "weekly" ) ? data['rObj']['daysOfWeek'] : "" ),//Array for day index else blank
 
-						"endingCondition": data['rObj']['endCondition'],
-						"endDate": ( ( data['rObj']['endCondition'] == "date" ) ? data['rObj']['endDate'] : "" ),
-						"endCount": ( ( data['rObj']['endCondition'] == "occurences" ) ? data['rObj']['endCount'] : "" ),
+						"endingCondition": data['rObj']['endingCondition'],
+						"endDate": ( ( data['rObj']['endingCondition'] == "date" ) ? data['rObj']['endDate'] : "" ),
+						"endCount": ( ( data['rObj']['endingCondition'] == "occurences" ) ? data['rObj']['endCount'] : "" ),
 
 						//Initial occurrence is latest and only
 						"lastOccurrence": data['date'],
@@ -134,7 +154,7 @@ enyo.kind( {
 				delete repeatInsert['maxItemId'];
 
 				sql.unshift( Checkbook.globals.gts_db.getInsert( "repeats", repeatInsert ) );
-			} else if( data['repeatUnlinked'] != 1 ) {
+			} else if( !( isNaN( data['repeatId'] ) || data['repeatId'] < 0 ) && data['repeatUnlinked'] != 1 && data['terminated'] != 1 ) {
 				//Existing recurrence event
 
 				if( data['rObj']['frequency'] == "none" ) {
@@ -149,9 +169,11 @@ enyo.kind( {
 					//remember to set lastUpdated to null
 				}
 
-				this.log( sql );
+				this.log( data, sql );
 			}
 		}
+
+		this.log( enyo.json.stringify( data ) );
 
 		delete data['rObj'];
 		delete data['maxRepeatId'];
