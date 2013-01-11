@@ -164,18 +164,60 @@ enyo.kind( {
 				} else {
 					//Modify recurrence event
 
-					//TODO
+					var repeatData = {
+							"repeatId": data['repeatId'],
 
-					//remember to set lastUpdated to null
+							//Repeat settings
+							"frequency": data['rObj']['frequency'],//Daily, Weekly, Monthly, Yearly
+							"itemSpan": data['rObj']['itemSpan'],//Time between events (every 2 months)
+							"daysOfWeek": enyo.json.stringify( ( data['rObj']['frequency'] == "weekly" ) ? data['rObj']['daysOfWeek'] : "" ),//Array for day index else blank
+
+							"endingCondition": data['rObj']['endingCondition'],
+							"endDate": ( ( data['rObj']['endingCondition'] == "date" ) ? data['rObj']['endDate'] : "" ),
+							"endCount": ( ( data['rObj']['endingCondition'] == "occurences" ) ? data['rObj']['endCount'] : "" ),
+
+							//Initial occurrence is latest and only
+							"lastOccurrence": data['date'],
+							"currCount": data['rObj']['currCount'],
+
+							//Original data
+							"origDate": data['rObj']['origDate'],
+							"rep_desc": data['desc'],
+							"rep_amount": data['amount'],
+							"rep_note": data['note'],
+							"rep_category": enyo.json.stringify( data['category'] ),
+							"rep_acctId": data['account'],
+							"rep_linkedAcctId": data['linkedAccount'],
+							"rep_autoTrsnLink": ( ( autoTransfer > 0 && autoTransferLink >= 0 ) ? autoTransfer : 0 ),
+							"rep_autoTrsnLinkAcct": ( ( autoTransfer > 0 && autoTransferLink >= 0 ) ? autoTransferLink : "" ),
+
+							//Sync system information
+							"last_sync": "",
+
+							//Termination
+							"terminated": 0,
+
+							//Temp data
+							"maxItemId": ( ( GTS.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['maxItemId'] + 1 : data['maxItemId'] )
+						};
+
+					sql = sql.concat( this._getDeleteFutureSQL( data['itemId'], repeatData['repeatId'], true ) );//Delete only future
+
+					sql = sql.concat( this.generateSeriesSQL( [ enyo.clone( repeatData ) ] ) );//Make new
+
+					//Delete temp data from object
+					delete repeatData['maxItemId'];
+					delete repeatData['lastOccurrence'];
+					delete repeatData['currCount'];
+
+					//Update
+					sql.push( Checkbook.globals.gts_db.getUpdate( "repeats", repeatData, { "repeatId": repeatData['repeatId'] } ) );
 				}
-
-				this.log( data, sql );
 			}
 		}
 
-		this.log( enyo.json.stringify( data ) );
-
 		delete data['rObj'];
+		delete data['maxItemId'];
 		delete data['maxRepeatId'];
 
 		return sql;
@@ -532,6 +574,16 @@ enyo.kind( {
 	/** @protected */
 	_getDeleteFutureSQL: function( transactionId, recurrenceId, onlyFuture ) {
 
+		var deleteArgs;
+
+		if( onlyFuture ) {
+
+			deleteArgs = [ recurrenceId, transactionId ];
+		} else {
+
+			deleteArgs = [ recurrenceId, transactionId, transactionId ];
+		}
+
 		return( [
 				//Decrement recurrence count
 				new GTS.databaseQuery(
@@ -543,8 +595,8 @@ enyo.kind( {
 				//Delete this and future transactions
 				new GTS.databaseQuery(
 						{
-							'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( itemId = ? OR itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + ( onlyFuture ? ">" : ">=" ) + " ( SELECT sub2.date FROM transactions sub2 WHERE sub2.itemId = ? ) ) )" ,
-							'values': [ recurrenceId, transactionId, transactionId ]
+							'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( " + ( onlyFuture ? "" : "itemId = ? OR " ) + "itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + ( onlyFuture ? ">" : ">=" ) + " ( SELECT sub2.date FROM transactions sub2 WHERE sub2.itemId = ? ) ) )",
+							'values': deleteArgs
 						}
 					)
 			]);

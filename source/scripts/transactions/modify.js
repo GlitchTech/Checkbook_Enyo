@@ -1268,7 +1268,12 @@ enyo.kind( {
 			this.trsnObj['rObj'] = false;
 		} else {
 
-			this.trsnObj['rObj'] = enyo.clone( this.$['recurrenceSelect'].getValue() );
+			if( !this.trsnObj['rObj'] ) {
+
+				this.trsnObj['rObj'] = {};
+			}
+
+			enyo.mixin( this.trsnObj['rObj'], enyo.clone( this.$['recurrenceSelect'].getValue() ) );
 		}
 
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );
@@ -1322,12 +1327,7 @@ enyo.kind( {
 	updateFuture: function() {
 
 		this.closeRecurrenceEventDialog();
-
-		this.log();
-		//Checkbook.globals.transactionManager.$['recurrence'].deleteFuture( transactionId, recurrenceId, options )
-		//Checkbook.globals.transactionManager.$['recurrence'].setTermination( recurrenceId, false, options )
-		//update recurrence object
-		//check for unmade recurrence items
+		this.saveModifiedTransaction();
 	},
 
 	updateAll: function() {

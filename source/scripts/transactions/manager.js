@@ -216,7 +216,7 @@ enyo.kind({
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
-							'sql': "SELECT ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
+							'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;",
 							'values': []
 						}
 					),
@@ -247,18 +247,20 @@ enyo.kind({
 			return;
 		}
 
+		data['maxItemId'] = parseInt( results[0]['maxItemId'] ) + 1;
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
 		//Prepare data
 		var sql = this._prepareData( data, type );
 
-		if( options['changes'] && data['repeatUnlinked'] != 1 && data['terminated'] != 1 ) {
+		if( data['repeatUnlinked'] != 1 && data['terminated'] != 1 ) {
 			//Handle recurrence events
 
 			sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data ) );
 		} else {
 
 			delete data['rObj'];
+			delete data['maxItemId'];
 			delete data['maxRepeatId'];
 		}
 
