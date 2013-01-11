@@ -1020,6 +1020,13 @@ enyo.kind( {
 
 	loadRecurrenceData: function( results ) {
 
+		if( results['terminated'] == 1 ) {
+			//Recurrence ended
+
+			this.$['recurrenceWrapper'].hide();
+			return;
+		}
+
 		var data = enyo.clone( results );
 
 		data['endDate'] = new Date( parseInt( results['endDate'] ) );

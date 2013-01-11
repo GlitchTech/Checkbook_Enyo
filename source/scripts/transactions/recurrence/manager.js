@@ -489,8 +489,8 @@ enyo.kind( {
 				//Delete this and future transactions
 				new GTS.databaseQuery(
 						{
-							'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( itemId = ? OR itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + ( onlyFuture ? ">" : ">=" ) + " transactions.date ) )" ,
-							'values': [ recurrenceId, transactionId ]
+							'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( itemId = ? OR itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + ( onlyFuture ? ">" : ">=" ) + " ( SELECT sub2.date FROM transactions sub2 WHERE sub2.itemId = ? ) ) )" ,
+							'values': [ recurrenceId, transactionId, transactionId ]
 						}
 					)
 			]);
