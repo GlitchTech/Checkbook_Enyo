@@ -160,7 +160,7 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 26;
+		this.versionCheck = 30;
 
 		if( currVersion == this.versionCheck ) {
 
@@ -184,14 +184,18 @@ enyo.kind({
 
 			Checkbook.globals.prefs['alwaysFullCalendar'] = results[0]['alwaysFullCalendar'];
 
+			Checkbook.globals.prefs['seriesCountLimit'] = results[0]['seriesCountLimit'];
+			Checkbook.globals.prefs['seriesDayLimit'] = results[0]['seriesDayLimit'];
+
 			Checkbook.globals.prefs['custom_sort'] = results[0]['custom_sort'];
 
-			//Check for recurring updates using the repeating system
 			this.$['message'].setContent( "Updating transaction data..." );
 			this.$['splashProgress'].animateProgressTo( 85 );
-			//this.repeat_updateAll( enyo.bind( this, this.splashFinished ) );
 
-			this.splashFinished();//Temp until repeat system is in place
+			enyo.asyncMethod(
+					this,
+					this.doFinish
+				);
 		} else if( currVersion >= 1 ) {
 
 			this.log( "DB out of date, preparing to update: " + currVersion + " to " + this.versionCheck );
@@ -203,19 +207,6 @@ enyo.kind({
 
 			this.buildInitialDB();
 		}
-	},
-
-	splashFinished: function() {
-
-		this.log();
-
-		this.$['splashProgress'].animateProgressTo( 100 );
-
-		//Slight delay to allow for system lag
-		enyo.asyncMethod(
-				this,
-				this.doFinish
-			);
 	},
 
 	buildInitialDB: function() {
@@ -808,10 +799,30 @@ enyo.kind({
 
 				this.versionCheck = 25;
 			case 25:
-				querySet.push( "ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;" );
+				querySet.push( "ALTER TABLE transactions RENAME TO expenses;" );
+				querySet.push( "ALTER TABLE transactionCategories RENAME TO expenseCategories;" );
 
 				this.versionCheck = 26;
 			case 26:
+				querySet.push( "ALTER TABLE expenses RENAME TO transactions;" );
+				querySet.push( "ALTER TABLE expenseCategories RENAME TO transactionCategories;" );
+
+				this.versionCheck = 27;
+			case 27:
+				querySet.push( "ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;" );
+
+				this.versionCheck = 28;
+			case 28:
+				querySet.push( "ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;" );
+				querySet.push( "ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;" );
+
+				this.versionCheck = 29;
+			case 29:
+				querySet.push( "ALTER TABLE prefs ADD COLUMN seriesCountLimit INTEGER NOT NULL DEFAULT 3;" );
+				querySet.push( "ALTER TABLE prefs ADD COLUMN seriesDayLimit INTEGER NOT NULL DEFAULT 45;" );
+
+				this.versionCheck = 30;
+			case 30:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );

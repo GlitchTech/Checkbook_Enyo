@@ -242,9 +242,8 @@ enyo.kind( {
 							]
 						},
 
-						{//TODO
-							showing: false,
-
+						{
+							name: "recurrenceWrapper",
 							kind: "onyx.Groupbox",
 							classes: "padding-half-top padding-half-bottom",
 							components: [
@@ -282,9 +281,9 @@ enyo.kind( {
 
 									components: [
 										{
-											name: "recurrence",
-											content: "Checkbook.transactions.repeat.select",
-											onChange: "recurrenceChanged"
+											name: "recurrenceSelect",
+											kind: "Checkbook.transactions.recurrence.select",
+											onRecurrenceChange: "recurrenceChanged"
 										}
 									]
 								}
@@ -544,11 +543,11 @@ enyo.kind( {
 					"linkedAccount": -1,
 					"cleared": 0,
 					"repeatId": -1,
+					"repeatUnlinked": 0,
 					"checkNum": "",
 					"category": "Uncategorized",
 					"category2": "Other",
 					"payee": ""
-					//TODO default repeat information
 				},
 				this.trsnObj
 			);
@@ -663,14 +662,23 @@ enyo.kind( {
 		this.$['cleared'].setValue( this.trsnObj['cleared'] );
 		this.$['notes'].setValue( this.trsnObj['note'] );
 
+		if( ( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) && this.trsnObj['repeatUnlinked'] != 1 ) {
+			//Existing recurrence
+
+			Checkbook.globals.transactionManager.$['recurrence'].fetch( this.trsnObj['repeatId'], { "onSuccess": enyo.bind( this, this.loadRecurrenceData ) } );
+		} else if( this.trsnObj['repeatUnlinked'] == 1 ) {
+			//Recurrence removed
+
+			this.$['recurrenceWrapper'].hide();
+		}
+
 		this.trsnObj['category'] = Checkbook.globals.transactionManager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
+		this.trsnObj['categoryOriginal'] = this.trsnObj['category'];
 
 		this.renderCategories = true;
 
 		//Run the formatters
 		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
-
-		//TODO set repeat values
 
 		this.adjustSystemViews();
 		this.dateChanged();
@@ -859,7 +867,8 @@ enyo.kind( {
 
 		this.$['dateDisplay'].setContent( date.format( { date: 'long', time: ( this.accountObj['showTransTime'] === 1 ? 'short' : '' ) } ) );
 
-		//this.$['recurrence'].setDate( date );//TEMP
+		this.$['recurrenceSelect'].setDate( date );
+		this.$['recurrenceSelect'].dateChanged();
 
 		return true;
 	},
@@ -1009,6 +1018,25 @@ enyo.kind( {
 
 	/** Recurrence Controls **/
 
+	loadRecurrenceData: function( results ) {
+
+		if( results['terminated'] == 1 ) {
+			//Recurrence ended
+
+			this.$['recurrenceWrapper'].hide();
+			return;
+		}
+
+		this.trsnObj['rObj'] = enyo.clone( results );
+
+		this.trsnObj['rObj']['endDate'] = new Date( parseInt( results['endDate'] ) );
+		this.trsnObj['rObj']['origDate'] = new Date( parseInt( results['origDate'] ) );
+		this.trsnObj['rObj']['lastUpdated'] = new Date( parseInt( results['lastUpdated'] ) );
+		this.trsnObj['rObj']['lastOccurrence'] = new Date( parseInt( results['lastOccurrence'] ) );
+
+		this.$['recurrenceSelect'].setValue( this.trsnObj['rObj'] );
+	},
+
 	toggleRecurrenceDrawer: function() {
 
 		this.$['recurrenceArrow'].addRemoveClass( "invert", !this.$['recurrenceDrawer'].getOpen() );
@@ -1040,6 +1068,172 @@ enyo.kind( {
 
 	saveTransaction: function() {
 
+		if( this.trsnObj['itemId'] < 0 ) {
+			//New transaction
+
+			this.saveNewTransaction();
+		} else {
+			//Modofied transaction
+
+			var robj = this.$['recurrenceSelect'].getValue();
+
+			if( ( ( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) || robj['frequency'] !== "none" ) &&
+			   this.trsnObj['repeatUnlinked'] != 1 &&
+			   this.trsnObj['terminated'] != 1 ) {
+				//Repeating
+
+				var changes = this.checkForChanges();
+
+				if( !changes['major'] && !changes['minor'] && !changes['recurrence'] ) {
+					//No changes
+
+					this.doFinish( { "status": 0 } );
+
+					return;
+				}
+
+				if( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) {
+					//Existing recurrence event
+
+					if( robj['frequency'] == "none" ) {
+						//End recurrence event
+
+						this.createComponent( {
+								name: "recurrenceEventDialog",
+								kind: "gts.ConfirmDialog",
+
+								title: "End Transaction Series",
+								message: "This will end the series and delete all following transactions.",
+
+								confirmText: "Continue",
+								confirmClass: "onyx-negative",
+
+								cancelText: "Cancel",
+								cancelClass: "",
+
+								onConfirm: "endRecurrenceEvent",
+								onCancel: "closeRecurrenceEventDialog"
+							});
+
+						this.$['recurrenceEventDialog'].show();
+
+						return;
+					} else if( changes['major'] ) {
+						//content change: this, following, all
+
+						this.createComponent( {
+								name: "recurrenceEventDialog",
+								kind: "Checkbook.transactions.recurrence.confirm",
+
+								onOne: "updateSingle",
+								onFuture: "updateFuture",
+								onAll: "updateAll",
+								onCancel: "closeRecurrenceEventDialog"
+							});
+
+						this.$['recurrenceEventDialog'].show();
+
+						return;
+					} else if( changes['recurrence'] ) {
+						//will only change all following events (continue, abort)
+
+						this.createComponent( {
+								name: "recurrenceEventDialog",
+								kind: "gts.ConfirmDialog",
+
+								title: "Transaction Series",
+								message: "This will change this and all following transactions.",
+
+								confirmText: "Continue",
+								confirmClass: "",
+
+								cancelText: "Cancel",
+								cancelClass: "",
+
+								onConfirm: "updateFuture",
+								onCancel: "closeRecurrenceEventDialog"
+							});
+
+						this.$['recurrenceEventDialog'].show();
+
+						return;
+					} else {
+
+						this.updateTransactionObject( changes['minor'] );
+					}
+				} else {
+
+					this.updateTransactionObject();
+				}
+
+				Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
+			} else {
+				//Nonrepeating or single instance
+
+				this.saveModifiedTransaction();
+			}
+		}
+	},
+
+	getSaveOptions: function() {
+
+		return( {
+				"onSuccess": enyo.bind(
+						this,
+						this.saveCompleteHandler,
+						{
+							"modifyStatus": 1,
+							"account": this.trsnObj['account'],
+							"linkedAccount": ( this.transactionType == 'transfer' ? this.trsnObj['linkedAccount'] : -1 ),
+							"atAccount": ( ( this.trsnObj['autoTransfer'] > 0 && this.trsnObj['autoTransferLink'] >= 0 ) ? this.trsnObj['autoTransferLink'] : -1 )
+						}
+					),
+				"onFailure": null
+			});
+	},
+
+	checkForChanges: function() {
+
+		var changes = {
+				"minor": false,
+				"major": false,
+				"recurrence": false
+			};
+
+		var time = this.$['date'].getValue();
+		time.setHours( this.$['time'].getValue().getHours() );
+		time.setMinutes( this.$['time'].getValue().getMinutes() );
+
+		if(
+			this.trsnObj['desc'] !== this.$['desc'].getValue() ||
+			this.trsnObj['amount_old'] != this.$['amount'].getValue() ||
+			this.trsnObj['date'] !== time ||
+			this.trsnObj['account'] !== this.$['account'].getValue() ||
+			( this.$['linkedAccount'].getShowing() && this.trsnObj['linkedAccount'] !== this.$['linkedAccount'].getValue() ) ||
+			enyo.json.stringify( this.trsnObj['categoryOriginal'] ) !== enyo.json.stringify( this.trsnObj['category'] ) ||
+			this.trsnObj['payee'] !== this.$['payeeField'].getValue() ||
+			this.trsnObj['note'] !== this.$['notes'].getValue() ) {
+
+			changes['major'] = true;
+		}
+
+		if(
+			this.trsnObj['checkNum'] !== this.$['checkNum'].getValue() ||
+			this.trsnObj['cleared'] !== this.$['cleared'].getValue() ) {
+
+			changes['minor'] = true;
+		}
+
+		if( !Checkbook.globals.transactionManager.$['recurrence'].compare( this.trsnObj['rObj'], this.$['recurrenceSelect'].getValue() ) ) {
+
+			changes['recurrence'] = true;
+		}
+
+		return changes;
+	},
+
+	updateTransactionObject: function( killRObj ) {
+
 		//this.transactionType
 
 		//this.trsnObj['itemId']
@@ -1059,64 +1253,43 @@ enyo.kind( {
 
 		//this.trsnObj['category']
 		//this.trsnObj['category2']
+		delete( this.trsnObj['categoryOriginal'] );
 
 		this.trsnObj['checkNum'] = this.$['checkNum'].getValue();
 		this.trsnObj['payee'] = this.$['payeeField'].getValue();
 		this.trsnObj['cleared'] = this.$['cleared'].getValue();
 		this.trsnObj['note'] = this.$['notes'].getValue();
 
-		this.trsnObj['rObj'] = { "pattern": "none" };//this.$['recurrence'].getValue();//TEMP
-		//this.trsnObj['repeatId']
-		//this.trsnObj['repeatUnlinked']
+		//this.trsnObj['repeatId']//Existing repeat
+		//this.trsnObj['repeatUnlinked']//Not linked to rest of series
 
-		this.log( this.trsnObj['rObj'], this.trsnObj['repeatId'], this.trsnObj['repeatUnlinked'] );
+		if( killRObj ) {
+
+			this.trsnObj['rObj'] = false;
+		} else {
+
+			if( !this.trsnObj['rObj'] ) {
+
+				this.trsnObj['rObj'] = {};
+			}
+
+			enyo.mixin( this.trsnObj['rObj'], enyo.clone( this.$['recurrenceSelect'].getValue() ) );
+		}
 
 		this.trsnObj['autoTransfer'] = ( ( this.$['autoTrans'].getShowing() && this.$['autoTrans'].getValue() ) ? this.accountObj['auto_savings'] : 0 );
 		this.trsnObj['autoTransferLink'] = this.accountObj['auto_savings_link'];
+	},
 
-		var options = {
-				"onSuccess": enyo.bind(
-						this,
-						this.saveCompleteHandler,
-						{
-							"modifyStatus": 1,
-							"account": this.trsnObj['account'],
-							"linkedAccount": ( this.transactionType == 'transfer' ? this.trsnObj['linkedAccount'] : -1 ),
-							"atAccount": ( ( this.trsnObj['autoTransfer'] > 0 && this.trsnObj['autoTransferLink'] >= 0 ) ? this.trsnObj['autoTransferLink'] : -1 )
-						}
-					),
-				"onFailure": null
-			};
+	saveNewTransaction: function() {
 
-		if( this.trsnObj['itemId'] < 0 ) {
-			//New transaction
+		this.updateTransactionObject();
+		Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
+	},
 
-			Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, options );
-		//} else if( this.trsnObj['repeatId'] >= 0 && this.trsnObj['repeatUnlinked'] != 1 ) {
-			//Modified repeating transaction
+	saveModifiedTransaction: function( killRObj ) {
 
-//if this.trsnObj['rObj']['pattern'] == "none"
-	//confirm that this will end the series & remove transactions after today
-
-/*
-Would you like to delete only this transaction, all transactions in the series, or this and all future transactions in the series?
----
-Only this instance
-All other transactions in the series will remain.
-//change repeatUnlinked to 1
----
-All following
-This and all the following transactions will be deleted.
----
-All transactions in the series
-All transactions in the series will be deleted.
----
-*/
-		} else {
-			//Modified transaction
-
-			Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, options );
-		}
+		this.updateTransactionObject( killRObj );
+		Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
 	},
 
 	saveCompleteHandler: function( inEvent ) {
@@ -1124,29 +1297,98 @@ All transactions in the series will be deleted.
 		enyo.asyncMethod( this, this.doFinish, inEvent );
 	},
 
+	closeRecurrenceEventDialog: function() {
+
+		this.$['recurrenceEventDialog'].hide();
+		this.$['recurrenceEventDialog'].destroy();
+	},
+
+	endRecurrenceEvent: function() {
+
+		this.closeRecurrenceEventDialog();
+
+		Checkbook.globals.transactionManager.$['recurrence'].deleteOnlyFuture(
+				this.trsnObj['itemId'],
+				this.trsnObj['repeatId'],
+				{
+					"onSuccess": enyo.bind( this, this.saveModifiedTransaction, true )
+				}
+			);
+	},
+
+	updateSingle: function() {
+
+		this.closeRecurrenceEventDialog();
+
+		this.trsnObj['repeatUnlinked'] = 1;
+		this.saveModifiedTransaction( true );
+	},
+
+	updateFuture: function() {
+
+		this.closeRecurrenceEventDialog();
+		this.saveModifiedTransaction();
+	},
+
+	updateAll: function() {
+
+		var self = this;
+		var repeatId = this.trsnObj['repeatId'];
+
+		this.closeRecurrenceEventDialog();
+
+		this.updateTransactionObject();
+
+		//Adjust as if new transaction
+		this.trsnObj['repeatId'] = -1;
+		this.$['date'].setValue( GTS.Object.isDate( this.trsnObj['rObj']['origDate'] ) ? this.trsnObj['rObj']['origDate'].getTime() : this.trsnObj['rObj']['origDate'] );
+
+		Checkbook.globals.transactionManager.$['recurrence'].deleteAll(
+				repeatId,
+				{
+					"onSuccess": enyo.bind( this, this.saveNewTransaction )
+				}
+			);
+	},
+
 	deleteTransaction: function() {
 
 		if( this.trsnObj['itemId'] < 0 ) {
 
-			this.doFinish( { status: 0 } );
+			this.doFinish( { "status": 0 } );
 		} else {
 
-			this.createComponent( {
-					name: "deleteTransactionConfirm",
-					kind: "gts.ConfirmDialog",
+			if( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) {
 
-					title: "Delete Transaction",
-					message: "Are you sure you want to delete this transaction?",
+				this.createComponent( {
+						name: "deleteTransactionConfirm",
+						kind: "Checkbook.transactions.recurrence.delete",
 
-					confirmText: "Delete",
-					confirmClass: "onyx-negative",
+						transactionId: this.trsnObj['itemId'],
+						recurrenceId: this.trsnObj['repeatId'],
 
-					cancelText: "Cancel",
-					cancelClass: "",
+						onFinish: "deleteTransactionConfirmClose",
+						onCancel: "deleteTransactionConfirmClose"
+					});
+			} else {
 
-					onConfirm: "deleteTransactionHandler",
-					onCancel: "deleteTransactionConfirmClose"
-				});
+				this.createComponent( {
+						name: "deleteTransactionConfirm",
+						kind: "gts.ConfirmDialog",
+
+						title: "Delete Transaction",
+						message: "Are you sure you want to delete this transaction?",
+
+						confirmText: "Delete",
+						confirmClass: "onyx-negative",
+
+						cancelText: "Cancel",
+						cancelClass: "",
+
+						onConfirm: "deleteTransactionHandler",
+						onCancel: "deleteTransactionConfirmClose"
+					});
+			}
 
 			this.$['deleteTransactionConfirm'].show();
 		}

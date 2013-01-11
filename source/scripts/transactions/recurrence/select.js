@@ -1,39 +1,35 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind( {
-	name: "Checkbook.transactions.repeat.select",
-	kind: enyo.Control,
+	name: "Checkbook.transactions.recurrence.select",
 
-	/** @protected variables */
 	recurrenceOptions: [],
 
-	/** @public variables */
+	systemActive: false,
+
 	published: {
 		date: ""
 	},
 
-	/** @public events */
 	events: {
-		onChange: ""
+		onRecurrenceChange: ""
 	},
 
-	/** UI */
 	components: [
 		{
 			name: "recurrenceNode",
-			kind: "GTS.ListSelectorBar",
-			labelText: "Recurrence",
+			kind: "GTS.SelectorBar",
+			label: "Recurrence",
 
 			onChange: "recurrenceNodeChanged",
 
-			className: "force-left-padding",
+			classes: "force-left-padding",
 
 			value: 0
 		}, {
 			name: "weeklyOptions",
-			kind: enyo.RowItem,
-			layoutKind: enyo.HFlexLayout,
 
+			classes: "h-box bo",
 			showing: false,
 
 			components: []
@@ -43,53 +39,55 @@ enyo.kind( {
 
 			components: [
 				{
-					kind: enyo.RowItem,
-					layoutKind: enyo.HFlexLayout,
-					align: "center",
+					kind: "onyx.Item",
+					classes: "text-center bordered h-box box-pack-center box-align-center",
 					components: [
 						{
-							content: "Every "
+							content: "Every"
 						}, {
-							name: "frequency",
-							kind: enyo.IntegerPicker,
+							kind: "onyx.PickerDecorator",
+							components: [
+								{
+									classes: "margin-half-left margin-half-right"
+								}, {
+									name: "itemSpan",
+									kind: "GTS.IntegerPicker",
 
-							label: "",
+									min: 1,
+									max: 64,
 
-							min: 1,
-							max: 64,
+									style: "margin-right: 3px;",
 
-							style: "margin-right: 3px;",
-
-							onChange: "sendSummary"
+									onChange: "sendSummary"
+								}
+							]
 						}, {
-							name: "frequencyUnits"
+							name: "itemSpanUnits"
 						}, {
 							content: "Frequency",
 
-							flex: 1,
-
-							className: "enyo-label",
-							style: "text-align: right;"
+							classes: "label box-flex-1 text-right"
 						}
 					]
 				}, {
 					name: "endingCondition",
-					kind: "GTS.ListSelectorBar",
-					labelText: "Ending Condition",
+					kind: "GTS.SelectorBar",
+					label: "Ending Condition",
 
-					className: "force-left-padding enyo-last",
+					classes: "bordered",
 
 					onChange: "endingConditionChanged",
 
 					choices: [
 						{
-							caption: 'Forever',
-							value: 'f'
+							content: 'Forever',
+							value: 'f',
+							active: true
 						}, {
-							caption: 'Until Date',
+							content: 'Until Date',
 							value: 'd'
 						}, {
-							caption: 'Occurrences',
+							content: 'Occurrences',
 							value: 'o'
 						}
 					],
@@ -97,53 +95,67 @@ enyo.kind( {
 					value: 'f'
 				}, {
 					name: "endingDateWrapper",
-					kind: enyo.RowItem,
+					kind: "onyx.Item",
 
-					className: "enyo-single",
+					classes: "bordered",
 					showing: false,
 
-					components: [
-						{
-							name: "endingDate",
-							kind: "GTS.DateTimePicker",
-
-							onChange: "sendSummary"
-						}
-					]
+					components: []
 				}, {
 					name: "endingCountWrapper",
-					kind: enyo.RowItem,
+					kind: "onyx.Item",
 
-					layoutKind: enyo.HFlexLayout,
-					align: "center",
-
-					className: "enyo-single",
+					classes: "text-center bordered h-box box-pack-center box-align-center",
 					showing: false,
 
 					components: [
 						{
-							name: "endingCount",
-							kind: enyo.IntegerPicker,
+							kind: "onyx.PickerDecorator",
+							components: [
+								{
+									classes: "margin-half-left margin-half-right"
+								}, {
+									name: "endingCount",
+									kind: "GTS.IntegerPicker",
 
-							label: "",
+									min: 1,
+									max: 100,
 
-							min: 1,
-							max: 100,
-
-							onChange: "sendSummary"
+									onChange: "sendSummary"
+								}
+							]
 						}, {
 							content: "Occurrences",
 
-							flex: 1,
-
-							className: "enyo-label",
-							style: "text-align: right;"
+							classes: "label box-flex-1 text-right"
 						}
 					]
 				}
 			]
 		}
 	],
+
+	/**
+	 * @protected
+	 * called when UI is built
+	 */
+	create: function() {
+
+		this.inherited( arguments );
+
+		if( this.date == "" ) {
+
+			this.date = new Date();
+		}
+
+		this.buildRecurrenceOptions();
+		this.buildDateSystem();
+		this.buildDayOfWeekSystem();
+
+		this.recurrenceNodeChanged();
+
+		this.systemActive = true;
+	},
 
 	/**
 	 * @public
@@ -155,51 +167,51 @@ enyo.kind( {
 
 		if( this.$['recurrenceNode'].getValue() == 0 ) {
 
-			robj['pattern'] = "none";
+			robj['frequency'] = "none";
 		} else {
 			//Recurrence
 
-			robj['startDate'] = Date.parse( this.date );
-			robj['frequency'] = this.$['frequency'].getValue();
+			robj['origDate'] = Date.parse( this.date );
+			robj['itemSpan'] = this.$['itemSpan'].getValue();
 
 			switch( this.$['recurrenceNode'].getValue() ) {
 				case 1://Daily
-					robj['pattern'] = "daily";
+					robj['frequency'] = "daily";
 					break;
 				case 2://Weekly
-					robj['pattern'] = "weekly";
+					robj['frequency'] = "weekly";
 
-					robj['dow'] = [];
+					robj['daysOfWeek'] = [];
 
 					for( i = 0; i < 7; i++ ) {
 
 						if( this.$['weekly' + i].getChecked() ) {
 
-							robj['dow'].push( i );
+							robj['daysOfWeek'].push( i );
 						}
 					}
 					break;
 				case 3://Monthly
-					robj['pattern'] = "monthly";
+					robj['frequency'] = "monthly";
 					break;
 				case 4://Yearly
 				default:
-					robj['pattern'] = "yearly";
+					robj['frequency'] = "yearly";
 			}
 
 			//ending conditions
 			switch( this.$['endingCondition'].getValue() ) {
 				case 'd':
-					robj['endCondition'] = "date";
+					robj['endingCondition'] = "date";
 					robj['endDate'] = Date.parse( this.$['endingDate'].getValue() );
 					break;
 				case 'o':
-					robj['endCondition'] = "occurences";
+					robj['endingCondition'] = "occurences";
 					robj['endCount'] = this.$['endingCount'].getValue();
 					break;
 				case 'f':
 				default:
-					robj['endCondition'] = "none";
+					robj['endingCondition'] = "none";
 			}
 		}
 
@@ -218,24 +230,26 @@ enyo.kind( {
 		} else {
 			//Recurrence
 
-			this.date = robj['startDate'];
-			this.$['frequency'].setValue( robj['frequency'] );
+			this.date = robj['origDate'];
+			this.$['itemSpan'].setValue( robj['itemSpan'] );
 
 			for( i = 0; i < 7; i++ ) {
 
 				this.$['weekly' + i].setChecked( false );
 			}
 
-			switch( robj['pattern'] ) {
+			switch( robj['frequency'] ) {
 				case "daily":
 					this.$['recurrenceNode'].setValue( 1 );
 					break;
 				case "weekly":
 					this.$['recurrenceNode'].setValue( 2 );
 
-					for( i = 0; i < robj['dow'].length; i++ ) {
+					robj['daysOfWeek'] = enyo.json.parse( robj['daysOfWeek'] );
 
-						this.$['weekly' + robj['dow'][i]].setChecked( true );
+					for( i = 0; i < robj['daysOfWeek'].length; i++ ) {
+
+						this.$['weekly' + robj['daysOfWeek'][i]].setChecked( true );
 					}
 					break;
 				case "monthly":
@@ -249,7 +263,7 @@ enyo.kind( {
 			}
 
 			//ending conditions
-			switch( robj['endCondition'] ) {
+			switch( robj['endingCondition'] ) {
 				case "date":
 					this.$['endingCondition'].setValue( 'd' );
 					this.$['endingDate'].setValue( robj['endDate'] );
@@ -270,73 +284,9 @@ enyo.kind( {
 
 	/**
 	 * @protected
-	 * called when UI is built
-	 */
-	rendered: function() {
-
-		this.inherited( arguments );
-
-		if( this.date == "" ) {
-
-			this.date = new Date();
-		}
-
-		//Build Weekly Repeat Options
-		var dowDate = new Date( 2011, 4, 1 );//Sunday, May 1, 2011
-		var dowComponents = [];
-
-		for( i = 0; i < 7; i++ ) {
-
-			dowComponents.push( {
-					flex: 1,
-					style: "text-align: center;",
-					components: [
-						{
-							content: dowDate.format( { format: "EEE" } ),
-							className: "enyo-label"
-						}, {
-							name: "weekly" + i,
-							kind: enyo.CheckBox,
-							onChange: "sendSummary",
-							checked: ( this.date.getDay() == i ),
-							dayName: dowDate.format( { format: "EEEE" } )
-						}
-					]
-				});
-
-			dowDate.setDate( dowDate.getDate() + 1 );
-		}
-
-		this.$['weeklyOptions'].createComponents( dowComponents, { owner: this } );
-		this.$['weeklyOptions'].render();
-
-		this.buildRecurrenceOptions();
-		this.recurrenceNodeChanged();
-	},
-
-	/**
-	 * @protected
-	 * Date recurrence is based on changed, called by system
-	 */
-	dateChanged: function() {
-
-		this.buildRecurrenceOptions();
-
-		if( this.$['recurrenceNode'].getValue() != 2 ) {
-
-			for( i = 0; i < 7; i++ ) {
-
-				this.$['weekly' + i].setChecked( this.date.getDay() == i );
-			}
-		}
-	},
-
-	/**
-	 * @protected
 	 * Builds a text string based on values set and sends to value to the onChange function
 	 */
 	sendSummary: function() {
-		//TODO: Localize
 
 		var summary = "";
 
@@ -346,7 +296,7 @@ enyo.kind( {
 		} else {
 			//Recurrence
 
-			summary = "Repeats every " + this.$['frequency'].getValue() + " ";
+			summary = "Repeats every " + this.$['itemSpan'].getValue() + " ";
 
 			switch( this.$['recurrenceNode'].getValue() ) {
 				case 1://Daily
@@ -406,30 +356,31 @@ enyo.kind( {
 			}
 		}
 
-		this.doChange( { "summary": summary, "value": this.getValue() } );
+		if( this.systemActive ) {
+
+			this.doRecurrenceChange( { "summary": summary, "value": this.getValue() } );
+		}
 	},
 
-	/**
-	 * @protected
-	 * Builds recurrence option dropdown according to currently set date
-	 */
+	/** ----- Generators ----- **/
+
 	buildRecurrenceOptions: function() {
 
 		this.recurrenceOptions = [
 				{
-					caption: "No Recurrence",
+					content: "No Recurrence",
 					value: 0
 				}, {
-					caption: "Daily",
+					content: "Daily",
 					value: 1
 				}, {
-					caption: "Weekly",
+					content: "Weekly",
 					value: 2
 				}, {
-					caption: "Monthly on the " + this.dateSuffix( this.date.getDate() ),//1st, 2nd, 3rd, etc
+					content: "Monthly on the " + this.dateSuffix( this.date.getDate() ),//1st, 2nd, 3rd, etc
 					value: 3
 				}, {
-					caption: "Yearly on " + this.date.format( { format: "MMMM" } ) + " " + this.dateSuffix( this.date.getDate() ),//ex: April 13th
+					content: "Yearly on " + this.date.format( { format: "MMMM" } ) + " " + this.dateSuffix( this.date.getDate() ),//ex: April 13th
 					value: 4
 				}
 			];
@@ -442,6 +393,105 @@ enyo.kind( {
 
 		this.$['recurrenceNode'].setValue( temp );
 	},
+
+	buildDateSystem: function() {
+
+		if( !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs['alwaysFullCalendar'] ) {
+			//Big Screen
+
+			this.$['endingDateWrapper'].createComponent(
+					{
+						name: "endingDate",
+						kind: "GTS.DatePicker",
+						onSelect: "sendSummary",
+
+						components: [
+							{
+								name: "endingTime",
+								kind: "GTS.TimePicker",
+
+								label: "Time",
+
+								minuteInterval: 5,
+								is24HrMode: false,
+
+								onSelect: "sendSummary"
+							}
+						]
+					}, {
+						owner: this
+					}
+				);
+		} else {
+			//Small Screen
+
+			this.$['endingDateWrapper'].createComponents(
+					[
+						{
+							classes: "onyx-toolbar-inline",
+							components: [
+								{
+									name: "label",
+									classes: "label",
+									content: "Date"
+								}, {
+									name: "endingDate",
+									kind: "onyx.DatePicker",
+									onSelect: "sendSummary"
+								}
+							]
+						}, {
+							name: "endingTime",
+							kind: "GTS.TimePicker",
+
+							label: "Time",
+
+							minuteInterval: 5,
+							is24HrMode: false,
+
+							onSelect: "sendSummary"
+						}
+					], {
+						owner: this
+					}
+				);
+		}
+	},
+
+	buildDayOfWeekSystem: function() {
+
+		//Build Weekly Repeat Options
+		var dowDate = new Date( 2011, 4, 1 );//Sunday, May 1, 2011
+		var dowComponents = [];
+
+		for( i = 0; i < 7; i++ ) {
+
+			dowComponents.push( {
+					classes: "text-center box-flex-1",
+					components: [
+						{
+							content: dowDate.format( { format: "EEE" } ),
+							classes: "label"
+						}, {
+							name: "weekly" + i,
+							kind: "onyx.Checkbox",
+
+							onchange: "sendSummary",
+
+							checked: ( this.date.getDay() == i ),
+							dayName: dowDate.format( { format: "EEEE" } )
+						}
+					]
+				});
+
+			dowDate.setDate( dowDate.getDate() + 1 );
+		}
+
+		this.$['weeklyOptions'].createComponents( dowComponents, { owner: this } );
+		this.$['weeklyOptions'].render();
+	},
+
+	/** ----- Events ----- **/
 
 	/**
 	 * @protected
@@ -457,21 +507,43 @@ enyo.kind( {
 
 		switch( this.$['recurrenceNode'].getValue() ) {
 			case 1:
-				this.$['frequencyUnits'].setContent( "day(s)" );
+				this.$['itemSpanUnits'].setContent( "day(s)" );
 				break;
 			case 2:
-				this.$['frequencyUnits'].setContent( "week(s)" );
+				this.$['itemSpanUnits'].setContent( "week(s)" );
 				break;
 			case 3:
-				this.$['frequencyUnits'].setContent( "month(s)" );
+				this.$['itemSpanUnits'].setContent( "month(s)" );
 				break;
 			case 4:
-				this.$['frequencyUnits'].setContent( "year(s)" );
+				this.$['itemSpanUnits'].setContent( "year(s)" );
 				break;
 			default:
-				this.$['frequencyUnits'].setContent( "span(s)" );
+				this.$['itemSpanUnits'].setContent( "span(s)" );
 		}
 
+		this.sendSummary();
+
+		return true;
+	},
+
+	/**
+	 * @protected
+	 * Date recurrence is based on changed, called by system
+	 */
+	dateChanged: function() {
+
+		this.buildRecurrenceOptions();
+
+		if( this.$['recurrenceNode'].getValue() != 2 ) {
+
+			for( i = 0; i < 7; i++ ) {
+
+				this.$['weekly' + i].setChecked( this.date.getDay() == i );
+			}
+		}
+
+		this.buildRecurrenceOptions();
 		this.sendSummary();
 	},
 
@@ -484,8 +556,18 @@ enyo.kind( {
 		this.$['endingDateWrapper'].setShowing( this.$['endingCondition'].getValue() == 'd' );
 		this.$['endingCountWrapper'].setShowing( this.$['endingCondition'].getValue() == 'o' );
 
+		if( this.$['endingDateWrapper'].getShowing() ) {
+
+			this.$['endingDate'].render();
+			this.$['endingTime'].render();
+		}
+
 		this.sendSummary();
+
+		return true;
 	},
+
+	/**************************/
 
 	/**
 	 * @protected

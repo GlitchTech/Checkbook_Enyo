@@ -358,10 +358,7 @@ enyo.kind({
 		Checkbook.globals.transactionManager = new Checkbook.transactions.manager();
 		Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager();
 
-		enyo.asyncMethod(
-				this,
-				this.loadCheckbookStage2
-			);
+		Checkbook.globals.transactionManager.$['recurrence'].updateSeriesTransactions( -1, { "onSuccess": enyo.bind( this, this.loadCheckbookStage2 ) } );
 	},
 
 	loadCheckbookStage2: function() {
@@ -382,13 +379,13 @@ enyo.kind({
 						{
 							"onSuccess": function() {
 
-								enyo.Signals.send( "viewAccount", { account: result } );
+								enyo.Signals.send( "viewAccount", { "account": result } );
 							}
 						}
 					);
 			} else {
 
-				enyo.Signals.send( "viewAccount", { account: result } );
+				enyo.Signals.send( "viewAccount", { "account": result } );
 			}
 		}
 

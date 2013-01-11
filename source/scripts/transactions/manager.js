@@ -7,15 +7,15 @@
  *	Requires GTS.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind({
-
 	name: "Checkbook.transactions.manager",
-	kind: enyo.Component,
+	kind: "enyo.Component",
 
-	/**
-	 * @protected recurrence variables
-	 */
-	seriesCountLimit: 3,
-	seriesDayLimit: 45,
+	components: [
+		{
+			name: "recurrence",
+			kind: "Checkbook.transactions.recurrence.manager"
+		}
+	],
 
 	/** @protected */
 	constructor: function() {
@@ -67,7 +67,7 @@ enyo.kind({
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
 		Checkbook.globals.gts_db.queries(
-				this.generateInsertTransactionSQL( data, type ),
+				this.generateInsertTransactionSQL( { "data": data, "type": type } ),
 				options
 			);
 	},
@@ -76,23 +76,24 @@ enyo.kind({
 	 * @protected
 	 * Creates SQL for inserting a new transaction (or set depending on type)
 	 *
-	 * @param {object}	dataIn	Object to be readied; Source object is not modified by function
-	 * @param {string}	type	Type of transaction; used to determine setting of amount;
+	 * @param {object}	inEvent			Event object for generation
+	 * @param {object}	inEvent.data	Object to be readied; Source object is not modified by function
+	 * @param {string}	inEvent.type	Type of transaction; used to determine setting of amount;
 	 */
-	generateInsertTransactionSQL: function( dataIn, type ) {
+	generateInsertTransactionSQL: function( inEvent ) {
 
 		//Copy object to break pass by reference link
-		var data = enyo.clone( dataIn );
+		var data = enyo.clone( inEvent['data'] );
 
 		//Save data about auto transfer system
 		var autoTransfer = data['autoTransfer'];
 		var autoTransferLink = data['autoTransferLink'];
 
 		//Prepare data
-		var sql = this._prepareData( data, type );
+		var sql = this._prepareData( data, inEvent['type'] );
 
-		//Handle repeating system
-		sql = sql.concat( this._handleRepeatSystem( data, autoTransfer, autoTransferLink ) );
+		//Handle recurrence events
+		sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data, autoTransfer, autoTransferLink ) );
 
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );
@@ -215,7 +216,7 @@ enyo.kind({
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 						{
-							'sql': "SELECT ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
+							'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;",
 							'values': []
 						}
 					),
@@ -246,13 +247,22 @@ enyo.kind({
 			return;
 		}
 
+		data['maxItemId'] = parseInt( results[0]['maxItemId'] ) + 1;
 		data['maxRepeatId'] = parseInt( results[0]['maxRepeatId'] ) + 1;
 
 		//Prepare data
 		var sql = this._prepareData( data, type );
 
-		//Handle repeating system
-		sql = sql.concat( this._handleRepeatSystem( data, -1 ) );
+		if( data['repeatUnlinked'] != 1 && data['terminated'] != 1 ) {
+			//Handle recurrence events
+
+			sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data ) );
+		} else {
+
+			delete data['rObj'];
+			delete data['maxItemId'];
+			delete data['maxRepeatId'];
+		}
 
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );
@@ -291,7 +301,7 @@ enyo.kind({
 		data['desc'] = ( ( data['desc'] === "" || data['desc'] === null ) ? "Description" : data['desc'] );
 		data['cleared'] = ( data['cleared'] ? 1 : 0 );
 
-		data['amount'] = ( GTS.Object.isNumber( data['amount'] ) ? 0 : Number( data['amount'] ).toFixed( 2 ).valueOf() );
+		data['amount'] = Number( data['amount'] ).toFixed( 2 ).valueOf();
 
 		data['date'] = Date.parse( data['date'] );
 
@@ -423,373 +433,6 @@ enyo.kind({
 		}
 
 		return sqlArray;
-	},
-
-	/**
-	 * @protected
-	 * Handle SQL for repeat events
-	 *
-	 * @param {object}	data	Object to be readied; Since object, pass by reference situation;
-	 * @param [bool]	autoTransfer	Type of autotransfer (0 if none)
-	 * @param [bool]	autoTransferLink	Account to transfer to
-	 *
-	 * @returns {object[]}	SQL functions to be run. Returns empty array if nothing to do.
-	 */
-	_handleRepeatSystem: function( data, autoTransfer, autoTransferLink ) {
-
-		var sqlArray = [];
-
-		if( data['rObj'] != false ) {
-			//Not creating from a recursion repeat call
-
-			if( ( !data['repeatId'] || data['repeatId'] < 0 ) && data['rObj']['pattern'] != "none" ) {
-				//New repeating transactions (check/handle)
-
-				data['repeatId'] = data['maxRepeatId'];
-
-				var repeatInsert = {
-						"repeatId": data['repeatId'],
-
-						//Repeat settings
-						"frequency": data['rObj']['pattern'],//Daily, Weekly, Monthly, Yearly
-						"itemSpan": data['rObj']['frequency'],//Time between events (every 2 months)
-						"daysOfWeek": enyo.json.stringify( ( data['rObj']['pattern'] == "weekly" ) ? data['rObj']['dow'] : "" ),//Array for day index else blank
-
-						"endingCondition": data['rObj']['endCondition'],
-						"endDate": ( ( data['rObj']['endCondition'] == "date" ) ? data['rObj']['endDate'] : "" ),
-						"endCount": ( ( data['rObj']['endCondition'] == "occurences" ) ? data['rObj']['endCount'] : "" ),
-
-						//Initial occurrence is latest and only
-						"lastOccurrence": data['date'],
-						"currCount": 1,
-
-						//Original data
-						"origDate": data['rObj']['startDate'],
-						"rep_desc": data['desc'],
-						"rep_amount": data['amount'],
-						"rep_note": data['note'],
-						"rep_category": enyo.json.stringify( data['category'] ),
-						"rep_acctId": data['account'],
-						"rep_linkedAcctId": data['linkedAccount'],
-						"rep_autoTrsnLink": ( ( autoTransfer > 0 && autoTransferLink >= 0 ) ? 1 : 0 ),
-
-						//Sync system information
-						"last_sync": "",
-
-						//Temp data
-						"maxItemId": ( ( GTS.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['itemId'] + 2 : data['itemId'] + 1 ),
-						"autoTransfer": autoTransfer,
-						"autoTransferLink": autoTransferLink
-					};
-
-				sqlArray = sqlArray.concat( this.generateSeriesSQL( [ enyo.clone( repeatInsert ) ] ) );
-
-				//Delete temp data from object
-				delete repeatInsert['maxItemId'];
-				delete repeatInsert['autoTransfer'];
-				delete repeatInsert['autoTransferLink'];
-
-				sqlArray.unshift( Checkbook.globals.gts_db.getInsert( "repeats", repeatInsert ) );
-			} else if( data['repeatUnlinked'] != 1 ) {
-				//If transaction is not 'unlinked' from repeating series
-
-				if( data['rObj']['pattern'] == "none" ) {
-					//Delete repeating entry
-
-					sqlArray.push( Checkbook.globals.gts_db.getDelete( "repeats", { "repeatId": data['repeatId'] } ) );
-
-					//Delete future (after curr date) transactions with repeat id except for this one
-					var endOfDay = new Date();
-					endOfDay.setHours( 23, 59, 59, 999 );
-
-					sqlArray.push(
-							new GTS.databaseQuery(
-									{
-										'sql': "DELETE FROM transactions WHERE itemId != ? AND repeatId = ? AND date > ?" ,
-										'values': [ data['itemId'], data['repeatId'], Date.parse( endOfDay ) ]
-									}
-								)
-						);
-
-					//Set repeatId to null
-					data['repeatId'] = null;
-				} else {
-					//Do existing repeating transactions
-
-					//TODO
-
-					//remember to set lastUpdated to null
-				}
-			}
-		}
-
-		delete data['rObj'];
-		delete data['maxRepeatId'];
-
-		/////////////////////////////////
-		//Temp while system not completed
-		data['repeatId'] = null;
-		this.log( sqlArray );
-		return [];
-		/////////////////////////////////
-
-		return sqlArray;
-	},
-
-	/**
-	 * @public
-	 * Checks for repeating transactions and creates new transactions if required
-	 *
-	 * @param int	[acctId]	specific account to update; if not set will update all accounts
-	 * @param {object}	[options]	Callback functions
-	 * @param {function}	[options.onSuccess]
-	 * @param {function}	[options.onError]
-	 */
-	updateSeriesTransactions: function( acctId, options ) {
-
-		acctId = acctId || -1;
-
-		var now = new Date();
-		var dayStart = new Date( now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0 );
-		var dayLimit = new Date( now.getFullYear(), now.getMonth(), ( now.getDate() + this.seriesDayLimit ), 23, 59, 59, 999 );
-
-		this.generateSeriesSQL( REPEAT_DATA_ARRAY );
-
-		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
-					{
-						'sql': "SELECT * " +
-							"FROM repeats " +
-							"WHERE " +
-								//Account ID
-								"( " +
-									"rep_acctId = ? " +
-									( acctId >= 0 ? "OR 1 = 1 " : "" ) +//Ignore account id if not set
-								") " +
-
-								//Under date limit
-								"lastOccurrence < ? " +
-
-								//Under count limit
-								" AND currCount < ? " +
-
-								//Ending condition checks
-								"AND ( " +
-										"( " +
-											"endingCondition = 'none' " +
-										") OR ( " +
-											"endingCondition = 'date' " +
-											"AND endDate != '' " +
-											"AND endDate > lastOccurrence " +
-										") OR ( " +
-											"endingCondition = 'occurences' " +
-											"AND endCount != '' " +
-											"AND endCount > currCount " +
-										") " +
-									") " +
-
-								//Last data update check
-								"AND ( " +
-									"lastUpdated < ? OR " +
-									"lastUpdate IS NULL OR " +
-									"lastUpdate = '' " +
-								")",
-						'values': [
-							acctId,
-							Date.parse( dayLimit ),
-							this.seriesCountLimit,
-							Date.parse( dayStart )
-						]
-					}
-				),
-				{
-					"onSuccess": function( results ) {
-
-						Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
-					},
-					"onError": function() {
-
-						if( enyo.isFunction( options['onError'] ) ) {
-
-							options['onError']();
-						}
-					}
-				}
-			);
-	},
-
-	/**
-	 * @protected
-	 * Generates SQL for saving series events
-	 *
-	 * @param {object}[]	repeatArray	Array of objects with series transaction information
-	 *
-	 * @returns {object[]}	SQL functions to be run. Returns empty array if nothing to do.
-	 */
-	generateSeriesSQL: function( repeatArray ) {
-
-		var sql = [];
-
-		if( repeatArray.length > 0 ) {
-
-			//Set max id to build off of; already 1 greater than max id
-			var maxItemId = repeatArray[0]['maxItemId'];
-
-			//Current datetime for calculations
-			var now = new Date();
-
-			//Cycle variables for content
-			var trsnData;
-			var serDate;
-			var serCount;
-			var type;
-
-			//Cycle and create SQL
-			for( var i = 0; i < repeatArray.length; i++ ) {
-
-				serDate = new Date( repeatArray[i]['lastOccurrence'] );
-				serCount = repeatArray[i]['currCount'];
-
-				//Reduce calls to parse function
-				repeatArray[i]['rep_category'] = enyo.json.parse( repeatArray[i]['rep_category'] );
-				repeatArray[i]['daysOfWeek'] = enyo.json.parse( repeatArray[i]['daysOfWeek'] );
-
-				while(
-						//Under date limit
-						Math.floor( ( serDate - new Date( repeatArray[i]['lastOccurrence'] ) ) / ( 1000 * 60 * 60 * 24 ) ) < this.seriesDayLimit
-
-						//Under count limit
-						&& ( serCount - repeatArray[i]['currCount'] ) < this.seriesCountLimit
-
-						//Ending condition checks
-						&& (
-							(
-								repeatArray[i]['endingCondition'] == "none"
-							) || (
-								repeatArray[i]['endingCondition'] == "date"
-								&& repeatArray[i]['endDate']
-								&& Date.parse( serDate ) <= repeatArray[i]['endDate']
-							) || (
-								repeatArray[i]['endingCondition'] == "occurences"
-								&& repeatArray[i]['endCount']
-								&& serCount <= repeatArray[i]['endCount']
-							)
-						)
-					) {
-
-					//Move date to next occurrence
-					if( repeatArray[i]['frequency'] == "daily" ) {
-
-						serDate.setDate( serDate.getDate() + 1 * repeatArray[i]['itemSpan'] );
-					} else if( repeatArray[i]['frequency'] == "weekly" ) {
-
-						//repeatArray[i]['daysOfWeek'] -- array of days repeat occurs on
-
-						var day = repeatArray[i]['daysOfWeek'].indexOf( serDate.getDay() );
-
-						if( day < 0 || ( day + 1 ) >= repeatArray[i]['daysOfWeek'].length ) {
-
-							while( serDate.getDay() > 0 ) {
-								//Increment date until next week (0)
-
-								serDate.setDate( serDate.getDate() + 1 );
-							}
-
-							while( serDate.getDay() < 7 && serDate.getDay() != repeatArray[i]['daysOfWeek'][0] ) {
-								//Increment date until first event of next week
-
-								serDate.setDate( serDate.getDate() + 1 );
-							}
-
-							//Increment date proper number of week spans
-							serDate.setDate( serDate.getDate() + ( 7 * ( repeatArray[i]['itemSpan'] - 1 ) ) );
-						} else {
-
-							//Now + ( number of days between now and next event day )
-							serDate.setDate( serDate.getDate() + ( repeatArray[i]['daysOfWeek'][day + 1] - repeatArray[i]['daysOfWeek'][day] ) );
-							day++
-						}
-					} else if( repeatArray[i]['frequency'] == "monthly" ) {
-
-						serDate.setMonth( serDate.getMonth() + 1 * repeatArray[i]['itemSpan'] );
-					} else if( repeatArray[i]['frequency'] == "yearly" ) {
-
-						serDate.setYear( serDate.getFullYear() + 1 * repeatArray[i]['itemSpan'] );
-					}
-
-					trsnData = {
-						"itemId": maxItemId,
-
-						"account": repeatArray[i]['rep_acctId'],
-						"repeatId": repeatArray[i]['repeatId'],
-
-						"desc": repeatArray[i]['rep_desc'],
-
-						"note": repeatArray[i]['rep_note'],
-						"date": Date.parse( serDate ),
-
-						"amount": repeatArray[i]['rep_amount'],
-
-						"amount_old": "NOT_A_VALUE",
-
-
-						"linkedRecord": -1,
-//set elsewhere
-						"linkedAccount": repeatArray[i]['rep_linkedAcctId'],
-
-
-						"cleared": false,
-
-						"checkNum": "",
-
-
-						"category": repeatArray[i]['rep_category'],
-
-						"category2": "",
-
-
-						"rObj": false,
-//do not calculate repeats for this event
-
-						"autoTransfer": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransfer'] : 0 ),
-
-						"autoTransferLink": ( repeatArray[i]['rep_autoTrsnLink'] == 1 ? repeatArray[i]['autoTransferLink'] : -1 )
-					};
-
-					if( GTS.Object.validNumber( repeatArray[i]['rep_linkedAcctId'] ) && repeatArray[i]['rep_linkedAcctId'] >= 0 ) {
-
-						type = "transfer";
-					} else if( repeatArray[i]['rep_amount'] < 0 ) {
-
-						type = "expense";
-					} else {
-
-						type = "income";
-					}
-
-					sql = sql.concat( this.generateInsertTransactionSQL( trsnData, type ) );
-
-					serCount++;
-					maxItemId += ( ( GTS.Object.validNumber( repeatArray[i]['linkedAccount'] ) && repeatArray[i]['linkedAccount'] >= 0 ) ? 2 : 1 );
-				}
-
-				//update repeat item
-				sql.push(
-						Checkbook.globals.gts_db.getUpdate(
-								"repeats",
-								{
-									"lastOccurrence": Date.parse( serDate ),
-									"currCount": serCount,
-									"lastUpdated": Date.parse( new Date() )
-								}, {
-									"repeatId": repeatArray[i]['repeatId']
-								}
-							)
-					);
-			}
-		}
-
-		return sql;
 	},
 
 	/**
@@ -930,7 +573,7 @@ enyo.kind({
 					"sql": "SELECT" +
 						//Expense table data
 						" DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account," +
-						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee," +
+						" main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.repeatUnlinked, main.checkNum, main.payee," +
 
 						//Category information (JSON if split)
 						" ( CASE WHEN main.category = '||~SPLIT~||' THEN" +

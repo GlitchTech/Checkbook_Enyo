@@ -6,6 +6,9 @@ enyo.kind( {
 	transactions: [],
 	account: {},
 
+	initialScrollCompleted: false,
+	savedScrollPosition: false,
+
 	events: {
 		onLoadingStart: "",
 		onLoadingFinish: ""
@@ -188,7 +191,8 @@ enyo.kind( {
 		this.log();
 
 		this.account = {};
-		this.$['list'].empty();
+		this.$['list'].setCount( 0 );
+		this.$['list'].reset();
 	},
 
 	reloadSystem: function() {
@@ -202,7 +206,11 @@ enyo.kind( {
 			return false;
 		}
 
-		this.initialScrollCompleted = false;
+		if( this.savedScrollPosition === false ) {
+
+			this.initialScrollCompleted = false;
+		}
+
 		this.reloadTransactionList();
 	},
 
@@ -315,6 +323,17 @@ enyo.kind( {
 		this.$['list'].scrollToRow( scrollToIndex );
 	},
 
+	rememberScrollPosition: function() {
+
+		this.savedScrollPosition = this.$['list'].getScrollPosition();
+	},
+
+	moveToSavedScrollPosition: function() {
+
+		this.$['list'].setScrollPosition( this.savedScrollPosition );
+		this.savedScrollPosition = false;
+	},
+
 	/** List Display **/
 
 	transactionBuildRow: function( inSender, inEvent ) {
@@ -390,7 +409,7 @@ enyo.kind( {
 
 			//Row Icons
 			var transferCheck = ( row['linkedRecord'] && !isNaN( row['linkedRecord'] ) && row['linkedRecord'] != "" );
-			var repeatCheck = ( row['repeatId'] && !isNaN( row['repeatId'] ) && row['repeatId'] != "" );
+			var repeatCheck = ( row['repeatId'] && !isNaN( row['repeatId'] ) && row['repeatId'] != "" && row['repeatId'] >= 0 );
 
 			this.$['mainBody'].addRemoveClass( "repeatTransferIcon", ( transferCheck && repeatCheck ) );
 			this.$['mainBody'].addRemoveClass( "transferIcon", ( transferCheck && !repeatCheck ) );
@@ -413,8 +432,7 @@ enyo.kind( {
 			return false;
 		}
 
-
-		if( index >= 0 && this.account['itemCount'] > this.$['list'].getCount() && !this.transactions[index] ) {
+		if( index >= 0 && this.account['itemCount'] >= this.$['list'].getCount() && !this.transactions[index] ) {
 
 			this.doLoadingStart();
 
@@ -509,6 +527,9 @@ results = {
 
 			this.initialScrollCompleted = true;
 			this.initialScroll();
+		} else if( this.savedScrollPosition ) {
+
+			enyo.job( "moveToSavedScrollPosition", enyo.bind( this, "moveToSavedScrollPosition" ), 1000 );
 		}
 
 		enyo.asyncMethod( this, this.doLoadingFinish );
@@ -764,6 +785,14 @@ results = {
 
 		//update database;
 		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+
+		if( inEvent['recurrence'] ) {
+
+			enyo.Signals.send( "accountBalanceChanged", { "accounts": accounts } );
+
+			this.reloadTransactionList();
+			return;
+		}
 
 		var balChanged = this.transactions[rowIndex]['amount'];
 		this.transactions.splice( rowIndex, 1 );
