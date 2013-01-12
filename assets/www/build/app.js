@@ -6604,7 +6604,7 @@ return gapi.auth.setToken(e);
 },
 auth: function(e) {
 this.nextSteps = e;
-if (window.device && window.plugins.childBrowser) {
+if (window.device && window.plugins.childBrowser && (enyo.platform.android || enyo.platform.androidChrome)) {
 var t = this.getAuthToken();
 this.log("Phonegap-ChildBrowsers Auth");
 var n = {
