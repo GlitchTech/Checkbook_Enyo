@@ -65,9 +65,16 @@ enyo.kind( {
 			classes: "deep-green",
 			components: [
 				{
-					showing: false,//While not draggable
-					kind: "onyx.Grabber",
-					style: "height: 27px;"//override MoreToolbar fitting
+					name: "backButton",
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "fireBack",
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/back.png"
+						}
+					]
 				},{
 					kind: "onyx.MenuDecorator",
 					components: [
@@ -264,6 +271,8 @@ enyo.kind( {
 			this.unloadSystem();
 			return;
 		}
+
+		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
 
 		if( !this.account['acctId'] ) {
 
@@ -523,6 +532,12 @@ enyo.kind( {
 	},
 
 	/* Footer Control */
+
+	fireBack: function() {
+
+		enyo.Signals.send( "onbackbutton" );
+		return true;
+	},
 
 	renderSortButton: function() {
 
