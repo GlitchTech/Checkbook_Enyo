@@ -692,7 +692,7 @@ enyo.kind({
 				{
 					"sql": "SELECT *, " +
 							//Transaction Sorting
-							"( SELECT qry FROM acctTrsnSortOptn WHERE sortId = accounts.sort ) AS sortQry, " +
+							"( SELECT qry FROM acctTrsnSortOptn WHERE sortId = IFNULL( accounts.sort, 1) ) AS sortQry, " +
 							//Transaction row count
 							"IFNULL( ( SELECT COUNT( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS itemCount, " +
 
