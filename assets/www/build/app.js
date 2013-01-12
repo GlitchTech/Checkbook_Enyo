@@ -7982,10 +7982,19 @@ this.tapHighlight && (this.preventTapDisplayTimer = (new Date).getTime(), onyx.I
 enyo.kind({
 name: "private.gapi",
 kind: "enyo.Component",
-published: {
 apiKey: "AIzaSyBOKT9NrmlBVx4RFPk2p3c5ee5cHMvs8Lc",
-clientId: "933238428058.apps.googleusercontent.com",
-clientSecret: "AmttUjVelS_L4X46GCltvF94"
+installedClientId: "933238428058.apps.googleusercontent.com",
+installedClientSecret: "AmttUjVelS_L4X46GCltvF94",
+clientId: "933238428058-smvr0gsdpbpiuo2q59gcll54rau9ivus.apps.googleusercontent.com",
+clientSecret: "mqgBXW7pTj1kUvpGswmD7miK",
+getApiKey: function() {
+return this.apiKey;
+},
+getClientId: function() {
+return window.device && window.plugins.childBrowser && (enyo.platform.android || enyo.platform.androidChrome) ? this.installedClientId : this.clientId;
+},
+getClientSecret: function() {
+return window.device && window.plugins.childBrowser && (enyo.platform.android || enyo.platform.androidChrome) ? this.installedClientSecret : this.clientSecret;
 }
 });
 
@@ -13178,9 +13187,14 @@ name: "footer",
 kind: "onyx.MoreToolbar",
 classes: "deep-green",
 components: [ {
-showing: !1,
-kind: "onyx.Grabber",
-style: "height: 27px;"
+name: "backButton",
+kind: "onyx.Button",
+classes: "padding-none transparent",
+ontap: "fireBack",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/back.png"
+} ]
 }, {
 kind: "onyx.MenuDecorator",
 components: [ {
@@ -13307,7 +13321,7 @@ if (!t.account || !t.account.acctId) {
 this.unloadSystem();
 return;
 }
-this.account.acctId || (this.$.header.show(), this.$.footer.show());
+this.$.backButton.setShowing(enyo.Panels.isScreenNarrow()), this.account.acctId || (this.$.header.show(), this.$.footer.show());
 if (t.force || !this.account.acctId || this.account.acctId !== t.account.acctId) this.account = enyo.clone(t.account), this.$.entries.account = enyo.clone(this.account), this.$.acctName.setContent(this.account.acctName), this.$.acctTypeIcon.setSrc("assets/" + this.account.acctCategoryIcon), this.renderBalanceButton(), this.renderSortButton(), this.$.entries.reloadSystem(), this.account.frozen === 1 ? (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0)) : (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1));
 this.$.header.reflow(), this.$.footer.reflow(), this.reflow();
 },
@@ -13395,6 +13409,9 @@ this.$.acctTypeIcon.hide(), this.$.loadingSpinner.show();
 },
 hidenLoadingIcon: function() {
 this.$.loadingSpinner.hide(), this.$.acctTypeIcon.show();
+},
+fireBack: function() {
+return enyo.Signals.send("onbackbutton"), !0;
 },
 renderSortButton: function() {
 transactionSortOptions.length <= 0 ? Checkbook.globals.transactionManager.fetchTransactionSorting({
