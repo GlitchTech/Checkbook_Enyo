@@ -10695,6 +10695,7 @@ n.amount = parseFloat(n.amount), n.itemId = parseInt(this.getNode(t[r], "gsx:gti
 if (typeof this.accountList[n.accountCat] == "undefined" || typeof this.accountList[n.accountCat][n.accountName] == "undefined") this.newAccounts.push({
 acctName: n.accountName,
 acctCategory: n.accountCat,
+sort: 1,
 acctNotes: ""
 }), this.addAccountListObject(-1, n.accountName, n.accountCat);
 n.linkedAccountName = this.getNode(t[r], "gsx:gtlinkedaccount"), n.linkedAccountCat = this.getNode(t[r], "gsx:gtlinkedaccountcat"), n.linkedRecord = parseInt(this.getNode(t[r], "gsx:gtlinkid"));
@@ -11426,7 +11427,7 @@ onError: e
 _buildAccountObjectsHandler: function(e, t, n, r) {
 this.log(t, n, r.length);
 for (var i = 0; i < r.length; i++) {
-var s = enyo.clone(r[i]);
+var s = r[i];
 s["defaultAccount"] == 1 && (this.accountObject.defaultAccountIndex = n + i), this.accountObject.idTable[n + i] = s.acctId, this.accountObject.accountsList[n + i] = {
 content: s.acctName,
 icon: "assets/" + s.acctCategoryIcon,
@@ -11439,7 +11440,7 @@ classes: "margin-right img-icon"
 }, {
 content: s.acctName
 } ]
-}, this.accountObject.accounts[n + i] = s;
+}, this.accountObject.accounts[n + i] = enyo.clone(s);
 }
 if (t > r.length) {
 while (this.accountObject.processingQueue.length > 0) {
@@ -11888,15 +11889,14 @@ content: "Search"
 }, {
 name: "loadingScrim",
 kind: "onyx.Scrim",
-classes: "onyx-scrim-translucent",
+classes: "enyo-fit onyx-scrim-translucent",
 showing: !0,
-style: "z-index: 1000;"
-}, {
-name: "loadingSpinner",
+style: "z-index: 1000;",
+components: [ {
 kind: "onyx.Spinner",
 style: "size-double",
-showing: !1,
-style: "z-index: 10001; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+style: "position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+} ]
 }, {
 kind: "Signals",
 accountChanged: "renderAccountList",
@@ -11911,10 +11911,10 @@ renderAccountList: function() {
 this.accountBalanceForceUpdate(), this.updateSortMenu();
 },
 showLoading: function() {
-this.$.loadingScrim.show(), this.$.loadingSpinner.show();
+this.$.loadingScrim.show();
 },
 hideLoading: function() {
-this.$.loadingScrim.hide(), this.$.loadingSpinner.hide();
+this.$.loadingScrim.hide();
 },
 accountBalanceViewChanged: function(e, t) {
 if (typeof t.index == "undefined" || t.index < 0 || t.index >= this.$.entries.accounts.length) {
@@ -11985,7 +11985,7 @@ addAccountComplete: function(e, t) {
 this.$.addAccountButton.setDisabled(!1), t.action === 1 && t.actionStatus === !0 && enyo.Signals.send("accountChanged");
 },
 toggleLock: function() {
-this.$.entries.getEditMode() ? this.$.entries.setEditMode(!1) : this.$.entries.setEditMode(!0), this.$.editModeButtonIcon.addRemoveClass("active", this.$.entries.getEditMode()), this.$.editOverlay.setShowing(this.$.entries.getEditMode());
+this.$.entries.getEditMode() ? this.$.entries.setEditMode(!1) : this.$.entries.setEditMode(!0), this.$.editModeButtonIcon.addRemoveClass("active", this.$.entries.getEditMode()), this.$.editOverlay.setShowing(this.$.entries.getEditMode()), this.$.header.reflow();
 },
 searchMenuSelected: function(e, t) {
 var n = t.content.toLowerCase();
@@ -13181,7 +13181,9 @@ ondragstart: "listDrag",
 ondrag: "listDrag",
 ondragfinish: "listDrag",
 onLoadingStart: "showLoadingIcon",
-onLoadingFinish: "hidenLoadingIcon"
+onLoadingFinish: "hideLoadingIcon",
+onScrimShow: "showLoadingScrim",
+onScrimHide: "hideLoadingScrim"
 }, {
 name: "footer",
 kind: "onyx.MoreToolbar",
@@ -13302,6 +13304,16 @@ value: "clear"
 } ]
 } ]
 }, {
+name: "loadingScrim",
+kind: "onyx.Scrim",
+classes: "onyx-scrim-translucent",
+style: "z-index: 1000;",
+components: [ {
+kind: "onyx.Spinner",
+style: "size-double",
+style: "position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+} ]
+}, {
 kind: "Signals",
 viewAccount: "viewAccount",
 accountChanged: "accountChanged",
@@ -13321,9 +13333,9 @@ if (!t.account || !t.account.acctId) {
 this.unloadSystem();
 return;
 }
-this.$.backButton.setShowing(enyo.Panels.isScreenNarrow()), this.account.acctId || (this.$.header.show(), this.$.footer.show());
+this.$.backButton.setShowing(enyo.Panels.isScreenNarrow()), this.showLoadingScrim(), this.account.acctId || (this.$.header.show(), this.$.footer.show());
 if (t.force || !this.account.acctId || this.account.acctId !== t.account.acctId) this.account = enyo.clone(t.account), this.$.entries.account = enyo.clone(this.account), this.$.acctName.setContent(this.account.acctName), this.$.acctTypeIcon.setSrc("assets/" + this.account.acctCategoryIcon), this.renderBalanceButton(), this.renderSortButton(), this.$.entries.reloadSystem(), this.account.frozen === 1 ? (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0)) : (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1));
-this.$.header.reflow(), this.$.footer.reflow(), this.reflow();
+this.hideLoadingScrim(), this.$.header.reflow(), this.$.footer.reflow(), this.reflow();
 },
 getAccountId: function() {
 return this.account.acctId;
@@ -13407,8 +13419,14 @@ callbackFn: enyo.bind(this, this.setAccountIndex)
 showLoadingIcon: function() {
 this.$.acctTypeIcon.hide(), this.$.loadingSpinner.show();
 },
-hidenLoadingIcon: function() {
+hideLoadingIcon: function() {
 this.$.loadingSpinner.hide(), this.$.acctTypeIcon.show();
+},
+showLoadingScrim: function() {
+this.$.loadingScrim.show();
+},
+hideLoadingScrim: function() {
+this.$.loadingScrim.hide();
 },
 fireBack: function() {
 return enyo.Signals.send("onbackbutton"), !0;
@@ -13457,7 +13475,7 @@ force: !0
 return this.log(t.selected), !0;
 },
 newTransaction: function(e) {
-this.$.addIncomeButton.getDisabled() || this.$.addTransferButton.getDisabled() || this.$.addExpenseButton.getDisabled() || (this.toggleCreateButtons(), enyo.Signals.send("modifyTransaction", {
+this.$.addIncomeButton.getDisabled() || this.$.addTransferButton.getDisabled() || this.$.addExpenseButton.getDisabled() || (this.toggleCreateButtons(), this.showLoadingScrim(), enyo.Signals.send("modifyTransaction", {
 name: "createTransaction",
 kind: "Checkbook.transactions.modify",
 accountObj: this.account,
@@ -13467,7 +13485,7 @@ onFinish: enyo.bind(this, this.addTransactionComplete)
 }));
 },
 addTransactionComplete: function(e, t) {
-this.toggleCreateButtons(), t.modifyStatus === 1 && (delete t.modifyStatus, this.balanceChangedHandler(t), this.account.itemCount++, this.$.entries.setItemCount(this.account.itemCount), this.$.entries.reloadSystem());
+t.modifyStatus === 1 && (delete t.modifyStatus, this.balanceChangedHandler(t), this.account.itemCount++, this.$.entries.setItemCount(this.account.itemCount), this.$.entries.reloadSystem()), this.toggleCreateButtons(), enyo.asyncMethod(this, this.hideLoadingScrim);
 },
 toggleCreateButtons: function() {
 this.$.addIncomeButton.getDisabled() ? (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1)) : (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0));
@@ -13484,7 +13502,9 @@ initialScrollCompleted: !1,
 savedScrollPosition: !1,
 events: {
 onLoadingStart: "",
-onLoadingFinish: ""
+onLoadingFinish: "",
+onScrimShow: "",
+onScrimHide: ""
 },
 components: [ {
 name: "list",
@@ -13724,14 +13744,14 @@ transactiontapped: function(e, t) {
 return Checkbook.globals.prefs.transPreview === 1 ? (this.$.viewSingle.setIndex(t.rowIndex), this.$.viewSingle.setTransaction(this.transactions[t.rowIndex]), this.$.viewSingle.setAccount(this.account), enyo.asyncMethod(this.$.viewSingle, this.$.viewSingle.show)) : enyo.asyncMethod(this, this.vsEdit, null, t), !0;
 },
 vsEdit: function(e, t) {
-this.log(), this.account.frozen !== 1 && enyo.Signals.send("modifyTransaction", {
+this.log(), this.account.frozen !== 1 && (this.doScrimShow(), enyo.Signals.send("modifyTransaction", {
 name: "editTransaction",
 kind: "Checkbook.transactions.modify",
 accountObj: this.account,
 trsnObj: enyo.clone(this.transactions[t.rowIndex]),
 transactionType: "",
 onFinish: enyo.bind(this, this.modifyTransactionComplete, t.rowIndex)
-});
+}));
 },
 modifyTransactionComplete: function(e, t, n) {
 var r = n.modifyStatus;
@@ -13739,7 +13759,7 @@ delete n.modifyStatus, r == 1 ? (enyo.Signals.send("accountBalanceChanged", {
 accounts: n
 }), this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e)) : r == 2 && (enyo.Signals.send("accountBalanceChanged", {
 accounts: n
-}), this.account.itemCount--, this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e - 1));
+}), this.account.itemCount--, this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e - 1)), enyo.asyncMethod(this, this.doScrimHide);
 },
 transactionHeld: function(e, t) {
 this.log(), this.log("I DO NOT WORK YET", arguments);
@@ -14941,6 +14961,7 @@ events: {
 onRequestInsertTransactionSQL: ""
 },
 compare: function(e, t) {
+if (GTS.Object.isUndefined(e) && !GTS.Object.isUndefined(t) || !GTS.Object.isUndefined(e) && GTS.Object.isUndefined(t)) return !1;
 var n = !0;
 n = n && e.frequency === t.frequency, n = n && e.itemSpan === t.itemSpan, n = n && enyo.json.stringify(e.daysOfWeek) === enyo.json.stringify(t.daysOfWeek), n = n && e.endingCondition === t.endingCondition;
 if (n && (e["endingCondition"] == "date" || t["endingCondition"] == "date")) {
