@@ -194,20 +194,16 @@ enyo.kind( {
 							onSelect: "functionSelected",
 							components: [
 								{
-									content: "Refresh",
-									value: "refresh"
+									content: "Refresh"
 								}, {
 									showing: false,
-									content: "Purge Transactions",
-									value: "purge"
+									content: "Purge Transactions"
 								}, {
 									showing: false,
-									content: "Combine Transactions",
-									value: "combine"
+									content: "Combine Transactions"
 								}, {
 									showing: false,
-									content: "Clear Multiple Transactions",
-									value: "clear"
+									content: "Clear Multiple Transactions"
 								}
 							]
 						}

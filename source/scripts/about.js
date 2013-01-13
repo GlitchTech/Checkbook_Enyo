@@ -45,7 +45,7 @@ enyo.kind({
 		},
 
 		{
-			classes: "h-box box-align-center margin-half-top margin-half-bottom",
+			classes: "text-center margin-half-top margin-half-bottom",
 
 			components: [
 				{
@@ -59,6 +59,7 @@ enyo.kind({
 		},
 
 		{
+			showing: false,
 			classes: "h-box box-align-center margin-half-top margin-half-bottom",
 
 			components: [
@@ -72,6 +73,7 @@ enyo.kind({
 				}
 			]
 		}, {
+			showing: false,//Website offline
 			classes: "h-box box-align-center margin-half-top margin-half-bottom",
 
 			components: [
@@ -79,7 +81,8 @@ enyo.kind({
 					kind: "enyo.Image",
 					src: "assets/application-web.png",
 				}, {
-					content: "<a href='" + enyo.fetchAppInfo()['vendorurl'] + "' target='_blank'>" + enyo.fetchAppInfo()['vendor'] + " Website</a>",
+					content: enyo.fetchAppInfo()['vendorurl'],
+					//content: "<a href='" + enyo.fetchAppInfo()['vendorurl'] + "' target='_blank'>" + enyo.fetchAppInfo()['vendor'] + " Website</a>",
 					classes: "padding-left dark-link",
 					allowHtml: true
 				}
@@ -92,7 +95,8 @@ enyo.kind({
 					kind: "enyo.Image",
 					src: "assets/twitter-icon.png",
 				}, {
-					content: "<a href='http://twitter.com/#!/glitchtech' target='_blank'>" + enyo.fetchAppInfo()['vendor'] + " Twitter</a>",
+					content: "@GlitchTech",
+					//content: "<a href='http://twitter.com/#!/glitchtech' target='_blank'>" + enyo.fetchAppInfo()['vendor'] + " Twitter</a>",
 					classes: "padding-left dark-link",
 					allowHtml: true
 				}
@@ -105,7 +109,8 @@ enyo.kind({
 					kind: "enyo.Image",
 					src: "assets/application-email.png",
 				}, {
-					content: "<a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support' target='_blank'>Send Email</a>",
+					content: enyo.fetchAppInfo()['vendoremail'],
+					//content: "<a href='mailto:" + enyo.fetchAppInfo()['vendoremail'] + "?subject=" + enyo.fetchAppInfo()['title'] + " Support' target='_blank'>Send Email</a>",
 					classes: "padding-left dark-link",
 					allowHtml: true
 				}

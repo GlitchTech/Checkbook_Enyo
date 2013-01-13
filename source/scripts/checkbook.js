@@ -75,11 +75,8 @@ enyo.kind({
 											content: "Report Bug (NYI)",
 											ontap: "errorReport"
 										}, {
-											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
-											//hidden until handling in about for links in child view
-											showing: false,
 											content: "About",
 											ontap: "showAbout"
 										}
@@ -473,6 +470,7 @@ enyo.kind({
 
 		//Hide other panes
 		this.$['container'].hide();
+
 		for( var i = 0; i < this.paneStack.length; i++ ) {
 
 			this.$[this.paneStack[i]].hide();
@@ -575,7 +573,7 @@ enyo.kind({
 
 		if( importStatus['success'] === true ) {
 
-			this.$['transactions'].reloadSystem();
+			this.$['transactions'].unloadSystem();
 
 			this.notificationType = null;
 
@@ -584,6 +582,14 @@ enyo.kind({
 					this.loadCheckbookStage2
 				);
 		}
+	},
+
+	/** Checkbook.reports.* **/
+
+	openReports: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		return;
 	},
 
 	/** Checkbook.budget.* **/
