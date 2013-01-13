@@ -58,7 +58,10 @@ enyo.kind( {
 			ondragfinish: "listDrag",
 
 			onLoadingStart: "showLoadingIcon",
-			onLoadingFinish: "hidenLoadingIcon"
+			onLoadingFinish: "hideLoadingIcon",
+
+			onScrimShow: "showLoadingScrim",
+			onScrimHide: "hideLoadingScrim"
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",
@@ -214,6 +217,24 @@ enyo.kind( {
 		},
 
 		{
+			name: "loadingScrim",
+			kind: "onyx.Scrim",
+			classes: "onyx-scrim-translucent",
+
+			style: "z-index: 1000;",
+
+			components: [
+				{
+					name: "loadingSpinner",
+					kind: "onyx.Spinner",
+					style: "size-double",
+
+					style: "position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+				}
+			]
+		},
+
+		{
 			kind: "Signals",
 
 			viewAccount: "viewAccount",
@@ -273,6 +294,7 @@ enyo.kind( {
 		}
 
 		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
+		this.showLoadingScrim();
 
 		if( !this.account['acctId'] ) {
 
@@ -339,6 +361,8 @@ enyo.kind( {
 				this.$['addExpenseButton'].setDisabled( false );
 			}
 		}
+
+		this.hideLoadingScrim();
 
 		this.$['header'].reflow();
 		this.$['footer'].reflow();
@@ -525,10 +549,20 @@ enyo.kind( {
 		this.$['loadingSpinner'].show();
 	},
 
-	hidenLoadingIcon: function() {
+	hideLoadingIcon: function() {
 
 		this.$['loadingSpinner'].hide();
 		this.$['acctTypeIcon'].show();
+	},
+
+	showLoadingScrim: function() {
+
+		this.$['loadingScrim'].show();
+	},
+
+	hideLoadingScrim: function() {
+
+		this.$['loadingScrim'].hide();
 	},
 
 	/* Footer Control */
@@ -662,6 +696,7 @@ enyo.kind( {
 		if( !( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
 
 			this.toggleCreateButtons();
+			this.showLoadingScrim();
 
 			enyo.Signals.send(
 					"modifyTransaction",
@@ -679,8 +714,6 @@ enyo.kind( {
 
 	addTransactionComplete: function( inSender, inEvent ) {
 
-		this.toggleCreateButtons();
-
 		if( inEvent['modifyStatus'] === 1 ) {
 
 			delete inEvent['modifyStatus'];
@@ -692,6 +725,9 @@ enyo.kind( {
 			this.$['entries'].setItemCount( this.account['itemCount'] );
 			this.$['entries'].reloadSystem();
 		}
+
+		this.toggleCreateButtons();
+		enyo.asyncMethod( this, this.hideLoadingScrim );
 	},
 
 	toggleCreateButtons: function() {

@@ -170,14 +170,16 @@ enyo.kind( {
 			classes: "onyx-scrim-translucent",
 
 			showing: true,
-			style: "z-index: 1000;"
-		}, {
-			name: "loadingSpinner",
-			kind: "onyx.Spinner",
-			style: "size-double",
+			style: "z-index: 1000;",
+			components: [
+				{
+					name: "loadingSpinner",
+					kind: "onyx.Spinner",
+					style: "size-double",
 
-			showing: false,
-			style: "z-index: 10001; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+					style: "position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+				}
+			]
 		},
 
 		{
@@ -219,7 +221,6 @@ enyo.kind( {
 	showLoading: function() {
 
 		this.$['loadingScrim'].show();
-		this.$['loadingSpinner'].show();
 	},
 
 	/**
@@ -231,7 +232,6 @@ enyo.kind( {
 	hideLoading: function() {
 
 		this.$['loadingScrim'].hide();
-		this.$['loadingSpinner'].hide();
 	},
 
 	accountBalanceViewChanged: function( inSender, inEvent ) {
@@ -393,6 +393,7 @@ enyo.kind( {
 
 		this.$['editModeButtonIcon'].addRemoveClass( "active", this.$['entries'].getEditMode() );
 		this.$['editOverlay'].setShowing( this.$['entries'].getEditMode() );
+		this.$['header'].reflow();
 	},
 
 	searchMenuSelected: function( inSender, inEvent ) {
