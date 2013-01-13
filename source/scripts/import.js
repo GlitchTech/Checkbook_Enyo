@@ -811,6 +811,7 @@ enyo.kind({
 					this.newAccounts.push( {
 							"acctName": trsn['accountName'],
 							"acctCategory": trsn['accountCat'],
+							"sort": 1,
 							"acctNotes": ""
 						});
 

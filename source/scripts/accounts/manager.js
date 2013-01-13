@@ -764,7 +764,7 @@ enyo.kind({
 
 		for( var i = 0; i < results.length; i++ ) {
 
-			var row = enyo.clone( results[i] );
+			var row = results[i];
 
 			if( row['defaultAccount'] == 1 ) {
 
@@ -790,7 +790,7 @@ enyo.kind({
 					]
 				};
 
-			this.accountObject.accounts[offset + i] = row;
+			this.accountObject.accounts[offset + i] = enyo.clone( row );
 		}
 
 		if( limit > results.length ) {
