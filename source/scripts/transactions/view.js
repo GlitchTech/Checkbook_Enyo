@@ -58,16 +58,26 @@ enyo.kind( {
 			ondragfinish: "listDrag",
 
 			onLoadingStart: "showLoadingIcon",
-			onLoadingFinish: "hidenLoadingIcon"
+			onLoadingFinish: "hideLoadingIcon",
+
+			onScrimShow: "showLoadingScrim",
+			onScrimHide: "hideLoadingScrim"
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",
 			classes: "deep-green",
 			components: [
 				{
-					showing: false,//While not draggable
-					kind: "onyx.Grabber",
-					style: "height: 27px;"//override MoreToolbar fitting
+					name: "backButton",
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "fireBack",
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/back.png"
+						}
+					]
 				},{
 					kind: "onyx.MenuDecorator",
 					components: [
@@ -207,6 +217,23 @@ enyo.kind( {
 		},
 
 		{
+			name: "loadingScrim",
+			kind: "onyx.Scrim",
+			classes: "onyx-scrim-translucent",
+
+			style: "z-index: 1000;",
+
+			components: [
+				{
+					kind: "onyx.Spinner",
+					style: "size-double",
+
+					style: "position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
+				}
+			]
+		},
+
+		{
 			kind: "Signals",
 
 			viewAccount: "viewAccount",
@@ -264,6 +291,9 @@ enyo.kind( {
 			this.unloadSystem();
 			return;
 		}
+
+		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
+		this.showLoadingScrim();
 
 		if( !this.account['acctId'] ) {
 
@@ -330,6 +360,8 @@ enyo.kind( {
 				this.$['addExpenseButton'].setDisabled( false );
 			}
 		}
+
+		this.hideLoadingScrim();
 
 		this.$['header'].reflow();
 		this.$['footer'].reflow();
@@ -510,19 +542,37 @@ enyo.kind( {
 		return true;
 	},
 
+	/* Loading Indicators */
+
 	showLoadingIcon: function() {
 
 		this.$['acctTypeIcon'].hide();
 		this.$['loadingSpinner'].show();
 	},
 
-	hidenLoadingIcon: function() {
+	hideLoadingIcon: function() {
 
 		this.$['loadingSpinner'].hide();
 		this.$['acctTypeIcon'].show();
 	},
 
+	showLoadingScrim: function() {
+
+		this.$['loadingScrim'].show();
+	},
+
+	hideLoadingScrim: function() {
+
+		this.$['loadingScrim'].hide();
+	},
+
 	/* Footer Control */
+
+	fireBack: function() {
+
+		enyo.Signals.send( "onbackbutton" );
+		return true;
+	},
 
 	renderSortButton: function() {
 
@@ -590,13 +640,13 @@ enyo.kind( {
 			this.log( "Budget system go" );
 			return true;
 
-			enyo.Signals.send( "showBudget", { "account": this.account } );
+			enyo.Signals.send( "showBudget", { "acctId": this.account['acctId'] } );
 		} else if( inEvent.content.toLowerCase() === "reports" ) {
 
 			this.log( "Report system go" );
 			return true;
 
-			//enyo.Signals.send( "?????", { "account": this.account } );
+			enyo.Signals.send( "showReports", { "acctId": this.account['acctId'] } );
 		} else if( inEvent.content.toLowerCase() === "search" ) {
 
 			this.log( "Search system go" );
@@ -647,6 +697,7 @@ enyo.kind( {
 		if( !( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
 
 			this.toggleCreateButtons();
+			this.showLoadingScrim();
 
 			enyo.Signals.send(
 					"modifyTransaction",
@@ -664,8 +715,6 @@ enyo.kind( {
 
 	addTransactionComplete: function( inSender, inEvent ) {
 
-		this.toggleCreateButtons();
-
 		if( inEvent['modifyStatus'] === 1 ) {
 
 			delete inEvent['modifyStatus'];
@@ -677,6 +726,9 @@ enyo.kind( {
 			this.$['entries'].setItemCount( this.account['itemCount'] );
 			this.$['entries'].reloadSystem();
 		}
+
+		this.toggleCreateButtons();
+		enyo.asyncMethod( this, this.hideLoadingScrim );
 	},
 
 	toggleCreateButtons: function() {

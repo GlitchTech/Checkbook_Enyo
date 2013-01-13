@@ -11,7 +11,10 @@ enyo.kind( {
 
 	events: {
 		onLoadingStart: "",
-		onLoadingFinish: ""
+		onLoadingFinish: "",
+
+		onScrimShow: "",
+		onScrimHide: ""
 	},
 
 	components: [
@@ -600,6 +603,8 @@ results = {
 		if( this.account['frozen'] !== 1 ) {
 			//account not frozen
 
+			this.doScrimShow();
+
 			enyo.Signals.send(
 					"modifyTransaction",
 					{
@@ -646,6 +651,8 @@ results = {
 					( rowIndex - 1 )
 				);
 		}
+
+		enyo.asyncMethod( this, this.doScrimHide );
 	},
 
 	transactionHeld: function( inSender, inEvent ) {

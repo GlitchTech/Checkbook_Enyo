@@ -980,5 +980,29 @@ enyo.kind({
 		}
 
 		return( category !== "" ? catDisplayItem : "" );
+	},
+
+	/**
+	 * @public
+	 * Determines transaction type
+	 *
+	 * @param {}	trsn	Transaction to parse
+	 *
+	 * @return {string}
+	 */
+	determineTransactionType: function( trsn ) {
+
+		var type = "income"
+
+		if( GTS.Object.validNumber( trsn['linkedAccount'] ) && trsn['linkedAccount'] >= 0 &&
+			GTS.Object.validNumber( trsn['linkedRecord'] ) && trsn['linkedRecord'] >= 0 ) {
+
+			type = "transfer";
+		} else if( trsn['amount'] < 0 ) {
+
+			type = "expense";
+		}
+
+		return type;
 	}
 });

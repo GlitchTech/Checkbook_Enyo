@@ -692,7 +692,7 @@ enyo.kind({
 				{
 					"sql": "SELECT *, " +
 							//Transaction Sorting
-							"( SELECT qry FROM acctTrsnSortOptn WHERE sortId = accounts.sort ) AS sortQry, " +
+							"( SELECT qry FROM acctTrsnSortOptn WHERE sortId = IFNULL( accounts.sort, 1) ) AS sortQry, " +
 							//Transaction row count
 							"IFNULL( ( SELECT COUNT( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS itemCount, " +
 
@@ -764,7 +764,7 @@ enyo.kind({
 
 		for( var i = 0; i < results.length; i++ ) {
 
-			var row = enyo.clone( results[i] );
+			var row = results[i];
 
 			if( row['defaultAccount'] == 1 ) {
 
@@ -790,7 +790,7 @@ enyo.kind({
 					]
 				};
 
-			this.accountObject.accounts[offset + i] = row;
+			this.accountObject.accounts[offset + i] = enyo.clone( row );
 		}
 
 		if( limit > results.length ) {

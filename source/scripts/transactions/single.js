@@ -376,16 +376,7 @@ enyo.kind( {
 		this.$['desc'].setContent( this.transaction['desc'] );
 
 		//Amount
-		if( GTS.Object.isNumber( this.transaction['linkedRecord'] ) && this.transaction['linkedRecord'] >= 0 ) {
-
-			this.transactionType = "transfer";
-		} else if( this.transaction['amount'] < 0 ) {
-
-			this.transactionType = "expense";
-		} else {
-
-			this.transactionType = "income";
-		}
+		this.transactionType = Checkbook.globals.transactionManager.determineTransactionType( this.transaction );
 
 		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
 		this.$['amount'].setContent( formatAmount( Math.abs( this.transaction['amount'] ) ) );

@@ -25,6 +25,14 @@ enyo.kind( {
 	 */
 	compare: function( r1, r2 ) {
 
+		if(
+			( GTS.Object.isUndefined( r1 ) && !GTS.Object.isUndefined( r2 ) ) ||
+			( !GTS.Object.isUndefined( r1 ) && GTS.Object.isUndefined( r2 ) ) ) {
+			//One is undefined. Not equal
+
+			return false;
+		}
+
 		var match = true;
 
 		match = match && ( r1['frequency'] === r2['frequency'] );

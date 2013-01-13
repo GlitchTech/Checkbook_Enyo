@@ -631,16 +631,7 @@ enyo.kind( {
 
 		if( this.trsnObj['itemId'] >= 0 ) {
 
-			if( GTS.Object.validNumber( this.trsnObj['linkedRecord'] ) && this.trsnObj['linkedRecord'] >= 0 ) {
-
-				this.transactionType = "transfer";
-			} else if( this.trsnObj['amount'] < 0 ) {
-
-				this.transactionType = "expense";
-			} else {
-
-				this.transactionType = "income";
-			}
+			this.transactionType = Checkbook.globals.transactionManager.determineTransactionType( this.trsnObj );
 		}
 
 		this.trsnObj['amount'] = Math.abs( this.trsnObj['amount'] ).toFixed( 2 );

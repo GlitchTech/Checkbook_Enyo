@@ -511,9 +511,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	buildTransactionSorting: function() {
 
 		this.$['transactionSorting'].setChoices( transactionSortOptions );
@@ -522,9 +519,6 @@ enyo.kind( {
 		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAutoTransferLink ) } );
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	buildAutoTransferLink: function( accounts ) {
 
 		if( accounts.length > 0) {
@@ -546,9 +540,6 @@ enyo.kind( {
 			);
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	transactionSortingUpdateLabel: function() {
 
 		Checkbook.globals.gts_db.query(
@@ -560,9 +551,6 @@ enyo.kind( {
 			);
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	transactionSortingUpdateLabelHandler: function( results ) {
 
 		if( results[0]['desc'] ) {
@@ -574,9 +562,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	accountDisplayUpdateLabel: function() {
 
 		var value = this.$['accountDisplay'].getValue();
@@ -593,9 +578,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	balanceUpdateLabel: function() {
 
 		var value = this.$['balance'].getValue();
@@ -615,9 +597,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	categoryChanged: function() {
 
 		if( Checkbook.globals.prefs['dispColor'] === 1 ) {
@@ -636,18 +615,12 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	togglePINStatus: function() {
 
 		this.$['pinLockDrawer'].setOpen( this.$['pinLock'].getValue() );
 		return true;
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	changePinCode: function() {
 
 		this.createComponent(
@@ -662,9 +635,6 @@ enyo.kind( {
 		this.$['pinPopup'].show();
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	changePinCodeHandler: function( inSender, inEvent ) {
 
 		if( enyo.isString( inEvent.value ) ) {
@@ -677,9 +647,6 @@ enyo.kind( {
 		this.$['pinPopup'].destroy();
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	toggleAutoTransferDrawer: function() {
 
 		var value = this.$['autoTransfer'].getValue();
@@ -698,9 +665,6 @@ enyo.kind( {
 		this.$['autoTransferDrawer'].setOpen( this.$['autoTransfer'].getValue() > 0	 );
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	//Set up UI & Data
 	setAccountValues: function() {
 
@@ -748,9 +712,6 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	renderDisplayItems: function( results ) {
 
 		if( !results || typeof( results ) === "undefined" ) {
@@ -816,9 +777,6 @@ enyo.kind( {
 			);
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	saveAccount: function() {
 
 		if( this.$['accountName'].getValue().length <= 0 ) {
@@ -872,9 +830,6 @@ enyo.kind( {
 		enyo.asyncMethod( this, this.doFinish, { "action": 1, "actionStatus": status } );
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	deleteAccount: function() {
 
 		if( this.acctId < 0 ) {
@@ -903,18 +858,12 @@ enyo.kind( {
 		}
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	deleteAccountConfirmClose: function() {
 
 		this.$['deleteAccountConfirm'].hide();
 		this.$['deleteAccountConfirm'].destroy();
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	deleteAccountHandler: function() {
 
 		this.deleteAccountConfirmClose();
@@ -927,9 +876,6 @@ enyo.kind( {
 			);
 	},
 
-	/**
-	 * TODO DEFINITION
-	 */
 	deleteFinished: function( status ) {
 
 		enyo.asyncMethod( this, this.doFinish, { "action": 2, "actionStatus": status } );
