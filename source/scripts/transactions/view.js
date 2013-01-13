@@ -145,7 +145,6 @@ enyo.kind( {
 						}
 					]
 				}, {
-					showing: false,
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
@@ -162,48 +161,34 @@ enyo.kind( {
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
-							onSelect: "searchSelected",
-							components: [
-								{
-									content: "Reports"
-								}, {
-									content: "Budget"
-								}, {
-									content: "Search"
-								}
-							]
-						}
-					]
-				}, {
-					kind: "onyx.MenuDecorator",
-					components: [
-						{
-							kind: "onyx.Button",
-							classes: "padding-none transparent",
-							components: [
-								{
-									kind: "onyx.Icon",
-									src: "assets/menu_icons/config.png"
-								}
-							]
-						}, {
-							kind: "onyx.Menu",
-							floating: true,
-							scrim: true,
-							scrimclasses: "onyx-scrim-translucent",
-							onSelect: "functionSelected",
+							onSelect: "footerMenuSelected",
 							components: [
 								{
 									content: "Refresh"
 								}, {
 									showing: false,
-									content: "Purge Transactions"
+									classes: "onyx-menu-divider"
 								}, {
 									showing: false,
-									content: "Combine Transactions"
+									content: "Reports"
 								}, {
 									showing: false,
-									content: "Clear Multiple Transactions"
+									content: "Budget"
+								}, {
+									showing: false,
+									content: "Search"
+								}, {
+									showing: false,
+									classes: "onyx-menu-divider"
+								}, {
+									showing: false,
+									content: "Purge"
+								}, {
+									showing: false,
+									content: "Combine"
+								}, {
+									showing: false,
+									content: "Clear Multiple"
 								}
 							]
 						}
@@ -629,30 +614,7 @@ enyo.kind( {
 		this.newTransaction( "Expense" );
 	},
 
-	searchSelected: function( inSender, inEvent ) {
-
-		if( inEvent.content.toLowerCase() === "budget" ) {
-
-			this.log( "Budget system go" );
-			return true;
-
-			enyo.Signals.send( "showBudget", { "acctId": this.account['acctId'] } );
-		} else if( inEvent.content.toLowerCase() === "reports" ) {
-
-			this.log( "Report system go" );
-			return true;
-
-			enyo.Signals.send( "showReports", { "acctId": this.account['acctId'] } );
-		} else if( inEvent.content.toLowerCase() === "search" ) {
-
-			this.log( "Search system go" );
-			return true;
-
-			enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'] } );
-		}
-	},
-
-	functionSelected: function( inSender, inEvent ) {
+	footerMenuSelected: function( inSender, inEvent ) {
 
 		if( inEvent.content.toLowerCase() === "refresh" ) {
 
@@ -676,13 +638,24 @@ enyo.kind( {
 						}
 					}
 				);
+		} else if( inEvent.content.toLowerCase() === "budget" ) {
 
-			return true;
+			this.log( "Budget system go" );
+			//enyo.Signals.send( "showBudget", { "acctId": this.account['acctId'] } );
+		} else if( inEvent.content.toLowerCase() === "reports" ) {
+
+			this.log( "Report system go" );
+			//enyo.Signals.send( "showReport", { "acctId": this.account['acctId'] } );
+		} else if( inEvent.content.toLowerCase() === "search" ) {
+
+			this.log( "Search system go" );
+			//enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'] } );
 		} else {
 
 			this.log( inEvent.selected );
-			return true;
 		}
+
+		return true;
 	},
 
 	/* Transaction & List Control */
