@@ -543,6 +543,8 @@ enyo.kind( {
 		return true;
 	},
 
+	/* Loading Indicators */
+
 	showLoadingIcon: function() {
 
 		this.$['acctTypeIcon'].hide();
@@ -639,13 +641,13 @@ enyo.kind( {
 			this.log( "Budget system go" );
 			return true;
 
-			enyo.Signals.send( "showBudget", { "account": this.account } );
+			enyo.Signals.send( "showBudget", { "acctId": this.account['acctId'] } );
 		} else if( inEvent.content.toLowerCase() === "reports" ) {
 
 			this.log( "Report system go" );
 			return true;
 
-			//enyo.Signals.send( "?????", { "account": this.account } );
+			enyo.Signals.send( "showReports", { "acctId": this.account['acctId'] } );
 		} else if( inEvent.content.toLowerCase() === "search" ) {
 
 			this.log( "Search system go" );

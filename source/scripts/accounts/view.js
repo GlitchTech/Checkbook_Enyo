@@ -167,7 +167,7 @@ enyo.kind( {
 		{
 			name: "loadingScrim",
 			kind: "onyx.Scrim",
-			classes: "onyx-scrim-translucent",
+			classes: "enyo-fit onyx-scrim-translucent",
 
 			showing: true,
 			style: "z-index: 1000;",

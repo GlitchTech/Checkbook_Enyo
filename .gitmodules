@@ -10,9 +10,6 @@
 [submodule "lib/g11n"]
 	path = lib/g11n
 	url = https://github.com/enyojs/g11n.git
-[submodule "lib/mvc"]
-	path = lib/mvc
-	url = https://github.com/enyojs/bootplate-mvc.git
 [submodule "lib/gts-plugins"]
 	path = lib/gts-plugins
 	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
