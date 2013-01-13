@@ -173,7 +173,6 @@ enyo.kind( {
 			style: "z-index: 1000;",
 			components: [
 				{
-					name: "loadingSpinner",
 					kind: "onyx.Spinner",
 					style: "size-double",
 

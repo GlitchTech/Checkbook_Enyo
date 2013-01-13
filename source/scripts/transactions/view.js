@@ -225,7 +225,6 @@ enyo.kind( {
 
 			components: [
 				{
-					name: "loadingSpinner",
 					kind: "onyx.Spinner",
 					style: "size-double",
 
