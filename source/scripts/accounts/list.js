@@ -72,7 +72,7 @@ enyo.kind({
 							useFittable: false
 						}, {
 							layoutKind: "",
-							classes: "account",
+							classes: "account h-box box-pack-center box-align-center",
 							components: [
 								{
 									name: "icon",
@@ -85,10 +85,9 @@ enyo.kind({
 									classes: "accountLockIcon unlocked"
 								}, {
 									name: "name",
-									classes: "text-ellipsis accountName"
+									classes: "accountName text-ellipsis box-flex-1"
 								}, {
-									name: "balance",
-									classes: "right"
+									name: "balance"
 								}
 							]
 						}, {
