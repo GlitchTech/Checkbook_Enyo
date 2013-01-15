@@ -55,8 +55,6 @@ while getopts hco: OPT; do
     esac
 done
 
-echo "This script can create a deployment in $TARGET"
-
 cat <<EOF
 ==========
 build step
@@ -90,3 +88,11 @@ for i in "$SOURCE/lib/"*; do
 		cp -r "$i" "$TARGET/lib"
 	fi
 done
+
+
+cat <<EOF
+
+============
+deployed to:
+$TARGET
+EOF
