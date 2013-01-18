@@ -21,10 +21,17 @@
 		<div class="body-temp">
 			<h1>Loading Checkbook</h1>
 			<script>
-				//PhoneGap event
-				document.addEventListener( "deviceready", onDeviceReady, false );
-				//BB10 WebWorks event
-				document.addEventListener( "webworksready", onDeviceReady, false );
+				if( !enyo.platform.touch ) {
+					//Not a mobile device
+
+					onDeviceReady();
+				} else {
+
+					//PhoneGap event
+					document.addEventListener( "deviceready", onDeviceReady, false );
+					//BB10 WebWorks event
+					document.addEventListener( "webworksready", onDeviceReady, false );
+				}
 
 				//PhoneGap is loaded and it is now safe to make calls PhoneGap methods
 				function onDeviceReady() {
