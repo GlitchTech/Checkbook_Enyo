@@ -141,23 +141,29 @@ t.folder = this.packageFolder, this.aliasPackage(e), t.packageName = this.packag
 
 // boot.js
 
-enyo.machine = {
+enyo.sanitizeHtml = function(e) {
+return typeof toStaticHTML == "undefined" ? e : toStaticHTML(e);
+}, enyo.execUnsafeLocalFunction = function(e) {
+typeof MSApp == "undefined" ? e() : MSApp.execUnsafeLocalFunction(e);
+}, enyo.machine = {
 sheet: function(e) {
 var t = "text/css", n = "stylesheet", r = e.slice(-5) == ".less";
 r && (window.less ? (t = "text/less", n = "stylesheet/less") : e = e.slice(0, e.length - 4) + "css");
 var i;
-enyo.runtimeLoading || r ? (i = document.createElement("link"), i.href = e, i.media = "screen", i.rel = n, i.type = t, document.getElementsByTagName("head")[0].appendChild(i)) : document.write('<link href="' + e + '" media="screen" rel="' + n + '" type="' + t + '" />'), r && window.less && (less.sheets.push(i), enyo.loader.finishCallbacks.lessRefresh || (enyo.loader.finishCallbacks.lessRefresh = function() {
+enyo.runtimeLoading || r ? (i = document.createElement("link"), i.href = e, i.media = "screen", i.rel = n, i.type = t, document.getElementsByTagName("head")[0].appendChild(i)) : (i = function() {
+document.write('<link href="' + e + '" media="screen" rel="' + n + '" type="' + t + '" />');
+}, enyo.execUnsafeLocalFunction(i)), r && window.less && (less.sheets.push(i), enyo.loader.finishCallbacks.lessRefresh || (enyo.loader.finishCallbacks.lessRefresh = function() {
 less.refresh(!0);
 }));
 },
 script: function(e, t, n) {
-if (!enyo.runtimeLoading) document.write('<script src="' + e + '"' + (t ? ' onload="' + t + '"' : "") + (n ? ' onerror="' + n + '"' : "") + "></scri" + "pt>"); else {
+if (!enyo.runtimeLoading) document.write(enyo.sanitizeHtml('<script src="' + e + '"' + (t ? ' onload="' + t + '"' : "") + (n ? ' onerror="' + n + '"' : "") + "></scri" + "pt>")); else {
 var r = document.createElement("script");
 r.src = e, r.onload = t, r.onerror = n, document.getElementsByTagName("head")[0].appendChild(r);
 }
 },
 inject: function(e) {
-document.write('<script type="text/javascript">' + e + "</script>");
+document.write(enyo.sanitizeHtml('<script type="text/javascript">' + e + "</script>"));
 }
 }, enyo.loader = new enyo.loaderFactory(enyo.machine), enyo.depends = function() {
 var e = enyo.loader;
@@ -383,11 +389,14 @@ delete e.name;
 var n = "kind" in e, r = e.kind;
 delete e.kind;
 var i = enyo.constructorForKind(r), s = i && i.prototype || null;
-if (n && r === undefined || i === undefined) throw "enyo.kind: Attempt to subclass an undefined kind. Check dependencies for [" + (t || "<unnamed>") + "].";
-var o = enyo.kind.makeCtor();
-return e.hasOwnProperty("constructor") && (e._constructor = e.constructor, delete e.constructor), enyo.setPrototype(o, s ? enyo.delegate(s) : {}), enyo.mixin(o.prototype, e), o.prototype.kindName = t, o.prototype.base = i, o.prototype.ctor = o, enyo.forEach(enyo.kind.features, function(t) {
-t(o, e);
-}), enyo.setObject(t, o), o;
+if (n && r === undefined || i === undefined) {
+var o = r === undefined ? "undefined kind" : "unknown kind (" + r + ")";
+throw "enyo.kind: Attempt to subclass an " + o + ". Check dependencies for [" + (t || "<unnamed>") + "].";
+}
+var u = enyo.kind.makeCtor();
+return e.hasOwnProperty("constructor") && (e._constructor = e.constructor, delete e.constructor), enyo.setPrototype(u, s ? enyo.delegate(s) : {}), enyo.mixin(u.prototype, e), u.prototype.kindName = t, u.prototype.base = i, u.prototype.ctor = u, enyo.forEach(enyo.kind.features, function(t) {
+t(u, e);
+}), enyo.setObject(t, u), u;
 }, enyo.singleton = function(e, t) {
 var n = e.name;
 delete e.name;
@@ -1568,7 +1577,7 @@ var e = this.generateInnerHtml(), t = this.generateOuterHtml(e);
 return this.generated = !0, t;
 },
 generateInnerHtml: function() {
-return this.flow(), this.children.length ? this.generateChildHtml() : this.allowHtml ? this.content : enyo.Control.escapeHtml(this.content);
+return this.flow(), this.children.length ? this.generateChildHtml() : this.allowHtml ? enyo.sanitizeHtml(this.content) : enyo.Control.escapeHtml(this.content);
 },
 generateChildHtml: function() {
 var e = "";
@@ -1576,7 +1585,7 @@ for (var t = 0, n; n = this.children[t]; t++) {
 var r = n.generateHtml();
 e += r;
 }
-return e;
+return enyo.sanitizeHtml(e);
 },
 generateOuterHtml: function(e) {
 return this.tag ? (this.tagsValid || this.prepareTags(), this._openTag + e + this._closeTag) : e;
@@ -3340,12 +3349,12 @@ var t = Math.abs(e), n = t - t / Math.pow(t, .02);
 return n = e < 0 ? -1 * n : n, n;
 },
 transitionComplete: function(e, t) {
-if (e !== this.$.clientContainer) return;
+if (t.originator !== this.$.client) return;
 var n = !1;
 this.isInTopOverScroll() ? (n = !0, this.scrollTop = this.topBoundary) : this.isInBottomOverScroll() && (n = !0, this.scrollTop = -1 * this.bottomBoundary), this.isInLeftOverScroll() ? (n = !0, this.scrollLeft = this.leftBoundary) : this.isInRightOverScroll() && (n = !0, this.scrollLeft = -1 * this.rightBoundary), n ? this.startOverflowScrolling() : this.stop();
 },
 scrollTo: function(e, t) {
-this.setScrollTop(-1 * t), this.setScrollLeft(-1 * e), this.start();
+this.setScrollTop(t), this.setScrollLeft(e), this.start();
 },
 getOverScrollBounds: function() {
 return {
@@ -3522,7 +3531,7 @@ scrollToBottom: function() {
 this.setScrollTop(this.getScrollBounds().maxTop);
 },
 scrollToRight: function() {
-this.setScrollTop(this.getScrollBounds().maxLeft);
+this.setScrollLeft(this.getScrollBounds().maxLeft);
 },
 scrollToLeft: function() {
 this.setScrollLeft(0);

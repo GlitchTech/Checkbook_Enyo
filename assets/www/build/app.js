@@ -1,7 +1,7 @@
 
 // minifier: path aliases
 
-enyo.path.addPaths({g11n: "/home/ryltar/git/gutoc/enyo/tools/../../lib/g11n/", layout: "/home/ryltar/git/gutoc/enyo/tools/../../lib/layout/", onyx: "/home/ryltar/git/gutoc/enyo/tools/../../lib/onyx/source/", private: "/home/ryltar/git/gutoc/enyo/tools/../../lib/private/", scripts: "../source/scripts/"});
+enyo.path.addPaths({g11n: "/home/ryltar/git/gutoc/enyo/../lib/g11n/", layout: "/home/ryltar/git/gutoc/enyo/../lib/layout/", onyx: "/home/ryltar/git/gutoc/enyo/../lib/onyx/source/", private: "/home/ryltar/git/gutoc/enyo/../lib/private/", scripts: "source/scripts/"});
 
 // javascript/g11n.js
 
@@ -1133,7 +1133,8 @@ noSelect: !1,
 multiSelect: !1,
 toggleSelected: !1,
 clientClasses: "",
-clientStyle: ""
+clientStyle: "",
+rowOffset: 0
 },
 events: {
 onSetupItem: "",
@@ -1147,7 +1148,6 @@ onDeselect: "selectDeselect"
 }, {
 name: "client"
 } ],
-rowOffset: 0,
 create: function() {
 this.inherited(arguments), this.noSelectChanged(), this.multiSelectChanged(), this.clientClassesChanged(), this.clientStyleChanged();
 },
@@ -1197,6 +1197,7 @@ isSelected: function(e) {
 return this.getSelection().isSelected(e);
 },
 renderRow: function(e) {
+if (e < this.rowOffset || e >= this.count + this.rowOffset) return;
 this.setupItem(e);
 var t = this.fetchRowNode(e);
 t && (t.innerHTML = this.$.client.generateChildHtml(), this.$.client.teardownChildren(), this.doRenderRow({
@@ -1217,6 +1218,7 @@ t = t.parentNode;
 return -1;
 },
 prepareRow: function(e) {
+if (e < 0 || e >= this.count) return;
 this.setupItem(e);
 var t = this.fetchRowNode(e);
 enyo.FlyweightRepeater.claimNode(this.$.client, t);
@@ -1225,6 +1227,7 @@ lockRow: function() {
 this.$.client.teardownChildren();
 },
 performOnRow: function(e, t, n) {
+if (e < 0 || e >= this.count) return;
 t && (this.prepareRow(e), enyo.call(n || null, t), this.lockRow());
 },
 statics: {
@@ -1251,8 +1254,9 @@ multiSelect: !1,
 toggleSelected: !1,
 fixedHeight: !1,
 reorderable: !1,
+centerReorderContainer: !0,
 swipeableComponents: [],
-enableSwipe: !0,
+enableSwipe: !1,
 persistSwipeableItem: !1
 },
 events: {
@@ -1267,11 +1271,12 @@ onSwipeComplete: ""
 },
 handlers: {
 onAnimateFinish: "animateFinish",
-ondrag: "drag",
-onup: "dragfinish",
-onholdpulse: "holdpulse",
 onRenderRow: "rowRendered",
 ondragstart: "dragstart",
+ondrag: "drag",
+ondragfinish: "dragfinish",
+onup: "up",
+onholdpulse: "holdpulse",
 onflick: "flick"
 },
 rowHeight: 0,
@@ -1302,10 +1307,9 @@ name: "swipeableComponents",
 style: "position:absolute; display:block; top:-1000px; left:0px;"
 } ]
 } ],
-initHoldCounter: 3,
-holdCounter: 3,
-holding: !1,
+reorderHoldTimeMS: 600,
 draggingRowIndex: -1,
+placeholderRowIndex: -1,
 dragToScrollThreshold: .1,
 prevScrollTop: 0,
 autoScrollTimeoutMS: 20,
@@ -1313,7 +1317,8 @@ autoScrollTimeout: null,
 pinnedReorderMode: !1,
 initialPinPosition: -1,
 itemMoved: !1,
-currentPage: null,
+currentPageNumber: -1,
+completeReorderTimeout: null,
 swipeIndex: null,
 swipeDirection: null,
 persistentItemVisible: !1,
@@ -1383,22 +1388,11 @@ for (var e = 0; e < this.pageCount; e++) this.portSize += this.getPageHeight(e);
 this.adjustPortSize();
 },
 holdpulse: function(e, t) {
-if (!this.getReorderable() || this.holding) return;
-if (this.holdCounter <= 0) {
-this.resetHoldCounter(), this.hold(e, t);
-return;
-}
-this.holdCounter--;
-},
-resetHoldCounter: function() {
-this.holdCounter = this.initHoldCounter;
-},
-hold: function(e, t) {
-t.preventDefault();
-if (this.shouldDoReorderHold(e, t)) return this.holding = !0, this.reorderHold(t), !1;
+if (!this.getReorderable() || this.isReordering()) return;
+if (t.holdTime >= this.reorderHoldTimeMS && this.shouldStartReordering(e, t)) return t.preventDefault(), this.startReordering(t), !1;
 },
 dragstart: function(e, t) {
-return this.swipeDragStart(e, t);
+if (this.isSwipeable()) return this.swipeDragStart(e, t);
 },
 drag: function(e, t) {
 return t.preventDefault(), this.shouldDoReorderDrag(t) ? (this.reorderDrag(t), !0) : this.shouldDoSwipeDrag() ? (this.swipeDrag(e, t), !0) : this.preventDragPropagation;
@@ -1407,50 +1401,46 @@ flick: function(e, t) {
 this.shouldDoSwipeFlick() && this.swipeFlick(e, t);
 },
 dragfinish: function(e, t) {
-this.getReorderable() && (this.resetHoldCounter(), this.finishReordering(e, t)), this.swipeDragFinish(e, t);
+this.isReordering() && this.finishReordering(e, t), this.isSwipeable() && this.swipeDragFinish(e, t);
+},
+up: function(e, t) {
+this.isReordering() && this.finishReordering(e, t);
 },
 generatePage: function(e, t) {
 this.page = e;
-var n = this.$.generator.rowOffset = this.rowsPerPage * this.page, r = this.$.generator.count = Math.min(this.count - n, this.rowsPerPage), i = this.$.generator.generateChildHtml();
+var n = this.rowsPerPage * this.page;
+this.$.generator.setRowOffset(n);
+var r = Math.min(this.count - n, this.rowsPerPage);
+this.$.generator.setCount(r);
+var i = this.$.generator.generateChildHtml();
 t.setContent(i), this.getReorderable() && this.draggingRowIndex > -1 && this.hideReorderingRow();
 var s = t.getBounds().height;
 !this.rowHeight && s > 0 && (this.rowHeight = Math.floor(s / r), this.updateMetrics());
 if (!this.fixedHeight) {
 var o = this.getPageHeight(e);
-o != s && s > 0 && (this.pageHeights[e] = s, this.portSize += s - o);
+this.pageHeights[e] = s, this.portSize += s - o;
 }
+},
+pageForRow: function(e) {
+return Math.floor(e / this.rowsPerPage);
 },
 update: function(e) {
 var t = !1, n = this.positionToPageInfo(e), r = n.pos + this.scrollerHeight / 2, i = Math.floor(r / Math.max(n.height, this.scrollerHeight) + .5) + n.no, s = i % 2 === 0 ? i : i - 1;
 this.p0 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
 },
 getPageRowHeights: function(e) {
-var t = [], n = document.querySelectorAll("#" + e.id + " div[data-enyo-index]");
-for (var r = 0, i, s; r < n.length; r++) i = n[r].getAttribute("data-enyo-index"), i !== null && (s = enyo.dom.getBounds(n[r]), t.push({
+var t = {}, n = e.hasNode().querySelectorAll("div[data-enyo-index]");
+for (var r = 0, i, s; r < n.length; r++) i = n[r].getAttribute("data-enyo-index"), i !== null && (s = enyo.dom.getBounds(n[r]), t[parseInt(i, 10)] = {
 height: s.height,
-width: s.width,
-index: parseInt(i, 10)
-}));
+width: s.width
+});
 return t;
 },
 updateRowBounds: function(e) {
-var t = this.getRowBoundsUpdateIndex(e, this.p0RowBounds);
-if (t > -1) {
-this.updateRowBoundsAtIndex(t, this.p0RowBounds, this.$.page0);
-return;
-}
-t = this.getRowBoundsUpdateIndex(e, this.p1RowBounds);
-if (t > -1) {
-this.updateRowBoundsAtIndex(t, this.p1RowBounds, this.$.page1);
-return;
-}
-},
-getRowBoundsUpdateIndex: function(e, t) {
-for (var n = 0; n < t.length; n++) if (t[n].index == e) return n;
-return -1;
+this.p0RowBounds[e] ? this.updateRowBoundsAtIndex(e, this.p0RowBounds, this.$.page0) : this.p1RowBounds[e] && this.updateRowBoundsAtIndex(e, this.p1RowBounds, this.$.page1);
 },
 updateRowBoundsAtIndex: function(e, t, n) {
-var r = document.querySelectorAll("#" + n.id + ' div[data-enyo-index="' + t[e].index + '"]'), i = enyo.dom.getBounds(r[0]);
+var r = n.hasNode().querySelector('div[data-enyo-index="' + e + '"]'), i = enyo.dom.getBounds(r);
 t[e].height = i.height, t[e].width = i.width;
 },
 updateForPosition: function(e) {
@@ -1484,24 +1474,31 @@ while (n >= 0) t++, r = this.getPageHeight(t), n -= r;
 return t = Math.max(t, 0), {
 no: t,
 height: r,
-pos: n + r
+pos: n + r,
+startRow: t * this.rowsPerPage,
+endRow: Math.min((t + 1) * this.rowsPerPage - 1, this.count - 1)
 };
 },
 isPageInRange: function(e) {
 return e == Math.max(0, Math.min(this.pageCount - 1, e));
 },
 getPageHeight: function(e) {
-return this.pageHeights[e] || this.defaultPageHeight;
+var t = this.pageHeights[e];
+if (!t) {
+var n = this.rowsPerPage * e, r = Math.min(this.count - n, this.rowsPerPage);
+t = this.defaultPageHeight * (r / this.rowsPerPage);
+}
+return Math.max(1, t);
 },
 invalidatePages: function() {
-this.p0 = this.p1 = null, this.$.page0.setContent(""), this.$.page1.setContent("");
+this.p0 = this.p1 = null, this.p0RowBounds = {}, this.p1RowBounds = {}, this.$.page0.setContent(""), this.$.page1.setContent("");
 },
 invalidateMetrics: function() {
 this.pageHeights = [], this.rowHeight = 0, this.updateMetrics();
 },
 scroll: function(e, t) {
-var n = this.inherited(arguments);
-return this.update(this.getScrollTop()), this.shouldDoPinnedReorderScroll() && this.reorderScroll(e, t), n;
+var n = this.inherited(arguments), r = this.getScrollTop();
+return this.lastPos === r ? n : (this.lastPos = r, this.update(r), this.shouldDoPinnedReorderScroll() && this.reorderScroll(e, t), n);
 },
 setScrollTop: function(e) {
 this.update(e), this.inherited(arguments), this.twiddle();
@@ -1516,7 +1513,7 @@ scrollToBottom: function() {
 this.update(this.getScrollBounds().maxTop), this.inherited(arguments);
 },
 scrollToRow: function(e) {
-var t = Math.floor(e / this.rowsPerPage), n = e % this.rowsPerPage, r = this.pageToPosition(t);
+var t = this.pageForRow(e), n = e % this.rowsPerPage, r = this.pageToPosition(t);
 this.updateForPosition(r), r = this.pageToPosition(t), this.setScrollPosition(r);
 if (t == this.p0 || t == this.p1) {
 var i = this.$.generator.fetchRowNode(e);
@@ -1553,7 +1550,12 @@ isSelected: function(e) {
 return this.$.generator.isSelected(e);
 },
 renderRow: function(e) {
-this.$.generator.renderRow(e);
+var t, n;
+if (this.p1 == null) {
+if (this.p0 == null) return;
+t = 0, n = this.count;
+} else t = Math.min(this.p0, this.p1) * this.rowsPerPage, n = Math.min(this.count - t, this.rowsPerPage * 2);
+this.$.generator.setRowOffset(t), this.$.generator.setCount(n), this.$.generator.renderRow(e);
 },
 rowRendered: function(e, t) {
 this.updateRowBounds(t.rowIndex);
@@ -1574,11 +1576,14 @@ twiddle: function() {
 var e = this.getStrategy();
 enyo.call(e, "twiddle");
 },
-shouldDoReorderHold: function(e, t) {
+pageForPageNumber: function(e, t) {
+return e % 2 === 0 ? !t || e === this.p0 ? this.$.page0 : null : !t || e === this.p1 ? this.$.page1 : null;
+},
+shouldStartReordering: function(e, t) {
 return !!this.getReorderable() && t.rowIndex >= 0 && !this.pinnedReorderMode && e === this.$.strategy && t.index >= 0 ? !0 : !1;
 },
-reorderHold: function(e) {
-this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = Math.floor(e.rowIndex / this.rowsPerPage), this.currentPage = this.currentPageNumber % 2, this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
+startReordering: function(e) {
+this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = this.pageForRow(e.rowIndex), this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
 },
 buildReorderContainer: function() {
 this.$.reorderContainer.destroyClientControls();
@@ -1588,7 +1593,7 @@ owner: this.owner
 this.$.reorderContainer.render();
 },
 styleReorderContainer: function(e) {
-this.setItemPosition(this.$.reorderContainer, e.rowIndex), this.setItemBounds(this.$.reorderContainer, e.rowIndex), this.$.reorderContainer.setShowing(!0), this.centerReorderContainerOnPointer(e);
+this.setItemPosition(this.$.reorderContainer, e.rowIndex), this.setItemBounds(this.$.reorderContainer, e.rowIndex), this.$.reorderContainer.setShowing(!0), this.centerReorderContainer && this.centerReorderContainerOnPointer(e);
 },
 appendNodeToReorderContainer: function(e) {
 this.$.reorderContainer.createComponent({
@@ -1604,21 +1609,20 @@ positionReorderContainer: function(e, t) {
 this.$.reorderContainer.addClass("enyo-animatedTopAndLeft"), this.$.reorderContainer.addStyles("left:" + e + "px;top:" + t + "px;"), this.setPositionReorderContainerTimeout();
 },
 setPositionReorderContainerTimeout: function() {
-var e = this;
-this.clearPositionReorderContainerTimeout(), this.positionReorderContainerTimeout = setTimeout(function() {
-e.$.reorderContainer.removeClass("enyo-animatedTopAndLeft"), e.clearPositionReorderContainerTimeout();
-}, 100);
+this.clearPositionReorderContainerTimeout(), this.positionReorderContainerTimeout = setTimeout(enyo.bind(this, function() {
+this.$.reorderContainer.removeClass("enyo-animatedTopAndLeft"), this.clearPositionReorderContainerTimeout();
+}), 100);
 },
 clearPositionReorderContainerTimeout: function() {
 this.positionReorderContainerTimeout && (clearTimeout(this.positionReorderContainerTimeout), this.positionReorderContainerTimeout = null);
 },
-shouldDoReorderDrag: function(e) {
+shouldDoReorderDrag: function() {
 return !this.getReorderable() || this.draggingRowIndex < 0 || this.pinnedReorderMode ? !1 : !0;
 },
 reorderDrag: function(e) {
 this.positionReorderNode(e), this.checkForAutoScroll(e);
 var t = this.getRowIndexFromCoordinate(e.pageY);
-t !== -1 && t != this.placeholderRowIndex && this.movePlaceholderToIndex(t);
+t !== -1 && (t >= this.placeholderRowIndex ? this.movePlaceholderToIndex(Math.min(this.count, t + 1)) : this.movePlaceholderToIndex(t));
 },
 positionReorderNode: function(e) {
 var t = this.$.reorderContainer.hasNode().style, n = parseInt(t.left, 10) + e.ddx, r = parseInt(t.top, 10) + e.ddy;
@@ -1632,43 +1636,36 @@ stopAutoScrolling: function() {
 this.autoScrollTimeout && (clearTimeout(this.autoScrollTimeout), this.autoScrollTimeout = null);
 },
 startAutoScrolling: function() {
-this.autoScrollTimeout = setTimeout(enyo.bind(this, this.autoScroll), this.autoScrollTimeoutMS);
+this.autoScrollTimeout = setInterval(enyo.bind(this, this.autoScroll), this.autoScrollTimeoutMS);
 },
 autoScroll: function() {
 this.scrollDistance === 0 ? this.stopAutoScrolling() : this.autoScrollTimeout || this.startAutoScrolling(), this.setScrollPosition(this.getScrollPosition() + this.scrollDistance), this.positionReorderNode({
 ddx: 0,
 ddy: 0
-}), this.startAutoScrolling();
+});
 },
 movePlaceholderToIndex: function(e) {
-var t = this.$.generator.fetchRowNode(e);
-if (!t) {
-enyo.log("No node - " + e);
-return;
-}
-var n = e > this.draggingRowIndex ? e + 1 : e, r = Math.floor(n / this.rowsPerPage), i = r % 2;
-r >= this.pageCount && (r = this.currentPageNumber, i = this.currentPage), this.currentPage == i ? this.$["page" + this.currentPage].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n)) : (this.$["page" + i].hasNode().insertBefore(this.placeholderNode, this.$.generator.fetchRowNode(n)), this.updatePageHeight(this.currentPageNumber, this.$["page" + this.currentPage]), this.updatePageHeight(r, this.$["page" + i]), this.updatePagePositions(r, i)), this.placeholderRowIndex = e, this.currentPageNumber = r, this.currentPage = i, this.itemMoved = !0;
+var t, n;
+if (e < 0) return;
+e >= this.count ? (t = null, n = this.pageForPageNumber(this.pageForRow(this.count - 1)).hasNode()) : (t = this.$.generator.fetchRowNode(e), n = t.parentNode);
+var r = this.pageForRow(e);
+r >= this.pageCount && (r = this.currentPageNumber), n.insertBefore(this.placeholderNode, t), this.currentPageNumber !== r && (this.updatePageHeight(this.currentPageNumber), this.updatePageHeight(r), this.updatePagePositions(r)), this.placeholderRowIndex = e, this.currentPageNumber = r, this.itemMoved = !0;
 },
 finishReordering: function(e, t) {
-if (this.draggingRowIndex < 0 || this.pinnedReorderMode) return;
-var n = this;
-return this.stopAutoScrolling(), this.$.strategy.listReordering = !1, this.moveReorderedContainerToDroppedPosition(t), setTimeout(function() {
-n.completeFinishReordering(t);
-}, 100), t.preventDefault(), !0;
+if (!this.isReordering() || this.pinnedReorderMode || this.completeReorderTimeout) return;
+return this.stopAutoScrolling(), this.$.strategy.listReordering = !1, this.moveReorderedContainerToDroppedPosition(t), this.completeReorderTimeout = setTimeout(enyo.bind(this, this.completeFinishReordering, t), 100), t.preventDefault(), !0;
 },
 moveReorderedContainerToDroppedPosition: function() {
 var e = this.getRelativeOffset(this.placeholderNode, this.hasNode()), t = this.getStrategyKind() == "ScrollStrategy" ? e.top : e.top - this.getScrollTop(), n = e.left - this.getScrollLeft();
 this.positionReorderContainer(n, t);
 },
 completeFinishReordering: function(e) {
-if (this.draggingRowIndex == this.placeholderRowIndex && !this.pinnedReorderMode) {
-if (!this.itemMoved) {
+this.completeReorderTimeout = null, this.placeholderRowIndex > this.draggingRowIndex && (this.placeholderRowIndex = Math.max(0, this.placeholderRowIndex - 1));
+if (this.draggingRowIndex == this.placeholderRowIndex && !this.pinnedReorderMode && !this.itemMoved) {
 this.beginPinnedReorder(e);
 return;
 }
-this.dropReorderedRow(e);
-}
-this.removePlaceholderNode(), this.dropReorderedRow(e), this.reorderRows(e), this.resetReorderState(), this.refresh();
+this.removePlaceholderNode(), this.emptyAndHideReorderContainer(), this.positionReorderedNode(), this.reorderRows(e), this.resetReorderState(), this.refresh();
 },
 beginPinnedReorder: function(e) {
 this.buildPinnedReorderContainer(), this.doSetupPinnedReorderComponents(enyo.mixin(e, {
@@ -1685,28 +1682,25 @@ owner: this.owner
 });
 this.$.reorderContainer.render();
 },
-dropReorderedRow: function(e) {
-this.emptyAndHideReorderContainer(), this.positionReorderedNode();
-},
 reorderRows: function(e) {
-this.doReorder(this.makeReorderEvent(e)), this.shouldMoveItemtoDiffPage() && this.moveItemToDiffPage(), this.updateListIndices();
+this.doReorder(this.makeReorderEvent(e)), this.currentPageNumber != this.initialPageNumber && this.moveItemToDiffPage(), this.updateListIndices();
 },
 makeReorderEvent: function(e) {
 return e.reorderFrom = this.draggingRowIndex, e.reorderTo = this.placeholderRowIndex, e;
 },
-shouldMoveItemtoDiffPage: function() {
-return this.currentPageNumber != this.initialPageNumber;
-},
 moveItemToDiffPage: function() {
-var e, t, n = this.currentPage == 1 ? 0 : 1;
-this.initialPageNumber < this.currentPageNumber ? (e = this.$["page" + this.currentPage].hasNode().firstChild, this.$["page" + n].hasNode().appendChild(e)) : (e = this.$["page" + this.currentPage].hasNode().lastChild, t = this.$["page" + n].hasNode().firstChild, this.$["page" + n].hasNode().insertBefore(e, t)), this.updatePagePositions(this.initialPageNumber, n);
+var e, t, n = this.pageForPageNumber(this.currentPageNumber), r = this.pageForPageNumber(this.currentPageNumber + 1);
+this.initialPageNumber < this.currentPageNumber ? (e = n.hasNode().firstChild, r.hasNode().appendChild(e)) : (e = n.hasNode().lastChild, t = r.hasNode().firstChild, r.hasNode().insertBefore(e, t)), this.correctPageHeights(), this.updatePagePositions(this.initialPageNumber);
 },
 positionReorderedNode: function() {
-var e = this.placeholderRowIndex > this.draggingRowIndex ? this.placeholderRowIndex + 1 : this.placeholderRowIndex, t = this.$.generator.fetchRowNode(e);
-this.$["page" + this.currentPage].hasNode().insertBefore(this.hiddenNode, t), this.showNode(this.hiddenNode);
+var e = this.hiddenNode;
+this.hiddenNode = null;
+if (!e.parentNode) return;
+var t = this.$.generator.fetchRowNode(this.placeholderRowIndex);
+t && t.parentNode.insertBefore(e, t), this.showNode(e);
 },
 resetReorderState: function() {
-this.draggingRowIndex = this.placeholderRowIndex = -1, this.holding = !1, this.pinnedReorderMode = !1;
+this.draggingRowIndex = this.placeholderRowIndex = -1, this.pinnedReorderMode = !1;
 },
 updateListIndices: function() {
 if (this.shouldDoRefresh()) {
@@ -1715,24 +1709,18 @@ return;
 }
 var e = Math.min(this.draggingRowIndex, this.placeholderRowIndex), t = Math.max(this.draggingRowIndex, this.placeholderRowIndex), n = this.draggingRowIndex - this.placeholderRowIndex > 0 ? 1 : -1, r, i, s, o;
 if (n === 1) {
-r = this.$.generator.fetchRowNode(this.draggingRowIndex), r.setAttribute("data-enyo-index", "reordered");
+r = this.$.generator.fetchRowNode(this.draggingRowIndex), r && r.setAttribute("data-enyo-index", "reordered");
 for (i = t - 1, s = t; i >= e; i--) {
 r = this.$.generator.fetchRowNode(i);
-if (!r) {
-enyo.log("No node - " + i);
-continue;
-}
+if (!r) continue;
 o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o + 1, r.setAttribute("data-enyo-index", s);
 }
-r = document.querySelectorAll('[data-enyo-index="reordered"]')[0], r.setAttribute("data-enyo-index", this.placeholderRowIndex);
+r = this.hasNode().querySelector('[data-enyo-index="reordered"]'), r.setAttribute("data-enyo-index", this.placeholderRowIndex);
 } else {
-r = this.$.generator.fetchRowNode(this.draggingRowIndex), r.setAttribute("data-enyo-index", this.placeholderRowIndex);
+r = this.$.generator.fetchRowNode(this.draggingRowIndex), r && r.setAttribute("data-enyo-index", this.placeholderRowIndex);
 for (i = e + 1, s = e; i <= t; i++) {
 r = this.$.generator.fetchRowNode(i);
-if (!r) {
-enyo.log("No node - " + i);
-continue;
-}
+if (!r) continue;
 o = parseInt(r.getAttribute("data-enyo-index"), 10), s = o - 1, r.setAttribute("data-enyo-index", s);
 }
 }
@@ -1743,10 +1731,10 @@ return Math.abs(this.initialPageNumber - this.currentPageNumber) > 1;
 getNodeStyle: function(e) {
 var t = this.$.generator.fetchRowNode(e);
 if (!t) {
-enyo.log("No node - " + e);
+this.log("No node - " + e);
 return;
 }
-var n = this.getRelativeOffset(t, this.hasNode()), r = this.getDimensions(t);
+var n = this.getRelativeOffset(t, this.hasNode()), r = enyo.dom.getBounds(t);
 return {
 h: r.height,
 w: r.width,
@@ -1762,45 +1750,40 @@ left: 0
 if (e !== t && e.parentNode) do n.top += e.offsetTop || 0, n.left += e.offsetLeft || 0, e = e.offsetParent; while (e && e !== t);
 return n;
 },
-getDimensions: function(e) {
-var t = window.getComputedStyle(e, null);
-return {
-height: parseInt(t.getPropertyValue("height"), 10),
-width: parseInt(t.getPropertyValue("width"), 10)
-};
-},
 replaceNodeWithPlaceholder: function(e) {
 var t = this.$.generator.fetchRowNode(e);
 if (!t) {
 enyo.log("No node - " + e);
 return;
 }
-this.placeholderNode = this.createPlaceholderNode(t), this.hiddenNode = this.hideNode(t), this.$["page" + this.currentPage].hasNode().insertBefore(this.placeholderNode, this.hiddenNode);
+this.placeholderNode = this.createPlaceholderNode(t), this.hiddenNode = this.hideNode(t);
+var n = this.pageForPageNumber(this.currentPageNumber);
+n.hasNode().insertBefore(this.placeholderNode, this.hiddenNode);
 },
 createPlaceholderNode: function(e) {
-var t = this.$.placeholder.hasNode().cloneNode(!0), n = this.getDimensions(e);
-return t.style.height = n.height, t.style.width = n.width, t;
+var t = this.$.placeholder.hasNode().cloneNode(!0), n = enyo.dom.getBounds(e);
+return t.style.height = n.height + "px", t.style.width = n.width + "px", t;
 },
 removePlaceholderNode: function() {
 this.removeNode(this.placeholderNode), this.placeholderNode = null;
-},
-removeHiddenNode: function() {
-this.removeNode(this.hiddenNode), this.hiddenNode = null;
 },
 removeNode: function(e) {
 if (!e || !e.parentNode) return;
 e.parentNode.removeChild(e);
 },
-updatePageHeight: function(e, t) {
+updatePageHeight: function(e) {
+if (e < 0) return;
+var t = this.pageForPageNumber(e, !0);
+if (t) {
 var n = t.getBounds().height;
 this.pageHeights[e] = n;
+}
 },
-updatePagePositions: function(e, t) {
-this.positionPage(this.currentPageNumber, this.$["page" + this.currentPage]), this.positionPage(e, this.$["page" + t]);
+updatePagePositions: function(e) {
+this.positionPage(this.currentPageNumber, this.pageForPageNumber(this.currentPageNumber)), this.positionPage(e, this.pageForPageNumber(e));
 },
 correctPageHeights: function() {
-var e = this.initialPageNumber % 2;
-this.updatePageHeight(this.currentPageNumber, this.$["page" + this.currentPage]), e != this.currentPageNumber && this.updatePageHeight(this.initialPageNumber, this.$["page" + e]);
+this.updatePageHeight(this.currentPageNumber), this.initialPageNumber != this.currentPageNumber && this.updatePageHeight(this.initialPageNumber);
 },
 hideNode: function(e) {
 return e.style.display = "none", e;
@@ -1809,21 +1792,26 @@ showNode: function(e) {
 return e.style.display = "block", e;
 },
 dropPinnedRow: function(e) {
-var t = this;
-this.moveReorderedContainerToDroppedPosition(e), setTimeout(function() {
-t.completeFinishReordering(e);
-}, 100);
+this.moveReorderedContainerToDroppedPosition(e), this.completeReorderTimeout = setTimeout(enyo.bind(this, this.completeFinishReordering, e), 100);
 return;
 },
 getRowIndexFromCoordinate: function(e) {
-var t = this.getScrollTop() + e - this.getNodePosition(this.hasNode()).top, n = this.positionToPageInfo(t), r = n.no == this.p0 ? this.p0RowBounds : this.p1RowBounds;
-if (!r) return -1;
-var i = n.pos, s = parseInt(window.getComputedStyle(this.placeholderNode).height, 10);
-for (var o = 0, u = 0; o < r.length; o++) {
-u += r[o].height > 0 ? r[o].height : s;
-if (u >= i) return r[o].index;
+var t = this.getScrollTop() + e - this.getNodePosition(this.hasNode()).top;
+if (t < 0) return -1;
+var n = this.positionToPageInfo(t), r = n.no == this.p0 ? this.p0RowBounds : this.p1RowBounds;
+if (!r) return this.count;
+var i = n.pos, s = enyo.dom.getBounds(this.placeholderNode).height, o = 0;
+for (var u = n.startRow; u <= n.endRow; ++u) {
+if (u === this.placeholderRowIndex) {
+o += s;
+if (o >= i) return -1;
 }
-return -1;
+if (u !== this.draggingRowIndex) {
+o += r[u].height;
+if (o >= i) return u;
+}
+}
+return u;
 },
 getIndexPosition: function(e) {
 return this.getNodePosition(this.$.generator.fetchRowNode(e));
@@ -1863,41 +1851,42 @@ return !this.getReorderable() || !this.pinnedReorderMode ? !1 : !0;
 reorderScroll: function(e, t) {
 this.getStrategyKind() == "ScrollStrategy" && this.$.reorderContainer.addStyles("top:" + (this.initialPinPosition + this.getScrollTop() - this.rowHeight) + "px;");
 var n = this.getRowIndexFromCoordinate(this.initialPinPosition);
-n != this.placeholderRowIndex && this.movePlaceholderToIndex(n);
+n != -1 && this.movePlaceholderToIndex(n);
 },
 hideReorderingRow: function() {
-var e = document.querySelectorAll('[data-enyo-index="' + this.draggingRowIndex + '"]')[0];
+var e = this.hasNode().querySelector('[data-enyo-index="' + this.draggingRowIndex + '"]');
 e && (this.hiddenNode = this.hideNode(e));
 },
 isReordering: function() {
 return this.draggingRowIndex > -1;
 },
 swipeDragStart: function(e, t) {
-return !this.hasSwipeableComponents() || t.vertical || this.draggingRowIndex > -1 ? !1 : (this.setSwipeDirection(t.xDirection), this.completeSwipeTimeout && this.completeSwipe(t), this.setFlicked(!1), this.setSwipeComplete(!1), this.swipeIndexChanged(t.index) && (this.clearSwipeables(), this.setSwipeIndex(t.index)), this.persistentItemVisible || this.startSwipe(t), this.draggedXDistance = 0, this.draggedYDistance = 0, !0);
+return t.index == null || t.vertical || this.draggingRowIndex > -1 ? !1 : (this.setSwipeDirection(t.xDirection), this.completeSwipeTimeout && this.completeSwipe(t), this.setFlicked(!1), this.setSwipeComplete(!1), this.swipeIndexChanged(t.index) && (this.clearSwipeables(), this.setSwipeIndex(t.index)), this.persistentItemVisible || this.startSwipe(t), this.draggedXDistance = 0, this.draggedYDistance = 0, !0);
 },
 shouldDoSwipeDrag: function() {
-return this.getEnableSwipe() && !this.isReordering();
+return this.isSwipeable() && !this.isReordering();
 },
 swipeDrag: function(e, t) {
-return this.draggedOutOfBounds(t) ? (this.swipeDragFinish(t), this.preventDragPropagation) : this.persistentItemVisible ? (this.dragPersistentItem(t), this.preventDragPropagation) : (this.dragSwipeableComponents(this.calcNewDragPosition(t.ddx)), this.draggedXDistance = t.dx, this.draggedYDistance = t.dy, this.preventDragPropagation);
+return this.persistentItemVisible ? (this.dragPersistentItem(t), this.preventDragPropagation) : (this.dragSwipeableComponents(this.calcNewDragPosition(t.ddx)), this.draggedXDistance = t.dx, this.draggedYDistance = t.dy, this.preventDragPropagation);
 },
 shouldDoSwipeFlick: function() {
 return !this.isReordering();
 },
 swipeFlick: function(e, t) {
-return this.getEnableSwipe() ? Math.abs(t.xVelocity) < Math.abs(t.yVelocity) ? !1 : (this.setFlicked(!0), this.persistentItemVisible ? (this.flickPersistentItem(t), !0) : (this.swipe(this.normalSwipeSpeedMS), !0)) : !1;
+if (t.index == null) return;
+return this.isSwipeable() ? Math.abs(t.xVelocity) < Math.abs(t.yVelocity) ? !1 : (this.setFlicked(!0), this.persistentItemVisible ? (this.flickPersistentItem(t), !0) : (this.swipe(this.normalSwipeSpeedMS), !0)) : !1;
 },
 swipeDragFinish: function(e, t) {
-return this.getEnableSwipe() ? this.wasFlicked() ? this.preventDragPropagation : (this.persistentItemVisible ? this.dragFinishPersistentItem(t) : this.calcPercentageDragged(this.draggedXDistance) > this.percentageDraggedThreshold ? this.swipe(this.fastSwipeSpeedMS) : this.backOutSwipe(t), this.preventDragPropagation) : this.preventDragPropagation;
+return this.wasFlicked() ? this.preventDragPropagation : (this.persistentItemVisible ? this.dragFinishPersistentItem(t) : this.calcPercentageDragged(this.draggedXDistance) > this.percentageDraggedThreshold ? this.swipe(this.fastSwipeSpeedMS) : this.backOutSwipe(t), this.preventDragPropagation);
 },
-hasSwipeableComponents: function() {
-return this.$.swipeableComponents.controls.length !== 0;
+isSwipeable: function() {
+return this.enableSwipe && this.$.swipeableComponents.controls.length !== 0;
 },
 positionSwipeableContainer: function(e, t) {
 var n = this.$.generator.fetchRowNode(e);
 if (!n) return;
-var r = this.getRelativeOffset(n, this.hasNode()), i = this.getDimensions(n), s = t == 1 ? -1 * i.width : i.width;
-this.$.swipeableComponents.addStyles("top: " + r.top + "px; left: " + s + "px; height: " + i.height + "; width: " + i.width);
+var r = this.getRelativeOffset(n, this.hasNode()), i = enyo.dom.getBounds(n), s = t == 1 ? -1 * i.width : i.width;
+this.$.swipeableComponents.addStyles("top: " + r.top + "px; left: " + s + "px; height: " + i.height + "px; width: " + i.width + "px;");
 },
 setSwipeDirection: function(e) {
 this.swipeDirection = e;
@@ -1918,17 +1907,11 @@ setSwipeIndex: function(e) {
 this.swipeIndex = e === undefined ? this.swipeIndex : e;
 },
 calcNewDragPosition: function(e) {
-var t = window.getComputedStyle(this.$.swipeableComponents.hasNode());
-if (!t) return !1;
-var n = parseInt(t.left, 10), r = this.getDimensions(this.$.swipeableComponents.node), i = this.swipeDirection == 1 ? 0 : -1 * r.width, s = this.swipeDirection == 1 ? n + e > i ? i : n + e : n + e < i ? i : n + e;
+var t = this.$.swipeableComponents.getBounds(), n = t.left, r = this.$.swipeableComponents.getBounds(), i = this.swipeDirection == 1 ? 0 : -1 * r.width, s = this.swipeDirection == 1 ? n + e > i ? i : n + e : n + e < i ? i : n + e;
 return s;
 },
 dragSwipeableComponents: function(e) {
 this.$.swipeableComponents.applyStyle("left", e + "px");
-},
-draggedOutOfBounds: function(e) {
-var t = this.getNodePosition(this.hasNode()), n = this.getBounds(), r = e.pageY - t.top < 0, i = e.pageY - t.top > n.height, s = e.pageX - t.left < 0, o = e.pageX - t.left > n.width;
-return r || i || s || o;
 },
 startSwipe: function(e) {
 e.index = this.swipeIndex, this.positionSwipeableContainer(this.swipeIndex, e.xDirection), this.$.swipeableComponents.setShowing(!0), this.setPersistentItemOrigin(e.xDirection), this.doSetupSwipeItem(e);
@@ -1948,21 +1931,21 @@ setPersistentItemOrigin: function(e) {
 this.persistentItemOrigin = e == 1 ? "left" : "right";
 },
 calcPercentageDragged: function(e) {
-return Math.abs(e / parseInt(window.getComputedStyle(this.$.swipeableComponents.hasNode()).width, 10));
+return Math.abs(e / this.$.swipeableComponents.getBounds().width);
 },
 swipe: function(e) {
 this.setSwipeComplete(!0), this.animateSwipe(0, e);
 },
 backOutSwipe: function(e) {
-var t = this.getDimensions(this.$.swipeableComponents.node), n = this.swipeDirection == 1 ? -1 * t.width : t.width;
+var t = this.$.swipeableComponents.getBounds(), n = this.swipeDirection == 1 ? -1 * t.width : t.width;
 this.animateSwipe(n, this.fastSwipeSpeedMS), this.setSwipeDirection(null), this.setFlicked(!0);
 },
 bounceItem: function(e) {
-var t = window.getComputedStyle(this.$.swipeableComponents.node);
-parseInt(t.left, 10) != parseInt(t.width, 10) && this.animateSwipe(0, this.normalSwipeSpeedMS);
+var t = this.$.swipeableComponents.getBounds();
+t.left != t.width && this.animateSwipe(0, this.normalSwipeSpeedMS);
 },
 slideAwayItem: function() {
-var e = this.$.swipeableComponents, t = parseInt(window.getComputedStyle(e.node).width, 10), n = this.persistentItemOrigin == "left" ? -1 * t : t;
+var e = this.$.swipeableComponents, t = e.getBounds().width, n = this.persistentItemOrigin == "left" ? -1 * t : t;
 this.animateSwipe(n, this.normalSwipeSpeedMS), this.persistentItemVisible = !1, this.setPersistSwipeableItem(!1);
 },
 clearSwipeables: function() {
@@ -2140,24 +2123,11 @@ classes: "enyo-list-page"
 }, {
 name: "belowClient"
 }, {
-name: "reorderContainer",
-classes: "enyo-list-reorder-container"
-}, {
 name: "placeholder",
-classes: "enyo-list-placeholder",
-style: "height:0px;"
+classes: "enyo-list-placeholder"
 }, {
-name: "pinnedPlaceholder",
-classes: "enyo-pinned-list-placeholder",
-components: [ {
-name: "pinnedPlaceholderContents",
-allowHtml: !0
-}, {
-name: "testButton",
-kind: "enyo.Button",
-content: "Drop",
-ontap: "dropPinnedRow"
-} ]
+name: "swipeableComponents",
+style: "position:absolute; display:block; top:-1000px; left:0px;"
 } ]
 } ],
 aboveComponents: null,
@@ -7949,8 +7919,8 @@ name: "GTS.Item",
 kind: "onyx.Item",
 classes: "gts-item",
 published: {
-tapHighlight: !1,
-tapPulse: !0,
+holdHighlight: !1,
+tapHighlight: !0,
 tapClass: "gts-pulse",
 highlightClass: "onyx-highlight"
 },
@@ -7961,19 +7931,17 @@ onhold: "hold",
 onrelease: "release"
 },
 startTap: function(e, t) {
-if (this.tapPulse) {
-if (this.preventTapDisplayTimer >= (new Date).getTime() - 50) return;
-onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.tapClass, !0, t), enyo.job("endTap", enyo.bind(this, this.endTap, e, t), 250);
-}
+if (this.preventTapDisplayTimer >= (new Date).getTime() - 50) return !0;
+this.tapHighlight && (onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.tapClass, !0, t), enyo.job("endTap", enyo.bind(this, this.endTap, e, t), 250));
 },
 endTap: function(e, t) {
-this.tapPulse && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.tapClass, !1, t);
+this.tapHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.tapClass, !1, t);
 },
 hold: function(e, t) {
-this.tapHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.highlightClass, !0, t);
+this.holdHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.highlightClass, !0, t);
 },
 release: function(e, t) {
-this.tapHighlight && (this.preventTapDisplayTimer = (new Date).getTime(), onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.highlightClass, !1, t));
+this.preventTapDisplayTimer = (new Date).getTime(), this.holdHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.highlightClass, !1, t);
 }
 });
 
@@ -9207,7 +9175,7 @@ ontap: "openBudget"
 }, {
 showing: !1,
 content: "Reports (NYI)",
-ontap: "openReports"
+ontap: "openReport"
 }, {
 showing: !1,
 classes: "onyx-menu-divider"
@@ -9216,10 +9184,8 @@ showing: !1,
 content: "Report Bug (NYI)",
 ontap: "errorReport"
 }, {
-showing: !1,
 classes: "onyx-menu-divider"
 }, {
-showing: !1,
 content: "About",
 ontap: "showAbout"
 } ]
@@ -9263,6 +9229,7 @@ modifyAccount: "showPanePopup",
 modifyTransaction: "showPanePopup",
 showBudget: "openBudget",
 showSearch: "openSearch",
+showReport: "openReport",
 showPanePopup: "showPanePopup",
 onbackbutton: "backHandler",
 onmenubutton: "menuHandler",
@@ -9410,18 +9377,22 @@ onFinish: enyo.bind(this, this.importComplete)
 });
 },
 importComplete: function(e, t) {
-t.success === !0 && (this.$.transactions.reloadSystem(), this.notificationType = null, enyo.asyncMethod(this, this.loadCheckbookStage2));
-},
-openBudget: function(e, t) {
-this.log(arguments);
-return;
+t.success === !0 && (this.$.transactions.unloadSystem(), this.notificationType = null, enyo.asyncMethod(this, this.loadCheckbookStage2));
 },
 openSearch: function(e, t) {
 this.log(arguments);
 return;
 },
-closeSearch: function(e, t) {
-t === !0 && (Checkbook.globals.accountManager.updateAccountModTime(), enyo.Signals.send("accountChanged"), this.$.transactions.reloadSystem()), enyo.isFunction(e.doNext) && e.doNext(t);
+closeSearch: function(e, t, n) {
+n.changes && (Checkbook.globals.accountManager.updateAccountModTime(), enyo.Signals.send("accountChanged"), this.$.transactions.reloadSystem()), enyo.isFunction(e) && e(n.changes);
+},
+openBudget: function(e, t) {
+this.log(arguments);
+return;
+},
+openReport: function(e, t) {
+this.log(arguments);
+return;
 }
 });
 
@@ -11173,7 +11144,7 @@ ontap: "doFinish",
 classes: "onyx-blue"
 } ]
 }, {
-classes: "h-box box-align-center margin-half-top margin-half-bottom",
+classes: "text-center margin-half-top margin-half-bottom",
 components: [ {
 content: "Thank you for using " + enyo.fetchAppInfo().title + " powered by"
 }, {
@@ -11182,6 +11153,7 @@ src: "assets/enyo-logo.png",
 style: "height: 32px; width: 87px;"
 } ]
 }, {
+showing: !1,
 classes: "h-box box-align-center margin-half-top margin-half-bottom",
 components: [ {
 kind: "enyo.Image",
@@ -11192,12 +11164,13 @@ classes: "padding-left dark-link",
 allowHtml: !0
 } ]
 }, {
+showing: !1,
 classes: "h-box box-align-center margin-half-top margin-half-bottom",
 components: [ {
 kind: "enyo.Image",
 src: "assets/application-web.png"
 }, {
-content: "<a href='" + enyo.fetchAppInfo().vendorurl + "' target='_blank'>" + enyo.fetchAppInfo().vendor + " Website</a>",
+content: enyo.fetchAppInfo().vendorurl,
 classes: "padding-left dark-link",
 allowHtml: !0
 } ]
@@ -11207,7 +11180,7 @@ components: [ {
 kind: "enyo.Image",
 src: "assets/twitter-icon.png"
 }, {
-content: "<a href='http://twitter.com/#!/glitchtech' target='_blank'>" + enyo.fetchAppInfo().vendor + " Twitter</a>",
+content: "@GlitchTech",
 classes: "padding-left dark-link",
 allowHtml: !0
 } ]
@@ -11217,7 +11190,7 @@ components: [ {
 kind: "enyo.Image",
 src: "assets/application-email.png"
 }, {
-content: "<a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " Support' target='_blank'>Send Email</a>",
+content: enyo.fetchAppInfo().vendoremail,
 classes: "padding-left dark-link",
 allowHtml: !0
 } ]
@@ -11512,8 +11485,8 @@ components: [ {
 name: "accountItem",
 kind: "GTS.Item",
 classes: "bordered account-item",
-tapPulse: !0,
-tapHighlight: !1,
+tapHighlight: !0,
+holdHighlight: !1,
 ontap: "accountTapped",
 components: [ {
 name: "catDivider",
@@ -11522,7 +11495,7 @@ ontap: "dividerTapped",
 useFittable: !1
 }, {
 layoutKind: "",
-classes: "account",
+classes: "account h-box box-pack-center box-align-center",
 components: [ {
 name: "icon",
 kind: "enyo.Image",
@@ -11534,10 +11507,9 @@ src: "assets/padlock_1.png",
 classes: "accountLockIcon unlocked"
 }, {
 name: "name",
-classes: "text-ellipsis accountName"
+classes: "accountName text-ellipsis box-flex-1"
 }, {
-name: "balance",
-classes: "right"
+name: "balance"
 } ]
 }, {
 name: "note",
@@ -13163,7 +13135,6 @@ style: "margin: 0 15px 0 0;"
 name: "acctName",
 content: "Checkbook",
 classes: "enyo-text-ellipsis",
-style: "margin-top: -6px;",
 fit: !0
 }, {
 name: "balanceMenu",
@@ -13247,7 +13218,6 @@ src: "assets/menu_icons/expense.png"
 } ]
 } ]
 }, {
-showing: !1,
 kind: "onyx.MenuDecorator",
 components: [ {
 kind: "onyx.Button",
@@ -13261,45 +13231,33 @@ kind: "onyx.Menu",
 floating: !0,
 scrim: !0,
 scrimclasses: "onyx-scrim-translucent",
-onSelect: "searchSelected",
+onSelect: "footerMenuSelected",
 components: [ {
+content: "Refresh"
+}, {
+showing: !1,
+classes: "onyx-menu-divider"
+}, {
+showing: !1,
 content: "Reports"
 }, {
+showing: !1,
 content: "Budget"
 }, {
+showing: !1,
 content: "Search"
-} ]
-} ]
-}, {
-kind: "onyx.MenuDecorator",
-components: [ {
-kind: "onyx.Button",
-classes: "padding-none transparent",
-components: [ {
-kind: "onyx.Icon",
-src: "assets/menu_icons/config.png"
-} ]
-}, {
-kind: "onyx.Menu",
-floating: !0,
-scrim: !0,
-scrimclasses: "onyx-scrim-translucent",
-onSelect: "functionSelected",
-components: [ {
-content: "Refresh",
-value: "refresh"
 }, {
 showing: !1,
-content: "Purge Transactions",
-value: "purge"
+classes: "onyx-menu-divider"
 }, {
 showing: !1,
-content: "Combine Transactions",
-value: "combine"
+content: "Purge"
 }, {
 showing: !1,
-content: "Clear Multiple Transactions",
-value: "clear"
+content: "Combine"
+}, {
+showing: !1,
+content: "Clear Multiple"
 } ]
 } ]
 } ]
@@ -13451,15 +13409,10 @@ this.newTransaction("Transfer");
 addExpense: function() {
 this.newTransaction("Expense");
 },
-searchSelected: function(e, t) {
-if (t.content.toLowerCase() === "budget") return this.log("Budget system go"), !0;
-if (t.content.toLowerCase() === "reports") return this.log("Report system go"), !0;
-if (t.content.toLowerCase() === "search") return this.log("Search system go"), !0;
-},
-functionSelected: function(e, t) {
+footerMenuSelected: function(e, t) {
 if (t.content.toLowerCase() === "refresh") {
 var n = this.account.acctId;
-return this.$.entries.rememberScrollPosition(), Checkbook.globals.transactionManager.$.recurrence.updateSeriesTransactions(n, {
+this.$.entries.rememberScrollPosition(), Checkbook.globals.transactionManager.$.recurrence.updateSeriesTransactions(n, {
 onSuccess: function() {
 Checkbook.globals.accountManager.fetchAccount(n, {
 onSuccess: function(e) {
@@ -13470,9 +13423,9 @@ force: !0
 }
 });
 }
-}), !0;
-}
-return this.log(t.selected), !0;
+});
+} else t.content.toLowerCase() === "budget" ? this.log("Budget system go") : t.content.toLowerCase() === "reports" ? this.log("Report system go") : t.content.toLowerCase() === "search" ? this.log("Search system go") : this.log(t.selected);
+return !0;
 },
 newTransaction: function(e) {
 this.$.addIncomeButton.getDisabled() || this.$.addTransferButton.getDisabled() || this.$.addExpenseButton.getDisabled() || (this.toggleCreateButtons(), this.showLoadingScrim(), enyo.Signals.send("modifyTransaction", {
@@ -13523,8 +13476,8 @@ aboveComponents: [],
 components: [ {
 name: "transactionWrapper",
 kind: "GTS.Item",
-tapPulse: !0,
-tapHighlight: !1,
+tapHighlight: !0,
+holdHighlight: !1,
 ontap: "transactiontapped",
 onhold: "transactionHeld",
 classes: "bordered",
@@ -13615,6 +13568,14 @@ cancelClass: "",
 onConfirm: "deleteTransactionConfirmHandler",
 onCancel: "deleteTransactionConfirmClose"
 } ],
+constructor: function() {
+this.inherited(arguments), this.bound = {
+transactionFetchGroupHandler: enyo.bind(this, this.transactionFetchGroupHandler),
+initialScroll: enyo.bind(this, this._initialScroll),
+initialScrollHandler: enyo.bind(this, this.initialScrollHandler),
+moveToSavedScrollPosition: enyo.bind(this, this.moveToSavedScrollPosition)
+};
+},
 accountChanged: function(e, t) {
 this.log(), t && t.deleted && this.getAccountId() === t.accountId ? this.unloadSystem() : this.reloadSystem();
 },
@@ -13635,7 +13596,7 @@ if (!this.account.acctId || this.account.acctId < 0) return !1;
 this.transactions = [], this.$.list.setCount(0), this.$.list.reset(), this.$.list.lazyLoad();
 },
 initialScroll: function() {
-enyo.job("initialScroll", enyo.bind(this, "_initialScroll"), 100);
+enyo.job("initialScroll", this.bound.initialScroll, 100);
 },
 _initialScroll: function() {
 if (this.$.list.getCount() <= 0) {
@@ -13676,7 +13637,7 @@ values: [ this.account.acctId ]
 }
 if (t) {
 var n = {
-onSuccess: enyo.bind(this, this.initialScrollHandler)
+onSuccess: this.bound.initialScrollHandler
 };
 Checkbook.globals.gts_db.query(t, n);
 }
@@ -13710,7 +13671,7 @@ transactionFetchGroup: function(e, t) {
 this.log(e, "|", t);
 var n = t.page * t.pageSize;
 return !this.account.acctId || this.account.acctId < 0 ? (this.log("System not ready yet"), !1) : n >= 0 && this.account.itemCount >= this.$.list.getCount() && !this.transactions[n] ? (this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
-onSuccess: enyo.bind(this, this.transactionFetchGroupHandler)
+onSuccess: this.bound.transactionFetchGroupHandler
 }, t.pageSize, n), !0) : !1;
 },
 transactionFetchGroupHandler: function(e, t, n) {
@@ -13726,7 +13687,7 @@ runningBalance: prepAmount(r),
 amount: prepAmount(t[s].amount)
 }, t[s]), this.transactions[e + s].desc = GTS.String.dirtyString(this.transactions[e + s].desc), this.transactions[e + s].category = GTS.String.dirtyString(this.transactions[e + s].category), this.transactions[e + s].category2 = GTS.String.dirtyString(this.transactions[e + s].category2), this.transactions[e + s].note = GTS.String.dirtyString(this.transactions[e + s].note), this.account.sort !== 0 && this.account.sort !== 6 && this.account.sort !== 8 && (r -= this.transactions[e + s].amount);
 }
-this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted ? this.savedScrollPosition && enyo.job("moveToSavedScrollPosition", enyo.bind(this, "moveToSavedScrollPosition"), 1e3) : (this.initialScrollCompleted = !0, this.initialScroll()), enyo.asyncMethod(this, this.doLoadingFinish);
+this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted ? this.savedScrollPosition && enyo.job("moveToSavedScrollPosition", this.bound.moveToSavedScrollPosition, 1e3) : (this.initialScrollCompleted = !0, this.initialScroll()), enyo.asyncMethod(this, this.doLoadingFinish);
 },
 duplicateTransaction: function(e) {
 this.log(), this.toggleCreateButtons();
@@ -13762,8 +13723,7 @@ accounts: n
 }), this.account.itemCount--, this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e - 1)), enyo.asyncMethod(this, this.doScrimHide);
 },
 transactionHeld: function(e, t) {
-this.log(), this.log("I DO NOT WORK YET", arguments);
-return;
+return this.log(arguments), this.log("I DO NOT WORK YET"), !0;
 },
 transactionHeldHandler: function(e, t) {
 this.log(), this.log("I DO NOT WORK YET", arguments);
@@ -13828,7 +13788,7 @@ this.transactions[u].runningBalance = prepAmount(a), this.account.sort !== 0 && 
 }
 }
 this.$.list.setCount(this.transactions.length), this.$.list.refresh(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
-onSuccess: enyo.bind(this, this.transactionFetchGroupHandler)
+onSuccess: this.bound.transactionFetchGroupHandler
 }, 1, this.transactions.length), enyo.Signals.send("accountBalanceChanged", {
 accounts: r
 });
