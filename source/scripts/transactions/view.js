@@ -34,7 +34,6 @@ enyo.kind( {
 					name: "acctName",
 					content: "Checkbook",
 					classes: "enyo-text-ellipsis",
-					style: "margin-top: -6px;",
 					fit: true
 				}, {
 					name: "balanceMenu",
@@ -145,7 +144,6 @@ enyo.kind( {
 						}
 					]
 				}, {
-					showing: false,
 					kind: "onyx.MenuDecorator",
 					components: [
 						{
@@ -162,52 +160,34 @@ enyo.kind( {
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
-							onSelect: "searchSelected",
+							onSelect: "footerMenuSelected",
 							components: [
 								{
+									content: "Refresh"
+								}, {
+									showing: false,
+									classes: "onyx-menu-divider"
+								}, {
+									showing: false,
 									content: "Reports"
 								}, {
+									showing: false,
 									content: "Budget"
 								}, {
+									showing: false,
 									content: "Search"
-								}
-							]
-						}
-					]
-				}, {
-					kind: "onyx.MenuDecorator",
-					components: [
-						{
-							kind: "onyx.Button",
-							classes: "padding-none transparent",
-							components: [
-								{
-									kind: "onyx.Icon",
-									src: "assets/menu_icons/config.png"
-								}
-							]
-						}, {
-							kind: "onyx.Menu",
-							floating: true,
-							scrim: true,
-							scrimclasses: "onyx-scrim-translucent",
-							onSelect: "functionSelected",
-							components: [
-								{
-									content: "Refresh",
-									value: "refresh"
 								}, {
 									showing: false,
-									content: "Purge Transactions",
-									value: "purge"
+									classes: "onyx-menu-divider"
 								}, {
 									showing: false,
-									content: "Combine Transactions",
-									value: "combine"
+									content: "Purge"
 								}, {
 									showing: false,
-									content: "Clear Multiple Transactions",
-									value: "clear"
+									content: "Combine"
+								}, {
+									showing: false,
+									content: "Clear Multiple"
 								}
 							]
 						}
@@ -633,30 +613,7 @@ enyo.kind( {
 		this.newTransaction( "Expense" );
 	},
 
-	searchSelected: function( inSender, inEvent ) {
-
-		if( inEvent.content.toLowerCase() === "budget" ) {
-
-			this.log( "Budget system go" );
-			return true;
-
-			enyo.Signals.send( "showBudget", { "acctId": this.account['acctId'] } );
-		} else if( inEvent.content.toLowerCase() === "reports" ) {
-
-			this.log( "Report system go" );
-			return true;
-
-			enyo.Signals.send( "showReports", { "acctId": this.account['acctId'] } );
-		} else if( inEvent.content.toLowerCase() === "search" ) {
-
-			this.log( "Search system go" );
-			return true;
-
-			enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'] } );
-		}
-	},
-
-	functionSelected: function( inSender, inEvent ) {
+	footerMenuSelected: function( inSender, inEvent ) {
 
 		if( inEvent.content.toLowerCase() === "refresh" ) {
 
@@ -680,13 +637,24 @@ enyo.kind( {
 						}
 					}
 				);
+		} else if( inEvent.content.toLowerCase() === "budget" ) {
 
-			return true;
+			this.log( "Budget system go" );
+			//enyo.Signals.send( "showBudget", { "acctId": this.account['acctId'] } );
+		} else if( inEvent.content.toLowerCase() === "reports" ) {
+
+			this.log( "Report system go" );
+			//enyo.Signals.send( "showReport", { "acctId": this.account['acctId'] } );
+		} else if( inEvent.content.toLowerCase() === "search" ) {
+
+			this.log( "Search system go" );
+			//enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'] } );
 		} else {
 
 			this.log( inEvent.selected );
-			return true;
 		}
+
+		return true;
 	},
 
 	/* Transaction & List Control */

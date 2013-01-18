@@ -44,8 +44,8 @@ enyo.kind( {
 					name: "transactionWrapper",
 					kind: "GTS.Item",
 
-					tapPulse: true,//tap
-					tapHighlight: false,//hold
+					tapHighlight: true,//tap
+					holdHighlight: false,//hold
 
 					ontap: "transactiontapped",
 					onhold: "transactionHeld",
@@ -174,6 +174,22 @@ enyo.kind( {
 		}
 	],
 
+	/**
+	 * @protected
+	 * @constructs
+	 */
+	constructor: function() {
+
+		this.inherited( arguments );
+
+		this.bound = {
+			transactionFetchGroupHandler: enyo.bind( this, this.transactionFetchGroupHandler ),
+			initialScroll: enyo.bind( this, this._initialScroll ),
+			initialScrollHandler: enyo.bind( this, this.initialScrollHandler ),
+			moveToSavedScrollPosition: enyo.bind( this, this.moveToSavedScrollPosition )
+		};
+	},
+
 	/** External Controls **/
 
 	accountChanged: function( inSender, inEvent ) {
@@ -243,7 +259,7 @@ enyo.kind( {
 
 	initialScroll: function() {
 
-		enyo.job( "initialScroll", enyo.bind( this, "_initialScroll" ), 100 );
+		enyo.job( "initialScroll", this.bound.initialScroll, 100 );
 	},
 
 	_initialScroll: function() {
@@ -302,7 +318,7 @@ enyo.kind( {
 		if( qryScrollCount ) {
 
 			var options = {
-					"onSuccess": enyo.bind( this, this.initialScrollHandler )
+					"onSuccess": this.bound.initialScrollHandler
 				};
 
 			Checkbook.globals.gts_db.query( qryScrollCount, options );
@@ -442,7 +458,7 @@ enyo.kind( {
 			Checkbook.globals.transactionManager.fetchTransactions(
 					this.account,
 					{
-						"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
+						"onSuccess": this.bound.transactionFetchGroupHandler
 					},
 					inEvent['pageSize'],//Limit
 					index//Offset
@@ -532,7 +548,7 @@ results = {
 			this.initialScroll();
 		} else if( this.savedScrollPosition ) {
 
-			enyo.job( "moveToSavedScrollPosition", enyo.bind( this, "moveToSavedScrollPosition" ), 1000 );
+			enyo.job( "moveToSavedScrollPosition", this.bound.moveToSavedScrollPosition, 1000 );
 		}
 
 		enyo.asyncMethod( this, this.doLoadingFinish );
@@ -657,10 +673,10 @@ results = {
 
 	transactionHeld: function( inSender, inEvent ) {
 
-		this.log();
+		this.log( arguments );
 
-		this.log( "I DO NOT WORK YET", arguments );
-		return;
+		this.log( "I DO NOT WORK YET" );
+		return true;
 
 		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
 
@@ -857,7 +873,7 @@ results = {
 		Checkbook.globals.transactionManager.fetchTransactions(
 				this.account,
 				{
-					"onSuccess": enyo.bind( this, this.transactionFetchGroupHandler )
+					"onSuccess": this.bound.transactionFetchGroupHandler
 				},
 				1,//Limit
 				this.transactions.length//Offset

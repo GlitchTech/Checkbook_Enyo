@@ -66,7 +66,7 @@ enyo.kind({
 										}, {
 											showing: false,
 											content: "Reports (NYI)",
-											ontap: "openReports"
+											ontap: "openReport"
 										}, {
 											showing: false,
 											classes: "onyx-menu-divider"
@@ -75,11 +75,8 @@ enyo.kind({
 											content: "Report Bug (NYI)",
 											ontap: "errorReport"
 										}, {
-											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
-											//hidden until handling in about for links in child view
-											showing: false,
 											content: "About",
 											ontap: "showAbout"
 										}
@@ -137,6 +134,7 @@ enyo.kind({
 			modifyTransaction: "showPanePopup",
 			showBudget: "openBudget",
 			showSearch: "openSearch",
+			showReport: "openReport",
 
 			showPanePopup: "showPanePopup",
 
@@ -473,6 +471,7 @@ enyo.kind({
 
 		//Hide other panes
 		this.$['container'].hide();
+
 		for( var i = 0; i < this.paneStack.length; i++ ) {
 
 			this.$[this.paneStack[i]].hide();
@@ -575,7 +574,7 @@ enyo.kind({
 
 		if( importStatus['success'] === true ) {
 
-			this.$['transactions'].reloadSystem();
+			this.$['transactions'].unloadSystem();
 
 			this.notificationType = null;
 
@@ -583,6 +582,51 @@ enyo.kind({
 					this,
 					this.loadCheckbookStage2
 				);
+		}
+	},
+
+	/** Checkbook.search **/
+
+	openSearch: function( inSender, inEvent ) {
+
+		this.log( arguments );
+		return;
+
+		enyo.asyncMethod(
+				this,
+				this.showPanePopup,
+				null,
+				enyo.mixin(
+						inEvent,
+						{
+							name: "search",
+							kind: "Checkbook.search.pane",
+							onModify: "showPanePopup",
+							onFinish: enyo.bind(
+									this,
+									this.closeSearch,
+									( inEvent && enyo.isFunction( inEvent['onFinish'] ) ? inEvent['onFinish'] : null )
+								)
+						}
+					)
+			);
+	},
+
+	closeSearch: function( doNext, inSender, inEvent ) {
+
+		if( inEvent['changes'] ) {
+			//Update account and transaction information
+
+			Checkbook.globals.accountManager.updateAccountModTime();
+
+			enyo.Signals.send( "accountChanged" );
+			this.$['transactions'].reloadSystem();
+		}
+
+		//If a prevous callback existed, call it with any arguments applied
+		if( enyo.isFunction( doNext ) ) {
+
+			doNext( inEvent['changes'] );
 		}
 	},
 
@@ -607,9 +651,9 @@ enyo.kind({
 			);
 	},
 
-	/** Checkbook.search **/
+	/** Checkbook.reports.* **/
 
-	openSearch: function( inSender, inEvent ) {
+	openReport: function( inSender, inEvent ) {
 
 		this.log( arguments );
 		return;
@@ -619,36 +663,12 @@ enyo.kind({
 				this.showPanePopup,
 				null,
 				enyo.mixin(
-						inEvent,
 						{
-							name: "search",
-							kind: "Checkbook.search.pane",
-							onModify: "showPanePopup",
-							onFinish: enyo.bind(
-									this,
-									this.closeSearch
-								),
-							doNext: ( inEvent && enyo.isFunction( inEvent['onFinish'] ) ? inEvent['onFinish'] : null )
-						}
+							name: "report",
+							kind: "Checkbook.report.view"
+						},
+						inEvent
 					)
 			);
-	},
-
-	closeSearch: function( inSender, changesMade ) {
-
-		if( changesMade === true ) {
-			//Update account and transaction information
-
-			Checkbook.globals.accountManager.updateAccountModTime();
-
-			enyo.Signals.send( "accountChanged" );
-			this.$['transactions'].reloadSystem();
-		}
-
-		//If a prevous callback existed, call it with any arguments applied
-		if( enyo.isFunction( inSender.doNext ) ) {
-
-			inSender.doNext( changesMade );
-		}
 	}
 });
