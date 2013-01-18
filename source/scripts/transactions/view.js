@@ -34,7 +34,6 @@ enyo.kind( {
 					name: "acctName",
 					content: "Checkbook",
 					classes: "enyo-text-ellipsis",
-					style: "margin-top: -6px;",
 					fit: true
 				}, {
 					name: "balanceMenu",

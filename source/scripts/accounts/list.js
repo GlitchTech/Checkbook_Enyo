@@ -59,8 +59,8 @@ enyo.kind({
 
 					classes: "bordered account-item",
 
-					tapPulse: true,//tap
-					tapHighlight: false,//hold
+					tapHighlight: true,//tap
+					holdHighlight: false,//hold
 
 					ontap: "accountTapped",
 
