@@ -9,7 +9,6 @@ for var in "$@"; do
 	case "$var" in
 		-h)
 			echo "
-USAGE ./tools/deploy_android.sh [-h] [-r]
 
 -h Display this message.
 -r Build from latest master release.
