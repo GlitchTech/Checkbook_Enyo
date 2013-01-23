@@ -5774,7 +5774,7 @@ return this.bound._errorHandler.apply(this, arguments), e.apply(null, arguments)
 },
 _errorHandler: function(e, t) {
 typeof t == "undefined" && (t = e);
-var n = "Database error ( " + t.code + " ): " + t.message;
+var n = "Database error ( " + t.code + " ): " + t.message + "<hr />" + enyo.json.stringify(t);
 enyo.error(n), Checkbook.globals.criticalError && (enyo.isString(t.message) && t.message.toLowerCase().match("read only database") ? Checkbook.globals.criticalError.load(null, "Warning! Your database has become read only. " + enyo.fetchAppInfo().title + " is unable to modify it in any way. Consult your operating system user's manual on how to remove the read only status from a file. For additional help, please <a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " - read only issue'>contact " + enyo.fetchAppInfo().vendor + "</a>.", null) : enyo.isString(t.message) && t.message.toLowerCase().match("disk i/o error") ? Checkbook.globals.criticalError.load(null, "Warning! Your database has become locked. Please restart " + enyo.fetchAppInfo().title + ". This usually occurs if " + enyo.fetchAppInfo().title + " is running while your device was put in USB mode. For additional help, please <a href='mailto:" + enyo.fetchAppInfo().vendoremail + "?subject=" + enyo.fetchAppInfo().title + " - disk i/o issue'>contact " + enyo.fetchAppInfo().vendor + "</a>.", null) : Checkbook.globals.criticalError.load(null, n, null));
 },
 _db_lost: function() {
@@ -9303,7 +9303,7 @@ onSuccess: enyo.bind(this, this.loadCheckbookStage2)
 });
 },
 loadCheckbookStage2: function() {
-Checkbook.globals.accountManager.fetchDefaultAccount({
+this.$.splash && this.$.splash.$.message.setContent("Loading account information..."), Checkbook.globals.accountManager.fetchDefaultAccount({
 onSuccess: enyo.bind(this, this.loadCheckbookStage3)
 });
 },
@@ -9460,7 +9460,7 @@ owner: this
 }), this.$.headerWrapper.render(), this.headerBuilt = !0), this.$.spinner.show(), this.checkSystem(), this.reflow();
 },
 checkSystem: function() {
-this.$.title.setContent("Loading Checkbook"), this.$.message.setContent("Preparing application."), this.$.splashProgress.animateProgressTo(5), Checkbook.globals || (Checkbook.globals = {}), Checkbook.globals.gts_db || (Checkbook.globals.gts_db = new GTS.database(getDBArgs()), this.log("Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created.")), Checkbook.globals.prefs || (Checkbook.globals.prefs = {}, this.log("creating prefs")), this.checkDB();
+this.$.title.setContent("Loading Checkbook"), this.$.message.setContent("Preparing application."), this.$.splashProgress.animateProgressTo(5), Checkbook.globals || (Checkbook.globals = {}), Checkbook.globals.prefs || (Checkbook.globals.prefs = {}, this.log("creating prefs")), Checkbook.globals.gts_db || (Checkbook.globals.gts_db = new GTS.database(getDBArgs()), this.log("Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created.")), this.checkDB();
 },
 checkDB: function() {
 this.log(), this.$.message.setContent("Checking database version..."), this.$.splashProgress.animateProgressTo(10), Checkbook.globals.gts_db.query("SELECT * FROM prefs LIMIT 1;", {
@@ -13668,7 +13668,7 @@ return this.$.mainBody.addRemoveClass("repeatTransferIcon", o && u), this.$.main
 }
 },
 transactionFetchGroup: function(e, t) {
-this.log(e, "|", t);
+this.log("FETCH", t.page, t.pageSize);
 var n = t.page * t.pageSize;
 return !this.account.acctId || this.account.acctId < 0 ? (this.log("System not ready yet"), !1) : n >= 0 && this.account.itemCount >= this.$.list.getCount() && !this.transactions[n] ? (this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
 onSuccess: this.bound.transactionFetchGroupHandler
@@ -15005,7 +15005,7 @@ return delete e.rObj, delete e.maxItemId, delete e.maxRepeatId, r;
 updateSeriesTransactions: function(e, t) {
 var n = new Date, r = new Date(n.getFullYear(), n.getMonth(), n.getDate() + Checkbook.globals.prefs.seriesDayLimit, 23, 59, 59, 999);
 e = e || -1, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
-sql: "SELECT ( SELECT IFNULL( ( MAX( itemId ) + 1 ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * FROM repeats WHERE ( rep_acctId = ? " + (e < 0 ? "OR 1 = 1 " : "") + ") " + "AND lastOccurrence < ? " + "AND ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date > ? ) < ? " + "AND ( " + "( " + "endingCondition = 'none' " + ") OR ( " + "endingCondition = 'date' " + "AND endDate != '' " + "AND endDate > lastOccurrence " + ") OR ( " + "endingCondition = 'occurences' " + "AND endCount != '' " + "AND endCount > currCount " + ") " + ") " + "AND terminated != 1",
+sql: "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * FROM repeats WHERE ( rep_acctId = ? " + (e < 0 ? "OR 1 = 1 " : "") + ") " + "AND lastOccurrence < ? " + "AND ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date > ? ) < ? " + "AND ( " + "( " + "endingCondition = 'none' " + ") OR ( " + "endingCondition = 'date' " + "AND endDate != '' " + "AND endDate > lastOccurrence " + ") OR ( " + "endingCondition = 'occurences' " + "AND endCount != '' " + "AND endCount > currCount " + ") " + ") " + "AND terminated != 1",
 values: [ e, Date.parse(r), Date.parse(n), Checkbook.globals.prefs.seriesCountLimit ]
 }), {
 onSuccess: enyo.bind(this, this._updateSeriesTransactionsHandler, t),
@@ -15013,7 +15013,7 @@ onError: t.onError
 });
 },
 _updateSeriesTransactionsHandler: function(e, t) {
-t.length > 0 ? Checkbook.globals.gts_db.queries(this.generateSeriesSQL(t), e) : enyo.isFunction(e.onSuccess) && e.onSuccess();
+t.length > 0 ? (repeatArray[0].maxItemId = parseInt(repeatArray[0].maxItemId) + 1, Checkbook.globals.gts_db.queries(this.generateSeriesSQL(t), e)) : enyo.isFunction(e.onSuccess) && e.onSuccess();
 },
 generateSeriesSQL: function(e) {
 var t = [];
@@ -15055,7 +15055,7 @@ autoTransferLink: e[l].rep_autoTrsnLink > 0 ? e[l].rep_autoTrsnLinkAcct : -1
 }, GTS.Object.validNumber(e[l].rep_linkedAcctId) && e[l].rep_linkedAcctId >= 0 ? f = "transfer" : e[l].rep_amount < 0 ? f = "expense" : f = "income", t = t.concat(Checkbook.globals.transactionManager.generateInsertTransactionSQL({
 data: i,
 type: f
-})), a++, n += GTS.Object.validNumber(e[l].linkedAccount) && e[l].linkedAccount >= 0 ? 2 : 1;
+})), a++, n += GTS.Object.validNumber(i.linkedAccount) && i.linkedAccount >= 0 ? 2 : 1;
 }
 t.push(Checkbook.globals.gts_db.getUpdate("repeats", {
 lastOccurrence: Date.parse(u),
