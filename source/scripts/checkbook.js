@@ -361,6 +361,11 @@ enyo.kind({
 
 	loadCheckbookStage2: function() {
 
+		if( this.$['splash'] ) {
+
+			this.$['splash'].$['message'].setContent( "Loading account information..." );
+		}
+
 		Checkbook.globals.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.loadCheckbookStage3 ) } );
 	},
 

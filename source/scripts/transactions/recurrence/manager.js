@@ -250,7 +250,7 @@ enyo.kind( {
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 					{
-						'sql': "SELECT ( SELECT IFNULL( ( MAX( itemId ) + 1 ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * " +
+						'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * " +
 							"FROM repeats " +
 							"WHERE " +
 								//Account ID
@@ -301,6 +301,8 @@ enyo.kind( {
 	_updateSeriesTransactionsHandler: function( options, results ) {
 
 		if( results.length > 0 ) {
+
+			repeatArray[0]['maxItemId'] = parseInt( repeatArray[0]['maxItemId'] ) + 1;
 
 			Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
 		} else if( enyo.isFunction( options['onSuccess'] ) ) {
@@ -456,7 +458,7 @@ enyo.kind( {
 					sql = sql.concat( Checkbook.globals.transactionManager.generateInsertTransactionSQL( { "data": trsnData, "type": type } ) );
 
 					serCount++;
-					maxItemId += ( ( GTS.Object.validNumber( repeatArray[i]['linkedAccount'] ) && repeatArray[i]['linkedAccount'] >= 0 ) ? 2 : 1 );
+					maxItemId += ( ( GTS.Object.validNumber( trsnData['linkedAccount'] ) && trsnData['linkedAccount'] >= 0 ) ? 2 : 1 );
 				}
 
 				//update repeat item
