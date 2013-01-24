@@ -250,7 +250,7 @@ enyo.kind( {
 		Checkbook.globals.gts_db.query(
 				new GTS.databaseQuery(
 					{
-						'sql': "SELECT ( SELECT IFNULL( ( MAX( itemId ) + 1 ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * " +
+						'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, *, ( ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NULL AND transactions.date > ? ) +  ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NOT NULL AND transactions.date > ? ) / 2 ) AS futureCount " +
 							"FROM repeats " +
 							"WHERE " +
 								//Account ID
@@ -263,7 +263,7 @@ enyo.kind( {
 								"AND lastOccurrence < ? " +
 
 								//Under count limit
-								"AND ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date > ? ) < ? " +
+								"AND futureCount < ? " +
 
 								//Ending condition checks
 								"AND ( " +
@@ -283,9 +283,10 @@ enyo.kind( {
 								//Terminated Check
 								"AND terminated != 1",
 						'values': [
+							Date.parse( now ),
+							Date.parse( now ),
 							acctId,
 							Date.parse( dayLimit ),
-							Date.parse( now ),
 							Checkbook.globals.prefs['seriesCountLimit']
 						]
 					}
@@ -302,7 +303,9 @@ enyo.kind( {
 
 		if( results.length > 0 ) {
 
-			Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results ), options );
+			var max = parseInt( results[0]['maxItemId'] ) + 1;
+
+			Checkbook.globals.gts_db.queries( this.generateSeriesSQL( results, max ), options );
 		} else if( enyo.isFunction( options['onSuccess'] ) ) {
 
 			options['onSuccess']();
@@ -317,20 +320,20 @@ enyo.kind( {
 	 *
 	 * @returns {object[]}	SQL functions to be run. Returns empty array if nothing to do.
 	 */
-	generateSeriesSQL: function( repeatArray ) {
+	generateSeriesSQL: function( repeatArray, maxItemId ) {
 
 		var sql = [];
 
 		if( repeatArray.length > 0 ) {
 
 			//Set max id to build off of; already 1 greater than max id
-			var maxItemId = repeatArray[0]['maxItemId'];
+			var maxItemId = maxItemId || repeatArray[0]['maxItemId'];
 
 			//Current datetime for calculations
 			var now = new Date();
 
 			//Cycle variables for content
-			var trsnData, origDate, lastOccurrence, serDate, serCount, type;
+			var trsnData, origDate, lastOccurrence, serDate, serCount, futureCount, type;
 
 			//Cycle and create SQL
 			for( var i = 0; i < repeatArray.length; i++ ) {
@@ -339,17 +342,20 @@ enyo.kind( {
 				lastOccurrence = new Date( parseInt( repeatArray[i]['lastOccurrence'] ) );
 				serDate = new Date( parseInt( repeatArray[i]['lastOccurrence'] ) );
 				serCount = repeatArray[i]['currCount'];
+				futureCount = repeatArray[i]['futureCount'];
 
 				//Reduce calls to parse function
 				var category = enyo.json.parse( repeatArray[i]['rep_category'] );
 				var daysOfWeek = enyo.json.parse( repeatArray[i]['daysOfWeek'] );
+
+				this.log( repeatArray[i]['testCount'] );
 
 				while(
 						//Under date limit
 						Math.floor( ( serDate - lastOccurrence ) / ( 1000 * 60 * 60 * 24 ) ) < Checkbook.globals.prefs['seriesDayLimit']
 
 						//Under count limit
-						&& ( serCount - repeatArray[i]['currCount'] ) < Checkbook.globals.prefs['seriesCountLimit']
+						&& futureCount < Checkbook.globals.prefs['seriesCountLimit']
 
 						//Ending condition checks
 						&& (
@@ -456,7 +462,8 @@ enyo.kind( {
 					sql = sql.concat( Checkbook.globals.transactionManager.generateInsertTransactionSQL( { "data": trsnData, "type": type } ) );
 
 					serCount++;
-					maxItemId += ( ( GTS.Object.validNumber( repeatArray[i]['linkedAccount'] ) && repeatArray[i]['linkedAccount'] >= 0 ) ? 2 : 1 );
+					futureCount++;
+					maxItemId += ( ( GTS.Object.validNumber( trsnData['linkedAccount'] ) && trsnData['linkedAccount'] >= 0 ) ? 2 : 1 );
 				}
 
 				//update repeat item

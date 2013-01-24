@@ -117,18 +117,18 @@ enyo.kind({
 			Checkbook.globals = {};
 		}
 
-		if( !Checkbook.globals.gts_db ) {
-
-			Checkbook.globals.gts_db = new GTS.database( getDBArgs() );
-
-			this.log( "Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created." );
-		}
-
 		if( !Checkbook.globals.prefs ) {
 
 			Checkbook.globals.prefs = {};
 
 			this.log( "creating prefs" );
+		}
+
+		if( !Checkbook.globals.gts_db ) {
+
+			Checkbook.globals.gts_db = new GTS.database( getDBArgs() );
+
+			this.log( "Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created." );
 		}
 
 		this.checkDB();

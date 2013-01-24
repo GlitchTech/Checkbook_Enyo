@@ -440,7 +440,7 @@ enyo.kind( {
 
 	transactionFetchGroup: function( inSender, inEvent ) {
 
-		this.log( inSender, "|", inEvent );
+		this.log( "FETCH", inEvent['page'], inEvent['pageSize'] );
 
 		var index = inEvent['page'] * inEvent['pageSize'];
 

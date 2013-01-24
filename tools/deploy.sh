@@ -2,15 +2,21 @@
 
 RELEASE=0
 RELEASEDIR=""
-DEPLOY="enyo/tools/deploy.js"
+
+# the folder this script is in (*/bootplate/tools)
+TOOLS=$(cd `dirname $0` && pwd)
+
+# enyo location
+ENYO="$TOOLS/../enyo"
+
+# deploy script location
+DEPLOY="$ENYO/tools/deploy.js"
 
 # Parse command line options.
-for var in "$@"; do
-	case "$var" in
-		-h)
+while getopts "hro:" OPTION; do
+	case $OPTION in
+		h)
 			echo "
-USAGE ./tools/deploy_android.sh [-h] [-r]
-
 -h Display this message.
 -r Build from latest master release.
 
@@ -20,13 +26,7 @@ Other arguments pass directly to $DEPLOY
 $DEPLOY -h
 			exit 0
 			;;
-		--release) RELEASE=1;;
-	esac
-done
-
-#Check for output director
-while getopts "o:" OPTION; do
-	case $OPTION in
+		r) RELEASE=1;;
 		o)
 			RELEASEDIR=$OPTARG;;
 	esac
@@ -42,7 +42,15 @@ if [ $RELEASE -eq 1 ]; then
 	git submodule update
 fi
 
-node $DEPLOY $@
+# check for node, but quietly
+if command -v node >/dev/null 2>&1; then
+	# use node to invoke deploy with imported parameters
+	echo "enyo/tools/minify.sh args: " $@
+	node $DEPLOY $@
+else
+	echo "No node found in path"
+	exit 1
+fi
 
 if [ -n $RELEASEDIR ]; then
 
