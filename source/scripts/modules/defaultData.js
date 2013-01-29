@@ -6,7 +6,7 @@ function getDBArgs() {
 		name: "Checkbook DB",
 		estimatedSize: ( 5 * 1024 * 1024 ),
 
-		debug: false//Only debug when in Beta versions
+		debug: enyo.fetchAppInfo()['id'].match( "beta" )//Only debug when in Beta versions
 	};
 
 	if( enyo.platform.android || enyo.platform.androidChrome ) {
