@@ -518,7 +518,7 @@ enyo.kind({
 			this.$['container'].show();
 		}
 
-		this.waterfall( "onresize", "onresize", this );
+		this.resized();
 	},
 
 	/** Checkbook.accounts.* **/
