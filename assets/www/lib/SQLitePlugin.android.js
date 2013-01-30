@@ -270,7 +270,7 @@
 			successcb = function( execres ) {
 
 				var res, saveres;
-				enyo.log( "executeSql callback:" + JSON.stringify( execres ) );
+				enyo.log( "executeSql callback: " + execres.length + " items" );
 				res = void 0;
 				saveres = void 0;
 				saveres = execres;
@@ -294,8 +294,6 @@
 		errorcb = null;
 
 		if( error ) {
-
-			enyo.log( "error not NULL: " + sql );
 
 			errorcb = function( res ) {
 

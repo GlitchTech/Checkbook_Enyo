@@ -83,39 +83,44 @@
 	height: 1000000px;
 }
 
-.enyo-list-page {
+.enyo-list-page, .enyo-list-holdingarea {
 	position: absolute;
 	left: 0;
 	right: 0;
 }
 
-.enyo-list-placeholder { }
+.enyo-list-holdingarea {
+	top: -10000px;
+}
+
 .enyo-pinned-list-placeholder {
-	border:1px solid red;
-	position:absolute;
-	top:0px; left:0px;
-	z-index:1000;
-	background:transparent;
-	overflow:hidden;
+	border: 1px solid red;
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 1000;
+	background: transparent;
+	overflow: hidden;
 }
+
 .enyo-pinned-list-placeholder button {
-	width:100px; height:100%;
-	position:absolute;
-	top:0px; right:0px;
+	width: 100px; height: 100%;
+	position: absolute;
+	top: 0; right: 0;
 }
+
 .enyo-list-reorder-container {
-	position:absolute;
-	top:0px; left:0px;
-	z-index:1000;
-	background:transparent;
-	overflow:hidden;
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 1000;
+	background: transparent;
+	overflow: hidden;
 }
 
 .enyo-animatedTopAndLeft {
-	transition: top 0.1s linear, left 0.1s linear;
 	-webkit-transition: top 0.1s linear, left 0.1s linear;
 	-moz-transition: top 0.1s linear, left 0.1s linear;
 	-o-transition: top 0.1s linear, left 0.1s linear;
+	transition: top 0.1s linear, left 0.1s linear;
 }
 
 /* /home/ryltar/git/gutoc/enyo/../lib/layout/list/source/PulldownList.css */
@@ -269,7 +274,7 @@
 	border:1px solid yellow;
 }
 
-/* source/Theme.less */
+/* Theme.less */
 
 /* Variable definitions */
 /* Fonts */
@@ -326,6 +331,7 @@
   vertical-align: middle;
 }
 .onyx-icon.onyx-icon-button.active,
+.onyx-icon.onyx-icon-button.pressed,
 .onyx-icon.onyx-icon-button:active:hover,
 .onyx-icon-toggle.active {
   background-position: 0 -32px;
@@ -363,7 +369,7 @@
   /* border-bottom: 1px solid rgba(15, 15, 15, 0.5); */
 
   box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.2);
-  background: #e1e1e1 url(../source/lib/onyx/images/gradient.png) repeat-x bottom;
+  background: #e1e1e1 url(../lib/onyx/images/gradient.png) repeat-x bottom;
   background-size: contain;
   /**/
 
@@ -382,14 +388,15 @@
 
 	the effect is as if .onyx-button.active doesn't exist
 */
-.onyx-button.active {
-  background-image: url(../source/lib/onyx/images/gradient-invert.png);
+.onyx-button.active,
+.onyx-button.pressed {
+  background-image: url(../lib/onyx/images/gradient-invert.png);
   background-position: top;
   border-top: 1px solid rgba(15, 15, 15, 0.6);
   box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.1);
 }
 .onyx-button:active:hover:not([disabled]) {
-  background-image: url(../source/lib/onyx/images/gradient-invert.png);
+  background-image: url(../lib/onyx/images/gradient-invert.png);
   background-position: top;
   border-top: 1px solid rgba(15, 15, 15, 0.6);
   box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.1);
@@ -410,7 +417,7 @@
   cursor: pointer;
   height: 32px;
   width: 32px;
-  background: url(../source/lib/onyx/images/checkbox.png) no-repeat;
+  background: url(../lib/onyx/images/checkbox.png) no-repeat;
   /* reset for ? */
 
   margin: 0px;
@@ -427,7 +434,7 @@
 }
 /* Grabber.css */
 .onyx-grabber {
-  background: url(../source/lib/onyx/images/grabbutton.png) no-repeat center;
+  background: url(../lib/onyx/images/grabbutton.png) no-repeat center;
   width: 23px;
   height: 27px;
 }
@@ -439,7 +446,7 @@
   border-radius: 8px;
   padding: 6px;
   color: #ffffff;
-  background: #4c4c4c url(../source/lib/onyx/images/gradient.png) repeat-x 0 bottom;
+  background: #4c4c4c url(../lib/onyx/images/gradient.png) repeat-x 0 bottom;
 }
 .onyx-popup-decorator {
   position: relative;
@@ -481,7 +488,7 @@
 
   background-color: #4c4c4c;
   border: none;
-  background: #4c4c4c url(../source/lib/onyx/images/gradient.png) repeat-x 0 10px;
+  background: #4c4c4c url(../lib/onyx/images/gradient.png) repeat-x 0 10px;
 }
 .onyx-groupbox .onyx-input-decorator {
   display: block;
@@ -531,6 +538,7 @@
   outline: none;
   cursor: pointer;
   background-color: transparent;
+  background-image: none;
   font-size: 16px;
   box-shadow: none;
   /* FIXME: hack for styling reset on Android */
@@ -655,6 +663,7 @@
   outline: none;
   cursor: pointer;
   background-color: transparent;
+  background-image: none;
   font-size: 16px;
   box-shadow: none;
   /* Remove scrollbars and resize handle */
@@ -687,6 +696,7 @@
   outline: none;
   cursor: pointer;
   background-color: transparent;
+  background-image: none;
   font-size: 16px;
   min-height: 20px;
   min-width: 100px;
@@ -712,7 +722,7 @@
   text-align: center;
   /**/
 
-  background: #e7e7e7 url(../source/lib/onyx/images/gradient.png) repeat-x bottom;
+  background: #e7e7e7 url(../lib/onyx/images/gradient.png) repeat-x bottom;
   /* IE8 */
 
   border: 1px solid #333333;
@@ -734,7 +744,7 @@
 }
 .onyx-radiobutton.active {
   color: #ffffff;
-  background: #0091f2 url(../source/lib/onyx/images/gradient-invert.png) repeat-x top;
+  background: #0091f2 url(../lib/onyx/images/gradient-invert.png) repeat-x top;
   border-top: 1px solid rgba(15, 15, 15, 0.6);
   box-shadow: inset 1px 2px 2px rgba(0, 0, 0, 0.2);
 }
@@ -777,7 +787,7 @@
 
   border-radius: 3px;
   box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.4);
-  background: #8bba3d url(../source/lib/onyx/images/gradient-invert.png) repeat-x bottom;
+  background: #8bba3d url(../lib/onyx/images/gradient-invert.png) repeat-x bottom;
   background-size: auto 100%;
   /* label */
 
@@ -795,7 +805,7 @@
   height: 30px;
   margin: 1px;
   border-radius: 3px;
-  background: #f6f6f6 url(../source/lib/onyx/images/gradient.png) repeat-x;
+  background: #f6f6f6 url(../lib/onyx/images/gradient.png) repeat-x;
   background-size: auto 100%;
 }
 .onyx-toggle-button .onyx-toggle-button-knob {
@@ -835,7 +845,7 @@
 
   padding: 9px 8px 10px 8px;
   border: 1px solid #3A3A3A;
-  background: #4c4c4c url(../source/lib/onyx/images/gradient.png) repeat-x 0 bottom;
+  background: #4c4c4c url(../lib/onyx/images/gradient.png) repeat-x 0 bottom;
   background-size: contain;
   color: #ffffff;
   /**/
@@ -892,7 +902,7 @@
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(0, 0, 0, 0.2);
   color: #ffffff;
-  background: #216593 url(../source/lib/onyx/images/gradient.png) repeat-x 0 bottom;
+  background: #216593 url(../lib/onyx/images/gradient.png) repeat-x 0 bottom;
   border-radius: 3px;
   white-space: nowrap;
 }
@@ -949,13 +959,13 @@
   height: 8px;
   border: 1px solid rgba(15, 15, 15, 0.2);
   border-radius: 3px;
-  background: #b8b8b8 url(../source/lib/onyx/images/gradient-invert.png) repeat-x;
+  background: #b8b8b8 url(../lib/onyx/images/gradient-invert.png) repeat-x;
   background-size: auto 100%;
 }
 .onyx-progress-bar-bar {
   height: 100%;
   border-radius: 3px;
-  background: #58abef url(../source/lib/onyx/images/gradient.png) repeat-x;
+  background: #58abef url(../lib/onyx/images/gradient.png) repeat-x;
   background-size: auto 100%;
 }
 .onyx-progress-bar-bar.striped {
@@ -1049,10 +1059,11 @@
   position: relative;
   height: 40px;
   width: 40px;
-  background: url(../source/lib/onyx/images/slider-handle.png) left top no-repeat;
+  background: url(../lib/onyx/images/slider-handle.png) left top no-repeat;
   margin: -23px -20px;
 }
 .onyx-slider-knob.active,
+.onyx-slider-knob.pressed,
 .onyx-slider-knob:active:hover {
   background-position: 0 -40px;
 }
@@ -1093,10 +1104,10 @@
   width: 59px;
   height: 58px;
   display: inline-block;
-  background: url(../source/lib/onyx/images/spinner-dark.gif) no-repeat 0 0;
+  background: url(../lib/onyx/images/spinner-dark.gif) no-repeat 0 0;
 }
 .onyx-spinner.onyx-light {
-  background: url(../source/lib/onyx/images/spinner-light.gif) no-repeat 0 0;
+  background: url(../lib/onyx/images/spinner-light.gif) no-repeat 0 0;
 }
 /* MoreToolbar.css */
 .onyx-more-toolbar {
@@ -1120,7 +1131,7 @@
   margin-bottom: 5px;
 }
 .onyx-more-button {
-  background-image: url(../source/lib/onyx/images/more.png);
+  background-image: url(../lib/onyx/images/more.png);
   width: 32px;
   height: 32px;
 }
@@ -1624,12 +1635,12 @@ body {
   padding-right: 32px;
   background-repeat: no-repeat;
   background-position: center right;
-  background-image: url(../source/assets/menu-arrow.png);
+  background-image: url(../assets/menu-arrow.png);
 }
 .arrow.dark,
 .arrow.dark:active,
 .arrow.dark:active:hover:not( [disabled] ) {
-  background-image: url(../source/assets/menu-arrow-light.png);
+  background-image: url(../assets/menu-arrow-light.png);
 }
 /*****************/
 .popup-header .enyo-header-inner {
@@ -1870,7 +1881,7 @@ body {
 }
 /* Checkbook Stamp Background */
 .checkbook-stamp {
-  background-image: url(../source/assets/trans_bg.png);
+  background-image: url(../assets/trans_bg.png);
   background-repeat: no-repeat;
   background-position: center center;
 }
@@ -2198,7 +2209,7 @@ body {
   right: 0;
   bottom: 0;
   left: 0;
-  background-image: url(../source/assets/trans_bg.png);
+  background-image: url(../assets/trans_bg.png);
   background-repeat: no-repeat;
   background-position: center;
   text-align: center;
@@ -2260,27 +2271,27 @@ body {
   background-position: 0px -32px;
 }
 .repeatIcon {
-  background-image: url(../source/assets/calendar.png);
+  background-image: url(../assets/calendar.png);
   background-repeat: no-repeat;
   background-position: top left;
 }
 .repeatTransferIcon {
-  background-image: url(../source/assets/future_transfer_1.png);
+  background-image: url(../assets/future_transfer_1.png);
   background-repeat: no-repeat;
   background-position: top left;
 }
 .transferIcon {
-  background-image: url(../source/assets/transfer_3.png);
+  background-image: url(../assets/transfer_3.png);
   background-repeat: no-repeat;
   background-position: top left;
 }
 .expenseIcon {
-  background-image: url(../source/assets/icon-expense.png);
+  background-image: url(../assets/icon-expense.png);
   background-repeat: no-repeat;
   background-position: top left;
 }
 .incomeIcon {
-  background-image: url(../source/assets/icon-income.png);
+  background-image: url(../assets/icon-income.png);
   background-repeat: no-repeat;
   background-position: top left;
 }

@@ -1200,7 +1200,7 @@ renderRow: function(e) {
 if (e < this.rowOffset || e >= this.count + this.rowOffset) return;
 this.setupItem(e);
 var t = this.fetchRowNode(e);
-t && (t.innerHTML = this.$.client.generateChildHtml(), this.$.client.teardownChildren(), this.doRenderRow({
+t && (enyo.dom.setInnerHtml(t, this.$.client.generateChildHtml()), this.$.client.teardownChildren(), this.doRenderRow({
 rowIndex: e
 }));
 },
@@ -1255,6 +1255,8 @@ toggleSelected: !1,
 fixedHeight: !1,
 reorderable: !1,
 centerReorderContainer: !0,
+reorderComponents: [],
+pinnedReorderComponents: [],
 swipeableComponents: [],
 enableSwipe: !1,
 persistSwipeableItem: !1
@@ -1276,8 +1278,7 @@ ondragstart: "dragstart",
 ondrag: "drag",
 ondragfinish: "dragfinish",
 onup: "up",
-onholdpulse: "holdpulse",
-onflick: "flick"
+onholdpulse: "holdpulse"
 },
 rowHeight: 0,
 listTools: [ {
@@ -1292,6 +1293,10 @@ tag: null,
 name: "client"
 } ]
 }, {
+name: "holdingarea",
+allowHtml: !0,
+classes: "enyo-list-holdingarea"
+}, {
 name: "page0",
 allowHtml: !0,
 classes: "enyo-list-page"
@@ -1300,20 +1305,21 @@ name: "page1",
 allowHtml: !0,
 classes: "enyo-list-page"
 }, {
-name: "placeholder",
-classes: "enyo-list-placeholder"
+name: "placeholder"
 }, {
 name: "swipeableComponents",
-style: "position:absolute; display:block; top:-1000px; left:0px;"
+style: "position:absolute; display:block; top:-1000px; left:0;"
 } ]
 } ],
 reorderHoldTimeMS: 600,
 draggingRowIndex: -1,
+draggingRowNode: null,
 placeholderRowIndex: -1,
 dragToScrollThreshold: .1,
 prevScrollTop: 0,
 autoScrollTimeoutMS: 20,
 autoScrollTimeout: null,
+autoscrollPageY: 0,
 pinnedReorderMode: !1,
 initialPinPosition: -1,
 itemMoved: !1,
@@ -1328,10 +1334,9 @@ completeSwipeTimeout: null,
 completeSwipeDelayMS: 500,
 normalSwipeSpeedMS: 200,
 fastSwipeSpeedMS: 100,
-flicked: !0,
 percentageDraggedThreshold: .2,
 importProps: function(e) {
-e.reorderable && (this.touch = !0), this.inherited(arguments);
+e && e.reorderable && (this.touch = !0), this.inherited(arguments);
 },
 create: function() {
 this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged();
@@ -1392,16 +1397,15 @@ if (!this.getReorderable() || this.isReordering()) return;
 if (t.holdTime >= this.reorderHoldTimeMS && this.shouldStartReordering(e, t)) return t.preventDefault(), this.startReordering(t), !1;
 },
 dragstart: function(e, t) {
+if (this.isReordering()) return !0;
 if (this.isSwipeable()) return this.swipeDragStart(e, t);
 },
 drag: function(e, t) {
-return t.preventDefault(), this.shouldDoReorderDrag(t) ? (this.reorderDrag(t), !0) : this.shouldDoSwipeDrag() ? (this.swipeDrag(e, t), !0) : this.preventDragPropagation;
-},
-flick: function(e, t) {
-this.shouldDoSwipeFlick() && this.swipeFlick(e, t);
+if (this.shouldDoReorderDrag(t)) return t.preventDefault(), this.reorderDrag(t), !0;
+if (this.isSwipeable()) return t.preventDefault(), this.swipeDrag(e, t), !0;
 },
 dragfinish: function(e, t) {
-this.isReordering() && this.finishReordering(e, t), this.isSwipeable() && this.swipeDragFinish(e, t);
+this.isReordering() ? this.finishReordering(e, t) : this.isSwipeable() && this.swipeDragFinish(e, t);
 },
 up: function(e, t) {
 this.isReordering() && this.finishReordering(e, t);
@@ -1424,9 +1428,12 @@ this.pageHeights[e] = s, this.portSize += s - o;
 pageForRow: function(e) {
 return Math.floor(e / this.rowsPerPage);
 },
+preserveDraggingRowNode: function(e) {
+this.draggingRowNode && this.pageForRow(this.draggingRowIndex) === e && (this.$.holdingarea.hasNode().appendChild(this.draggingRowNode), this.draggingRowNode = null);
+},
 update: function(e) {
 var t = !1, n = this.positionToPageInfo(e), r = n.pos + this.scrollerHeight / 2, i = Math.floor(r / Math.max(n.height, this.scrollerHeight) + .5) + n.no, s = i % 2 === 0 ? i : i - 1;
-this.p0 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
+this.p0 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p0), this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p1), this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
 },
 getPageRowHeights: function(e) {
 var t = {}, n = e.hasNode().querySelectorAll("div[data-enyo-index]");
@@ -1498,7 +1505,7 @@ this.pageHeights = [], this.rowHeight = 0, this.updateMetrics();
 },
 scroll: function(e, t) {
 var n = this.inherited(arguments), r = this.getScrollTop();
-return this.lastPos === r ? n : (this.lastPos = r, this.update(r), this.shouldDoPinnedReorderScroll() && this.reorderScroll(e, t), n);
+return this.lastPos === r ? n : (this.lastPos = r, this.update(r), this.pinnedReorderMode && this.reorderScroll(e, t), n);
 },
 setScrollTop: function(e) {
 this.update(e), this.inherited(arguments), this.twiddle();
@@ -1583,7 +1590,7 @@ shouldStartReordering: function(e, t) {
 return !!this.getReorderable() && t.rowIndex >= 0 && !this.pinnedReorderMode && e === this.$.strategy && t.index >= 0 ? !0 : !1;
 },
 startReordering: function(e) {
-this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = this.pageForRow(e.rowIndex), this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
+this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.draggingRowNode = e.target, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = this.pageForRow(e.rowIndex), this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
 },
 buildReorderContainer: function() {
 this.$.reorderContainer.destroyClientControls();
@@ -1602,7 +1609,7 @@ content: e.innerHTML
 }).render();
 },
 centerReorderContainerOnPointer: function(e) {
-var t = this.getNodePosition(this.hasNode()), n = e.pageX - t.left - parseInt(this.$.reorderContainer.domStyles.width, 10) / 2, r = e.pageY - t.top + this.getScrollTop() - parseInt(this.$.reorderContainer.domStyles.height, 10) / 2;
+var t = enyo.dom.calcNodePosition(this.hasNode()), n = e.pageX - t.left - parseInt(this.$.reorderContainer.domStyles.width, 10) / 2, r = e.pageY - t.top + this.getScrollTop() - parseInt(this.$.reorderContainer.domStyles.height, 10) / 2;
 this.getStrategyKind() != "ScrollStrategy" && (n -= this.getScrollLeft(), r -= this.getScrollTop()), this.positionReorderContainer(n, r);
 },
 positionReorderContainer: function(e, t) {
@@ -1620,17 +1627,19 @@ shouldDoReorderDrag: function() {
 return !this.getReorderable() || this.draggingRowIndex < 0 || this.pinnedReorderMode ? !1 : !0;
 },
 reorderDrag: function(e) {
-this.positionReorderNode(e), this.checkForAutoScroll(e);
-var t = this.getRowIndexFromCoordinate(e.pageY);
+this.positionReorderNode(e), this.checkForAutoScroll(e), this.updatePlaceholderPosition(e.pageY);
+},
+updatePlaceholderPosition: function(e) {
+var t = this.getRowIndexFromCoordinate(e);
 t !== -1 && (t >= this.placeholderRowIndex ? this.movePlaceholderToIndex(Math.min(this.count, t + 1)) : this.movePlaceholderToIndex(t));
 },
 positionReorderNode: function(e) {
-var t = this.$.reorderContainer.hasNode().style, n = parseInt(t.left, 10) + e.ddx, r = parseInt(t.top, 10) + e.ddy;
+var t = this.$.reorderContainer.getBounds(), n = t.left + e.ddx, r = t.top + e.ddy;
 r = this.getStrategyKind() == "ScrollStrategy" ? r + (this.getScrollTop() - this.prevScrollTop) : r, this.$.reorderContainer.addStyles("top: " + r + "px ; left: " + n + "px"), this.prevScrollTop = this.getScrollTop();
 },
 checkForAutoScroll: function(e) {
-var t = this.getNodePosition(this.hasNode()), n = this.getBounds(), r;
-e.pageY - t.top < n.height * this.dragToScrollThreshold ? (r = 100 * (1 - (e.pageY - t.top) / (n.height * this.dragToScrollThreshold)), this.scrollDistance = -1 * r) : e.pageY - t.top > n.height * (1 - this.dragToScrollThreshold) ? (r = 100 * ((e.pageY - t.top - n.height * (1 - this.dragToScrollThreshold)) / (n.height - n.height * (1 - this.dragToScrollThreshold))), this.scrollDistance = 1 * r) : this.scrollDistance = 0, this.scrollDistance === 0 ? this.stopAutoScrolling() : this.autoScrollTimeout || this.startAutoScrolling();
+var t = enyo.dom.calcNodePosition(this.hasNode()), n = this.getBounds(), r;
+this.autoscrollPageY = e.pageY, e.pageY - t.top < n.height * this.dragToScrollThreshold ? (r = 100 * (1 - (e.pageY - t.top) / (n.height * this.dragToScrollThreshold)), this.scrollDistance = -1 * r) : e.pageY - t.top > n.height * (1 - this.dragToScrollThreshold) ? (r = 100 * ((e.pageY - t.top - n.height * (1 - this.dragToScrollThreshold)) / (n.height - n.height * (1 - this.dragToScrollThreshold))), this.scrollDistance = 1 * r) : this.scrollDistance = 0, this.scrollDistance === 0 ? this.stopAutoScrolling() : this.autoScrollTimeout || this.startAutoScrolling();
 },
 stopAutoScrolling: function() {
 this.autoScrollTimeout && (clearTimeout(this.autoScrollTimeout), this.autoScrollTimeout = null);
@@ -1642,7 +1651,7 @@ autoScroll: function() {
 this.scrollDistance === 0 ? this.stopAutoScrolling() : this.autoScrollTimeout || this.startAutoScrolling(), this.setScrollPosition(this.getScrollPosition() + this.scrollDistance), this.positionReorderNode({
 ddx: 0,
 ddy: 0
-});
+}), this.updatePlaceholderPosition(this.autoscrollPageY);
 },
 movePlaceholderToIndex: function(e) {
 var t, n;
@@ -1661,11 +1670,11 @@ this.positionReorderContainer(n, t);
 },
 completeFinishReordering: function(e) {
 this.completeReorderTimeout = null, this.placeholderRowIndex > this.draggingRowIndex && (this.placeholderRowIndex = Math.max(0, this.placeholderRowIndex - 1));
-if (this.draggingRowIndex == this.placeholderRowIndex && !this.pinnedReorderMode && !this.itemMoved) {
+if (this.draggingRowIndex == this.placeholderRowIndex && this.pinnedReorderComponents.length && !this.pinnedReorderMode && !this.itemMoved) {
 this.beginPinnedReorder(e);
 return;
 }
-this.removePlaceholderNode(), this.emptyAndHideReorderContainer(), this.positionReorderedNode(), this.reorderRows(e), this.resetReorderState(), this.refresh();
+this.removeDraggingRowNode(), this.removePlaceholderNode(), this.emptyAndHideReorderContainer(), this.positionReorderedNode(), this.pinnedReorderMode = !1, this.reorderRows(e), this.draggingRowIndex = this.placeholderRowIndex = -1, this.refresh();
 },
 beginPinnedReorder: function(e) {
 this.buildPinnedReorderContainer(), this.doSetupPinnedReorderComponents(enyo.mixin(e, {
@@ -1699,9 +1708,6 @@ if (!e.parentNode) return;
 var t = this.$.generator.fetchRowNode(this.placeholderRowIndex);
 t && t.parentNode.insertBefore(e, t), this.showNode(e);
 },
-resetReorderState: function() {
-this.draggingRowIndex = this.placeholderRowIndex = -1, this.pinnedReorderMode = !1;
-},
 updateListIndices: function() {
 if (this.shouldDoRefresh()) {
 this.refresh();
@@ -1730,10 +1736,7 @@ return Math.abs(this.initialPageNumber - this.currentPageNumber) > 1;
 },
 getNodeStyle: function(e) {
 var t = this.$.generator.fetchRowNode(e);
-if (!t) {
-this.log("No node - " + e);
-return;
-}
+if (!t) return;
 var n = this.getRelativeOffset(t, this.hasNode()), r = enyo.dom.getBounds(t);
 return {
 h: r.height,
@@ -1767,6 +1770,11 @@ return t.style.height = n.height + "px", t.style.width = n.width + "px", t;
 removePlaceholderNode: function() {
 this.removeNode(this.placeholderNode), this.placeholderNode = null;
 },
+removeDraggingRowNode: function() {
+this.draggingRowNode = null;
+var e = this.$.holdingarea.hasNode();
+e.innerHTML = "";
+},
 removeNode: function(e) {
 if (!e || !e.parentNode) return;
 e.parentNode.removeChild(e);
@@ -1775,8 +1783,8 @@ updatePageHeight: function(e) {
 if (e < 0) return;
 var t = this.pageForPageNumber(e, !0);
 if (t) {
-var n = t.getBounds().height;
-this.pageHeights[e] = n;
+var n = this.pageHeights[e], r = t.getBounds().height;
+this.pageHeights[e] = r, this.portSize += r - n;
 }
 },
 updatePagePositions: function(e) {
@@ -1795,12 +1803,15 @@ dropPinnedRow: function(e) {
 this.moveReorderedContainerToDroppedPosition(e), this.completeReorderTimeout = setTimeout(enyo.bind(this, this.completeFinishReordering, e), 100);
 return;
 },
+cancelPinnedMode: function(e) {
+this.placeholderRowIndex = this.draggingRowIndex, this.dropPinnedRow(e);
+},
 getRowIndexFromCoordinate: function(e) {
-var t = this.getScrollTop() + e - this.getNodePosition(this.hasNode()).top;
+var t = this.getScrollTop() + e - enyo.dom.calcNodePosition(this.hasNode()).top;
 if (t < 0) return -1;
 var n = this.positionToPageInfo(t), r = n.no == this.p0 ? this.p0RowBounds : this.p1RowBounds;
 if (!r) return this.count;
-var i = n.pos, s = enyo.dom.getBounds(this.placeholderNode).height, o = 0;
+var i = n.pos, s = this.placeholderNode ? enyo.dom.getBounds(this.placeholderNode).height : 0, o = 0;
 for (var u = n.startRow; u <= n.endRow; ++u) {
 if (u === this.placeholderRowIndex) {
 o += s;
@@ -1814,28 +1825,7 @@ if (o >= i) return u;
 return u;
 },
 getIndexPosition: function(e) {
-return this.getNodePosition(this.$.generator.fetchRowNode(e));
-},
-getNodePosition: function(e) {
-var t = e, n = 0, r = 0;
-while (e && e.offsetParent) n += e.offsetTop, r += e.offsetLeft, e = e.offsetParent;
-e = t;
-var i = enyo.dom.getCssTransformProp();
-while (e && e.getAttribute) {
-var s = enyo.dom.getComputedStyleValue(e, i);
-if (s && s != "none") {
-var o = s.lastIndexOf(","), u = s.lastIndexOf(",", o - 1);
-o >= 0 && u >= 0 && (n += parseFloat(s.substr(o + 1, s.length - o)), r += parseFloat(s.substr(u + 1, o - u)));
-}
-e = e.parentNode;
-}
-return {
-top: n,
-left: r
-};
-},
-cloneRowNode: function(e) {
-return this.$.generator.fetchRowNode(e).cloneNode(!0);
+return enyo.dom.calcNodePosition(this.$.generator.fetchRowNode(e));
 },
 setItemPosition: function(e, t) {
 var n = this.getNodeStyle(t), r = this.getStrategyKind() == "ScrollStrategy" ? n.top : n.top - this.getScrollTop(), i = "top:" + r + "px; left:" + n.left + "px;";
@@ -1845,13 +1835,8 @@ setItemBounds: function(e, t) {
 var n = this.getNodeStyle(t), r = "width:" + n.w + "px; height:" + n.h + "px;";
 e.addStyles(r);
 },
-shouldDoPinnedReorderScroll: function() {
-return !this.getReorderable() || !this.pinnedReorderMode ? !1 : !0;
-},
 reorderScroll: function(e, t) {
-this.getStrategyKind() == "ScrollStrategy" && this.$.reorderContainer.addStyles("top:" + (this.initialPinPosition + this.getScrollTop() - this.rowHeight) + "px;");
-var n = this.getRowIndexFromCoordinate(this.initialPinPosition);
-n != -1 && this.movePlaceholderToIndex(n);
+this.getStrategyKind() == "ScrollStrategy" && this.$.reorderContainer.addStyles("top:" + (this.initialPinPosition + this.getScrollTop() - this.rowHeight) + "px;"), this.updatePlaceholderPosition(this.initialPinPosition);
 },
 hideReorderingRow: function() {
 var e = this.hasNode().querySelector('[data-enyo-index="' + this.draggingRowIndex + '"]');
@@ -1860,51 +1845,31 @@ e && (this.hiddenNode = this.hideNode(e));
 isReordering: function() {
 return this.draggingRowIndex > -1;
 },
-swipeDragStart: function(e, t) {
-return t.index == null || t.vertical || this.draggingRowIndex > -1 ? !1 : (this.setSwipeDirection(t.xDirection), this.completeSwipeTimeout && this.completeSwipe(t), this.setFlicked(!1), this.setSwipeComplete(!1), this.swipeIndexChanged(t.index) && (this.clearSwipeables(), this.setSwipeIndex(t.index)), this.persistentItemVisible || this.startSwipe(t), this.draggedXDistance = 0, this.draggedYDistance = 0, !0);
+isSwiping: function() {
+return this.swipeIndex != null && !this.swipeComplete && this.swipeDirection != null;
 },
-shouldDoSwipeDrag: function() {
-return this.isSwipeable() && !this.isReordering();
+swipeDragStart: function(e, t) {
+return t.index == null || t.vertical ? !0 : (this.completeSwipeTimeout && this.completeSwipe(t), this.swipeComplete = !1, this.swipeIndex != t.index && (this.clearSwipeables(), this.swipeIndex = t.index), this.swipeDirection = t.xDirection, this.persistentItemVisible || this.startSwipe(t), this.draggedXDistance = 0, this.draggedYDistance = 0, !0);
 },
 swipeDrag: function(e, t) {
-return this.persistentItemVisible ? (this.dragPersistentItem(t), this.preventDragPropagation) : (this.dragSwipeableComponents(this.calcNewDragPosition(t.ddx)), this.draggedXDistance = t.dx, this.draggedYDistance = t.dy, this.preventDragPropagation);
-},
-shouldDoSwipeFlick: function() {
-return !this.isReordering();
-},
-swipeFlick: function(e, t) {
-if (t.index == null) return;
-return this.isSwipeable() ? Math.abs(t.xVelocity) < Math.abs(t.yVelocity) ? !1 : (this.setFlicked(!0), this.persistentItemVisible ? (this.flickPersistentItem(t), !0) : (this.swipe(this.normalSwipeSpeedMS), !0)) : !1;
+return this.persistentItemVisible ? (this.dragPersistentItem(t), this.preventDragPropagation) : this.isSwiping() ? (this.dragSwipeableComponents(this.calcNewDragPosition(t.ddx)), this.draggedXDistance = t.dx, this.draggedYDistance = t.dy, !0) : !1;
 },
 swipeDragFinish: function(e, t) {
-return this.wasFlicked() ? this.preventDragPropagation : (this.persistentItemVisible ? this.dragFinishPersistentItem(t) : this.calcPercentageDragged(this.draggedXDistance) > this.percentageDraggedThreshold ? this.swipe(this.fastSwipeSpeedMS) : this.backOutSwipe(t), this.preventDragPropagation);
+if (this.persistentItemVisible) this.dragFinishPersistentItem(t); else {
+if (!this.isSwiping()) return !1;
+var n = this.calcPercentageDragged(this.draggedXDistance);
+n > this.percentageDraggedThreshold && t.xDirection === this.swipeDirection ? this.swipe(this.fastSwipeSpeedMS) : this.backOutSwipe(t);
+}
+return this.preventDragPropagation;
 },
 isSwipeable: function() {
-return this.enableSwipe && this.$.swipeableComponents.controls.length !== 0;
+return this.enableSwipe && this.$.swipeableComponents.controls.length !== 0 && !this.isReordering() && !this.pinnedReorderMode;
 },
 positionSwipeableContainer: function(e, t) {
 var n = this.$.generator.fetchRowNode(e);
 if (!n) return;
 var r = this.getRelativeOffset(n, this.hasNode()), i = enyo.dom.getBounds(n), s = t == 1 ? -1 * i.width : i.width;
 this.$.swipeableComponents.addStyles("top: " + r.top + "px; left: " + s + "px; height: " + i.height + "px; width: " + i.width + "px;");
-},
-setSwipeDirection: function(e) {
-this.swipeDirection = e;
-},
-setFlicked: function(e) {
-this.flicked = e;
-},
-wasFlicked: function() {
-return this.flicked;
-},
-setSwipeComplete: function(e) {
-this.swipeComplete = e;
-},
-swipeIndexChanged: function(e) {
-return this.swipeIndex === null ? !0 : e === undefined ? !1 : e !== this.swipeIndex;
-},
-setSwipeIndex: function(e) {
-this.swipeIndex = e === undefined ? this.swipeIndex : e;
 },
 calcNewDragPosition: function(e) {
 var t = this.$.swipeableComponents.getBounds(), n = t.left, r = this.$.swipeableComponents.getBounds(), i = this.swipeDirection == 1 ? 0 : -1 * r.width, s = this.swipeDirection == 1 ? n + e > i ? i : n + e : n + e < i ? i : n + e;
@@ -1924,9 +1889,6 @@ dragFinishPersistentItem: function(e) {
 var t = this.calcPercentageDragged(e.dx) > .2, n = e.dx > 0 ? "right" : e.dx < 0 ? "left" : null;
 this.persistentItemOrigin == n ? t ? this.slideAwayItem() : this.bounceItem(e) : this.bounceItem(e);
 },
-flickPersistentItem: function(e) {
-e.xVelocity > 0 ? this.persistentItemOrigin == "left" ? this.bounceItem(e) : this.slideAwayItem() : e.xVelocity < 0 && (this.persistentItemOrigin == "right" ? this.bounceItem(e) : this.slideAwayItem());
-},
 setPersistentItemOrigin: function(e) {
 this.persistentItemOrigin = e == 1 ? "left" : "right";
 },
@@ -1934,11 +1896,11 @@ calcPercentageDragged: function(e) {
 return Math.abs(e / this.$.swipeableComponents.getBounds().width);
 },
 swipe: function(e) {
-this.setSwipeComplete(!0), this.animateSwipe(0, e);
+this.swipeComplete = !0, this.animateSwipe(0, e);
 },
 backOutSwipe: function(e) {
 var t = this.$.swipeableComponents.getBounds(), n = this.swipeDirection == 1 ? -1 * t.width : t.width;
-this.animateSwipe(n, this.fastSwipeSpeedMS), this.setSwipeDirection(null), this.setFlicked(!0);
+this.animateSwipe(n, this.fastSwipeSpeedMS), this.swipeDirection = null;
 },
 bounceItem: function(e) {
 var t = this.$.swipeableComponents.getBounds();
@@ -1955,7 +1917,7 @@ completeSwipe: function(e) {
 this.completeSwipeTimeout && (clearTimeout(this.completeSwipeTimeout), this.completeSwipeTimeout = null), this.getPersistSwipeableItem() ? this.persistentItemVisible = !0 : (this.$.swipeableComponents.setShowing(!1), this.swipeComplete && this.doSwipeComplete({
 index: this.swipeIndex,
 xDirection: this.swipeDirection
-})), this.setSwipeDirection(null);
+})), this.swipeIndex = null, this.swipeDirection = null;
 },
 animateSwipe: function(e, t) {
 var n = enyo.now(), r = 0, i = this.$.swipeableComponents, s = parseInt(i.domStyles.left, 10), o = e - s;
@@ -2113,6 +2075,10 @@ tag: null,
 name: "client"
 } ]
 }, {
+name: "holdingarea",
+allowHtml: !0,
+classes: "enyo-list-holdingarea"
+}, {
 name: "page0",
 allowHtml: !0,
 classes: "enyo-list-page"
@@ -2123,8 +2089,7 @@ classes: "enyo-list-page"
 }, {
 name: "belowClient"
 }, {
-name: "placeholder",
-classes: "enyo-list-placeholder"
+name: "placeholder"
 }, {
 name: "swipeableComponents",
 style: "position:absolute; display:block; top:-1000px; left:0px;"
@@ -3498,7 +3463,16 @@ this.applyStyle("background-image", "url(" + enyo.path.rewrite(this.src) + ")");
 enyo.kind({
 name: "onyx.Button",
 kind: "enyo.Button",
-classes: "onyx-button enyo-unselectable"
+classes: "onyx-button enyo-unselectable",
+create: function() {
+enyo.platform.firefoxOS && (this.handlers.ondown = "down", this.handlers.onleave = "leave"), this.inherited(arguments);
+},
+down: function(e, t) {
+this.addClass("pressed");
+},
+leave: function(e, t) {
+this.removeClass("pressed");
+}
 });
 
 // IconButton.js
@@ -3510,6 +3484,15 @@ published: {
 active: !1
 },
 classes: "onyx-icon-button",
+create: function() {
+enyo.platform.firefoxOS && (this.handlers.ondown = "down", this.handlers.onleave = "leave"), this.inherited(arguments);
+},
+down: function(e, t) {
+this.addClass("pressed");
+},
+leave: function(e, t) {
+this.removeClass("pressed");
+},
 rendered: function() {
 this.inherited(arguments), this.activeChanged();
 },
@@ -4858,7 +4841,7 @@ name: "knob",
 classes: "onyx-slider-knob"
 } ],
 create: function() {
-this.inherited(arguments), this.createComponents(this.moreComponents), this.valueChanged();
+this.inherited(arguments), enyo.platform.firefoxOS && (this.moreComponents[2].ondown = "down", this.moreComponents[2].onleave = "leave"), this.createComponents(this.moreComponents), this.valueChanged();
 },
 valueChanged: function() {
 this.value = this.clampValue(this.min, this.max, this.value);
@@ -4893,6 +4876,12 @@ if (this.tappable) {
 var n = this.calcKnobPosition(t);
 return n = this.increment ? this.calcIncrement(n) : n, this.tapped = !0, this.animateTo(n), !0;
 }
+},
+down: function(e, t) {
+this.addClass("pressed");
+},
+leave: function(e, t) {
+this.removeClass("pressed");
 },
 animateTo: function(e) {
 this.$.animator.play({
@@ -5557,7 +5546,7 @@ enyo.log("SQLitePluginTransaction.prototype.executeSql");
 var i, s, o;
 i = void 0, s = void 0, o = void 0, o = this, s = null, n && (s = function(e) {
 var t, r;
-return enyo.log("executeSql callback:" + JSON.stringify(e)), t = void 0, r = void 0, r = e, t = {
+return enyo.log("executeSql callback: " + e.length + " items"), t = void 0, r = void 0, r = e, t = {
 rows: {
 item: function(e) {
 return r[e];
@@ -5567,9 +5556,9 @@ length: r.length
 rowsAffected: r.rowsAffected,
 insertId: r.insertId || null
 }, n(o, t);
-}), i = null, r ? (enyo.log("error not NULL: " + e), i = function(e) {
+}), i = null, r ? i = function(e) {
 return r(o, e);
-}) : enyo.log("error NULL: " + e), enyo.log("executeSql - add_to_transaction: " + e), this.add_to_transaction(this.trans_id, e, t, s, i);
+} : enyo.log("error NULL: " + e), enyo.log("executeSql - add_to_transaction: " + e), this.add_to_transaction(this.trans_id, e, t, s, i);
 }, r.prototype.complete = function(e, t) {
 var n, r, i;
 enyo.log("SQLitePluginTransaction.prototype.complete");
@@ -8034,7 +8023,7 @@ database: "ext:checkbook-database",
 version: "1",
 name: "Checkbook DB",
 estimatedSize: 5242880,
-debug: !1
+debug: enyo.fetchAppInfo().id.match("beta")
 };
 if (enyo.platform.android || enyo.platform.androidChrome) window.openDatabase = window.sqlitePlugin.openDatabase;
 return e;
@@ -9352,7 +9341,7 @@ return this.$[n.name].show(), this.paneStack.push(n.name), !0;
 hidePanePopup: function(e) {
 enyo.isFunction(e.onFinishFollower) && e.onFinishFollower.apply(null, arguments), this.paneStack.splice(this.paneStack.indexOf(e.name), 1), e.destroy();
 var t = this.paneStack.length;
-t > 0 ? this.$[this.paneStack[t - 1]].show() : this.$.container.show(), this.waterfall("onresize", "onresize", this);
+t > 0 ? this.$[this.paneStack[t - 1]].show() : this.$.container.show(), this.resized();
 },
 viewAccount: function() {
 enyo.Panels.isScreenNarrow() && this.$.mainViews.setIndex(1);
@@ -11272,14 +11261,14 @@ updateAccountBalView: function(e, t, n) {
 Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("accounts", {
 bal_view: t
 }, {
-rowid: e
+acctId: e
 }), this._prepareModOptions(n));
 },
 updateAccountSorting: function(e, t, n) {
 Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getUpdate("accounts", {
 sort: t
 }, {
-rowid: e
+acctId: e
 }), this._prepareModOptions(n));
 },
 deleteAccount: function(e, t) {
@@ -11389,7 +11378,7 @@ t = GTS.Object.isNumber(t) ? t : 100, n = GTS.Object.isNumber(n) ? n : 0, n <= 0
 var r = new Date, i = Date.parse(r);
 r.setHours(23, 59, 59, 999), r = Date.parse(r);
 var s = new GTS.databaseQuery({
-sql: "SELECT *, ( SELECT qry FROM acctTrsnSortOptn WHERE sortId = IFNULL( accounts.sort, 1) ) AS sortQry, IFNULL( ( SELECT COUNT( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS itemCount, IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ), 'icon_2.png' ) AS acctCategoryIcon, ( SELECT accountCategories.color FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCategoryColor, ( SELECT accountCategories.catOrder FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCatOrder, ( SELECT accountCategories.rowid FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCatId, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) ), 0 ) AS balance0, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) AND transactions.cleared = 1 ), 0 ) AS balance1, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND transactions.cleared = 0 ), 0 ) AS balance3, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS balance2 FROM accounts ORDER BY " + accountSortOptions[Checkbook.globals.prefs.custom_sort].query + " LIMIT ? OFFSET ?",
+sql: "SELECT *, ( SELECT qry FROM acctTrsnSortOptn WHERE sortId = IFNULL( accounts.sort, 1 ) ) AS sortQry, IFNULL( ( SELECT COUNT( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS itemCount, IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ), 'icon_2.png' ) AS acctCategoryIcon, ( SELECT accountCategories.color FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCategoryColor, ( SELECT accountCategories.catOrder FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCatOrder, ( SELECT accountCategories.rowid FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCatId, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) ), 0 ) AS balance0, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) AND transactions.cleared = 1 ), 0 ) AS balance1, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND transactions.cleared = 0 ), 0 ) AS balance3, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS balance2 FROM accounts ORDER BY " + accountSortOptions[Checkbook.globals.prefs.custom_sort].query + " LIMIT ? OFFSET ?",
 values: [ i, r, i, r, t, n ]
 });
 Checkbook.globals.gts_db.query(s, {
@@ -11413,7 +11402,7 @@ classes: "margin-right img-icon"
 }, {
 content: s.acctName
 } ]
-}, this.accountObject.accounts[n + i] = enyo.clone(s);
+}, this.accountObject.accounts[n + i] = enyo.clone(s), this.accountObject.accounts[n + i].sort = parseInt(this.accountObject.accounts[n + i].sort);
 }
 if (t > r.length) {
 while (this.accountObject.processingQueue.length > 0) {
@@ -12073,12 +12062,16 @@ name: "transactionSorting",
 kind: "GTS.SelectorBar",
 classes: "bordered",
 label: "Sorting",
+maxHeight: 350,
+labelWidth: "150px",
 onChange: "transactionSortingUpdateLabel"
 }, {
 name: "accountDisplay",
 kind: "GTS.SelectorBar",
 classes: "bordered",
 label: "Display",
+maxHeight: 350,
+labelWidth: "150px",
 onChange: "accountDisplayUpdateLabel",
 value: 0,
 choices: [ {
@@ -12096,6 +12089,8 @@ name: "balance",
 kind: "GTS.SelectorBar",
 classes: "bordered",
 label: "Balance",
+maxHeight: 350,
+labelWidth: "150px",
 onChange: "balanceUpdateLabel",
 value: 0,
 choices: [ {
@@ -12656,7 +12651,7 @@ var n = t.index, r = t.item, i = this.categories[n];
 if (i) {
 r.$.icon.setSrc("assets/" + i.icon), r.$.name.setContent(i.name);
 for (var s = 0; s < appColors.length; s++) r.$.item.removeClass(appColors[s].name);
-return r.$.item.addClass(i.color), n > 0 ? r.$.up.show() : r.$.up.hide(), n < this.categories.length - 1 ? r.$.down.show() : r.$.down.hide(), !0;
+return Checkbook.globals.prefs.dispColor === 1 && r.$.item.addClass(i.color), n > 0 ? r.$.up.show() : r.$.up.hide(), n < this.categories.length - 1 ? r.$.down.show() : r.$.down.hide(), !0;
 }
 },
 createNew: function(e, t) {
@@ -13489,7 +13484,8 @@ components: [ {
 classes: "box-flex-1",
 components: [ {
 name: "desc",
-classes: "description text-ellipsis bold"
+classes: "description text-ellipsis bold",
+allowHtml: !0
 }, {
 name: "time",
 classes: "date smaller"
@@ -15005,69 +15001,73 @@ return delete e.rObj, delete e.maxItemId, delete e.maxRepeatId, r;
 updateSeriesTransactions: function(e, t) {
 var n = new Date, r = new Date(n.getFullYear(), n.getMonth(), n.getDate() + Checkbook.globals.prefs.seriesDayLimit, 23, 59, 59, 999);
 e = e || -1, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
-sql: "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, * FROM repeats WHERE ( rep_acctId = ? " + (e < 0 ? "OR 1 = 1 " : "") + ") " + "AND lastOccurrence < ? " + "AND ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date > ? ) < ? " + "AND ( " + "( " + "endingCondition = 'none' " + ") OR ( " + "endingCondition = 'date' " + "AND endDate != '' " + "AND endDate > lastOccurrence " + ") OR ( " + "endingCondition = 'occurences' " + "AND endCount != '' " + "AND endCount > currCount " + ") " + ") " + "AND terminated != 1",
-values: [ e, Date.parse(r), Date.parse(n), Checkbook.globals.prefs.seriesCountLimit ]
+sql: "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, *, ( ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NULL AND transactions.date > ? ) +  ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NOT NULL AND transactions.date > ? ) / 2 ) AS futureCount FROM repeats WHERE ( rep_acctId = ? " + (e < 0 ? "OR 1 = 1 " : "") + ") " + "AND lastOccurrence < ? " + "AND futureCount < ? " + "AND ( " + "( " + "endingCondition = 'none' " + ") OR ( " + "endingCondition = 'date' " + "AND endDate != '' " + "AND endDate > lastOccurrence " + ") OR ( " + "endingCondition = 'occurences' " + "AND endCount != '' " + "AND endCount > currCount " + ") " + ") " + "AND terminated != 1",
+values: [ Date.parse(n), Date.parse(n), e, Date.parse(r), Checkbook.globals.prefs.seriesCountLimit ]
 }), {
 onSuccess: enyo.bind(this, this._updateSeriesTransactionsHandler, t),
 onError: t.onError
 });
 },
 _updateSeriesTransactionsHandler: function(e, t) {
-t.length > 0 ? (repeatArray[0].maxItemId = parseInt(repeatArray[0].maxItemId) + 1, Checkbook.globals.gts_db.queries(this.generateSeriesSQL(t), e)) : enyo.isFunction(e.onSuccess) && e.onSuccess();
+if (t.length > 0) {
+var n = parseInt(t[0].maxItemId) + 1;
+Checkbook.globals.gts_db.queries(this.generateSeriesSQL(t, n), e);
+} else enyo.isFunction(e.onSuccess) && e.onSuccess();
 },
-generateSeriesSQL: function(e) {
-var t = [];
+generateSeriesSQL: function(e, t) {
+var n = [];
 if (e.length > 0) {
-var n = e[0].maxItemId, r = new Date, i, s, o, u, a, f;
-for (var l = 0; l < e.length; l++) {
-s = new Date(parseInt(e[l].origDate)), o = new Date(parseInt(e[l].lastOccurrence)), u = new Date(parseInt(e[l].lastOccurrence)), a = e[l].currCount;
-var c = enyo.json.parse(e[l].rep_category), h = enyo.json.parse(e[l].daysOfWeek);
-while (Math.floor((u - o) / 864e5) < Checkbook.globals.prefs.seriesDayLimit && a - e[l].currCount < Checkbook.globals.prefs.seriesCountLimit && (e[l]["endingCondition"] == "none" || e[l]["endingCondition"] == "date" && e[l].endDate && Date.parse(u) <= e[l].endDate || e[l]["endingCondition"] == "occurences" && e[l].endCount && a <= e[l].endCount)) {
-if (e[l]["frequency"] == "daily") u.setDate(u.getDate() + 1 * e[l].itemSpan); else if (e[l]["frequency"] == "weekly") {
-var p = h.indexOf(u.getDay());
-if (p < 0 || p + 1 >= h.length) {
+var t = t || e[0].maxItemId, r = new Date, i, s, o, u, a, f, l;
+for (var c = 0; c < e.length; c++) {
+s = new Date(parseInt(e[c].origDate)), o = new Date(parseInt(e[c].lastOccurrence)), u = new Date(parseInt(e[c].lastOccurrence)), a = e[c].currCount, f = e[c].futureCount;
+var h = enyo.json.parse(e[c].rep_category), p = enyo.json.parse(e[c].daysOfWeek);
+this.log(e[c].testCount);
+while (Math.floor((u - o) / 864e5) < Checkbook.globals.prefs.seriesDayLimit && f < Checkbook.globals.prefs.seriesCountLimit && (e[c]["endingCondition"] == "none" || e[c]["endingCondition"] == "date" && e[c].endDate && Date.parse(u) <= e[c].endDate || e[c]["endingCondition"] == "occurences" && e[c].endCount && a <= e[c].endCount)) {
+if (e[c]["frequency"] == "daily") u.setDate(u.getDate() + 1 * e[c].itemSpan); else if (e[c]["frequency"] == "weekly") {
+var d = p.indexOf(u.getDay());
+if (d < 0 || d + 1 >= p.length) {
 while (u.getDay() > 0) u.setDate(u.getDate() + 1);
-while (u.getDay() < 7 && u.getDay() != h[0]) u.setDate(u.getDate() + 1);
-u.setDate(u.getDate() + 7 * (e[l].itemSpan - 1));
-} else u.setDate(u.getDate() + (h[p + 1] - h[p]));
-} else if (e[l]["frequency"] == "monthly") {
-var d = Math.max(u.getDate(), s.getDate());
-u.setDate(1), u.setMonth(u.getMonth() + 1 * e[l].itemSpan), u.setDate(Math.min(d, u.daysInMonth()));
-} else e[l]["frequency"] == "yearly" && u.setYear(u.getFullYear() + 1 * e[l].itemSpan);
+while (u.getDay() < 7 && u.getDay() != p[0]) u.setDate(u.getDate() + 1);
+u.setDate(u.getDate() + 7 * (e[c].itemSpan - 1));
+} else u.setDate(u.getDate() + (p[d + 1] - p[d]));
+} else if (e[c]["frequency"] == "monthly") {
+var v = Math.max(u.getDate(), s.getDate());
+u.setDate(1), u.setMonth(u.getMonth() + 1 * e[c].itemSpan), u.setDate(Math.min(v, u.daysInMonth()));
+} else e[c]["frequency"] == "yearly" && u.setYear(u.getFullYear() + 1 * e[c].itemSpan);
 i = {
-itemId: n,
-account: e[l].rep_acctId,
-repeatId: e[l].repeatId,
-desc: e[l].rep_desc,
-note: e[l].rep_note,
+itemId: t,
+account: e[c].rep_acctId,
+repeatId: e[c].repeatId,
+desc: e[c].rep_desc,
+note: e[c].rep_note,
 date: u,
-amount: e[l].rep_amount,
+amount: e[c].rep_amount,
 amount_old: "NOT_A_VALUE",
 linkedRecord: -1,
-linkedAccount: e[l].rep_linkedAcctId,
+linkedAccount: e[c].rep_linkedAcctId,
 cleared: !1,
 checkNum: "",
-category: c,
+category: h,
 category2: "",
 rObj: !1,
-autoTransfer: e[l].rep_autoTrsnLink,
-autoTransferLink: e[l].rep_autoTrsnLink > 0 ? e[l].rep_autoTrsnLinkAcct : -1
-}, GTS.Object.validNumber(e[l].rep_linkedAcctId) && e[l].rep_linkedAcctId >= 0 ? f = "transfer" : e[l].rep_amount < 0 ? f = "expense" : f = "income", t = t.concat(Checkbook.globals.transactionManager.generateInsertTransactionSQL({
+autoTransfer: e[c].rep_autoTrsnLink,
+autoTransferLink: e[c].rep_autoTrsnLink > 0 ? e[c].rep_autoTrsnLinkAcct : -1
+}, GTS.Object.validNumber(e[c].rep_linkedAcctId) && e[c].rep_linkedAcctId >= 0 ? l = "transfer" : e[c].rep_amount < 0 ? l = "expense" : l = "income", n = n.concat(Checkbook.globals.transactionManager.generateInsertTransactionSQL({
 data: i,
-type: f
-})), a++, n += GTS.Object.validNumber(i.linkedAccount) && i.linkedAccount >= 0 ? 2 : 1;
+type: l
+})), a++, f++, t += GTS.Object.validNumber(i.linkedAccount) && i.linkedAccount >= 0 ? 2 : 1;
 }
-t.push(Checkbook.globals.gts_db.getUpdate("repeats", {
+n.push(Checkbook.globals.gts_db.getUpdate("repeats", {
 lastOccurrence: Date.parse(u),
 currCount: a,
 lastUpdated: Date.parse(new Date)
 }, {
-repeatId: e[l].repeatId
+repeatId: e[c].repeatId
 }));
 }
-t.length > 0 && Checkbook.globals.accountManager.updateAccountModTime();
+n.length > 0 && Checkbook.globals.accountManager.updateAccountModTime();
 }
-return t;
+return n;
 },
 setTermination: function(e, t, n) {
 Checkbook.globals.gts_db.queries(Checkbook.globals.gts_db.getUpdate("repeats", {
