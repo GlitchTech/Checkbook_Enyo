@@ -67,7 +67,8 @@ enyo.kind( {
 										{
 											//long desc can push down amount & cleared fields
 											name: "desc",
-											classes: "description text-ellipsis bold"
+											classes: "description text-ellipsis bold",
+											allowHtml: true
 										}, {
 											name: "time",
 											classes: "date smaller"
