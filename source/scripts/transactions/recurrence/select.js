@@ -18,7 +18,7 @@ enyo.kind( {
 	components: [
 		{
 			name: "recurrenceNode",
-			kind: "GTS.SelectorBar",
+			kind: "gts.SelectorBar",
 			label: "Recurrence",
 
 			onChange: "recurrenceNodeChanged",
@@ -51,7 +51,7 @@ enyo.kind( {
 									classes: "margin-half-left margin-half-right"
 								}, {
 									name: "itemSpan",
-									kind: "GTS.IntegerPicker",
+									kind: "gts.IntegerPicker",
 
 									min: 1,
 									max: 64,
@@ -71,7 +71,7 @@ enyo.kind( {
 					]
 				}, {
 					name: "endingCondition",
-					kind: "GTS.SelectorBar",
+					kind: "gts.SelectorBar",
 					label: "Ending Condition",
 
 					classes: "bordered",
@@ -116,7 +116,7 @@ enyo.kind( {
 									classes: "margin-half-left margin-half-right"
 								}, {
 									name: "endingCount",
-									kind: "GTS.IntegerPicker",
+									kind: "gts.IntegerPicker",
 
 									min: 1,
 									max: 100,
@@ -402,13 +402,13 @@ enyo.kind( {
 			this.$['endingDateWrapper'].createComponent(
 					{
 						name: "endingDate",
-						kind: "GTS.DatePicker",
+						kind: "gts.DatePicker",
 						onSelect: "sendSummary",
 
 						components: [
 							{
 								name: "endingTime",
-								kind: "GTS.TimePicker",
+								kind: "gts.TimePicker",
 
 								label: "Time",
 
@@ -442,7 +442,7 @@ enyo.kind( {
 							]
 						}, {
 							name: "endingTime",
-							kind: "GTS.TimePicker",
+							kind: "gts.TimePicker",
 
 							label: "Time",
 

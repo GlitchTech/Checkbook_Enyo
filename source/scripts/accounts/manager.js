@@ -7,7 +7,7 @@
  *
  * @requires webOS enyo
  * @requires Prototype JS
- * @requires GTS.database to exist in Checkbook.globals.gts_db
+ * @requires gts.database to exist in Checkbook.globals.gts_db
  * @requires Checkbook.encrypt
  */
 enyo.kind({
@@ -57,7 +57,7 @@ enyo.kind({
 
 			this.log( "creating database object." );
 
-			var db = new GTS.database( getDBArgs() );
+			var db = new gts.database( getDBArgs() );
 		}
 
 		// Setup listing of bound methods
@@ -95,7 +95,7 @@ enyo.kind({
 	 */
 	_createAccountFollower: function( data, options, code ) {
 
-		if( data['auto_savings'] == 0 || !GTS.Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
+		if( data['auto_savings'] == 0 || !gts.Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
 			//Linking turned off || No account linked
 
 			data['auto_savings'] = 0;
@@ -156,7 +156,7 @@ enyo.kind({
 	 */
 	_updateAccountFollower: function( data, acctId, pinChanged, options, code ) {
 
-		if( data['auto_savings'] == 0 || !GTS.Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
+		if( data['auto_savings'] == 0 || !gts.Object.isNumber( data['auto_savings_link'] ) || data['auto_savings_link'] < 0 ) {
 			//Linking turned off || No account linked
 
 			data['auto_savings'] = 0;
@@ -323,7 +323,7 @@ enyo.kind({
 
 			if( enyo.isFunction( options['onSuccess'] ) ) {
 
-				if( GTS.Object.isNumber( this.accountObject.defaultAccountIndex ) && this.accountObject.defaultAccountIndex >= 0 ) {
+				if( gts.Object.isNumber( this.accountObject.defaultAccountIndex ) && this.accountObject.defaultAccountIndex >= 0 ) {
 
 					options['onSuccess']( this.accountObject.accounts[this.accountObject.defaultAccountIndex] );
 				} else {
@@ -421,7 +421,7 @@ enyo.kind({
 		today.setHours( 23, 59, 59, 999 );
 		today = Date.parse( today );
 
-		var qryAccountBalance = new GTS.databaseQuery(
+		var qryAccountBalance = new gts.databaseQuery(
 				{
 					"sql": "SELECT " +
 
@@ -507,8 +507,8 @@ enyo.kind({
 				if( !options['showHidden'] ) {
 					//Don't return hidden accounts
 
-					offset = ( GTS.Object.isNumber( offset ) ? offset : 0 );
-					limit = ( GTS.Object.isNumber( limit ) ? limit : this.accountObject.accounts.length );
+					offset = ( gts.Object.isNumber( offset ) ? offset : 0 );
+					limit = ( gts.Object.isNumber( limit ) ? limit : this.accountObject.accounts.length );
 
 					//hidden == 2
 					for( var i = offset; i < limit; i++ ) {
@@ -520,7 +520,7 @@ enyo.kind({
 					}
 				} else {
 
-					data = this.accountObject.accounts.slice( ( GTS.Object.isNumber( offset ) ? offset : 0 ), limit );
+					data = this.accountObject.accounts.slice( ( gts.Object.isNumber( offset ) ? offset : 0 ), limit );
 				}
 
 				options['onSuccess']( data );
@@ -558,7 +558,7 @@ enyo.kind({
 
 			if( enyo.isFunction( options['onSuccess'] ) ) {
 
-				options['onSuccess']( this.accountObject.accountsList.slice( ( GTS.Object.isNumber( offset ) ? offset : 0 ), limit ) );
+				options['onSuccess']( this.accountObject.accountsList.slice( ( gts.Object.isNumber( offset ) ? offset : 0 ), limit ) );
 			}
 		} else {
 
@@ -590,7 +590,7 @@ enyo.kind({
 		today.setHours( 23, 59, 59, 999 );
 		today = Date.parse( today );
 
-		var qryAccounts = new GTS.databaseQuery(
+		var qryAccounts = new gts.databaseQuery(
 				{
 					"sql": "SELECT " +
 							//0: Available
@@ -672,8 +672,8 @@ enyo.kind({
 	 */
 	_buildAccountObjects: function( onError, limit, offset ) {
 
-		limit = ( GTS.Object.isNumber( limit ) ? limit : 100 );
-		offset = ( GTS.Object.isNumber( offset ) ? offset : 0 );
+		limit = ( gts.Object.isNumber( limit ) ? limit : 100 );
+		offset = ( gts.Object.isNumber( offset ) ? offset : 0 );
 
 		if( offset <= 0 ) {
 
@@ -688,7 +688,7 @@ enyo.kind({
 		today.setHours( 23, 59, 59, 999 );
 		today = Date.parse( today );
 
-		var qryAccounts = new GTS.databaseQuery(
+		var qryAccounts = new gts.databaseQuery(
 				{
 					"sql": "SELECT *, " +
 							//Transaction Sorting

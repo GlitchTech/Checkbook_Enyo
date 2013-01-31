@@ -4,7 +4,7 @@
  * Checkbook.accountCategory.manager ( Component )
  *
  * Control system for managing account categories. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind({
 
@@ -20,7 +20,7 @@ enyo.kind({
 
 			this.log( "creating database object." );
 
-			var db = new GTS.database( getDBArgs() );
+			var db = new gts.database( getDBArgs() );
 		}
 	},
 
@@ -59,7 +59,7 @@ enyo.kind({
 
 		//rowid, name, catOrder, icon, color, view_status
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							"sql": "SELECT COUNT( name ) AS nameCount FROM accountCategories WHERE name LIKE ? AND rowid != ?;",
 							"values": [ name, id ]
@@ -113,7 +113,7 @@ enyo.kind({
 		Checkbook.globals.accountManager.updateAccountModTime();
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							'sql': "UPDATE accountCategories SET catOrder = ( SELECT IFNULL( MAX( catOrder ) + 1, 0 ) FROM accountCategories LIMIT 1 ) WHERE rowid = ?;",
 							'values': [ Checkbook.globals.gts_db.lastInsertRowId ]

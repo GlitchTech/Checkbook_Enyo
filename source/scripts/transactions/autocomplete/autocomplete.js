@@ -17,7 +17,7 @@ enyo.kind( {
 	components:[
 		{
 			name: "ac",
-			kind: "GTS.AutoComplete",
+			kind: "gts.AutoComplete",
 
 			onValueSelected: "handleSuggestion",
 			onDataRequested: "fetchData",
@@ -52,7 +52,7 @@ enyo.kind( {
 		}
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							"sql": "SELECT " +
 										"DISTINCT desc " +
@@ -86,7 +86,7 @@ enyo.kind( {
 	handleSuggestion: function( inSender, inEvent ) {
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							"sql": "SELECT " +
 									"( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct, " +
@@ -124,7 +124,7 @@ enyo.kind( {
 					"data": true,
 					"desc": desc,
 					"linkedAccount": results[0]['linkedAccount'],
-					"category": Checkbook.globals.transactionManager.parseCategoryDB( GTS.String.dirtyString( results[0]['category'] ), GTS.String.dirtyString( results[0]['category2'] ) )
+					"category": Checkbook.globals.transactionManager.parseCategoryDB( gts.String.dirtyString( results[0]['category'] ), gts.String.dirtyString( results[0]['category2'] ) )
 				};
 		}
 

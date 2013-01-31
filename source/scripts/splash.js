@@ -126,7 +126,7 @@ enyo.kind({
 
 		if( !Checkbook.globals.gts_db ) {
 
-			Checkbook.globals.gts_db = new GTS.database( getDBArgs() );
+			Checkbook.globals.gts_db = new gts.database( getDBArgs() );
 
 			this.log( "Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created." );
 		}

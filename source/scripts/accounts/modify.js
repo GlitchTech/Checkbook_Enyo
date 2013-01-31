@@ -81,7 +81,7 @@ enyo.kind( {
 							]
 						}, {
 							name: "accountCategory",
-							kind: "GTS.SelectorBar",
+							kind: "gts.SelectorBar",
 							classes: "custom-background bordered",
 
 							label: "Account Category",
@@ -89,7 +89,7 @@ enyo.kind( {
 							onChange: "categoryChanged"
 						}, {
 							name: "defaultAccount",
-							kind: "GTS.ToggleBar",
+							kind: "gts.ToggleBar",
 							classes: "bordered",
 
 							label: "Default Account",
@@ -100,13 +100,13 @@ enyo.kind( {
 
 						{
 							name: "securityOptionDrawer",
-							kind: "GTS.DividerDrawer",
+							kind: "gts.DividerDrawer",
 							caption: "Security Options",
 							open: true,
 							components: [
 								{
 									name: "freezeAccount",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Freeze Internal Transactions",
@@ -115,7 +115,7 @@ enyo.kind( {
 									offContent: "No"
 								}, {
 									name: "pinLock",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "PIN Lock",
@@ -159,13 +159,13 @@ enyo.kind( {
 						},
 
 						{
-							kind: "GTS.DividerDrawer",
+							kind: "gts.DividerDrawer",
 							caption: "Display Options",
 							open: true,
 							components: [
 								{
 									name: "transactionSorting",
-									kind: "GTS.SelectorBar",
+									kind: "gts.SelectorBar",
 									classes: "bordered",
 
 									label: "Sorting",
@@ -175,7 +175,7 @@ enyo.kind( {
 									onChange: "transactionSortingUpdateLabel"
 								}, {
 									name: "accountDisplay",
-									kind: "GTS.SelectorBar",
+									kind: "gts.SelectorBar",
 									classes: "bordered",
 
 									label: "Display",
@@ -198,7 +198,7 @@ enyo.kind( {
 									]
 								}, {
 									name: "balance",
-									kind: "GTS.SelectorBar",
+									kind: "gts.SelectorBar",
 									classes: "bordered",
 
 									label: "Balance",
@@ -224,7 +224,7 @@ enyo.kind( {
 									]
 								}, {
 									name: "showTransTime",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Show Transaction Time",
@@ -234,7 +234,7 @@ enyo.kind( {
 									value: true
 								}, {
 									name: "showRunningBal",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Show Running Balance",
@@ -243,7 +243,7 @@ enyo.kind( {
 									offContent: "No"
 								}, {
 									name: "hideTransNotes",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Hide Transaction Notes",
@@ -255,13 +255,13 @@ enyo.kind( {
 						},
 
 						{
-							kind: "GTS.DividerDrawer",
+							kind: "gts.DividerDrawer",
 							caption: "Transaction Options",
 							open: true,
 							components: [
 								{
 									name: "descriptionMultilineMode",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Description Multiline Mode",
@@ -270,7 +270,7 @@ enyo.kind( {
 									offContent: "No"
 								}, {
 									name: "autoComplete",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Use Auto-Complete",
@@ -280,7 +280,7 @@ enyo.kind( {
 									value: true
 								}, {
 									name: "atmMode",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Use ATM Mode",
@@ -290,7 +290,7 @@ enyo.kind( {
 									value: true
 								}, {
 									name: "autoTransfer",
-									kind: "GTS.SelectorBar",
+									kind: "gts.SelectorBar",
 									classes: "bordered",
 
 									label: "Auto Transfer",
@@ -314,7 +314,7 @@ enyo.kind( {
 									components: [
 										{
 											name: "autoTransferLink",
-											kind: "GTS.SelectorBar",
+											kind: "gts.SelectorBar",
 
 											label: "Transfer to...",
 											classes: "iconListSelector"
@@ -322,7 +322,7 @@ enyo.kind( {
 									]
 								}, {
 									name: "expenseCategories",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Add Expense Categories",
@@ -332,7 +332,7 @@ enyo.kind( {
 									value: true
 								}, {
 									name: "checkNumber",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Add Check Number Field",
@@ -341,7 +341,7 @@ enyo.kind( {
 									offContent: "No"
 								}, {
 									name: "payeeField",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Add Payee Field",
@@ -353,7 +353,7 @@ enyo.kind( {
 									showing: false,
 
 									name: "hideCleared",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 									classes: "bordered",
 
 									label: "Hide cleared transactions",

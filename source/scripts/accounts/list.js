@@ -4,7 +4,7 @@
  * Checkbook.accounts.list ( Component )
  *
  * Account list display system
- *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *	Requires gts.database to exist in Checkbook.globals.gts_db
  *	Requires Checkbook.accounts.manager
  */
 
@@ -55,7 +55,7 @@ enyo.kind({
 			components: [
 				{
 					name: "accountItem",
-					kind: "GTS.Item",
+					kind: "gts.Item",
 
 					classes: "bordered account-item",
 
@@ -67,7 +67,7 @@ enyo.kind({
 					components: [
 						{
 							name: "catDivider",
-							kind: "GTS.Divider",
+							kind: "gts.Divider",
 							ontap: "dividerTapped",
 							useFittable: false
 						}, {
@@ -356,7 +356,7 @@ enyo.kind({
 
 				Checkbook.globals.prefs['custom_sort'] = 1;
 
-				qryOrder.push( new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ) );
+				qryOrder.push( new gts.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ) );
 			}
 
 			Checkbook.globals.gts_db.queries( qryOrder );
@@ -538,7 +538,7 @@ enyo.kind({
 
 			if( acctIndex >= 0 ) {
 
-				if( typeof( inEvent['accountBal'] ) !== "undefined" && GTS.Object.size( inEvent['accountBal'] ) > 0 ) {
+				if( typeof( inEvent['accountBal'] ) !== "undefined" && gts.Object.size( inEvent['accountBal'] ) > 0 ) {
 
 					this.accountBalanceChangedHandler( acctIndex, inEvent['accountBal'] );
 				} else {

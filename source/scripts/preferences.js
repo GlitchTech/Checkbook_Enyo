@@ -59,7 +59,7 @@ enyo.kind({
 									content: "Program Security"
 								}, {
 									name: "pinLock",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 
 									label: "PIN Lock",
 
@@ -110,7 +110,7 @@ enyo.kind({
 									content: "General Options"
 								}, {
 									name: "transPreview",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 
 									label: "Transaction Preview",
 									sublabel: "Show preview of a tapped transaction.",
@@ -121,7 +121,7 @@ enyo.kind({
 									onChange: "updateTransPreview"
 								}, {
 									name: "dispColor",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 
 									label: "Account Colors",
 									sublabel: "Add color in some areas based on account categories.",
@@ -132,7 +132,7 @@ enyo.kind({
 									onChange: "updateDispColor"
 								}, {
 									name: "alwaysFullCalendar",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 
 									label: "Full Calendar",
 									sublabel: "Set modify transaction system to always use a full calendar instead of a date picker for small screens.",
@@ -143,7 +143,7 @@ enyo.kind({
 									onChange: "updateAlwaysFullCalendar"
 								}, {
 									name: "updateNotice",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 
 									label: "System Notifications",
 									sublabel: "Recieve in-app notices of updates and other important news.",
@@ -154,7 +154,7 @@ enyo.kind({
 									onChange: "updateUpdateNotice"
 								}, {
 									name: "errorReporting",
-									kind: "GTS.ToggleBar",
+									kind: "gts.ToggleBar",
 
 									label: "Error Reporting",
 									sublabel: "Report errors to GlitchTech Science",
@@ -198,7 +198,7 @@ enyo.kind({
 								}, {
 									*/
 									name: "defaultAccount",
-									kind: "GTS.SelectorBar",
+									kind: "gts.SelectorBar",
 
 									disabled: true,
 
@@ -232,7 +232,7 @@ enyo.kind({
 									content: "Recurrence Options"
 								}, {
 									name: "seriesCountLimit",
-									kind: "GTS.IntegerPickerBar",
+									kind: "gts.IntegerPickerBar",
 
 									min: 1,
 									max: 15,
@@ -243,7 +243,7 @@ enyo.kind({
 									onChange: "updateSeriesCountLimit"
 								}, {
 									name: "seriesDayLimit",
-									kind: "GTS.IntegerPickerBar",
+									kind: "gts.IntegerPickerBar",
 
 									min: 5,
 									max: 150,
@@ -680,7 +680,7 @@ enyo.kind({
 
 		this.createComponent( {
 				name: "wipeProgress",
-				kind: "GTS.ProgressDialog",
+				kind: "gts.ProgressDialog",
 				animateProgress: true
 			});
 

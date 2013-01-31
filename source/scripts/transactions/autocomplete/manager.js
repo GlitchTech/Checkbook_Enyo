@@ -4,7 +4,7 @@
  * Checkbook.autocompleteprefs.manager ( Component )
  *
  * Control system for managing custom transaction suggestions. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind( {
 	name: "Checkbook.autocompleteprefs.manager",
@@ -19,7 +19,7 @@ enyo.kind( {
 
 			this.log( "creating database object." );
 
-			var db = new GTS.database( getDBArgs() );
+			var db = new gts.database( getDBArgs() );
 		}
 	},
 
@@ -38,7 +38,7 @@ enyo.kind( {
 	createTransaction: function( data, type, options ) {
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
 							'values': []

@@ -14,13 +14,15 @@ enyo.kind( {
 		onLoadingFinish: "",
 
 		onScrimShow: "",
-		onScrimHide: ""
+		onScrimHide: "",
+
+		onCloneTransaction: ""
 	},
 
 	components: [
 		{
 			name: "list",
-			kind: "GTS.LazyList",
+			kind: "gts.LazyList",
 
 			classes: "checkbook-stamp enyo-fit",
 
@@ -44,7 +46,7 @@ enyo.kind( {
 			components: [
 				{
 					name: "transactionWrapper",
-					kind: "GTS.Item",
+					kind: "gts.Item",
 
 					tapHighlight: true,//tap
 					holdHighlight: false,//hold
@@ -130,23 +132,33 @@ enyo.kind( {
 
 		{
 			name: "transactonMenu",
-			kind: "onyx.Menu",
+			kind: "gts.EventMenu",
+
 			showOnTop: true,
 			floating: true,
+			scrim: true,
+			scrimclasses: "onyx-scrim-translucent",
+
+			onSelect: "transactionHeldHandler",
+
 			components: [
 				{
 					name: "tmClear",
-					content: "Clear Transaction",
-					value: "clear"
+					content: "Clear",
+					value: "clear",
+					classes: "bordered"
 				}, {
-					content: "Edit Transaction",
-					value: "edit"
+					content: "Edit",
+					value: "edit",
+					classes: "bordered"
 				}, {
-					content: "Duplicate Transaction",
-					value: "duplicate"
+					content: "Duplicate",
+					value: "duplicate",
+					classes: "bordered"
 				}, {
-					content: "Delete Transaction",
-					value: "delete"
+					content: "Delete",
+					value: "delete",
+					classes: "bordered"
 				}
 			]
 		},
@@ -157,23 +169,6 @@ enyo.kind( {
 			onClear: "vsCleared",
 			onEdit: "vsEdit",
 			onDelete: "transactionDeleted"
-		},
-
-		{
-			name: "deleteTransactionConfirm",
-			kind: "gts.ConfirmDialog",
-
-			title: "Delete Transaction",
-			message: "Are you sure you want to delete this transaction?",
-
-			confirmText: "Delete",
-			confirmClass: "onyx-negative",
-
-			cancelText: "Cancel",
-			cancelClass: "",
-
-			onConfirm: "deleteTransactionConfirmHandler",
-			onCancel: "deleteTransactionConfirmClose"
 		}
 	],
 
@@ -293,25 +288,25 @@ enyo.kind( {
 
 		switch( this.account['sort'] ) {
 			case 0://oldest >> newest, show newest
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date ASC, itemId ASC;",
 						'values': [ this.account['acctId'], currDate ]
 					});
 				break;
 			case 1://newest >> oldest, show newest
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date DESC, itemId DESC;",
 						'values': [ this.account['acctId'], currDate ]
 					});
 				break;
 			case 6://cleared first
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 1;",
 						'values': [ this.account['acctId'] ]
 					});
 				break;
 			case 7://pending first
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 0;",
 						'values': [ this.account['acctId'] ]
 					});
@@ -534,10 +529,10 @@ results = {
 					results[i]//fetched properties
 				);
 
-			this.transactions[offset + i]['desc'] = GTS.String.dirtyString( this.transactions[offset + i]['desc'] );
-			this.transactions[offset + i]['category'] = GTS.String.dirtyString( this.transactions[offset + i]['category'] );
-			this.transactions[offset + i]['category2'] = GTS.String.dirtyString( this.transactions[offset + i]['category2'] );
-			this.transactions[offset + i]['note'] = GTS.String.dirtyString( this.transactions[offset + i]['note'] );
+			this.transactions[offset + i]['desc'] = gts.String.dirtyString( this.transactions[offset + i]['desc'] );
+			this.transactions[offset + i]['category'] = gts.String.dirtyString( this.transactions[offset + i]['category'] );
+			this.transactions[offset + i]['category2'] = gts.String.dirtyString( this.transactions[offset + i]['category2'] );
+			this.transactions[offset + i]['note'] = gts.String.dirtyString( this.transactions[offset + i]['note'] );
 
 			if( this.account['sort'] !== 0 && this.account['sort'] !== 6 && this.account['sort'] !== 8 ) {
 
@@ -564,21 +559,16 @@ results = {
 
 	duplicateTransaction: function( rowIndex ) {
 
-		this.log();
+		var newTrsn = enyo.clone( this.transactions[rowIndex] );
 
-		this.toggleCreateButtons();
+		var type = "income";
 
-		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
-
-		if( GTS.Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
+		if( gts.Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
 
 			type = "transfer";
 		} else if( newTrsn['amount'] < 0 ) {
 
 			type = "expense";
-		} else {
-
-			type = "income";
 		}
 
 		delete newTrsn['date'];
@@ -587,17 +577,7 @@ results = {
 		delete newTrsn['repeatId'];
 		delete newTrsn['cleared'];
 
-		enyo.Signals.send(
-				"modifyTransaction",
-				{
-					name: "createTransaction",
-					kind: "Checkbook.transactions.modify",
-					accountObj: this.account,
-					trsnObj: newTrsn,
-					transactionType: type.toLowerCase(),
-					onFinish: enyo.bind( this, this.addTransactionComplete )//TODO -- needs linking to parent
-				}
-			);
+		this.doCloneTransaction( { "data": newTrsn, "type": type.toLowerCase() } );
 	},
 
 	transactiontapped: function( inSender, inEvent ) {
@@ -679,59 +659,50 @@ results = {
 
 	transactionHeld: function( inSender, inEvent ) {
 
-		this.log( arguments );
-
-		this.log( "I DO NOT WORK YET" );
-		return true;
-
-		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
-
-			this.$['tmClear'].setContent( "Unclear Transaction" );
-		} else {
-
-			this.$['tmClear'].setContent( "Clear Transaction" );
-		}
-
-		this.$['transactonMenu'].rowIndex = inEvent.index;
-
-		this.waterfallDown( "onRequestShowMenu", { activator: inEvent.originator } );
-	},
-
-	transactionHeldHandler: function( inSender, inEvent ) {
-
-		this.log();
-
-		this.log( "I DO NOT WORK YET", arguments );
-		return true;
-
-		var rowIndex = this.$['transactonMenu'].rowIndex;
-
-		if( !GTS.Object.validNumber( rowIndex ) || rowIndex < 0 ) {
+		if( this.account['frozen'] === 1 ) {
 
 			return;
 		}
 
-		if( inSender.value === "clear" ) {
+		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
 
-			this.vsCleared( null, rowIndex );
-		} else if( inSender.value === "edit" ) {
+			this.$['tmClear'].setContent( "Unclear" );
+		} else {
 
-			this.vsEdit( null, rowIndex );
-		} else if( inSender.value === "duplicate" ) {
+			this.$['tmClear'].setContent( "Clear" );
+		}
+
+		this.$['transactonMenu'].rowIndex = inEvent.index;
+		this.$['transactonMenu'].showAtEvent( inEvent );
+	},
+
+	transactionHeldHandler: function( inSender, inEvent ) {
+
+		var rowIndex = this.$['transactonMenu'].rowIndex;
+
+		if( !gts.Object.validNumber( rowIndex ) || rowIndex < 0 || !inEvent.selected ) {
+
+			return;
+		}
+
+		if( inEvent.selected.value === "clear" ) {
+
+			enyo.asyncMethod( this, this.vsCleared, null, { "rowIndex": rowIndex } );
+		} else if( inEvent.selected.value === "edit" ) {
+
+			enyo.asyncMethod( this, this.vsEdit, null, { "rowIndex": rowIndex } );
+		} else if( inEvent.selected.value === "duplicate" ) {
 
 			this.duplicateTransaction( rowIndex );
-		} else if( inSender.value === "delete" ) {
+		} else if( inEvent.selected.value === "delete" ) {
 
-			this.$['deleteTransactionConfirm'].rowIndex = rowIndex;
-			this.$['deleteTransactionConfirm'].openAtCenter();
+			enyo.asyncMethod( this, this.confirmDeletion, rowIndex );
 		}
 
 		return true;
 	},
 
 	transactionCleared: function( inSender, inEvent ) {
-
-		this.log();
 
 		this.vsCleared( null, inEvent );
 
@@ -779,19 +750,57 @@ results = {
 		return true;
 	},
 
-	deleteTransactionConfirmHandler: function() {
+	confirmDeletion: function( index ) {
 
-		this.log();
+		if( this.transactions[index]['repeatId'] > 0 || this.transactions[index]['repeatId'] === 0 ) {
 
-		this.transactionDeleted( null, this.$['deleteTransactionConfirm'].rowIndex );
-		this.deleteTransactionConfirmClose();
+			this.createComponent( {
+					name: "deleteTransactionConfirm",
+					kind: "Checkbook.transactions.recurrence.delete",
+
+					transactionId: this.transactions[index]['itemId'],
+					recurrenceId: this.transactions[index]['repeatId'],
+
+					rowIndex: index,
+
+					onFinish: "deleteTransactionHandler",
+					onCancel: "deleteTransactionConfirmClose"
+				});
+		} else {
+
+			this.createComponent( {
+					name: "deleteTransactionConfirm",
+					kind: "gts.ConfirmDialog",
+
+					title: "Delete Transaction",
+					message: "Are you sure you want to delete this transaction?",
+
+					confirmText: "Delete",
+					confirmClass: "onyx-negative",
+
+					cancelText: "Cancel",
+					cancelClass: "",
+
+					rowIndex: index,
+
+					onConfirm: "deleteTransactionHandler",
+					onCancel: "deleteTransactionConfirmClose"
+				});
+		}
+
+		this.$['deleteTransactionConfirm'].show();
 	},
 
 	deleteTransactionConfirmClose: function() {
 
-		this.log();
+		this.$['deleteTransactionConfirm'].hide();
+		this.$['deleteTransactionConfirm'].destroy();
+	},
 
-		this.$['deleteTransactionConfirm'].close();
+	deleteTransactionHandler: function() {
+
+		this.transactionDeleted( null, { "rowIndex": this.$['deleteTransactionConfirm'].rowIndex } );
+		enyo.asyncMethod( this, this.deleteTransactionConfirmClose );
 	},
 
 	transactionDeleted: function( inSender, inEvent ) {

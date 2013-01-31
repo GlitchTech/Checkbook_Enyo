@@ -51,7 +51,7 @@ enyo.kind({
 			components: [
 				{
 					name: "generalWrapper",
-					kind: "GTS.AutoComplete",
+					kind: "gts.AutoComplete",
 					layoutKind: "FittableColumnsLayout",
 
 					alwaysLooksFocused: true,
@@ -101,7 +101,7 @@ enyo.kind({
 			]
 		}, {
 			name: "errorMessage",
-			kind: "GTS.InlineNotification",
+			kind: "gts.InlineNotification",
 			type: "error",
 
 			content: "",
@@ -206,7 +206,7 @@ enyo.kind({
 		}
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							"sql": "SELECT DISTINCT genCat FROM transactionCategories WHERE genCat LIKE ? LIMIT ?;",
 							"values": [ inEvent.value + "%", inSender.getLimit() ]

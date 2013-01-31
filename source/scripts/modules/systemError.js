@@ -1,5 +1,5 @@
 /**
- * GTS.system_error ( ModalDialog )
+ * gts.system_error ( ModalDialog )
  *
  * Standardized alert kind. Will display title, content, icon, and OK button. On OK press, calls onFinish.
  * @requires appinfo.js to contain vendoremail and title for certain error modes. See conditional statement starting 177 for more information.
