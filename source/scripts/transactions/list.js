@@ -14,7 +14,9 @@ enyo.kind( {
 		onLoadingFinish: "",
 
 		onScrimShow: "",
-		onScrimHide: ""
+		onScrimHide: "",
+
+		onCloneTransaction: ""
 	},
 
 	components: [
@@ -557,11 +559,9 @@ results = {
 
 	duplicateTransaction: function( rowIndex ) {
 
-		this.log();
+		var newTrsn = enyo.clone( this.transactions[rowIndex] );
 
-		this.toggleCreateButtons();
-
-		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
+		var type = "income";
 
 		if( gts.Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
 
@@ -569,9 +569,6 @@ results = {
 		} else if( newTrsn['amount'] < 0 ) {
 
 			type = "expense";
-		} else {
-
-			type = "income";
 		}
 
 		delete newTrsn['date'];
@@ -580,17 +577,7 @@ results = {
 		delete newTrsn['repeatId'];
 		delete newTrsn['cleared'];
 
-		enyo.Signals.send(
-				"modifyTransaction",
-				{
-					name: "createTransaction",
-					kind: "Checkbook.transactions.modify",
-					accountObj: this.account,
-					trsnObj: newTrsn,
-					transactionType: type.toLowerCase(),
-					onFinish: enyo.bind( this, this.addTransactionComplete )//TODO -- needs linking to parent
-				}
-			);
+		this.doCloneTransaction( { "data": newTrsn, "type": type.toLowerCase() } );
 	},
 
 	transactiontapped: function( inSender, inEvent ) {
@@ -701,8 +688,7 @@ results = {
 			enyo.asyncMethod( this, this.vsEdit, null, { "rowIndex": rowIndex } );
 		} else if( inEvent.selected.value === "duplicate" ) {
 
-			this.log( "duplicate" );
-			//this.duplicateTransaction( rowIndex );
+			this.duplicateTransaction( rowIndex );
 		} else if( inEvent.selected.value === "delete" ) {
 
 			enyo.asyncMethod( this, this.confirmDeletion, rowIndex );

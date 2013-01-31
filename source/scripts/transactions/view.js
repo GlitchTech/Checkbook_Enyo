@@ -60,7 +60,9 @@ enyo.kind( {
 			onLoadingFinish: "hideLoadingIcon",
 
 			onScrimShow: "showLoadingScrim",
-			onScrimHide: "hideLoadingScrim"
+			onScrimHide: "hideLoadingScrim",
+
+			onCloneTransaction: "cloneTransaction"
 		}, {
 			name: "footer",
 			kind: "onyx.MoreToolbar",
@@ -661,6 +663,11 @@ enyo.kind( {
 
 	newTransaction: function( type ) {
 
+		this.cloneTransaction( null, { "data": {}, "type": type.toLowerCase() } );
+	},
+
+	cloneTransaction: function( inSender, inEvent ) {
+
 		//Prevent user from launching multiple New Transaction windows
 		if( !( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
 
@@ -673,8 +680,8 @@ enyo.kind( {
 						name: "createTransaction",
 						kind: "Checkbook.transactions.modify",
 						accountObj: this.account,
-						trsnObj: {},
-						transactionType: type.toLowerCase(),
+						trsnObj: inEvent['data'],
+						transactionType: inEvent['type'],
 						onFinish: enyo.bind( this, this.addTransactionComplete )
 					}
 				);
