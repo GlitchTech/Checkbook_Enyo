@@ -184,7 +184,10 @@ enyo.kind({
 				item.$['item'].removeClass( appColors[i]['name'] );
 			}
 
-			item.$['item'].addClass( row['color'] );
+			if( Checkbook.globals.prefs['dispColor'] === 1 ) {
+
+				item.$['item'].addClass( row['color'] );
+			}
 
 			if( index > 0 ) {
 
