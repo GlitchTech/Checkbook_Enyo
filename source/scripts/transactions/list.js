@@ -659,6 +659,11 @@ results = {
 
 	transactionHeld: function( inSender, inEvent ) {
 
+		if( this.account['frozen'] === 1 ) {
+
+			return;
+		}
+
 		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
 
 			this.$['tmClear'].setContent( "Unclear" );
