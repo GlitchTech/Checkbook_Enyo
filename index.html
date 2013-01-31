@@ -45,8 +45,7 @@
 
 					if( !window.Checkbook.app ) {
 
-						alert('No application build found, redirecting to debug.html.');
-						location = 'debug.html';
+						alert( "No application build found." );
 					}
 
 					new Checkbook.app().renderInto( document.body );
