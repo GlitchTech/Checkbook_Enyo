@@ -34,6 +34,7 @@ enyo.depends(
 	"$lib/gts-plugins/ProgressDialog",
 	"$lib/gts-plugins/AutoComplete",
 	"$lib/gts-plugins/Item",
+	"$lib/gts-plugins/EventMenu",
 
 	"$lib/private",
 

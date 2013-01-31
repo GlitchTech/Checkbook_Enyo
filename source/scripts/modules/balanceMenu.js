@@ -23,7 +23,7 @@ enyo.kind({
 			name: "display"
 		}, {
 			name: "menu",
-			kind: "GTS.SelectedMenu",
+			kind: "gts.SelectedMenu",
 			floating: true,
 			scrim: true,
 			scrimclasses: "onyx-scrim-translucent",

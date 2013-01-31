@@ -4,7 +4,7 @@
  * Checkbook.transactions.manager ( Component )
  *
  * Control system for managing transactions. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind({
 	name: "Checkbook.transactions.manager",
@@ -26,7 +26,7 @@ enyo.kind({
 
 			this.log( "creating database object." );
 
-			var db = new GTS.database( getDBArgs() );
+			var db = new gts.database( getDBArgs() );
 		}
 	},
 
@@ -44,7 +44,7 @@ enyo.kind({
 	createTransaction: function( data, type, options ) {
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;" ,
 							'values': []
@@ -100,13 +100,13 @@ enyo.kind({
 
 		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", data ) );
 
-		if( GTS.Object.validNumber( data['linkedRecord'] ) && data['linkedRecord'] >= 0 ) {
+		if( gts.Object.validNumber( data['linkedRecord'] ) && data['linkedRecord'] >= 0 ) {
 			//Set up Linked Transaction
 
 			var linkedData = enyo.clone( data );
 
-			GTS.Object.swap( linkedData, 'linkedRecord', 'itemId' );
-			GTS.Object.swap( linkedData, 'linkedAccount', 'account' );
+			gts.Object.swap( linkedData, 'linkedRecord', 'itemId' );
+			gts.Object.swap( linkedData, 'linkedAccount', 'account' );
 			linkedData['amount'] = -linkedData['amount'];
 
 			sql.push( Checkbook.globals.gts_db.getInsert( "transactions", linkedData ) );
@@ -134,7 +134,7 @@ enyo.kind({
 
 		var atData = enyo.clone( data );//Don't manipulate origional data
 
-		if( GTS.Object.validNumber( atData['linkedRecord'] ) && atData['linkedRecord'] >= 0 ) {
+		if( gts.Object.validNumber( atData['linkedRecord'] ) && atData['linkedRecord'] >= 0 ) {
 
 			atData['itemId'] += 2;
 		} else {
@@ -189,8 +189,8 @@ enyo.kind({
 		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", atData ) );
 
 		//Build linked auto transaction
-		GTS.Object.swap( atData, 'linkedRecord', 'itemId' );
-		GTS.Object.swap( atData, 'linkedAccount', 'account' );
+		gts.Object.swap( atData, 'linkedRecord', 'itemId' );
+		gts.Object.swap( atData, 'linkedAccount', 'account' );
 		atData['amount'] = -atData['amount'];
 
 		sql.push( Checkbook.globals.gts_db.getInsert( "transactions", atData ) );
@@ -214,7 +214,7 @@ enyo.kind({
 		//TODO need a param after options for dealing with series transactions
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;",
 							'values': []
@@ -269,13 +269,13 @@ enyo.kind({
 
 		sql.push( Checkbook.globals.gts_db.getUpdate( "transactions", data, { "itemId": data['itemId'] } ) );
 
-		if( GTS.Object.validNumber( data['linkedRecord'] ) ) {
+		if( gts.Object.validNumber( data['linkedRecord'] ) ) {
 			//Transfer Controls
 
 			var linkedData = enyo.clone( data );
 
-			GTS.Object.swap( linkedData, 'linkedRecord', 'itemId' );
-			GTS.Object.swap( linkedData, 'linkedAccount', 'account' );
+			gts.Object.swap( linkedData, 'linkedRecord', 'itemId' );
+			gts.Object.swap( linkedData, 'linkedAccount', 'account' );
 
 			linkedData['amount'] = -linkedData['amount'];
 
@@ -353,7 +353,7 @@ enyo.kind({
 		var sqlArray = [];
 
 		sqlArray.push(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							'sql': "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )" ,
 							'values': [
@@ -489,7 +489,7 @@ enyo.kind({
 							}
 						),
 					//Split Transactions
-					new GTS.databaseQuery(
+					new gts.databaseQuery(
 							{
 								'sql': "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )" ,
 								'values': [ trsnId, trsnId ]
@@ -513,7 +513,7 @@ enyo.kind({
 	 */
 	fetchTransaction: function( transId, options ) {
 
-		var qryTransaction = new GTS.databaseQuery(
+		var qryTransaction = new gts.databaseQuery(
 				{
 					"sql": "SELECT" +
 						//Expense table data
@@ -568,7 +568,7 @@ enyo.kind({
 	 */
 	fetchTransactions: function( accountObj, options, limit, offset ) {
 
-		var qryTransactions = new GTS.databaseQuery(
+		var qryTransactions = new gts.databaseQuery(
 				{
 					"sql": "SELECT" +
 						//Expense table data
@@ -636,7 +636,7 @@ enyo.kind({
 
 			//NEEDS REWORKING: doesn't play nice with pending/cleared order by
 
-			var qryBalance = new GTS.databaseQuery(
+			var qryBalance = new gts.databaseQuery(
 					{
 						"sql": "",
 						"values": [
@@ -693,7 +693,7 @@ enyo.kind({
 	 */
 	searchTransactions: function( whereStrings, whereArgs, sortQry, options, limit, offset ) {
 
-		var qryTransactions = new GTS.databaseQuery(
+		var qryTransactions = new gts.databaseQuery(
 				{
 					"sql": "SELECT" +
 						//Expense table data
@@ -760,7 +760,7 @@ enyo.kind({
 	 */
 	searchTransactionsCount: function( whereStrings, whereArgs, sortQry, options ) {
 
-		var qryTransactions = new GTS.databaseQuery(
+		var qryTransactions = new gts.databaseQuery(
 				{
 					"sql": "SELECT COUNT( DISTINCT main.itemId ) AS searchCount" +
 						" FROM transactions main" +
@@ -848,7 +848,7 @@ enyo.kind({
 	 */
 	 fetchMaxCheckNumber: function( acctId, options ) {
 
-		if( !GTS.Object.isNumber( acctId ) ) {
+		if( !gts.Object.isNumber( acctId ) ) {
 
 			this.log( "No account number specified." );
 
@@ -994,8 +994,8 @@ enyo.kind({
 
 		var type = "income"
 
-		if( GTS.Object.validNumber( trsn['linkedAccount'] ) && trsn['linkedAccount'] >= 0 &&
-			GTS.Object.validNumber( trsn['linkedRecord'] ) && trsn['linkedRecord'] >= 0 ) {
+		if( gts.Object.validNumber( trsn['linkedAccount'] ) && trsn['linkedAccount'] >= 0 &&
+			gts.Object.validNumber( trsn['linkedRecord'] ) && trsn['linkedRecord'] >= 0 ) {
 
 			type = "transfer";
 		} else if( trsn['amount'] < 0 ) {

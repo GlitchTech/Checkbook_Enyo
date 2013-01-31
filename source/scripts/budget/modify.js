@@ -93,7 +93,7 @@ enyo.kind({
 					showing: false,
 
 					name: "span",
-					kind: "GTS.ListSelectorBar",
+					kind: "gts.ListSelectorBar",
 					labelText: "Time Span",
 					choices: [
 							"1 month", "2 months", "3 months"
@@ -105,7 +105,7 @@ enyo.kind({
 					showing: false,
 
 					name: "rollover",
-					kind: "GTS.ToggleBar",
+					kind: "gts.ToggleBar",
 					style: "padding-left: 0;",
 					mainText: "Rollover",
 					subText: "",
@@ -162,14 +162,14 @@ enyo.kind({
 
 		{
 			name: "progress",
-			kind: "GTS.progress",
+			kind: "gts.progress",
 
 			title: "",
 			message: "",
 			progress: ""
 		}, {
 			name: "errorMessage",
-			kind: "GTS.system_error",
+			kind: "gts.system_error",
 
 			errTitle: "Budget Error",
 			errMessage: "",
@@ -261,7 +261,7 @@ enyo.kind({
 
 	save: function() {
 
-		this.budgetObj['spending_limit'] = ( GTS.Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
+		this.budgetObj['spending_limit'] = ( gts.Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
 
 		if( this.budgetObj['spending_limit'] === 0 ) {
 

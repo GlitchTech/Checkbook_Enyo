@@ -69,7 +69,7 @@ enyo.kind({
 				}, {
 					//icon picker
 					name: "icon",
-					kind: "GTS.SelectorBar",
+					kind: "gts.SelectorBar",
 
 					label: "Icon",
 					maxHeight: 300,
@@ -78,7 +78,7 @@ enyo.kind({
 				}, {
 					//picker with background colors
 					name: "color",
-					kind: "GTS.SelectorBar",
+					kind: "gts.SelectorBar",
 
 					label: "Color",
 
@@ -90,7 +90,7 @@ enyo.kind({
 			]
 		}, {
 			name: "errorMessage",
-			kind: "GTS.InlineNotification",
+			kind: "gts.InlineNotification",
 			type: "error",
 
 			content: "",
@@ -167,7 +167,7 @@ enyo.kind({
 
 		this.$['name'].setValue( this.name );
 		this.$['icon'].setValue( this.icon );
-		this.$['color'].setValue( GTS.String.ucfirst( this.color ) );
+		this.$['color'].setValue( gts.String.ucfirst( this.color ) );
 
 		for( var i = 0; i < appColors.length; i++ ) {
 

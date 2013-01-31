@@ -496,10 +496,10 @@ enyo.kind({
 					results[i]//fetched properties
 				);
 
-			this.transactions[offset + i]['desc'] = GTS.String.dirtyString( this.transactions[offset + i]['desc'] );
-			this.transactions[offset + i]['category'] = GTS.String.dirtyString( this.transactions[offset + i]['category'] );
-			this.transactions[offset + i]['category2'] = GTS.String.dirtyString( this.transactions[offset + i]['category2'] );
-			this.transactions[offset + i]['note'] = GTS.String.dirtyString( this.transactions[offset + i]['note'] );
+			this.transactions[offset + i]['desc'] = gts.String.dirtyString( this.transactions[offset + i]['desc'] );
+			this.transactions[offset + i]['category'] = gts.String.dirtyString( this.transactions[offset + i]['category'] );
+			this.transactions[offset + i]['category2'] = gts.String.dirtyString( this.transactions[offset + i]['category2'] );
+			this.transactions[offset + i]['note'] = gts.String.dirtyString( this.transactions[offset + i]['note'] );
 		}
 
 		if( this.$['entries'] ) {

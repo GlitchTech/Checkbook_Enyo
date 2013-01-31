@@ -4,7 +4,7 @@
  * Checkbook.encryption ( Component )
  *
  * Control system for encryption of strings using stored spike.
- *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *	Requires gts.database to exist in Checkbook.globals.gts_db
  *
  * @see http://code.google.com/p/crypto-js/
  */

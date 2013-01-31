@@ -195,7 +195,7 @@ enyo.kind({
 
 		{
 			name: "progress",
-			kind: "GTS.ProgressDialog",
+			kind: "gts.ProgressDialog",
 			animateProgress: true,
 			onCancel: "closeImport",
 			cancelText: "Cancel"
@@ -212,7 +212,7 @@ enyo.kind({
 
 		{
 			name: "gapi",
-			kind: "GTS.Gapi",
+			kind: "gts.Gapi",
 			onReady: "gapiReady"
 		},
 
@@ -223,7 +223,7 @@ enyo.kind({
 
 		{
 			name: "gssc",
-			kind: "GTS.gdata",
+			kind: "gts.gdata",
 			appName: "com.glitchtechscience.checkbook"
 		},
 
@@ -779,7 +779,7 @@ enyo.kind({
 
 			trsn['amount'] = deformatAmount( this.getNode( data[i], 'gsx:amount' ) );
 
-			if( GTS.Object.validNumber( trsn['amount'] ) ) {
+			if( gts.Object.validNumber( trsn['amount'] ) ) {
 				//Only continue if amount field is not empty && is a number
 
 				trsn['amount'] = parseFloat( trsn['amount'] );
@@ -787,7 +787,7 @@ enyo.kind({
 				//Transaction Id
 				trsn['itemId'] = parseInt( this.getNode( data[i], 'gsx:gtid' ) );
 
-				if( !GTS.Object.validNumber( trsn['itemId'] ) ) {
+				if( !gts.Object.validNumber( trsn['itemId'] ) ) {
 
 					trsn['itemId'] = "";
 				}
@@ -823,7 +823,7 @@ enyo.kind({
 				trsn['linkedAccountCat'] = this.getNode( data[i], 'gsx:gtlinkedaccountcat' );
 				trsn['linkedRecord'] = parseInt( this.getNode( data[i], 'gsx:gtlinkid' ) );
 
-				if( GTS.Object.validNumber( trsn['linkedRecord'] ) ) {
+				if( gts.Object.validNumber( trsn['linkedRecord'] ) ) {
 
 					if( trsn['linkedAccountName'] === "" ) {
 
@@ -870,7 +870,7 @@ enyo.kind({
 				//Date
 				trsn['date'] = Date.deformat( this.getNode( data[i], 'gsx:date' ) );
 
-				if( !GTS.Object.validNumber( trsn['date'] ) ) {
+				if( !gts.Object.validNumber( trsn['date'] ) ) {
 
 					trsn['date'] = Date.parse( new Date() );
 				}
@@ -890,7 +890,7 @@ enyo.kind({
 						];
 				} else {
 
-					if( GTS.String.isJSON( trsn['category'] ) ) {
+					if( gts.String.isJSON( trsn['category'] ) ) {
 						//valid JSON (prototype.js function)
 
 						trsn['category'] = enyo.json.parse( trsn['category'] );
@@ -955,7 +955,7 @@ enyo.kind({
 		} else {
 
 			//Trim extra space from start and end of node content
-			return GTS.String.trim( container[id]['#text'] );
+			return gts.String.trim( container[id]['#text'] );
 		}
 	},
 
@@ -1036,7 +1036,7 @@ enyo.kind({
 			delete this.importItems[this.documentIndex]['transactions'][i]['linkedAccountCat'];
 
 			//Check for invalid itemId
-			if( !GTS.Object.validNumber( this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) ) {
+			if( !gts.Object.validNumber( this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) ) {
 
 				delete this.importItems[this.documentIndex]['transactions'][i]['itemId'];
 			}
@@ -1046,7 +1046,7 @@ enyo.kind({
 			for( var j = 0; j < this.importItems[this.documentIndex]['transactions'][i]['category'][j]; j++ ) {
 
 				queries.push(
-						new GTS.databaseQuery(
+						new gts.databaseQuery(
 							{
 								"sql": "INSERT INTO transactionCategories( genCat, specCat ) SELECT ?, ? WHERE NOT EXISTS( SELECT 1 FROM transactionCategories WHERE genCat = ? AND specCat = ? );",
 								"values": [
