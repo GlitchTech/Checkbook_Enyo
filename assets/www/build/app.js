@@ -5582,7 +5582,7 @@ openDatabase: e.opendb
 // $lib/database.js
 
 enyo.kind({
-name: "GTS.database",
+name: "gts.database",
 kind: enyo.Component,
 published: {
 database: "",
@@ -5685,7 +5685,7 @@ return this._getInsertReplaceSub(n, t);
 _getInsertReplaceSub: function(e, t) {
 var n = " VALUES ( ", r = [];
 for (var i in t) enyo.isArray(t[i]) && t[i][1] === !0 ? (e += i, n += t[i][0]) : (r.push(t[i]), e += i, n += "?"), e += ", ", n += ", ";
-return e = e.substr(0, e.length - 2) + " )", n = n.substr(0, n.length - 2) + " )", e += n, new GTS.databaseQuery({
+return e = e.substr(0, e.length - 2) + " )", n = n.substr(0, n.length - 2) + " )", e += n, new gts.databaseQuery({
 sql: e,
 values: r
 });
@@ -5701,7 +5701,7 @@ a = a.join(", ");
 o += (a.length > 0 ? a : "*") + " FROM " + e;
 var c = [];
 for (var h in n) c.push(h + " = ?"), u.push(n[h]);
-return c.length > 0 && (o += " WHERE " + c.join(" AND ")), enyo.isArray(r) && r.length > 0 ? o += " ORDER BY " + r.join(", ") : enyo.isString(r) && r.length > 0 && (o += " ORDER BY " + r), i = parseInt(i), isNaN(i) || (o += " LIMIT ?", u.push(i)), i = parseInt(s), isNaN(s) || (o += " OFFSET ?", u.push(s)), new GTS.databaseQuery({
+return c.length > 0 && (o += " WHERE " + c.join(" AND ")), enyo.isArray(r) && r.length > 0 ? o += " ORDER BY " + r.join(", ") : enyo.isString(r) && r.length > 0 && (o += " ORDER BY " + r), i = parseInt(i), isNaN(i) || (o += " LIMIT ?", u.push(i)), i = parseInt(s), isNaN(s) || (o += " OFFSET ?", u.push(s)), new gts.databaseQuery({
 sql: o,
 values: u
 });
@@ -5712,7 +5712,7 @@ for (var o in t) s.push(o + " = ?"), i.push(t[o]);
 r += s.join(", ");
 var u = [];
 for (var o in n) u.push(o + " = ?"), i.push(n[o]);
-return u.length > 0 && (r += " WHERE " + u.join(" AND ")), new GTS.databaseQuery({
+return u.length > 0 && (r += " WHERE " + u.join(" AND ")), new gts.databaseQuery({
 sql: r,
 values: i
 });
@@ -5720,7 +5720,7 @@ values: i
 getDelete: function(e, t) {
 var n = "DELETE FROM " + e + " WHERE ", r = [], i = [];
 for (var s in t) i.push(s + " = ?"), r.push(t[s]);
-return n += i.join(" AND "), new GTS.databaseQuery({
+return n += i.join(" AND "), new gts.databaseQuery({
 sql: n,
 values: r
 });
@@ -5763,14 +5763,14 @@ enyo.error(n), Checkbook.globals.criticalError && (enyo.isString(t.message) && t
 _db_lost: function() {
 enyo.error("Database: connection has been closed or lost; cannot execute SQL");
 }
-}), GTS.databaseQuery = function(e) {
+}), gts.databaseQuery = function(e) {
 this.sql = typeof e.sql != "undefined" ? e.sql : "", this.values = typeof e.values != "undefined" ? e.values : [];
 };
 
 // $lib/gdata.js
 
 enyo.kind({
-name: "GTS.gdata",
+name: "gts.gdata",
 published: {
 authKey: "",
 acctType: "HOSTED_OR_GOOGLE",
@@ -5848,11 +5848,11 @@ return e.formatCurrency(2, "$", ".", ",");
 }
 
 function deformatAmount(e) {
-e = GTS.String.trim(e);
+e = gts.String.trim(e);
 if (!e) return 0;
 if (isNaN(e)) {
 var t = e[0] === "(" && e[e.length - 1] === ")";
-e = GTS.String.trim(e.replace(/[^0-9\s,'".-]*/g, ""));
+e = gts.String.trim(e.replace(/[^0-9\s,'".-]*/g, ""));
 var n = e.length;
 if (n <= 0) return 0;
 var r = 3, i = e.length - 1;
@@ -6420,7 +6420,7 @@ return i + t + (u ? o.substr(0, u) + r : "") + o.substr(u).replace(/(\d{3})(?=\d
 // Object.js
 
 enyo.singleton({
-name: "GTS.Object",
+name: "gts.Object",
 kind: "enyo.Component",
 numericValues: function(e) {
 return Object.values(e).select(this.isNumber);
@@ -6457,7 +6457,7 @@ return typeof e == "undefined";
 // String.js
 
 enyo.singleton({
-name: "GTS.String",
+name: "gts.String",
 kind: "enyo.Component",
 published: {
 dirtyItem: [ "&", "<", ">", '"', "`", "'", "\n" ],
@@ -6501,7 +6501,7 @@ return e && !this.isBlank(e) ? (e = e.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4}
 // gapi.js
 
 enyo.kind({
-name: "GTS.Gapi",
+name: "gts.Gapi",
 nextSteps: {},
 published: {
 apiKey: "",
@@ -6711,7 +6711,7 @@ typeof gapi.client[e] == "undefined" ? gapi.client.load(e, "v" + t, n.onSuccess)
 // LazyList.js
 
 enyo.kind({
-name: "GTS.LazyList",
+name: "gts.LazyList",
 kind: "enyo.AroundList",
 lastLazyLoad: 0,
 published: {
@@ -6746,7 +6746,7 @@ this.inherited(arguments);
 // SelectorBar.js
 
 enyo.kind({
-name: "GTS.SelectorBar",
+name: "gts.SelectorBar",
 kind: "onyx.Item",
 classes: "gts-selectorBar",
 published: {
@@ -6836,7 +6836,7 @@ return this.value = t.selected.hasOwnProperty("value") ? t.selected.value : t.co
 // ToggleBar.js
 
 enyo.kind({
-name: "GTS.ToggleBar",
+name: "gts.ToggleBar",
 kind: "onyx.Item",
 classes: "gts-ToggleBar",
 published: {
@@ -6908,7 +6908,7 @@ return this.$["switch"].getValue();
 // Divider.js
 
 enyo.kind({
-name: "GTS.Divider",
+name: "gts.Divider",
 classes: "gts-Divider",
 published: {
 content: "",
@@ -6947,7 +6947,7 @@ this.$.caption.setContent(this.content), this.$.caption.applyStyle("display", th
 // DividerDrawer.js
 
 enyo.kind({
-name: "GTS.DividerDrawer",
+name: "gts.DividerDrawer",
 classes: "gts-DividerDrawer",
 published: {
 caption: "",
@@ -7004,7 +7004,7 @@ open: this.getOpen()
 // SelectedMenu.js
 
 enyo.kind({
-name: "GTS.SelectedMenu",
+name: "gts.SelectedMenu",
 kind: "onyx.Menu",
 classes: "gts-selectedMenu",
 published: {
@@ -7033,7 +7033,7 @@ this.setValue(t.selected.value), this.doChange(t.selected);
 // InlineNotification.js
 
 enyo.kind({
-name: "GTS.InlineNotification",
+name: "gts.InlineNotification",
 classes: "inline-notification",
 content: "",
 allowHtml: !0,
@@ -7056,7 +7056,7 @@ this.addRemoveClass("no-image", !this.icon);
 // IntegerPicker.js
 
 enyo.kind({
-name: "GTS.IntegerPicker",
+name: "gts.IntegerPicker",
 kind: "onyx.Picker",
 classes: "gts-integer-picker",
 published: {
@@ -7103,7 +7103,7 @@ this.setValue(t.selected.content);
 // IntegerPickerBar.js
 
 enyo.kind({
-name: "GTS.IntegerPickerBar",
+name: "gts.IntegerPickerBar",
 kind: "onyx.Item",
 classes: "gts-integerPickerBar",
 published: {
@@ -7133,7 +7133,7 @@ name: "pickerButton",
 classes: "arrow"
 }, {
 name: "integer",
-kind: "GTS.IntegerPicker",
+kind: "gts.IntegerPicker",
 min: 1,
 max: 25,
 classes: "gts-IntegerPickerBar",
@@ -7187,7 +7187,7 @@ value: this.getValue()
 // DatePicker.js
 
 enyo.kind({
-name: "GTS.DatePicker",
+name: "gts.DatePicker",
 kind: "enyo.Control",
 classes: "gts-calendar",
 published: {
@@ -7527,7 +7527,7 @@ date: this.value
 // TimePicker.js
 
 enyo.kind({
-name: "GTS.TimePicker",
+name: "gts.TimePicker",
 kind: "onyx.TimePicker",
 classes: "gts-timepicker",
 published: {
@@ -7557,7 +7557,7 @@ this.$.label.setContent(this.label);
 // DecimalInput.js
 
 enyo.kind({
-name: "GTS.DecimalInput",
+name: "gts.DecimalInput",
 kind: "Input",
 classes: "gts-decimal-input",
 deleteAction: !1,
@@ -7709,7 +7709,7 @@ this.doConfirm(t), this.hide();
 // ProgressDialog.js
 
 enyo.kind({
-name: "GTS.ProgressDialog",
+name: "gts.ProgressDialog",
 kind: "onyx.Popup",
 classes: "gts-progress-dialog",
 published: {
@@ -7802,7 +7802,7 @@ this.doCancel(t), this.hide();
 // AutoComplete.js
 
 enyo.kind({
-name: "GTS.AutoComplete",
+name: "gts.AutoComplete",
 kind: "onyx.InputDecorator",
 classes: "gts-autocomplete",
 active: !1,
@@ -7902,7 +7902,7 @@ return e;
 // Item.js
 
 enyo.kind({
-name: "GTS.Item",
+name: "gts.Item",
 kind: "onyx.Item",
 classes: "gts-item",
 published: {
@@ -7929,6 +7929,20 @@ this.holdHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || th
 },
 release: function(e, t) {
 this.preventTapDisplayTimer = (new Date).getTime(), this.holdHighlight && onyx.Item.addRemoveFlyweightClass(this.controlParent || this, this.highlightClass, !1, t);
+}
+});
+
+// EventMenu.js
+
+enyo.kind({
+name: "gts.EventMenu",
+kind: "onyx.Menu",
+adjustPosition: function() {},
+showingChanged: function() {
+this.inherited(arguments), this.updatePosition();
+},
+resizeHandler: function() {
+this.inherited(arguments), this.updatePosition();
 }
 });
 
@@ -7969,7 +7983,7 @@ components: [ {
 name: "display"
 }, {
 name: "menu",
-kind: "GTS.SelectedMenu",
+kind: "gts.SelectedMenu",
 floating: !0,
 scrim: !0,
 scrimclasses: "onyx-scrim-translucent",
@@ -8669,7 +8683,7 @@ classes: "small label"
 } ]
 }, {
 name: "errorMessage",
-kind: "GTS.InlineNotification",
+kind: "gts.InlineNotification",
 type: "error",
 content: "",
 showing: !1
@@ -9447,7 +9461,7 @@ owner: this
 }), this.$.headerWrapper.render(), this.headerBuilt = !0), this.$.spinner.show(), this.checkSystem(), this.reflow();
 },
 checkSystem: function() {
-this.$.title.setContent("Loading Checkbook"), this.$.message.setContent("Preparing application."), this.$.splashProgress.animateProgressTo(5), Checkbook.globals || (Checkbook.globals = {}), Checkbook.globals.prefs || (Checkbook.globals.prefs = {}, this.log("creating prefs")), Checkbook.globals.gts_db || (Checkbook.globals.gts_db = new GTS.database(getDBArgs()), this.log("Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created.")), this.checkDB();
+this.$.title.setContent("Loading Checkbook"), this.$.message.setContent("Preparing application."), this.$.splashProgress.animateProgressTo(5), Checkbook.globals || (Checkbook.globals = {}), Checkbook.globals.prefs || (Checkbook.globals.prefs = {}, this.log("creating prefs")), Checkbook.globals.gts_db || (Checkbook.globals.gts_db = new gts.database(getDBArgs()), this.log("Checkbook.globals.gts_db v" + Checkbook.globals.gts_db.getVersion() + " created.")), this.checkDB();
 },
 checkDB: function() {
 this.log(), this.$.message.setContent("Checking database version..."), this.$.splashProgress.animateProgressTo(10), Checkbook.globals.gts_db.query("SELECT * FROM prefs LIMIT 1;", {
@@ -9943,7 +9957,7 @@ kind: "onyx.GroupboxHeader",
 content: "Program Security"
 }, {
 name: "pinLock",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 label: "PIN Lock",
 onContent: "Yes",
 offContent: "No",
@@ -9981,7 +9995,7 @@ kind: "onyx.GroupboxHeader",
 content: "General Options"
 }, {
 name: "transPreview",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 label: "Transaction Preview",
 sublabel: "Show preview of a tapped transaction.",
 onContent: "Yes",
@@ -9989,7 +10003,7 @@ offContent: "No",
 onChange: "updateTransPreview"
 }, {
 name: "dispColor",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 label: "Account Colors",
 sublabel: "Add color in some areas based on account categories.",
 onContent: "Yes",
@@ -9997,7 +10011,7 @@ offContent: "No",
 onChange: "updateDispColor"
 }, {
 name: "alwaysFullCalendar",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 label: "Full Calendar",
 sublabel: "Set modify transaction system to always use a full calendar instead of a date picker for small screens.",
 onContent: "Yes",
@@ -10005,7 +10019,7 @@ offContent: "No",
 onChange: "updateAlwaysFullCalendar"
 }, {
 name: "updateNotice",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 label: "System Notifications",
 sublabel: "Recieve in-app notices of updates and other important news.",
 onContent: "Yes",
@@ -10013,7 +10027,7 @@ offContent: "No",
 onChange: "updateUpdateNotice"
 }, {
 name: "errorReporting",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 label: "Error Reporting",
 sublabel: "Report errors to GlitchTech Science",
 onContent: "Yes",
@@ -10031,7 +10045,7 @@ kind: "onyx.GroupboxHeader",
 content: "Accounts"
 }, {
 name: "defaultAccount",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 disabled: !0,
 label: "Default Account",
 onChange: "updateDefaultAccount",
@@ -10056,7 +10070,7 @@ kind: "onyx.GroupboxHeader",
 content: "Recurrence Options"
 }, {
 name: "seriesCountLimit",
-kind: "GTS.IntegerPickerBar",
+kind: "gts.IntegerPickerBar",
 min: 1,
 max: 15,
 label: "Series Occurrence Limit",
@@ -10064,7 +10078,7 @@ sublabel: "Maximum number of times an event will be created within the date limi
 onChange: "updateSeriesCountLimit"
 }, {
 name: "seriesDayLimit",
-kind: "GTS.IntegerPickerBar",
+kind: "gts.IntegerPickerBar",
 min: 5,
 max: 150,
 step: 5,
@@ -10271,7 +10285,7 @@ this.$.fullwipeConfirm.hide(), this.$.fullwipeConfirm.destroy();
 fullwipeRun: function() {
 this.fullwipeConfirmClose(), this.createComponent({
 name: "wipeProgress",
-kind: "GTS.ProgressDialog",
+kind: "gts.ProgressDialog",
 animateProgress: !0
 }), this.$.wipeProgress.show({
 title: "Purging All Data",
@@ -10417,7 +10431,7 @@ value: 3
 } ]
 }, {
 name: "progress",
-kind: "GTS.ProgressDialog",
+kind: "gts.ProgressDialog",
 animateProgress: !0,
 onCancel: "closeImport",
 cancelText: "Cancel"
@@ -10430,14 +10444,14 @@ secondaryMessage: "",
 onFinish: "closeErrorMessage"
 }, {
 name: "gapi",
-kind: "GTS.Gapi",
+kind: "gts.Gapi",
 onReady: "gapiReady"
 }, {
 name: "gapiAccess",
 kind: "private.gapi"
 }, {
 name: "gssc",
-kind: "GTS.gdata",
+kind: "gts.gdata",
 appName: "com.glitchtechscience.checkbook"
 }, {
 name: "cryptoSystem",
@@ -10648,8 +10662,8 @@ processDocDataFollower: function(e) {
 var t = enyo.isArray(e) ? e : [], n;
 for (var r = 0; r < t.length; r++) {
 n = {}, n.amount = deformatAmount(this.getNode(t[r], "gsx:amount"));
-if (GTS.Object.validNumber(n.amount)) {
-n.amount = parseFloat(n.amount), n.itemId = parseInt(this.getNode(t[r], "gsx:gtid")), GTS.Object.validNumber(n.itemId) || (n.itemId = ""), n.accountName = this.getNode(t[r], "gsx:account"), n.accountCat = this.getNode(t[r], "gsx:accountcat"), n.accountName === "" && (n.accountName = this.importItems[this.documentIndex].name), n.accountCat === "" && (n.accountCat = "Imported Account");
+if (gts.Object.validNumber(n.amount)) {
+n.amount = parseFloat(n.amount), n.itemId = parseInt(this.getNode(t[r], "gsx:gtid")), gts.Object.validNumber(n.itemId) || (n.itemId = ""), n.accountName = this.getNode(t[r], "gsx:account"), n.accountCat = this.getNode(t[r], "gsx:accountcat"), n.accountName === "" && (n.accountName = this.importItems[this.documentIndex].name), n.accountCat === "" && (n.accountCat = "Imported Account");
 if (typeof this.accountList[n.accountCat] == "undefined" || typeof this.accountList[n.accountCat][n.accountName] == "undefined") this.newAccounts.push({
 acctName: n.accountName,
 acctCategory: n.accountCat,
@@ -10657,7 +10671,7 @@ sort: 1,
 acctNotes: ""
 }), this.addAccountListObject(-1, n.accountName, n.accountCat);
 n.linkedAccountName = this.getNode(t[r], "gsx:gtlinkedaccount"), n.linkedAccountCat = this.getNode(t[r], "gsx:gtlinkedaccountcat"), n.linkedRecord = parseInt(this.getNode(t[r], "gsx:gtlinkid"));
-if (GTS.Object.validNumber(n.linkedRecord)) {
+if (gts.Object.validNumber(n.linkedRecord)) {
 n.linkedAccountName === "" && (n.linkedAccountName = this.importItems[this.documentIndex].name), n.linkedAccountCat === "" && (n.linkedAccountCat = "Imported Account");
 if (typeof this.accountList[n.linkedAccountCat] == "undefined" || typeof this.accountList[n.linkedAccountCat][n.linkedAccountName] == "undefined") this.newAccounts.push({
 acctName: n.linkedAccountName,
@@ -10665,11 +10679,11 @@ acctCategory: n.linkedAccountCat,
 acctNotes: ""
 }), this.addAccountListObject(-1, n.linkedAccountName, n.linkedAccountCat);
 } else n.linkedAccountName = "", n.linkedAccountCat = "", n.linkedRecord = "";
-n.cleared = this.getNode(t[r], "gsx:cleared").toLowerCase(), n["cleared"] == 0 || n["cleared"] == "no" || n["cleared"] == "not" || n["cleared"] == "false" || n["cleared"] == "" ? n.cleared = 0 : n.cleared = 1, n.date = Date.deformat(this.getNode(t[r], "gsx:date")), GTS.Object.validNumber(n.date) || (n.date = Date.parse(new Date)), n.category = this.getNode(t[r], "gsx:gtcat"), n.category === "" || n.category.toLowerCase() === "none" ? n.category = [ {
+n.cleared = this.getNode(t[r], "gsx:cleared").toLowerCase(), n["cleared"] == 0 || n["cleared"] == "no" || n["cleared"] == "not" || n["cleared"] == "false" || n["cleared"] == "" ? n.cleared = 0 : n.cleared = 1, n.date = Date.deformat(this.getNode(t[r], "gsx:date")), gts.Object.validNumber(n.date) || (n.date = Date.parse(new Date)), n.category = this.getNode(t[r], "gsx:gtcat"), n.category === "" || n.category.toLowerCase() === "none" ? n.category = [ {
 category: "",
 category2: "",
 amount: ""
-} ] : GTS.String.isJSON(n.category) ? n.category = enyo.json.parse(n.category) : n.category = [ {
+} ] : gts.String.isJSON(n.category) ? n.category = enyo.json.parse(n.category) : n.category = [ {
 category: n.category.split("|", 2)[0],
 category2: n.category.split("|", 2)[1],
 amount: ""
@@ -10683,7 +10697,7 @@ var t = (e + this.importItems[this.documentIndex].offset) / this.importItems[thi
 this.$.progress.setMessage(this.importItems[this.documentIndex].name + "<br />Downloading: " + (new Number(isNaN(n) ? 0 : n * 100)).toFixed(1) + "%"), isNaN(r) || this.$.progress.setProgress(r);
 },
 getNode: function(e, t) {
-return typeof e == "undefined" || typeof e[t] == "undefined" || typeof e[t]["#text"] == "undefined" ? "" : GTS.String.trim(e[t]["#text"]);
+return typeof e == "undefined" || typeof e[t] == "undefined" || typeof e[t]["#text"] == "undefined" ? "" : gts.String.trim(e[t]["#text"]);
 },
 nextDocumentPage: function() {
 this.pageIndex++, this.pageIndex < this.importItems[this.documentIndex].pages.length ? this.downloadDocData(1, this.standardLimit) : this.newAccounts.length > 0 ? this.insertNewAccounts() : this.saveDocData(0, this.standardLimit / 2);
@@ -10701,7 +10715,7 @@ saveDocData: function(e, t) {
 var n = [], r = e + t;
 r >= this.importItems[this.documentIndex].transactions.length && (r = this.importItems[this.documentIndex].transactions.length);
 for (var i = e; i < r; i++) {
-this.importItems[this.documentIndex].transactions[i].account = this.accountList[this.importItems[this.documentIndex].transactions[i].accountCat][this.importItems[this.documentIndex].transactions[i].accountName], this.importItems[this.documentIndex].transactions[i].linkedRecord !== "" ? this.importItems[this.documentIndex].transactions[i].linkedAccount = this.accountList[this.importItems[this.documentIndex].transactions[i].linkedAccountCat][this.importItems[this.documentIndex].transactions[i].linkedAccountName] : delete this.importItems[this.documentIndex].transactions[i].linkedRecord, delete this.importItems[this.documentIndex].transactions[i].accountName, delete this.importItems[this.documentIndex].transactions[i].accountCat, delete this.importItems[this.documentIndex].transactions[i].linkedAccountName, delete this.importItems[this.documentIndex].transactions[i].linkedAccountCat, GTS.Object.validNumber(this.importItems[this.documentIndex].transactions[i].itemId) || delete this.importItems[this.documentIndex].transactions[i].itemId;
+this.importItems[this.documentIndex].transactions[i].account = this.accountList[this.importItems[this.documentIndex].transactions[i].accountCat][this.importItems[this.documentIndex].transactions[i].accountName], this.importItems[this.documentIndex].transactions[i].linkedRecord !== "" ? this.importItems[this.documentIndex].transactions[i].linkedAccount = this.accountList[this.importItems[this.documentIndex].transactions[i].linkedAccountCat][this.importItems[this.documentIndex].transactions[i].linkedAccountName] : delete this.importItems[this.documentIndex].transactions[i].linkedRecord, delete this.importItems[this.documentIndex].transactions[i].accountName, delete this.importItems[this.documentIndex].transactions[i].accountCat, delete this.importItems[this.documentIndex].transactions[i].linkedAccountName, delete this.importItems[this.documentIndex].transactions[i].linkedAccountCat, gts.Object.validNumber(this.importItems[this.documentIndex].transactions[i].itemId) || delete this.importItems[this.documentIndex].transactions[i].itemId;
 var s = this.importItems[this.documentIndex].transactions[i].category, o = [];
 s.length > 1 && this.importItems[this.documentIndex].transactions[i].itemId ? o = Checkbook.globals.transactionManager.handleCategoryData(this.importItems[this.documentIndex].transactions[i]) : (this.importItems[this.documentIndex].transactions[i].category = s[0].category, this.importItems[this.documentIndex].transactions[i].category2 = s[0].category2), n.push(Checkbook.globals.gts_db.getReplace("transactions", this.importItems[this.documentIndex].transactions[i])), n = n.concat(o);
 }
@@ -10885,7 +10899,7 @@ value: 3
 } ]
 }, {
 name: "progress",
-kind: "GTS.ProgressDialog",
+kind: "gts.ProgressDialog",
 animateProgress: !0,
 onCancel: "closeExport",
 cancelText: "Cancel"
@@ -10898,7 +10912,7 @@ secondaryMessage: "",
 onFinish: "closeErrorMessage"
 }, {
 name: "gapi",
-kind: "GTS.Gapi",
+kind: "gts.Gapi",
 onReady: "gapiReady"
 }, {
 name: "gapiAccess",
@@ -11048,7 +11062,7 @@ var o = 0;
 n + r < s.length ? o = n + r : o = s.length, this.$.progress.setMessage(t + 1 + " of " + e.length + "<br />" + "Processing account"), this.$.progress.setProgress((t + 1) * (2 + o / s.length) / 4 / e.length * 100);
 for (var u = n; u < o; u++) {
 var a = s[u];
-i.csv += '"' + GTS.String.cleanString(a.accountName) + '",' + '"' + GTS.String.cleanString(a.accountCat) + '",' + "\"'" + (new Date(parseInt(a.date))).format("special") + '",' + '"' + formatAmount(a.amount) + '",' + '"' + GTS.String.cleanString(a.desc) + '",' + '"' + (a["cleared"] == 1 ? "Yes" : "No") + '",' + '"' + GTS.String.cleanString(a.checkNum) + '",' + '"' + GTS.String.cleanString(a.note) + '",' + '"' + GTS.String.cleanString(a.payee) + '",' + '"' + a.itemId + '",' + '"' + enyo.json.stringify(Checkbook.globals.transactionManager.parseCategoryDB(a.category, a.category2)).replace(/"/g, '""') + '",' + '"' + a.linkedRecord + '",' + '"' + GTS.String.cleanString(a.linkedAccountName) + '",' + '"' + GTS.String.cleanString(a.linkedAccountCat) + '"\n';
+i.csv += '"' + gts.String.cleanString(a.accountName) + '",' + '"' + gts.String.cleanString(a.accountCat) + '",' + "\"'" + (new Date(parseInt(a.date))).format("special") + '",' + '"' + formatAmount(a.amount) + '",' + '"' + gts.String.cleanString(a.desc) + '",' + '"' + (a["cleared"] == 1 ? "Yes" : "No") + '",' + '"' + gts.String.cleanString(a.checkNum) + '",' + '"' + gts.String.cleanString(a.note) + '",' + '"' + gts.String.cleanString(a.payee) + '",' + '"' + a.itemId + '",' + '"' + enyo.json.stringify(Checkbook.globals.transactionManager.parseCategoryDB(a.category, a.category2)).replace(/"/g, '""') + '",' + '"' + a.linkedRecord + '",' + '"' + gts.String.cleanString(a.linkedAccountName) + '",' + '"' + gts.String.cleanString(a.linkedAccountCat) + '"\n';
 }
 o < s.length ? enyo.asyncMethod(this, this.buildSheetContent, e, t, o, r, i, s) : this.uploadSheet(e, t, i);
 },
@@ -11059,7 +11073,7 @@ var u = new Date, a = "[" + enyo.fetchAppInfo().title + "] " + n.accountName + "
 date: "long",
 time: "short"
 }) + "]", f = {
-title: GTS.String.cleanString(a),
+title: gts.String.cleanString(a),
 mimeType: o
 }, l = i + "Content-Type: application/json\r\n\r\n" + JSON.stringify(f) + i + "Content-Type: " + o + "\r\n" + "\r\n" + n.csv + s, c = gapi.client.request({
 path: "/upload/drive/v2/files?convert=true",
@@ -11221,7 +11235,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(getDBArgs());
+var e = new gts.database(getDBArgs());
 }
 this.bound = {
 _errorHandler: enyo.bind(this, this._errorHandler)
@@ -11233,7 +11247,7 @@ sect_order: [ "( SELECT IFNULL( MAX( sect_order ), 0 ) FROM accounts )", !0 ]
 }), this._prepareDataObject(e), this.$.cryptoSystem.encryptString(e.lockedCode, enyo.bind(this, this._createAccountFollower, e, t));
 },
 _createAccountFollower: function(e, t, n) {
-if (e["auto_savings"] == 0 || !GTS.Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
+if (e["auto_savings"] == 0 || !gts.Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
 e["acctLocked"] == 0 || n == "" || !n ? (e.acctLocked = 0, e.lockedCode = "") : (e.acctLocked = 1, e.lockedCode = n);
 var r = [ Checkbook.globals.gts_db.getInsert("accounts", e) ];
 e.defaultAccount === 1 && r.unshift(Checkbook.globals.gts_db.getUpdate("accounts", {
@@ -11246,7 +11260,7 @@ updateAccount: function(e, t, n, r) {
 this._prepareDataObject(e), this.$.cryptoSystem.encryptString(e.lockedCode, enyo.bind(this, this._updateAccountFollower, e, t, n, r));
 },
 _updateAccountFollower: function(e, t, n, r, i) {
-if (e["auto_savings"] == 0 || !GTS.Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
+if (e["auto_savings"] == 0 || !gts.Object.isNumber(e.auto_savings_link) || e.auto_savings_link < 0) e.auto_savings = 0, e.auto_savings_link = -1;
 e["acctLocked"] == 0 || i == "" || !i ? (e.acctLocked = 0, e.lockedCode = "") : n && (e.acctLocked = 1, e.lockedCode = i);
 var s = [ Checkbook.globals.gts_db.getUpdate("accounts", e, {
 acctId: t
@@ -11299,7 +11313,7 @@ acctId: e
 r >= 0 ? this.accountObject.defaultAccountIndex = r : this.updateAccountModTime(), Checkbook.globals.gts_db.queries(n, t);
 },
 fetchDefaultAccount: function(e) {
-this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && (GTS.Object.isNumber(this.accountObject.defaultAccountIndex) && this.accountObject.defaultAccountIndex >= 0 ? e.onSuccess(this.accountObject.accounts[this.accountObject.defaultAccountIndex]) : e.onSuccess()) : (e = this._getOptions(e), this.accountObject.processingQueue.push({
+this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && (gts.Object.isNumber(this.accountObject.defaultAccountIndex) && this.accountObject.defaultAccountIndex >= 0 ? e.onSuccess(this.accountObject.accounts[this.accountObject.defaultAccountIndex]) : e.onSuccess()) : (e = this._getOptions(e), this.accountObject.processingQueue.push({
 source: "fetchDefaultAccount",
 func: enyo.bind(this, this.fetchDefaultAccount, e)
 }), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError)));
@@ -11319,7 +11333,7 @@ func: enyo.bind(this, this.fetchAccount, e, t)
 fetchAccountBalance: function(e, t) {
 var n = new Date, r = Date.parse(n);
 n.setHours(23, 59, 59, 999), n = Date.parse(n);
-var i = new GTS.databaseQuery({
+var i = new gts.databaseQuery({
 sql: "SELECT IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) ), 0 ) AS balance0, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) AND transactions.cleared = 1 ), 0 ) AS balance1, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND transactions.cleared = 0 ), 0 ) AS balance3, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS balance2 FROM accounts WHERE acctId = ?",
 values: [ r, n, r, n, e ]
 });
@@ -11335,9 +11349,9 @@ if (this.accountObject.lastModified <= this.accountObject.lastBuild) {
 if (enyo.isFunction(e.onSuccess)) {
 var r = [];
 if (!e.showHidden) {
-n = GTS.Object.isNumber(n) ? n : 0, t = GTS.Object.isNumber(t) ? t : this.accountObject.accounts.length;
+n = gts.Object.isNumber(n) ? n : 0, t = gts.Object.isNumber(t) ? t : this.accountObject.accounts.length;
 for (var i = n; i < t; i++) this.accountObject.accounts[i].hidden !== 2 && r.push(this.accountObject.accounts[i]);
-} else r = this.accountObject.accounts.slice(GTS.Object.isNumber(n) ? n : 0, t);
+} else r = this.accountObject.accounts.slice(gts.Object.isNumber(n) ? n : 0, t);
 e.onSuccess(r);
 }
 } else e = this._getOptions(e), this.accountObject.processingQueue.push({
@@ -11346,7 +11360,7 @@ func: enyo.bind(this, this.fetchAccounts, e, t, n)
 }), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError));
 },
 fetchAccountsList: function(e, t, n) {
-this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accountsList.slice(GTS.Object.isNumber(n) ? n : 0, t)) : (this.accountObject.processingQueue.push({
+this.accountObject.lastModified <= this.accountObject.lastBuild ? enyo.isFunction(e.onSuccess) && e.onSuccess(this.accountObject.accountsList.slice(gts.Object.isNumber(n) ? n : 0, t)) : (this.accountObject.processingQueue.push({
 source: "fetchAccountsList",
 func: enyo.bind(this, this.fetchAccountsList, e, t, n)
 }), this.accountObject.processing || (this.accountObject.processing = !0, this._buildAccountObjects(e.onError)));
@@ -11354,7 +11368,7 @@ func: enyo.bind(this, this.fetchAccountsList, e, t, n)
 fetchOverallBalances: function(e) {
 var t = new Date, n = Date.parse(t);
 t.setHours(23, 59, 59, 999), t = Date.parse(t);
-var r = new GTS.databaseQuery({
+var r = new gts.databaseQuery({
 sql: "SELECT SUM( IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) ), 0 ) ) AS balance0, SUM( IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) AND transactions.cleared = 1 ), 0 ) ) AS balance1, SUM( IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) ) AS balance2, SUM( IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND transactions.cleared = 0 ), 0 ) ) AS balance3, SUM( CASE WHEN bal_view = 0 THEN IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) ), 0 ) WHEN bal_view = 1 THEN IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) AND transactions.cleared = 1 ), 0 ) WHEN bal_view = 2 THEN IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) WHEN bal_view = 3 THEN IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND transactions.cleared = 0 ), 0 ) ELSE 0 END ) AS stdBal FROM accounts WHERE hidden = 0",
 values: [ n, t, n, t, n, t, n, t ]
 });
@@ -11372,10 +11386,10 @@ n[0] = r.balance0, n[1] = r.balance1, n[2] = r.balance2, n[3] = r.balance3, n[4]
 enyo.isFunction(e) && e(n);
 },
 _buildAccountObjects: function(e, t, n) {
-t = GTS.Object.isNumber(t) ? t : 100, n = GTS.Object.isNumber(n) ? n : 0, n <= 0 && (this.accountObject.defaultAccountIndex = -1, this.accountObject.idTable = [], this.accountObject.accounts = [], this.accountObject.accountsList = []);
+t = gts.Object.isNumber(t) ? t : 100, n = gts.Object.isNumber(n) ? n : 0, n <= 0 && (this.accountObject.defaultAccountIndex = -1, this.accountObject.idTable = [], this.accountObject.accounts = [], this.accountObject.accountsList = []);
 var r = new Date, i = Date.parse(r);
 r.setHours(23, 59, 59, 999), r = Date.parse(r);
-var s = new GTS.databaseQuery({
+var s = new gts.databaseQuery({
 sql: "SELECT *, ( SELECT qry FROM acctTrsnSortOptn WHERE sortId = IFNULL( accounts.sort, 1 ) ) AS sortQry, IFNULL( ( SELECT COUNT( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS itemCount, IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ), 'icon_2.png' ) AS acctCategoryIcon, ( SELECT accountCategories.color FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCategoryColor, ( SELECT accountCategories.catOrder FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCatOrder, ( SELECT accountCategories.rowid FROM accountCategories WHERE accountCategories.name = accounts.acctCategory ) AS acctCatId, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) ), 0 ) AS balance0, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND ( ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 1 ) OR ( CAST( transactions.date AS INTEGER ) <= ? AND showTransTime = 0 ) ) AND transactions.cleared = 1 ), 0 ) AS balance1, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId AND transactions.cleared = 0 ), 0 ) AS balance3, IFNULL( ( SELECT SUM( transactions.amount ) FROM transactions WHERE transactions.account = accounts.acctId ), 0 ) AS balance2 FROM accounts ORDER BY " + accountSortOptions[Checkbook.globals.prefs.custom_sort].query + " LIMIT ? OFFSET ?",
 values: [ i, r, i, r, t, n ]
 });
@@ -11470,14 +11484,14 @@ onSetupSwipeItem: "setupSwipeItem",
 onSwipeComplete: "swipeComplete",
 components: [ {
 name: "accountItem",
-kind: "GTS.Item",
+kind: "gts.Item",
 classes: "bordered account-item",
 tapHighlight: !0,
 holdHighlight: !1,
 ontap: "accountTapped",
 components: [ {
 name: "catDivider",
-kind: "GTS.Divider",
+kind: "gts.Divider",
 ontap: "dividerTapped",
 useFittable: !1
 }, {
@@ -11638,7 +11652,7 @@ sect_order: i
 }, {
 rowid: this.accounts[i].acctId
 }));
-Checkbook.globals.prefs.custom_sort !== 1 && (Checkbook.globals.prefs.custom_sort = 1, r.push(new GTS.databaseQuery({
+Checkbook.globals.prefs.custom_sort !== 1 && (Checkbook.globals.prefs.custom_sort = 1, r.push(new gts.databaseQuery({
 sql: "UPDATE prefs SET custom_sort = ?;",
 values: [ Checkbook.globals.prefs.custom_sort ]
 }))), Checkbook.globals.gts_db.queries(r), this.refresh(), enyo.Signals.send("accountSortOptionChanged");
@@ -11707,7 +11721,7 @@ return;
 }
 if (typeof t["account"] != "undefined") {
 var n = t.account >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex(t.account) : -1;
-n >= 0 && (typeof t.accountBal != "undefined" && GTS.Object.size(t.accountBal) > 0 ? this.accountBalanceChangedHandler(n, t.accountBal) : Checkbook.globals.accountManager.fetchAccountBalance(t.account, {
+n >= 0 && (typeof t.accountBal != "undefined" && gts.Object.size(t.accountBal) > 0 ? this.accountBalanceChangedHandler(n, t.accountBal) : Checkbook.globals.accountManager.fetchAccountBalance(t.account, {
 onSuccess: enyo.bind(this, this.accountBalanceChangedHandler, n)
 }));
 }
@@ -11786,7 +11800,7 @@ src: "assets/menu_icons/sort.png"
 } ]
 }, {
 name: "sortMenu",
-kind: "GTS.SelectedMenu",
+kind: "gts.SelectedMenu",
 floating: !0,
 scrim: !0,
 scrimclasses: "onyx-scrim-translucent",
@@ -11923,7 +11937,7 @@ this.$.sortMenu.setValue(Checkbook.globals.prefs.custom_sort);
 },
 sortMenuSelected: function(e, t) {
 if (!t.selected || Checkbook.globals.prefs.custom_sort === t.selected.value) return;
-return Checkbook.globals.prefs.custom_sort = t.selected.value, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+return Checkbook.globals.prefs.custom_sort = t.selected.value, Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "UPDATE prefs SET custom_sort = ?;",
 values: [ Checkbook.globals.prefs.custom_sort ]
 }), {
@@ -11993,13 +12007,13 @@ classes: "label"
 } ]
 }, {
 name: "accountCategory",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 classes: "custom-background bordered",
 label: "Account Category",
 onChange: "categoryChanged"
 }, {
 name: "defaultAccount",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Default Account",
 sublabel: "This account is launched automatically on start.",
@@ -12007,12 +12021,12 @@ onContent: "Yes",
 offContent: "No"
 }, {
 name: "securityOptionDrawer",
-kind: "GTS.DividerDrawer",
+kind: "gts.DividerDrawer",
 caption: "Security Options",
 open: !0,
 components: [ {
 name: "freezeAccount",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Freeze Internal Transactions",
 sublabel: "Prevent any changes from being made only in this account.",
@@ -12020,7 +12034,7 @@ onContent: "Yes",
 offContent: "No"
 }, {
 name: "pinLock",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "PIN Lock",
 onContent: "Yes",
@@ -12052,12 +12066,12 @@ classes: "label"
 } ]
 } ]
 }, {
-kind: "GTS.DividerDrawer",
+kind: "gts.DividerDrawer",
 caption: "Display Options",
 open: !0,
 components: [ {
 name: "transactionSorting",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 classes: "bordered",
 label: "Sorting",
 maxHeight: 350,
@@ -12065,7 +12079,7 @@ labelWidth: "150px",
 onChange: "transactionSortingUpdateLabel"
 }, {
 name: "accountDisplay",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 classes: "bordered",
 label: "Display",
 maxHeight: 350,
@@ -12084,7 +12098,7 @@ value: 2
 } ]
 }, {
 name: "balance",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 classes: "bordered",
 label: "Balance",
 maxHeight: 350,
@@ -12106,7 +12120,7 @@ value: 2
 } ]
 }, {
 name: "showTransTime",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Show Transaction Time",
 sublabel: "Displays the transaction time in addition to the date.",
@@ -12115,7 +12129,7 @@ offContent: "No",
 value: !0
 }, {
 name: "showRunningBal",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Show Running Balance",
 sublabel: "Running balance will be shown beneath transaction amount. The transaction amount will be black and the current balance will be colored. Only available in certain sort modes.",
@@ -12123,7 +12137,7 @@ onContent: "Yes",
 offContent: "No"
 }, {
 name: "hideTransNotes",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Hide Transaction Notes",
 sublabel: "Transaction notes will be hidden.",
@@ -12131,12 +12145,12 @@ onContent: "Yes",
 offContent: "No"
 } ]
 }, {
-kind: "GTS.DividerDrawer",
+kind: "gts.DividerDrawer",
 caption: "Transaction Options",
 open: !0,
 components: [ {
 name: "descriptionMultilineMode",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Description Multiline Mode",
 sublabel: "Allows the transaction description to take up multiple lines in the add/edit transaction screen.",
@@ -12144,7 +12158,7 @@ onContent: "Yes",
 offContent: "No"
 }, {
 name: "autoComplete",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Use Auto-Complete",
 sublabel: "Displays suggestions for transaction descriptions based on your history.",
@@ -12153,7 +12167,7 @@ offContent: "No",
 value: !0
 }, {
 name: "atmMode",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Use ATM Mode",
 sublabel: "Amount field will be automatically formatted as you type.",
@@ -12162,7 +12176,7 @@ offContent: "No",
 value: !0
 }, {
 name: "autoTransfer",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 classes: "bordered",
 label: "Auto Transfer",
 onChange: "toggleAutoTransferDrawer",
@@ -12182,13 +12196,13 @@ name: "autoTransferDrawer",
 kind: "onyx.Drawer",
 components: [ {
 name: "autoTransferLink",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 label: "Transfer to...",
 classes: "iconListSelector"
 } ]
 }, {
 name: "expenseCategories",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Add Expense Categories",
 sublabel: "Add a field to record the expense category in the add/edit transaction screen.",
@@ -12197,7 +12211,7 @@ offContent: "No",
 value: !0
 }, {
 name: "checkNumber",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Add Check Number Field",
 sublabel: "Add a field to record the check number in the add/edit transaction screen.",
@@ -12205,7 +12219,7 @@ onContent: "Yes",
 offContent: "No"
 }, {
 name: "payeeField",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Add Payee Field",
 sublabel: "Add a field to record the payee in the add/edit transaction screen.",
@@ -12215,7 +12229,7 @@ value: !1
 }, {
 showing: !1,
 name: "hideCleared",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Hide cleared transactions",
 sublabel: "",
@@ -12476,14 +12490,14 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(getDBArgs());
+var e = new gts.database(getDBArgs());
 }
 },
 fetchCategories: function(e, t, n) {
 Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("accountCategories", [ "rowid", "*" ], null, [ "catOrder", "name COLLATE NOCASE" ], t, n), e);
 },
 fetchMatchingCount: function(e, t, n) {
-Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT COUNT( name ) AS nameCount FROM accountCategories WHERE name LIKE ? AND rowid != ?;",
 values: [ e, t ]
 }), {
@@ -12504,7 +12518,7 @@ onError: t.onError
 });
 },
 createCategoryFollower: function(e) {
-Checkbook.globals.accountManager.updateAccountModTime(), Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+Checkbook.globals.accountManager.updateAccountModTime(), Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "UPDATE accountCategories SET catOrder = ( SELECT IFNULL( MAX( catOrder ) + 1, 0 ) FROM accountCategories LIMIT 1 ) WHERE rowid = ?;",
 values: [ Checkbook.globals.gts_db.lastInsertRowId ]
 }), e);
@@ -12743,13 +12757,13 @@ classes: "small label"
 } ]
 }, {
 name: "icon",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 label: "Icon",
 maxHeight: 300,
 choices: appIcons
 }, {
 name: "color",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 label: "Color",
 classes: "custom-background legend",
 choices: appColors,
@@ -12757,7 +12771,7 @@ onChange: "colorChanged"
 } ]
 }, {
 name: "errorMessage",
-kind: "GTS.InlineNotification",
+kind: "gts.InlineNotification",
 type: "error",
 content: "",
 showing: !1
@@ -12785,7 +12799,7 @@ name: "manager",
 kind: "Checkbook.accountCategory.manager"
 } ],
 show: function(e, t, n, r) {
-this.inherited(arguments), e < 0 ? this.$.deleteButton.hide() : this.$.deleteButton.show(), e < 0 ? (this.$.title.setContent("Create a Category"), this.rowid = -1, this.name = "", this.icon = "", this.color = "") : e > 0 ? (this.$.title.setContent("Edit Category"), this.rowid = e, this.name = t, this.icon = n, this.color = r) : this.hide(), this.$.name.setValue(this.name), this.$.icon.setValue(this.icon), this.$.color.setValue(GTS.String.ucfirst(this.color));
+this.inherited(arguments), e < 0 ? this.$.deleteButton.hide() : this.$.deleteButton.show(), e < 0 ? (this.$.title.setContent("Create a Category"), this.rowid = -1, this.name = "", this.icon = "", this.color = "") : e > 0 ? (this.$.title.setContent("Edit Category"), this.rowid = e, this.name = t, this.icon = n, this.color = r) : this.hide(), this.$.name.setValue(this.name), this.$.icon.setValue(this.icon), this.$.color.setValue(gts.String.ucfirst(this.color));
 for (var i = 0; i < appColors.length; i++) this.$.color.removeClass(appColors[i].name);
 this.$.color.addClass(this.color), Checkbook.globals.prefs.dispColor === 1 ? this.$.color.show() : this.$.color.hide(), this.$.name.focus();
 },
@@ -12872,11 +12886,11 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(getDBArgs());
+var e = new gts.database(getDBArgs());
 }
 },
 createTransaction: function(e, t, n) {
-Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;",
 values: []
 }), {
@@ -12892,23 +12906,23 @@ type: t
 generateInsertTransactionSQL: function(e) {
 var t = enyo.clone(e.data), n = t.autoTransfer, r = t.autoTransferLink, i = this._prepareData(t, e.type);
 i = i.concat(this.$.recurrence.handleRecurrenceSystem(t, n, r)), i = i.concat(this.handleCategoryData(t)), i.push(Checkbook.globals.gts_db.getInsert("transactions", t));
-if (GTS.Object.validNumber(t.linkedRecord) && t.linkedRecord >= 0) {
+if (gts.Object.validNumber(t.linkedRecord) && t.linkedRecord >= 0) {
 var s = enyo.clone(t);
-GTS.Object.swap(s, "linkedRecord", "itemId"), GTS.Object.swap(s, "linkedAccount", "account"), s.amount = -s.amount, i.push(Checkbook.globals.gts_db.getInsert("transactions", s));
+gts.Object.swap(s, "linkedRecord", "itemId"), gts.Object.swap(s, "linkedAccount", "account"), s.amount = -s.amount, i.push(Checkbook.globals.gts_db.getInsert("transactions", s));
 }
 return n > 0 && r >= 0 && (i = i.concat(this.createAutoTransfer(t, n, r))), i;
 },
 createAutoTransfer: function(e, t, n) {
 if (t <= 0 || n < 0) return [];
 var r = enyo.clone(e);
-GTS.Object.validNumber(r.linkedRecord) && r.linkedRecord >= 0 ? r.itemId += 2 : r.itemId += 1, t === 1 ? r.amount >= 0 ? r.amount = Math.round(Math.ceil(r.amount) * 100 - r.amount * 100) / 100 : r.amount = Math.round(Math.floor(r.amount) * 100 - r.amount * 100) / 100 : t === 2 ? r.amount >= 0 ? r.amount = 1 : r.amount = -1 : r.amount = 0;
+gts.Object.validNumber(r.linkedRecord) && r.linkedRecord >= 0 ? r.itemId += 2 : r.itemId += 1, t === 1 ? r.amount >= 0 ? r.amount = Math.round(Math.ceil(r.amount) * 100 - r.amount * 100) / 100 : r.amount = Math.round(Math.floor(r.amount) * 100 - r.amount * 100) / 100 : t === 2 ? r.amount >= 0 ? r.amount = 1 : r.amount = -1 : r.amount = 0;
 if (r["amount"] == 0) return [];
 r.linkedAccount = n, r.linkedRecord = r.itemId + 1, r.note = r.desc, r.desc = "Auto Transfer", r.category = "Transfer", r.category2 = "Auto Transfer", delete r.checkNum, delete r.payee;
 var i = [];
-return i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), GTS.Object.swap(r, "linkedRecord", "itemId"), GTS.Object.swap(r, "linkedAccount", "account"), r.amount = -r.amount, i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), i;
+return i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), gts.Object.swap(r, "linkedRecord", "itemId"), gts.Object.swap(r, "linkedAccount", "account"), r.amount = -r.amount, i.push(Checkbook.globals.gts_db.getInsert("transactions", r)), i;
 },
 updateTransaction: function(e, t, n) {
-Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, ( SELECT IFNULL( MAX( repeatId ), 0 ) FROM repeats LIMIT 1 ) AS maxRepeatId;",
 values: []
 }), {
@@ -12925,9 +12939,9 @@ var i = this._prepareData(e, t);
 e["repeatUnlinked"] != 1 && e["terminated"] != 1 ? i = i.concat(this.$.recurrence.handleRecurrenceSystem(e)) : (delete e.rObj, delete e.maxItemId, delete e.maxRepeatId), i = i.concat(this.handleCategoryData(e)), i.push(Checkbook.globals.gts_db.getUpdate("transactions", e, {
 itemId: e.itemId
 }));
-if (GTS.Object.validNumber(e.linkedRecord)) {
+if (gts.Object.validNumber(e.linkedRecord)) {
 var s = enyo.clone(e);
-GTS.Object.swap(s, "linkedRecord", "itemId"), GTS.Object.swap(s, "linkedAccount", "account"), s.amount = -s.amount, delete s.cleared, i.push(Checkbook.globals.gts_db.getUpdate("transactions", s, {
+gts.Object.swap(s, "linkedRecord", "itemId"), gts.Object.swap(s, "linkedAccount", "account"), s.amount = -s.amount, delete s.cleared, i.push(Checkbook.globals.gts_db.getUpdate("transactions", s, {
 itemId: s.itemId
 }));
 }
@@ -12938,7 +12952,7 @@ return e.desc = e.desc === "" || e.desc === null ? "Description" : e.desc, e.cle
 },
 handleCategoryData: function(e) {
 var t = [];
-t.push(new GTS.databaseQuery({
+t.push(new gts.databaseQuery({
 sql: "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )",
 values: [ e.itemId, e.itemId ]
 }));
@@ -12978,13 +12992,13 @@ Checkbook.globals.gts_db.queries([ Checkbook.globals.gts_db.getDelete("transacti
 itemId: e
 }), Checkbook.globals.gts_db.getDelete("transactions", {
 linkedRecord: e
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )",
 values: [ e, e ]
 }) ], t);
 },
 fetchTransaction: function(e, t) {
-var n = new GTS.databaseQuery({
+var n = new gts.databaseQuery({
 sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE main.itemId = ? LIMIT 1;',
 values: [ e ]
 });
@@ -12996,7 +13010,7 @@ onError: t.onError
 });
 },
 fetchTransactions: function(e, t, n, r) {
-var i = new GTS.databaseQuery({
+var i = new gts.databaseQuery({
 sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.repeatUnlinked, main.checkNum, main.payee, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE account = ? ORDER BY ' + e.sortQry,
 values: [ e.acctId ]
 });
@@ -13008,7 +13022,7 @@ fetchTransactionsFollower: function(e, t, n, r, i) {
 if (e.runningBalance === 1) {
 var s;
 i.length > 0 && !isNaN(i[0].date) ? s = parseInt(i[0].date) : s = Date.parse(new Date);
-var o = new GTS.databaseQuery({
+var o = new gts.databaseQuery({
 sql: "",
 values: [ e.acctId, s ]
 });
@@ -13021,14 +13035,14 @@ onError: t.onError
 } else enyo.isFunction(t.onSuccess) && t.onSuccess(r, i, []);
 },
 searchTransactions: function(e, t, n, r, i, s) {
-var o = new GTS.databaseQuery({
+var o = new gts.databaseQuery({
 sql: 'SELECT DISTINCT main.itemId, main.desc, main.amount, main.note, main.date, main.account, main.linkedRecord, main.linkedAccount, main.cleared, main.repeatId, main.checkNum, main.payee, ( SELECT accts.acctName FROM accounts accts WHERE accts.acctId = main.account ) AS acctName, ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) AS acctCategory,IFNULL( ( SELECT accountCategories.icon FROM accountCategories WHERE accountCategories.name = ( SELECT accts.acctCategory FROM accounts accts WHERE accts.acctId = main.account ) ), \'icon_2.png\' ) AS acctCategoryIcon,  ( SELECT accts.showTransTime FROM accounts accts WHERE accts.acctId = main.account ) AS showTransTime, ( SELECT accts.enableCategories FROM accounts accts WHERE accts.acctId = main.account ) AS enableCategories, ( SELECT accts.checkField FROM accounts accts WHERE accts.acctId = main.account ) AS checkField, ( SELECT accts.hideNotes FROM accounts accts WHERE accts.acctId = main.account ) AS hideNotes, ( SELECT accts.frozen FROM accounts accts WHERE accts.acctId = main.account ) AS frozen, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN ( \'[\' || IFNULL( ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( \'{ "category": "\' || ts.genCat || \'", "category2" : "\' || ts.specCat || \'", "amount": "\' || ts.amount || \'" }\' ) AS json FROM transactionSplit ts WHERE ts.transId = main.itemId ORDER BY ts.amount DESC ) ), \'{ "category": "?", "category2" : "?", "amount": "0" }\' ) || \']\' ) ELSE main.category END ) AS category, ( CASE WHEN main.category = \'||~SPLIT~||\' THEN \'PARSE_CATEGORY\' ELSE main.category2 END ) AS category2 FROM transactions main WHERE ' + e + " ORDER BY " + n,
 values: enyo.clone(t)
 });
 i && (o.sql += " LIMIT ?", o.values.push(i)), s && (o.sql += " OFFSET ?", o.values.push(s)), Checkbook.globals.gts_db.query(o, r);
 },
 searchTransactionsCount: function(e, t, n, r) {
-var i = new GTS.databaseQuery({
+var i = new gts.databaseQuery({
 sql: "SELECT COUNT( DISTINCT main.itemId ) AS searchCount FROM transactions main WHERE " + e,
 values: enyo.clone(t)
 });
@@ -13061,7 +13075,7 @@ sortGroup: n.sortGroup
 enyo.isFunction(e.onSuccess) && e.onSuccess();
 },
 fetchMaxCheckNumber: function(e, t) {
-if (!GTS.Object.isNumber(e)) {
+if (!gts.Object.isNumber(e)) {
 this.log("No account number specified."), enyo.isFunction(t.onError) && t.onError("No account specified");
 return;
 }
@@ -13097,7 +13111,7 @@ return e !== "" ? i : "";
 },
 determineTransactionType: function(e) {
 var t = "income";
-return GTS.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 && GTS.Object.validNumber(e.linkedRecord) && e.linkedRecord >= 0 ? t = "transfer" : e.amount < 0 && (t = "expense"), t;
+return gts.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 && gts.Object.validNumber(e.linkedRecord) && e.linkedRecord >= 0 ? t = "transfer" : e.amount < 0 && (t = "expense"), t;
 }
 });
 
@@ -13147,7 +13161,8 @@ ondragfinish: "listDrag",
 onLoadingStart: "showLoadingIcon",
 onLoadingFinish: "hideLoadingIcon",
 onScrimShow: "showLoadingScrim",
-onScrimHide: "hideLoadingScrim"
+onScrimHide: "hideLoadingScrim",
+onCloneTransaction: "cloneTransaction"
 }, {
 name: "footer",
 kind: "onyx.MoreToolbar",
@@ -13172,7 +13187,7 @@ src: "assets/menu_icons/sort.png"
 } ]
 }, {
 name: "sortMenu",
-kind: "GTS.SelectedMenu",
+kind: "gts.SelectedMenu",
 floating: !0,
 scrim: !0,
 scrimclasses: "onyx-scrim-translucent",
@@ -13421,12 +13436,18 @@ force: !0
 return !0;
 },
 newTransaction: function(e) {
+this.cloneTransaction(null, {
+data: {},
+type: e.toLowerCase()
+});
+},
+cloneTransaction: function(e, t) {
 this.$.addIncomeButton.getDisabled() || this.$.addTransferButton.getDisabled() || this.$.addExpenseButton.getDisabled() || (this.toggleCreateButtons(), this.showLoadingScrim(), enyo.Signals.send("modifyTransaction", {
 name: "createTransaction",
 kind: "Checkbook.transactions.modify",
 accountObj: this.account,
-trsnObj: {},
-transactionType: e.toLowerCase(),
+trsnObj: t.data,
+transactionType: t.type,
 onFinish: enyo.bind(this, this.addTransactionComplete)
 }));
 },
@@ -13450,11 +13471,12 @@ events: {
 onLoadingStart: "",
 onLoadingFinish: "",
 onScrimShow: "",
-onScrimHide: ""
+onScrimHide: "",
+onCloneTransaction: ""
 },
 components: [ {
 name: "list",
-kind: "GTS.LazyList",
+kind: "gts.LazyList",
 classes: "checkbook-stamp enyo-fit",
 reorderable: !1,
 enableSwipe: !1,
@@ -13469,7 +13491,7 @@ onSwipeComplete: "",
 aboveComponents: [],
 components: [ {
 name: "transactionWrapper",
-kind: "GTS.Item",
+kind: "gts.Item",
 tapHighlight: !0,
 holdHighlight: !1,
 ontap: "transactiontapped",
@@ -13528,22 +13550,29 @@ pinnedReorderComponents: [],
 swipeableComponents: []
 }, {
 name: "transactonMenu",
-kind: "onyx.Menu",
+kind: "gts.EventMenu",
 showOnTop: !0,
 floating: !0,
+scrim: !0,
+scrimclasses: "onyx-scrim-translucent",
+onSelect: "transactionHeldHandler",
 components: [ {
 name: "tmClear",
-content: "Clear Transaction",
-value: "clear"
+content: "Clear",
+value: "clear",
+classes: "bordered"
 }, {
-content: "Edit Transaction",
-value: "edit"
+content: "Edit",
+value: "edit",
+classes: "bordered"
 }, {
-content: "Duplicate Transaction",
-value: "duplicate"
+content: "Duplicate",
+value: "duplicate",
+classes: "bordered"
 }, {
-content: "Delete Transaction",
-value: "delete"
+content: "Delete",
+value: "delete",
+classes: "bordered"
 } ]
 }, {
 name: "viewSingle",
@@ -13551,17 +13580,6 @@ kind: "Checkbook.transactions.viewSingle",
 onClear: "vsCleared",
 onEdit: "vsEdit",
 onDelete: "transactionDeleted"
-}, {
-name: "deleteTransactionConfirm",
-kind: "gts.ConfirmDialog",
-title: "Delete Transaction",
-message: "Are you sure you want to delete this transaction?",
-confirmText: "Delete",
-confirmClass: "onyx-negative",
-cancelText: "Cancel",
-cancelClass: "",
-onConfirm: "deleteTransactionConfirmHandler",
-onCancel: "deleteTransactionConfirmClose"
 } ],
 constructor: function() {
 this.inherited(arguments), this.bound = {
@@ -13607,25 +13625,25 @@ this.account.showTransTime !== 1 && e.setHours(23, 59, 59, 999), e = Date.parse(
 var t = null;
 switch (this.account.sort) {
 case 0:
-t = new GTS.databaseQuery({
+t = new gts.databaseQuery({
 sql: "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date ASC, itemId ASC;",
 values: [ this.account.acctId, e ]
 });
 break;
 case 1:
-t = new GTS.databaseQuery({
+t = new gts.databaseQuery({
 sql: "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date DESC, itemId DESC;",
 values: [ this.account.acctId, e ]
 });
 break;
 case 6:
-t = new GTS.databaseQuery({
+t = new gts.databaseQuery({
 sql: "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 1;",
 values: [ this.account.acctId ]
 });
 break;
 case 7:
-t = new GTS.databaseQuery({
+t = new gts.databaseQuery({
 sql: "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 0;",
 values: [ this.account.acctId ]
 });
@@ -13682,20 +13700,15 @@ this.transactions[e + s] = enyo.mixin({
 dispRunningBalance: i,
 runningBalance: prepAmount(r),
 amount: prepAmount(t[s].amount)
-}, t[s]), this.transactions[e + s].desc = GTS.String.dirtyString(this.transactions[e + s].desc), this.transactions[e + s].category = GTS.String.dirtyString(this.transactions[e + s].category), this.transactions[e + s].category2 = GTS.String.dirtyString(this.transactions[e + s].category2), this.transactions[e + s].note = GTS.String.dirtyString(this.transactions[e + s].note), this.account.sort !== 0 && this.account.sort !== 6 && this.account.sort !== 8 && (r -= this.transactions[e + s].amount);
+}, t[s]), this.transactions[e + s].desc = gts.String.dirtyString(this.transactions[e + s].desc), this.transactions[e + s].category = gts.String.dirtyString(this.transactions[e + s].category), this.transactions[e + s].category2 = gts.String.dirtyString(this.transactions[e + s].category2), this.transactions[e + s].note = gts.String.dirtyString(this.transactions[e + s].note), this.account.sort !== 0 && this.account.sort !== 6 && this.account.sort !== 8 && (r -= this.transactions[e + s].amount);
 }
 this.$.list.setCount(this.transactions.length), this.$.list.refresh(), this.initialScrollCompleted ? this.savedScrollPosition && enyo.job("moveToSavedScrollPosition", this.bound.moveToSavedScrollPosition, 1e3) : (this.initialScrollCompleted = !0, this.initialScroll()), enyo.asyncMethod(this, this.doLoadingFinish);
 },
 duplicateTransaction: function(e) {
-this.log(), this.toggleCreateButtons();
-var t, n = enyo.clone(this.transactions[e]);
-GTS.Object.validNumber(n.linkedRecord) && n.linkedRecord >= 0 ? t = "transfer" : n.amount < 0 ? t = "expense" : t = "income", delete n.date, delete n.itemId, delete n.linkedRecord, delete n.repeatId, delete n.cleared, enyo.Signals.send("modifyTransaction", {
-name: "createTransaction",
-kind: "Checkbook.transactions.modify",
-accountObj: this.account,
-trsnObj: n,
-transactionType: t.toLowerCase(),
-onFinish: enyo.bind(this, this.addTransactionComplete)
+var t = enyo.clone(this.transactions[e]), n = "income";
+gts.Object.validNumber(t.linkedRecord) && t.linkedRecord >= 0 ? n = "transfer" : t.amount < 0 && (n = "expense"), delete t.date, delete t.itemId, delete t.linkedRecord, delete t.repeatId, delete t.cleared, this.doCloneTransaction({
+data: t,
+type: n.toLowerCase()
 });
 },
 transactiontapped: function(e, t) {
@@ -13720,15 +13733,20 @@ accounts: n
 }), this.account.itemCount--, this.reloadTransactionList(), enyo.asyncMethod(this.$.list, this.$.list.scrollToRow, e - 1)), enyo.asyncMethod(this, this.doScrimHide);
 },
 transactionHeld: function(e, t) {
-return this.log(arguments), this.log("I DO NOT WORK YET"), !0;
+if (this.account.frozen === 1) return;
+this.transactions[t.index].cleared === 1 ? this.$.tmClear.setContent("Unclear") : this.$.tmClear.setContent("Clear"), this.$.transactonMenu.rowIndex = t.index, this.$.transactonMenu.showAtEvent(t);
 },
 transactionHeldHandler: function(e, t) {
-this.log(), this.log("I DO NOT WORK YET", arguments);
-return !0;
-var n;
+var n = this.$.transactonMenu.rowIndex;
+if (!gts.Object.validNumber(n) || n < 0 || !t.selected) return;
+return t.selected.value === "clear" ? enyo.asyncMethod(this, this.vsCleared, null, {
+rowIndex: n
+}) : t.selected.value === "edit" ? enyo.asyncMethod(this, this.vsEdit, null, {
+rowIndex: n
+}) : t.selected.value === "duplicate" ? this.duplicateTransaction(n) : t.selected.value === "delete" && enyo.asyncMethod(this, this.confirmDeletion, n), !0;
 },
 transactionCleared: function(e, t) {
-return this.log(), this.vsCleared(null, t), t.preventDefault(), !0;
+return this.vsCleared(null, t), t.preventDefault(), !0;
 },
 vsCleared: function(e, t) {
 var n = t.rowIndex;
@@ -13745,11 +13763,36 @@ linkedAccount: this.transactions[n].linkedAccount
 }
 }), enyo.isFunction(t.callback) && t.callback(r), !0;
 },
-deleteTransactionConfirmHandler: function() {
-this.log(), this.transactionDeleted(null, this.$.deleteTransactionConfirm.rowIndex), this.deleteTransactionConfirmClose();
+confirmDeletion: function(e) {
+this.transactions[e].repeatId > 0 || this.transactions[e].repeatId === 0 ? this.createComponent({
+name: "deleteTransactionConfirm",
+kind: "Checkbook.transactions.recurrence.delete",
+transactionId: this.transactions[e].itemId,
+recurrenceId: this.transactions[e].repeatId,
+rowIndex: e,
+onFinish: "deleteTransactionHandler",
+onCancel: "deleteTransactionConfirmClose"
+}) : this.createComponent({
+name: "deleteTransactionConfirm",
+kind: "gts.ConfirmDialog",
+title: "Delete Transaction",
+message: "Are you sure you want to delete this transaction?",
+confirmText: "Delete",
+confirmClass: "onyx-negative",
+cancelText: "Cancel",
+cancelClass: "",
+rowIndex: e,
+onConfirm: "deleteTransactionHandler",
+onCancel: "deleteTransactionConfirmClose"
+}), this.$.deleteTransactionConfirm.show();
 },
 deleteTransactionConfirmClose: function() {
-this.log(), this.$.deleteTransactionConfirm.close();
+this.$.deleteTransactionConfirm.hide(), this.$.deleteTransactionConfirm.destroy();
+},
+deleteTransactionHandler: function() {
+this.transactionDeleted(null, {
+rowIndex: this.$.deleteTransactionConfirm.rowIndex
+}), enyo.asyncMethod(this, this.deleteTransactionConfirmClose);
 },
 transactionDeleted: function(e, t) {
 this.log();
@@ -13803,7 +13846,7 @@ centered: !0,
 floating: !0,
 scrim: !0,
 scrimclasses: "onyx-scrim-translucent",
-autoDismiss: !1,
+autoDismiss: !0,
 published: {
 index: -1,
 account: null,
@@ -13933,7 +13976,7 @@ classes: "label"
 } ]
 }, {
 name: "cleared",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Cleared",
 sublabel: "",
@@ -14137,7 +14180,7 @@ ontap: "amountTypeChanged",
 classes: "margin-right"
 }, {
 name: "amount",
-kind: "GTS.DecimalInput",
+kind: "gts.DecimalInput",
 fit: !0,
 placeholder: "0.00"
 }, {
@@ -14146,13 +14189,13 @@ classes: "label"
 } ]
 }, {
 name: "account",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 label: "Account",
 onChange: "accountChanged",
 classes: "custom-background bordered"
 }, {
 name: "linkedAccount",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 label: "Transfer To...",
 onChange: "linkedAccountChanged",
 classes: "custom-background"
@@ -14217,7 +14260,7 @@ kind: "onyx.InputDecorator",
 classes: "inline-force margin-right",
 components: [ {
 name: "categoryAmount",
-kind: "GTS.DecimalInput",
+kind: "gts.DecimalInput",
 oninput: "categoryAmountChanged",
 placeholder: "0.00"
 } ]
@@ -14329,7 +14372,7 @@ classes: "label"
 } ]
 }, {
 name: "cleared",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Cleared",
 sublabel: "",
@@ -14338,7 +14381,7 @@ offContent: "Pending",
 value: !1
 }, {
 name: "autoTrans",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 classes: "bordered",
 label: "Auto Transfer",
 sublabel: "",
@@ -14408,11 +14451,11 @@ this.inherited(arguments), this.buildDateSystem();
 buildDateSystem: function() {
 !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs.alwaysFullCalendar ? this.$.dateDrawer.createComponent({
 name: "date",
-kind: "GTS.DatePicker",
+kind: "gts.DatePicker",
 onSelect: "dateChanged",
 components: [ {
 name: "time",
-kind: "GTS.TimePicker",
+kind: "gts.TimePicker",
 label: "Time",
 minuteInterval: 5,
 is24HrMode: !1,
@@ -14433,7 +14476,7 @@ onSelect: "dateChanged"
 } ]
 }, {
 name: "time",
-kind: "GTS.TimePicker",
+kind: "gts.TimePicker",
 label: "Time",
 minuteInterval: 5,
 is24HrMode: !1,
@@ -14476,7 +14519,7 @@ initialAccountLoadHandler: function(e) {
 this.$.account.removeClass(this.accountObj.acctCategoryColor), this.accountObj = e, this.$.categorySystem.loadCategories(enyo.bind(this, this.loadTransactionData));
 },
 loadTransactionData: function() {
-this.log(), GTS.Object.validNumber(this.trsnObj.amount) && (this.trsnObj.amount_old = this.trsnObj.amount), this.trsnObj.itemId >= 0 && (this.transactionType = Checkbook.globals.transactionManager.determineTransactionType(this.trsnObj)), this.trsnObj.amount = Math.abs(this.trsnObj.amount).toFixed(2), this.trsnObj.date = new Date(parseInt(this.trsnObj.date)), this.trsnObj.cleared = this.trsnObj.cleared === 1, this.$.desc.setValue(this.trsnObj.desc), this.$.amount.setValue(this.trsnObj.amount), this.$.account.setValue(this.trsnObj.account), this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.$.date.setValue(this.trsnObj.date), this.$.time.setValue(this.trsnObj.date), this.$.checkNum.setValue(this.trsnObj.checkNum), this.$.payeeField.setValue(this.trsnObj.payee), this.$.cleared.setValue(this.trsnObj.cleared), this.$.notes.setValue(this.trsnObj.note), (this.trsnObj.repeatId > 0 || this.trsnObj.repeatId === 0) && this.trsnObj["repeatUnlinked"] != 1 ? Checkbook.globals.transactionManager.$.recurrence.fetch(this.trsnObj.repeatId, {
+this.log(), gts.Object.validNumber(this.trsnObj.amount) && (this.trsnObj.amount_old = this.trsnObj.amount), this.trsnObj.itemId >= 0 && (this.transactionType = Checkbook.globals.transactionManager.determineTransactionType(this.trsnObj)), this.trsnObj.amount = Math.abs(this.trsnObj.amount).toFixed(2), this.trsnObj.date = new Date(parseInt(this.trsnObj.date)), this.trsnObj.cleared = this.trsnObj.cleared === 1, this.$.desc.setValue(this.trsnObj.desc), this.$.amount.setValue(this.trsnObj.amount), this.$.account.setValue(this.trsnObj.account), this.$.linkedAccount.setValue(this.trsnObj.linkedAccount), this.$.date.setValue(this.trsnObj.date), this.$.time.setValue(this.trsnObj.date), this.$.checkNum.setValue(this.trsnObj.checkNum), this.$.payeeField.setValue(this.trsnObj.payee), this.$.cleared.setValue(this.trsnObj.cleared), this.$.notes.setValue(this.trsnObj.note), (this.trsnObj.repeatId > 0 || this.trsnObj.repeatId === 0) && this.trsnObj["repeatUnlinked"] != 1 ? Checkbook.globals.transactionManager.$.recurrence.fetch(this.trsnObj.repeatId, {
 onSuccess: enyo.bind(this, this.loadRecurrenceData)
 }) : this.trsnObj["repeatUnlinked"] == 1 && this.$.recurrenceWrapper.hide(), this.trsnObj.category = Checkbook.globals.transactionManager.parseCategoryDB(this.trsnObj.category, this.trsnObj.category2), this.trsnObj.categoryOriginal = this.trsnObj.category, this.renderCategories = !0, this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.adjustSystemViews(), this.dateChanged(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.reflow();
 },
@@ -14536,7 +14579,7 @@ time: this.accountObj.showTransTime === 1 ? "short" : ""
 getCategoryItem: function(e, t) {
 if (!this.renderCategories) return;
 var n = this.trsnObj.category[t.index], r = t.item;
-if (n && r) return r.$.categoryWrapper.addRemoveClass("h-box", !enyo.Panels.isScreenNarrow()), r.$.categoryItemBreak.setShowing(enyo.Panels.isScreenNarrow()), r.$.categoryText.setContent(n.category + " >> " + GTS.String.dirtyString(n.category2)), r.$.categoryText.addRemoveClass("margin-half-bottom", enyo.Panels.isScreenNarrow()), r.$.categoryText.addRemoveClass("full-width", enyo.Panels.isScreenNarrow()), this.trsnObj.category.length > 1 ? (n.amount = Math.abs(n.amount).toFixed(2), this.accountObj["atmEntry"] == 1 ? (r.$.categoryAmount.setValue(deformatAmount(n.amount)), r.$.categoryAmount.setAtm(!0), r.$.categoryAmount.setSelectAllOnFocus(!1)) : (r.$.categoryAmount.setAtm(!1), r.$.categoryAmount.setSelectAllOnFocus(!0)), r.$.categoryAmount.setDisabled(!1), r.$.categoryDelete.setDisabled(!1), r.$.categoryDelete.addClass("onyx-negative")) : (r.$.categoryAmount.setDisabled(!0), r.$.categoryDelete.setDisabled(!0), r.$.categoryDelete.removeClass("onyx-negative"), n.amount = 0), !0;
+if (n && r) return r.$.categoryWrapper.addRemoveClass("h-box", !enyo.Panels.isScreenNarrow()), r.$.categoryItemBreak.setShowing(enyo.Panels.isScreenNarrow()), r.$.categoryText.setContent(n.category + " >> " + gts.String.dirtyString(n.category2)), r.$.categoryText.addRemoveClass("margin-half-bottom", enyo.Panels.isScreenNarrow()), r.$.categoryText.addRemoveClass("full-width", enyo.Panels.isScreenNarrow()), this.trsnObj.category.length > 1 ? (n.amount = Math.abs(n.amount).toFixed(2), this.accountObj["atmEntry"] == 1 ? (r.$.categoryAmount.setValue(deformatAmount(n.amount)), r.$.categoryAmount.setAtm(!0), r.$.categoryAmount.setSelectAllOnFocus(!1)) : (r.$.categoryAmount.setAtm(!1), r.$.categoryAmount.setSelectAllOnFocus(!0)), r.$.categoryAmount.setDisabled(!1), r.$.categoryDelete.setDisabled(!1), r.$.categoryDelete.addClass("onyx-negative")) : (r.$.categoryAmount.setDisabled(!0), r.$.categoryDelete.setDisabled(!0), r.$.categoryDelete.removeClass("onyx-negative"), n.amount = 0), !0;
 },
 categoryTapped: function(e, t) {
 this.$.categorySystem.getCategoryChoice(enyo.bind(this, this.categorySelected, t.index), this.trsnObj.category[t.index]);
@@ -14701,7 +14744,7 @@ this.closeRecurrenceEventDialog(), this.saveModifiedTransaction();
 },
 updateAll: function() {
 var e = this, t = this.trsnObj.repeatId;
-this.closeRecurrenceEventDialog(), this.updateTransactionObject(), this.trsnObj.repeatId = -1, this.$.date.setValue(GTS.Object.isDate(this.trsnObj.rObj.origDate) ? this.trsnObj.rObj.origDate.getTime() : this.trsnObj.rObj.origDate), Checkbook.globals.transactionManager.$.recurrence.deleteAll(t, {
+this.closeRecurrenceEventDialog(), this.updateTransactionObject(), this.trsnObj.repeatId = -1, this.$.date.setValue(gts.Object.isDate(this.trsnObj.rObj.origDate) ? this.trsnObj.rObj.origDate.getTime() : this.trsnObj.rObj.origDate), Checkbook.globals.transactionManager.$.recurrence.deleteAll(t, {
 onSuccess: enyo.bind(this, this.saveNewTransaction)
 });
 },
@@ -14749,7 +14792,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(getDBArgs());
+var e = new gts.database(getDBArgs());
 }
 }
 });
@@ -14856,7 +14899,7 @@ enabled: !0
 },
 components: [ {
 name: "ac",
-kind: "GTS.AutoComplete",
+kind: "gts.AutoComplete",
 onValueSelected: "handleSuggestion",
 onDataRequested: "fetchData",
 components: [ {
@@ -14875,7 +14918,7 @@ if (t.value.length <= 0) {
 t.callback([]);
 return;
 }
-Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT DISTINCT desc FROM transactions WHERE desc LIKE ? ORDER BY desc ASC LIMIT ?;",
 values: [ t.value + "%", e.getLimit() ]
 }), {
@@ -14888,7 +14931,7 @@ for (var n = 0; n < e.length; n++) t.push(e[n].desc);
 this.$.ac.setValues(t);
 },
 handleSuggestion: function(e, t) {
-return Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+return Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT ( SELECT linkedAccount FROM( SELECT b.linkedAccount, COUNT( b.desc ) AS countB FROM transactions b WHERE b.desc = a.desc AND b.linkedAccount != '' AND b.account = ? GROUP BY b.linkedAccount ORDER BY countB DESC LIMIT 1 ) ) AS linkedAcct,  ( CASE WHEN a.category = '||~SPLIT~||' THEN ( '[' || ( SELECT GROUP_CONCAT( json ) FROM ( SELECT ( '{ \"category\": \"' || ts.genCat || '\", \"category2\" : \"' || ts.specCat || '\", \"amount\": \"' || ts.amount || '\" }' ) AS json FROM transactionSplit ts WHERE ts.transId = a.itemId ORDER BY ts.amount DESC ) ) || ']' ) ELSE a.category END ) AS category, ( CASE WHEN a.category = '||~SPLIT~||' THEN 'PARSE_CATEGORY' ELSE a.category2 END ) AS category2, COUNT( desc ) AS count FROM transactions a WHERE desc = ? AND category != '' GROUP BY category ORDER BY count DESC LIMIT 1;",
 values: [ this.getOwner().$.account.getValue(), t.value ]
 }), {
@@ -14903,7 +14946,7 @@ if (t.length > 0) var n = {
 data: !0,
 desc: e,
 linkedAccount: t[0].linkedAccount,
-category: Checkbook.globals.transactionManager.parseCategoryDB(GTS.String.dirtyString(t[0].category), GTS.String.dirtyString(t[0].category2))
+category: Checkbook.globals.transactionManager.parseCategoryDB(gts.String.dirtyString(t[0].category), gts.String.dirtyString(t[0].category2))
 };
 this.doValueChanged(n);
 }
@@ -14918,11 +14961,11 @@ events: {
 onRequestInsertTransactionSQL: ""
 },
 compare: function(e, t) {
-if (GTS.Object.isUndefined(e) && !GTS.Object.isUndefined(t) || !GTS.Object.isUndefined(e) && GTS.Object.isUndefined(t)) return !1;
+if (gts.Object.isUndefined(e) && !gts.Object.isUndefined(t) || !gts.Object.isUndefined(e) && gts.Object.isUndefined(t)) return !1;
 var n = !0;
 n = n && e.frequency === t.frequency, n = n && e.itemSpan === t.itemSpan, n = n && enyo.json.stringify(e.daysOfWeek) === enyo.json.stringify(t.daysOfWeek), n = n && e.endingCondition === t.endingCondition;
 if (n && (e["endingCondition"] == "date" || t["endingCondition"] == "date")) {
-var r = GTS.Object.isDate(e.endDate) ? e.endDate : new Date(e.endDate), i = GTS.Object.isDate(t.endDate) ? t.endDate : new Date(t.endDate);
+var r = gts.Object.isDate(e.endDate) ? e.endDate : new Date(e.endDate), i = gts.Object.isDate(t.endDate) ? t.endDate : new Date(t.endDate);
 n = n && r === i;
 }
 return n && (e["endingCondition"] == "occurences" || t["endingCondition"] == "occurences") && (n = n && e.endCount === t.endCount), n;
@@ -14966,7 +15009,7 @@ rep_linkedAcctId: e.linkedAccount,
 rep_autoTrsnLink: t > 0 && n >= 0 ? t : 0,
 rep_autoTrsnLinkAcct: t > 0 && n >= 0 ? n : "",
 last_sync: "",
-maxItemId: GTS.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.itemId + 2 : e.itemId + 1
+maxItemId: gts.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.itemId + 2 : e.itemId + 1
 };
 r = r.concat(this.generateSeriesSQL([ enyo.clone(i) ])), delete i.maxItemId, r.unshift(Checkbook.globals.gts_db.getInsert("repeats", i));
 } else if (!(isNaN(e.repeatId) || e.repeatId < 0) && e["repeatUnlinked"] != 1 && e["terminated"] != 1) if (e["rObj"]["frequency"] == "none") r.push(this._getDeleteFutureSQL(e.itemId, e.repeatId, !0)); else {
@@ -14991,7 +15034,7 @@ rep_autoTrsnLink: t > 0 && n >= 0 ? t : 0,
 rep_autoTrsnLinkAcct: t > 0 && n >= 0 ? n : "",
 last_sync: "",
 terminated: 0,
-maxItemId: GTS.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.maxItemId + 1 : e.maxItemId
+maxItemId: gts.Object.validNumber(e.linkedAccount) && e.linkedAccount >= 0 ? e.maxItemId + 1 : e.maxItemId
 };
 r = r.concat(this._getDeleteFutureSQL(e.itemId, s.repeatId, !0)), r = r.concat(this.generateSeriesSQL([ enyo.clone(s) ])), delete s.maxItemId, delete s.lastOccurrence, delete s.currCount, r.push(Checkbook.globals.gts_db.getUpdate("repeats", s, {
 repeatId: s.repeatId
@@ -15001,7 +15044,7 @@ return delete e.rObj, delete e.maxItemId, delete e.maxRepeatId, r;
 },
 updateSeriesTransactions: function(e, t) {
 var n = new Date, r = new Date(n.getFullYear(), n.getMonth(), n.getDate() + Checkbook.globals.prefs.seriesDayLimit, 23, 59, 59, 999);
-e = e || -1, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+e = e || -1, Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, *, ( ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NULL AND transactions.date > ? ) +  ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NOT NULL AND transactions.date > ? ) / 2 ) AS futureCount FROM repeats WHERE ( rep_acctId = ? " + (e < 0 ? "OR 1 = 1 " : "") + ") " + "AND lastOccurrence < ? " + "AND futureCount < ? " + "AND ( " + "( " + "endingCondition = 'none' " + ") OR ( " + "endingCondition = 'date' " + "AND endDate != '' " + "AND endDate > lastOccurrence " + ") OR ( " + "endingCondition = 'occurences' " + "AND endCount != '' " + "AND endCount > currCount " + ") " + ") " + "AND terminated != 1",
 values: [ Date.parse(n), Date.parse(n), e, Date.parse(r), Checkbook.globals.prefs.seriesCountLimit ]
 }), {
@@ -15053,10 +15096,10 @@ category2: "",
 rObj: !1,
 autoTransfer: e[c].rep_autoTrsnLink,
 autoTransferLink: e[c].rep_autoTrsnLink > 0 ? e[c].rep_autoTrsnLinkAcct : -1
-}, GTS.Object.validNumber(e[c].rep_linkedAcctId) && e[c].rep_linkedAcctId >= 0 ? l = "transfer" : e[c].rep_amount < 0 ? l = "expense" : l = "income", n = n.concat(Checkbook.globals.transactionManager.generateInsertTransactionSQL({
+}, gts.Object.validNumber(e[c].rep_linkedAcctId) && e[c].rep_linkedAcctId >= 0 ? l = "transfer" : e[c].rep_amount < 0 ? l = "expense" : l = "income", n = n.concat(Checkbook.globals.transactionManager.generateInsertTransactionSQL({
 data: i,
 type: l
-})), a++, f++, t += GTS.Object.validNumber(i.linkedAccount) && i.linkedAccount >= 0 ? 2 : 1;
+})), a++, f++, t += gts.Object.validNumber(i.linkedAccount) && i.linkedAccount >= 0 ? 2 : 1, i.autoTransfer > 0 && i.autoTransferLink >= 0 && (t += 2);
 }
 n.push(Checkbook.globals.gts_db.getUpdate("repeats", {
 lastOccurrence: Date.parse(u),
@@ -15082,10 +15125,10 @@ Checkbook.globals.gts_db.queries([ Checkbook.globals.gts_db.getDelete("transacti
 itemId: e
 }), Checkbook.globals.gts_db.getDelete("transactions", {
 linkedRecord: e
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )",
 values: [ e, e ]
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "UPDATE repeats SET currCount = MAX( IFNULL( ( SELECT ( sub.currCount - 1 ) FROM repeats sub WHERE sub.repeatId = repeats.repeatId ), 0 ), 0 ) WHERE repeatId = ?",
 values: [ t ]
 }) ], n);
@@ -15098,10 +15141,10 @@ Checkbook.globals.gts_db.queries(this._getDeleteFutureSQL(e, t, !0), n);
 },
 _getDeleteFutureSQL: function(e, t, n) {
 var r;
-return n ? r = [ t, e ] : r = [ t, e, e ], [ new GTS.databaseQuery({
+return n ? r = [ t, e ] : r = [ t, e, e ], [ new gts.databaseQuery({
 sql: "UPDATE repeats SET terminated = 1, currCount = MAX( ( ( SELECT sub.currCount FROM repeats sub WHERE sub.repeatId = repeats.repeatId ) - ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date " + (n ? ">" : ">=") + " ( SELECT trsn.date FROM transactions trsn WHERE trsn.itemId = ? ) ) ), 0 ) WHERE repeatId = ?",
 values: [ e, t ]
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "DELETE FROM transactions WHERE repeatId = ? AND ( " + (n ? "" : "itemId = ? OR ") + "itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + (n ? ">" : ">=") + " ( SELECT sub2.date FROM transactions sub2 WHERE sub2.itemId = ? ) ) )",
 values: r
 }) ];
@@ -15263,7 +15306,7 @@ onRecurrenceChange: ""
 },
 components: [ {
 name: "recurrenceNode",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 label: "Recurrence",
 onChange: "recurrenceNodeChanged",
 classes: "force-left-padding",
@@ -15287,7 +15330,7 @@ components: [ {
 classes: "margin-half-left margin-half-right"
 }, {
 name: "itemSpan",
-kind: "GTS.IntegerPicker",
+kind: "gts.IntegerPicker",
 min: 1,
 max: 64,
 style: "margin-right: 3px;",
@@ -15301,7 +15344,7 @@ classes: "label box-flex-1 text-right"
 } ]
 }, {
 name: "endingCondition",
-kind: "GTS.SelectorBar",
+kind: "gts.SelectorBar",
 label: "Ending Condition",
 classes: "bordered",
 onChange: "endingConditionChanged",
@@ -15334,7 +15377,7 @@ components: [ {
 classes: "margin-half-left margin-half-right"
 }, {
 name: "endingCount",
-kind: "GTS.IntegerPicker",
+kind: "gts.IntegerPicker",
 min: 1,
 max: 100,
 onChange: "sendSummary"
@@ -15473,11 +15516,11 @@ this.$.recurrenceNode.setChoices(this.recurrenceOptions), this.$.recurrenceNode.
 buildDateSystem: function() {
 !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs.alwaysFullCalendar ? this.$.endingDateWrapper.createComponent({
 name: "endingDate",
-kind: "GTS.DatePicker",
+kind: "gts.DatePicker",
 onSelect: "sendSummary",
 components: [ {
 name: "endingTime",
-kind: "GTS.TimePicker",
+kind: "gts.TimePicker",
 label: "Time",
 minuteInterval: 5,
 is24HrMode: !1,
@@ -15498,7 +15541,7 @@ onSelect: "sendSummary"
 } ]
 }, {
 name: "endingTime",
-kind: "GTS.TimePicker",
+kind: "gts.TimePicker",
 label: "Time",
 minuteInterval: 5,
 is24HrMode: !1,
@@ -15573,7 +15616,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(getDBArgs());
+var e = new gts.database(getDBArgs());
 }
 },
 fetchCategories: function(e, t, n) {
@@ -15613,7 +15656,7 @@ i.length < n ? enyo.isFunction(t.onSuccess) && t.onSuccess() : this.load(e, t, r
 },
 createCategory: function(e, t, n) {
 this.categoriesChanged();
-var r = new GTS.databaseQuery({
+var r = new gts.databaseQuery({
 sql: "INSERT INTO transactionCategories( genCat, specCat ) VALUES( ?, ? );",
 values: [ e, t ]
 });
@@ -15621,13 +15664,13 @@ Checkbook.globals.gts_db.query(r, n);
 },
 editCategory: function(e, t, n, r, i, s) {
 this.categoriesChanged();
-var o = [ new GTS.databaseQuery({
+var o = [ new gts.databaseQuery({
 sql: "UPDATE transactionCategories SET genCat = ?, specCat = ? WHERE catId = ?;",
 values: [ t, n, e ]
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "UPDATE transactions SET category = ?, category2 = ? WHERE category = ? AND category2 = ?;",
 values: [ t, n, r, i ]
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "UPDATE transactionSplit SET genCat = ?, specCat = ? WHERE genCat = ? AND specCat = ?;",
 values: [ t, n, r, i ]
 }) ];
@@ -15635,13 +15678,13 @@ Checkbook.globals.gts_db.queries(o, s);
 },
 editGroup: function(e, t, n) {
 this.categoriesChanged();
-var r = [ new GTS.databaseQuery({
+var r = [ new gts.databaseQuery({
 sql: "UPDATE transactionCategories SET genCat = ? WHERE genCat = ?;",
 values: [ e, t ]
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "UPDATE transactions SET category = ? WHERE category = ?;",
 values: [ e, t ]
-}), new GTS.databaseQuery({
+}), new gts.databaseQuery({
 sql: "UPDATE transactionSplit SET genCat = ? WHERE genCat = ?;",
 values: [ e, t ]
 }) ];
@@ -15649,7 +15692,7 @@ Checkbook.globals.gts_db.queries(r, n);
 },
 deleteCategory: function(e, t) {
 this.categoriesChanged();
-var n = new GTS.databaseQuery({
+var n = new gts.databaseQuery({
 sql: "DELETE FROM transactionCategories WHERE catId = ?;",
 values: [ e ]
 });
@@ -15938,7 +15981,7 @@ kind: "onyx.Groupbox",
 classes: "light",
 components: [ {
 name: "generalWrapper",
-kind: "GTS.AutoComplete",
+kind: "gts.AutoComplete",
 layoutKind: "FittableColumnsLayout",
 alwaysLooksFocused: !0,
 onValueSelected: "generalAutoSuggestComplete",
@@ -15972,7 +16015,7 @@ classes: "small label"
 } ]
 }, {
 name: "errorMessage",
-kind: "GTS.InlineNotification",
+kind: "gts.InlineNotification",
 type: "error",
 content: "",
 showing: !1
@@ -16007,7 +16050,7 @@ if (t.value.length <= 0) {
 t.callback([]);
 return;
 }
-Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT DISTINCT genCat FROM transactionCategories WHERE genCat LIKE ? LIMIT ?;",
 values: [ t.value + "%", e.getLimit() ]
 }), {
@@ -16112,7 +16155,7 @@ style: "margin: 0 15px 0 0;"
 }, {
 showing: !1,
 name: "loadingSpinner",
-kind: "GTS.Spinner",
+kind: "gts.Spinner",
 className: "img-icon",
 style: "margin: 0px 15px 5px 0;"
 }, {
@@ -16229,7 +16272,7 @@ style: "margin-right: 10px;"
 } ]
 }, {
 name: "fromToggle",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 mainText: "Limit Start Date",
 subText: "Limit the earliest date that can appear in search query.",
 onText: "Yes",
@@ -16241,11 +16284,11 @@ kind: enyo.BasicDrawer,
 style: "padding: 0px 25px 0px 5px;",
 components: [ {
 name: "fromDate",
-kind: "GTS.DateTimePicker"
+kind: "gts.DateTimePicker"
 } ]
 }, {
 name: "toToggle",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 mainText: "Limit End Date",
 subText: "Limit the latest date that can appear in search query.",
 onText: "Yes",
@@ -16257,11 +16300,11 @@ kind: enyo.BasicDrawer,
 style: "padding: 0px 25px 0px 5px;",
 components: [ {
 name: "toDate",
-kind: "GTS.DateTimePicker"
+kind: "gts.DateTimePicker"
 } ]
 }, {
 name: "cleared",
-kind: "GTS.ListSelectorBar",
+kind: "gts.ListSelectorBar",
 labelText: "Include Transaction Status",
 className: "force-left-padding",
 value: 2,
@@ -16277,21 +16320,21 @@ value: 0
 } ]
 }, {
 name: "includeNeg",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 mainText: "Include Expenses",
 onText: "Yes",
 offText: "No",
 value: !0
 }, {
 name: "includePos",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 mainText: "Include Income",
 onText: "Yes",
 offText: "No",
 value: !0
 }, {
 name: "includeTrans",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 mainText: "Include Transfers",
 onText: "Yes",
 offText: "No",
@@ -16330,7 +16373,7 @@ Date.validDate(a) ? (a.setHours(23, 59, 59, 999), this.$.toDate.setValue(a), thi
 }
 this.toggleToggles();
 var f = "";
-t && (f += '"' + t + '"' + (n && n !== "%" ? ' "' + n + '"' : "")), this.$.searchString.setValue(GTS.String.trim(f)), this.$.searchString.getValue().length > 0 && this.search();
+t && (f += '"' + t + '"' + (n && n !== "%" ? ' "' + n + '"' : "")), this.$.searchString.setValue(gts.String.trim(f)), this.$.searchString.getValue().length > 0 && this.search();
 },
 toggleToggles: function() {
 this.$.fromDrawer.setOpen(this.$.fromToggle.getValue()), this.$.toDrawer.setOpen(this.$.toToggle.getValue());
@@ -16352,8 +16395,8 @@ authSuccessful: function(e) {
 this.acctList.items[e.rowIndex].bypass = !0, this.accountSelectedChanged(null, e);
 },
 search: function() {
-var e = "", t = [], n = GTS.String.trim(GTS.String.dirtyString(this.$.searchString.getValue())), r = n.match(/"([^"]*)"/gi);
-n = GTS.String.trim(n.replace(/"[^"]*"/gi, "")), n = n.split(" ");
+var e = "", t = [], n = gts.String.trim(gts.String.dirtyString(this.$.searchString.getValue())), r = n.match(/"([^"]*)"/gi);
+n = gts.String.trim(n.replace(/"[^"]*"/gi, "")), n = n.split(" ");
 if (r && r.length > 0) {
 for (var i = 0; i < r.length; i++) r[i] = r[i].replace(/"/g, "");
 n = n.concat(r);
@@ -16596,7 +16639,7 @@ onSuccess: enyo.bind(this, this.acquirePageHandler, n)
 acquirePageHandler: function(e, t) {
 for (var n = 0; n < t.length; n++) this.transactions[e + n] = enyo.mixin({
 amount: prepAmount(t[n].amount)
-}, t[n]), this.transactions[e + n].desc = GTS.String.dirtyString(this.transactions[e + n].desc), this.transactions[e + n].category = GTS.String.dirtyString(this.transactions[e + n].category), this.transactions[e + n].category2 = GTS.String.dirtyString(this.transactions[e + n].category2), this.transactions[e + n].note = GTS.String.dirtyString(this.transactions[e + n].note);
+}, t[n]), this.transactions[e + n].desc = gts.String.dirtyString(this.transactions[e + n].desc), this.transactions[e + n].category = gts.String.dirtyString(this.transactions[e + n].category), this.transactions[e + n].category2 = gts.String.dirtyString(this.transactions[e + n].category2), this.transactions[e + n].note = gts.String.dirtyString(this.transactions[e + n].note);
 this.$.entries && this.$.entries.refresh(), this.doLoading(!1);
 }
 });
@@ -16610,7 +16653,7 @@ constructor: function() {
 this.inherited(arguments);
 if (!Checkbook.globals.gts_db) {
 this.log("creating database object.");
-var e = new GTS.database(getDBArgs());
+var e = new gts.database(getDBArgs());
 }
 },
 createBudget: function(e, t) {
@@ -16621,7 +16664,7 @@ onSuccess: enyo.bind(this, this.createBudgetFollower, t)
 createBudgetFollower: function(e) {
 console.log(arguments);
 var t = Checkbook.globals.gts_db.lastInsertID();
-t ? Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+t ? Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "UPDATE budgets SET budgetOrder = ( SELECT IFNULL( MAX( budgetOrder ) + 1, 0 ) FROM budgets LIMIT 1 ) WHERE budgetId = ?;",
 values: [ t ]
 }), e) : enyo.isFunction(e.onSuccess) && e.onSuccess();
@@ -16637,7 +16680,7 @@ budgetId: e
 }), t);
 },
 fetchOverallBudget: function(e, t, n) {
-var r = new GTS.databaseQuery({
+var r = new gts.databaseQuery({
 sql: "SELECT COUNT( budgetId ) AS budgetCount, IFNULL( SUM( spending_limit ), 0 ) AS spending_limit, IFNULL( SUM(  IFNULL( ( SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) + ( IFNULL( ( SELECT ABS( SUM( ts.amount ) ) FROM transactions ex LEFT JOIN transactionSplit ts ON ts.transId = ex.itemId WHERE ts.genCat LIKE budgets.category AND ts.specCat LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) ) ), 0 ) AS spent FROM budgets;",
 values: [ e, t, e, t ]
 });
@@ -16649,7 +16692,7 @@ onError: n.onError
 });
 },
 fetchBudget: function(e, t, n, r) {
-var i = new GTS.databaseQuery({
+var i = new gts.databaseQuery({
 sql: "SELECT *, ( IFNULL( ( SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) + ( IFNULL( ( SELECT ABS( SUM( ts.amount ) ) FROM transactions ex LEFT JOIN transactionSplit ts ON ts.transId = ex.itemId WHERE ts.genCat LIKE budgets.category AND ts.specCat LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) ) ) AS spent FROM budgets WHERE budgetId = ? ORDER BY " + budgetSortOptions[sort].query + " LIMIT 1;",
 values: [ t, n, t, n, e ]
 });
@@ -16661,7 +16704,7 @@ onError: r.onError
 });
 },
 fetchBudgets: function(e, t, n, r, i, s) {
-r = GTS.Object.validNumber(r) ? r : 0, i = GTS.Object.validNumber(i) ? i : 100, s = GTS.Object.validNumber(s) ? s : 0, Checkbook.globals.gts_db.query(new GTS.databaseQuery({
+r = gts.Object.validNumber(r) ? r : 0, i = gts.Object.validNumber(i) ? i : 100, s = gts.Object.validNumber(s) ? s : 0, Checkbook.globals.gts_db.query(new gts.databaseQuery({
 sql: "SELECT *, ( IFNULL( ( SELECT ABS( SUM( ex.amount ) ) FROM transactions ex WHERE ex.category LIKE budgets.category AND ex.category2 LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) + ( IFNULL( ( SELECT ABS( SUM( ts.amount ) ) FROM transactions ex LEFT JOIN transactionSplit ts ON ts.transId = ex.itemId WHERE ts.genCat LIKE budgets.category AND ts.specCat LIKE budgets.category2 AND CAST( ex.date AS INTEGER ) >= ? AND CAST( ex.date AS INTEGER ) <= ? ), 0 ) ) ) AS spent FROM budgets ORDER BY " + budgetSortOptions[r].query + " LIMIT ?" + " OFFSET ?;",
 values: [ e, t, e, t, i, s ]
 }), n);
@@ -16694,7 +16737,7 @@ style: "margin: 0 15px 0 0;"
 }, {
 showing: !1,
 name: "loadingSpinner",
-kind: "GTS.Spinner",
+kind: "gts.Spinner",
 className: "img-icon",
 style: "margin: 0px 15px 5px 0;"
 }, {
@@ -16936,7 +16979,7 @@ onSuccess: enyo.bind(this, this.buildPage, n)
 }, this.sort, e.getPageSize(), n));
 },
 buildPage: function(e, t) {
-for (var n = 0; n < t.length; n++) this.budgets[e + n] = t[n], this.budgets[e + n].category = GTS.String.dirtyString(this.budgets[e + n].category), this.budgets[e + n].category2 = GTS.String.dirtyString(this.budgets[e + n].category2);
+for (var n = 0; n < t.length; n++) this.budgets[e + n] = t[n], this.budgets[e + n].category = gts.String.dirtyString(this.budgets[e + n].category), this.budgets[e + n].category2 = gts.String.dirtyString(this.budgets[e + n].category2);
 this.$.entries.refresh(), this.loadingDisplay(!1);
 },
 loadingDisplay: function(e) {
@@ -17012,7 +17055,7 @@ className: "enyo-label"
 }, {
 showing: !1,
 name: "span",
-kind: "GTS.ListSelectorBar",
+kind: "gts.ListSelectorBar",
 labelText: "Time Span",
 choices: [ "1 month", "2 months", "3 months" ],
 value: "1 month",
@@ -17020,7 +17063,7 @@ style: "padding: 10px !important;"
 }, {
 showing: !1,
 name: "rollover",
-kind: "GTS.ToggleBar",
+kind: "gts.ToggleBar",
 style: "padding-left: 0;",
 mainText: "Rollover",
 subText: "",
@@ -17064,13 +17107,13 @@ flex: 1
 } ]
 }, {
 name: "progress",
-kind: "GTS.progress",
+kind: "gts.progress",
 title: "",
 message: "",
 progress: ""
 }, {
 name: "errorMessage",
-kind: "GTS.system_error",
+kind: "gts.system_error",
 errTitle: "Budget Error",
 errMessage: "",
 errMessage2: "",
@@ -17112,7 +17155,7 @@ renderAmount: function() {
 this.$.amount.setValue(this.budgetObj.spending_limit);
 },
 save: function() {
-this.budgetObj.spending_limit = GTS.Object.validNumber(this.$.amount.getValue()) ? 0 : Number(Number(this.$.amount.getValue()).toFixed(2));
+this.budgetObj.spending_limit = gts.Object.validNumber(this.$.amount.getValue()) ? 0 : Number(Number(this.$.amount.getValue()).toFixed(2));
 if (this.budgetObj.spending_limit === 0) {
 this.$.errorMessage.load(null, "Spending limit must not be zero.", null, null);
 return;

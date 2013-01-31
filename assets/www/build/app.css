@@ -1665,9 +1665,11 @@ body {
 .onyx-item.bordered {
   font-size: .9rem;
 }
+.onyx-menu .bordered:first-child,
 .enyo-node .bordered:first-child {
   border-top: 0px;
 }
+.onyx-menu .bordered:last-child,
 .enyo-node .bordered:last-child {
   border-bottom: 0px;
 }
@@ -1774,6 +1776,7 @@ body {
 
 }
 .rich-brown {
+  color: #f1f1f1;
   background-color: #382513;
 }
 .rich-brown-trans {
