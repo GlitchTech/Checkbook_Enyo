@@ -464,6 +464,11 @@ enyo.kind( {
 					serCount++;
 					futureCount++;
 					maxItemId += ( ( gts.Object.validNumber( trsnData['linkedAccount'] ) && trsnData['linkedAccount'] >= 0 ) ? 2 : 1 );
+
+					if( trsnData['autoTransfer'] > 0 && trsnData['autoTransferLink'] >= 0 ) {
+
+						maxItemId += 2;
+					}
 				}
 
 				//update repeat item
