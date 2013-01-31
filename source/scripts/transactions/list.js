@@ -27,6 +27,8 @@ enyo.kind( {
 			reorderable: false,
 			enableSwipe: false,
 
+			touchOverscroll: false,
+
 			onSetupItem: "transactionBuildRow",
 			onAcquirePage: "transactionFetchGroup",
 
@@ -441,8 +443,6 @@ enyo.kind( {
 
 	transactionFetchGroup: function( inSender, inEvent ) {
 
-		this.log( "FETCH", inEvent['page'], inEvent['pageSize'] );
-
 		var index = inEvent['page'] * inEvent['pageSize'];
 
 		if( !this.account['acctId'] || this.account['acctId'] < 0 ) {
@@ -456,19 +456,24 @@ enyo.kind( {
 
 			this.doLoadingStart();
 
-			Checkbook.globals.transactionManager.fetchTransactions(
-					this.account,
-					{
-						"onSuccess": this.bound.transactionFetchGroupHandler
-					},
-					inEvent['pageSize'],//Limit
-					index//Offset
-				);
+			enyo.asyncMethod( this, this._transactionFetchGroup, inEvent['pageSize'], index );
 
 			return true;
 		}
 
 		return false;
+	},
+
+	_transactionFetchGroup: function( limit, offset ) {
+
+			Checkbook.globals.transactionManager.fetchTransactions(
+					this.account,
+					{
+						"onSuccess": this.bound.transactionFetchGroupHandler
+					},
+					limit,
+					offset
+				);
 	},
 
 	transactionFetchGroupHandler: function( offset, results, rbResults ) {
