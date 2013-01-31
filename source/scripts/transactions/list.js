@@ -137,6 +137,8 @@ enyo.kind( {
 			scrim: true,
 			scrimclasses: "onyx-scrim-translucent",
 
+			onSelect: "transactionHeldHandler",
+
 			components: [
 				{
 					name: "tmClear",
@@ -165,23 +167,6 @@ enyo.kind( {
 			onClear: "vsCleared",
 			onEdit: "vsEdit",
 			onDelete: "transactionDeleted"
-		},
-
-		{
-			name: "deleteTransactionConfirm",
-			kind: "gts.ConfirmDialog",
-
-			title: "Delete Transaction",
-			message: "Are you sure you want to delete this transaction?",
-
-			confirmText: "Delete",
-			confirmClass: "onyx-negative",
-
-			cancelText: "Cancel",
-			cancelClass: "",
-
-			onConfirm: "deleteTransactionConfirmHandler",
-			onCancel: "deleteTransactionConfirmClose"
 		}
 	],
 
@@ -687,8 +672,6 @@ results = {
 
 	transactionHeld: function( inSender, inEvent ) {
 
-		this.log( arguments );
-
 		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
 
 			this.$['tmClear'].setContent( "Unclear" );
@@ -698,45 +681,38 @@ results = {
 		}
 
 		this.$['transactonMenu'].rowIndex = inEvent.index;
-
 		this.$['transactonMenu'].showAtEvent( inEvent );
 	},
 
 	transactionHeldHandler: function( inSender, inEvent ) {
 
-		this.log();
-
-		this.log( "I DO NOT WORK YET", arguments );
-		return true;
-
 		var rowIndex = this.$['transactonMenu'].rowIndex;
 
-		if( !gts.Object.validNumber( rowIndex ) || rowIndex < 0 ) {
+		if( !gts.Object.validNumber( rowIndex ) || rowIndex < 0 || !inEvent.selected ) {
 
 			return;
 		}
 
-		if( inSender.value === "clear" ) {
+		if( inEvent.selected.value === "clear" ) {
 
-			this.vsCleared( null, rowIndex );
-		} else if( inSender.value === "edit" ) {
+			this.vsCleared( null, { "rowIndex": rowIndex } );
+		} else if( inEvent.selected.value === "edit" ) {
 
-			this.vsEdit( null, rowIndex );
-		} else if( inSender.value === "duplicate" ) {
+			this.log( "edit" );
+			//this.vsEdit( null, rowIndex );
+		} else if( inEvent.selected.value === "duplicate" ) {
 
-			this.duplicateTransaction( rowIndex );
-		} else if( inSender.value === "delete" ) {
+			this.log( "duplicate" );
+			//this.duplicateTransaction( rowIndex );
+		} else if( inEvent.selected.value === "delete" ) {
 
-			this.$['deleteTransactionConfirm'].rowIndex = rowIndex;
-			this.$['deleteTransactionConfirm'].openAtCenter();
+			this.confirmDeletion( rowIndex );
 		}
 
 		return true;
 	},
 
 	transactionCleared: function( inSender, inEvent ) {
-
-		this.log();
 
 		this.vsCleared( null, inEvent );
 
@@ -784,19 +760,57 @@ results = {
 		return true;
 	},
 
-	deleteTransactionConfirmHandler: function() {
+	confirmDeletion: function( index ) {
 
-		this.log();
+		if( this.transactions[index]['repeatId'] > 0 || this.transactions[index]['repeatId'] === 0 ) {
 
-		this.transactionDeleted( null, this.$['deleteTransactionConfirm'].rowIndex );
-		this.deleteTransactionConfirmClose();
+			this.createComponent( {
+					name: "deleteTransactionConfirm",
+					kind: "Checkbook.transactions.recurrence.delete",
+
+					transactionId: this.transactions[index]['itemId'],
+					recurrenceId: this.transactions[index]['repeatId'],
+
+					rowIndex: index,
+
+					onFinish: "deleteTransactionHandler",
+					onCancel: "deleteTransactionConfirmClose"
+				});
+		} else {
+
+			this.createComponent( {
+					name: "deleteTransactionConfirm",
+					kind: "gts.ConfirmDialog",
+
+					title: "Delete Transaction",
+					message: "Are you sure you want to delete this transaction?",
+
+					confirmText: "Delete",
+					confirmClass: "onyx-negative",
+
+					cancelText: "Cancel",
+					cancelClass: "",
+
+					rowIndex: index,
+
+					onConfirm: "deleteTransactionHandler",
+					onCancel: "deleteTransactionConfirmClose"
+				});
+		}
+
+		this.$['deleteTransactionConfirm'].show();
 	},
 
 	deleteTransactionConfirmClose: function() {
 
-		this.log();
+		this.$['deleteTransactionConfirm'].hide();
+		this.$['deleteTransactionConfirm'].destroy();
+	},
 
-		this.$['deleteTransactionConfirm'].close();
+	deleteTransactionHandler: function() {
+
+		this.transactionDeleted( null, { "rowIndex": this.$['deleteTransactionConfirm'].rowIndex } );
+		enyo.asyncMethod( this, this.deleteTransactionConfirmClose );
 	},
 
 	transactionDeleted: function( inSender, inEvent ) {
