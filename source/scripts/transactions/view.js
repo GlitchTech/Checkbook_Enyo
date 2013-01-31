@@ -91,7 +91,7 @@ enyo.kind( {
 							]
 						}, {
 							name: "sortMenu",
-							kind: "GTS.SelectedMenu",
+							kind: "gts.SelectedMenu",
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
@@ -225,7 +225,7 @@ enyo.kind( {
 	/**
 	 * @protected
 	 * @function
-	 * @name GTS.SelectorBar#rendered
+	 * @name gts.SelectorBar#rendered
 	 *
 	 * Called by Enyo when UI is rendered.
 	 */

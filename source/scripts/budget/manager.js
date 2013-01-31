@@ -14,7 +14,7 @@ enyo.kind({
 
 			this.log( "creating database object." );
 
-			var db = new GTS.database( getDBArgs() );
+			var db = new gts.database( getDBArgs() );
 		}
 	},
 
@@ -50,7 +50,7 @@ enyo.kind({
 		if( id ) {
 
 			Checkbook.globals.gts_db.query(
-					new GTS.databaseQuery( {
+					new gts.databaseQuery( {
 							sql: "UPDATE budgets SET budgetOrder = ( SELECT IFNULL( MAX( budgetOrder ) + 1, 0 ) FROM budgets LIMIT 1 ) WHERE budgetId = ?;",
 							values: [ id ]
 						}),
@@ -121,7 +121,7 @@ enyo.kind({
 	 */
 	fetchOverallBudget: function( startTime, endTime, options ) {
 
-		var qryTransaction = new GTS.databaseQuery(
+		var qryTransaction = new gts.databaseQuery(
 				{
 					"sql": "SELECT" +
 						" COUNT( budgetId ) AS budgetCount," +
@@ -174,7 +174,7 @@ enyo.kind({
 	 */
 	fetchBudget: function( budgetId, startTime, endTime, options ) {
 
-		var qryTransaction = new GTS.databaseQuery(
+		var qryTransaction = new gts.databaseQuery(
 				{
 						"sql": "SELECT *, " +
 								"( IFNULL( ( " +
@@ -230,12 +230,12 @@ enyo.kind({
 	 */
 	fetchBudgets: function( startTime, endTime, options, sort, limit, offset ) {
 
-		sort = ( GTS.Object.validNumber( sort ) ? sort : 0 );
-		limit = ( GTS.Object.validNumber( limit ) ? limit : 100 );
-		offset = ( GTS.Object.validNumber( offset ) ? offset : 0 );
+		sort = ( gts.Object.validNumber( sort ) ? sort : 0 );
+		limit = ( gts.Object.validNumber( limit ) ? limit : 100 );
+		offset = ( gts.Object.validNumber( offset ) ? offset : 0 );
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 					{
 						"sql": "SELECT *, " +
 								"( IFNULL( ( " +

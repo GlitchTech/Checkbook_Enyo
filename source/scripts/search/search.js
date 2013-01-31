@@ -37,7 +37,7 @@ enyo.kind({
 					showing: false,
 
 					name: "loadingSpinner",
-					kind: "GTS.Spinner",
+					kind: "gts.Spinner",
 					className: "img-icon",
 					style: "margin: 0px 15px 5px 0;"
 				}, {

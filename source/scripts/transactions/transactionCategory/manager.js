@@ -4,7 +4,7 @@
  * Checkbook.transactionCategory.manager ( Component )
  *
  * Control system for managing transaction categories. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind({
 
@@ -22,7 +22,7 @@ enyo.kind({
 
 			this.log( "creating database object." );
 
-			var db = new GTS.database( getDBArgs() );
+			var db = new gts.database( getDBArgs() );
 		}
 	},
 
@@ -134,7 +134,7 @@ enyo.kind({
 
 		this.categoriesChanged();
 
-		var qryCategories = new GTS.databaseQuery(
+		var qryCategories = new gts.databaseQuery(
 				{
 					"sql": "INSERT INTO transactionCategories( genCat, specCat ) VALUES( ?, ? );",
 					"values": [ general, specific ]
@@ -166,19 +166,19 @@ enyo.kind({
 		this.categoriesChanged();
 
 		var qryCategories = [
-			new GTS.databaseQuery(
+			new gts.databaseQuery(
 					{
 						"sql": "UPDATE transactionCategories SET genCat = ?, specCat = ? WHERE catId = ?;",
 						"values": [ general, specific, id ]
 					}
 				),
-			new GTS.databaseQuery(
+			new gts.databaseQuery(
 					{
 						"sql": "UPDATE transactions SET category = ?, category2 = ? WHERE category = ? AND category2 = ?;",
 						"values": [ general, specific, oldGeneral, oldSpecific ]
 					}
 				),
-			new GTS.databaseQuery(
+			new gts.databaseQuery(
 					{
 						"sql": "UPDATE transactionSplit SET genCat = ?, specCat = ? WHERE genCat = ? AND specCat = ?;",
 						"values": [ general, specific, oldGeneral, oldSpecific ]
@@ -208,19 +208,19 @@ enyo.kind({
 		this.categoriesChanged();
 
 		var qryCategories = [
-			new GTS.databaseQuery(
+			new gts.databaseQuery(
 					{
 						"sql": "UPDATE transactionCategories SET genCat = ? WHERE genCat = ?;",
 						"values": [ general, oldGeneral ]
 					}
 				),
-			new GTS.databaseQuery(
+			new gts.databaseQuery(
 					{
 						"sql": "UPDATE transactions SET category = ? WHERE category = ?;",
 						"values": [ general, oldGeneral ]
 					}
 				),
-			new GTS.databaseQuery(
+			new gts.databaseQuery(
 					{
 						"sql": "UPDATE transactionSplit SET genCat = ? WHERE genCat = ?;",
 						"values": [ general, oldGeneral ]
@@ -248,7 +248,7 @@ enyo.kind({
 
 		this.categoriesChanged();
 
-		var qryCategories = new GTS.databaseQuery(
+		var qryCategories = new gts.databaseQuery(
 				{
 					"sql": "DELETE FROM transactionCategories WHERE catId = ?;",
 					"values": [ id ]

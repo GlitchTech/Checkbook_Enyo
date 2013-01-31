@@ -68,7 +68,7 @@ enyo.kind( {
 			]
 		}, {
 			name: "errorMessage",
-			kind: "GTS.InlineNotification",
+			kind: "gts.InlineNotification",
 			type: "error",
 
 			content: "",

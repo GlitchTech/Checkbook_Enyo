@@ -90,7 +90,7 @@ enyo.kind({
 					]
 				}, {
 					name: "fromToggle",
-					kind: "GTS.ToggleBar",
+					kind: "gts.ToggleBar",
 					mainText: "Limit Start Date",
 					subText: "Limit the earliest date that can appear in search query.",
 					onText: "Yes",
@@ -103,13 +103,13 @@ enyo.kind({
 					components: [
 						{
 							name: "fromDate",
-							kind: "GTS.DateTimePicker",
+							kind: "gts.DateTimePicker",
 							//showTime: false
 						}
 					]
 				}, {
 					name: "toToggle",
-					kind: "GTS.ToggleBar",
+					kind: "gts.ToggleBar",
 					mainText: "Limit End Date",
 					subText: "Limit the latest date that can appear in search query.",
 					onText: "Yes",
@@ -122,13 +122,13 @@ enyo.kind({
 					components: [
 						{
 							name: "toDate",
-							kind: "GTS.DateTimePicker",
+							kind: "gts.DateTimePicker",
 							//showTime: false
 						}
 					]
 				}, {
 					name: "cleared",
-					kind: "GTS.ListSelectorBar",
+					kind: "gts.ListSelectorBar",
 					labelText: "Include Transaction Status",
 					className: "force-left-padding",
 
@@ -147,21 +147,21 @@ enyo.kind({
 					]
 				}, {
 					name: "includeNeg",
-					kind: "GTS.ToggleBar",
+					kind: "gts.ToggleBar",
 					mainText: "Include Expenses",
 					onText: "Yes",
 					offText: "No",
 					value: true
 				}, {
 					name: "includePos",
-					kind: "GTS.ToggleBar",
+					kind: "gts.ToggleBar",
 					mainText: "Include Income",
 					onText: "Yes",
 					offText: "No",
 					value: true
 				}, {
 					name: "includeTrans",
-					kind: "GTS.ToggleBar",
+					kind: "gts.ToggleBar",
 					mainText: "Include Transfers",
 					onText: "Yes",
 					offText: "No",
@@ -264,7 +264,7 @@ enyo.kind({
 			searchStr += '"' + category + '"' + ( ( category2 && category2 !== "%" ) ? ' "' + category2 + '"' : "" );
 		}
 
-		this.$['searchString'].setValue( GTS.String.trim( searchStr ) );
+		this.$['searchString'].setValue( gts.String.trim( searchStr ) );
 
 		if( this.$['searchString'].getValue().length > 0 ) {
 
@@ -339,12 +339,12 @@ enyo.kind({
 		var whereStrs = "";
 		var whereArgs = [];
 
-		var searchStr = GTS.String.trim( GTS.String.dirtyString( this.$['searchString'].getValue() ) );
+		var searchStr = gts.String.trim( gts.String.dirtyString( this.$['searchString'].getValue() ) );
 
 		//Extract quote items
 		var phrases = searchStr.match( /"([^"]*)"/gi );
 
-		searchStr = GTS.String.trim( searchStr.replace( /"[^"]*"/gi, "" ) );
+		searchStr = gts.String.trim( searchStr.replace( /"[^"]*"/gi, "" ) );
 		searchStr = searchStr.split( " " );
 
 		if( phrases && phrases.length > 0 ) {

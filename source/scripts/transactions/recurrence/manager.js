@@ -4,7 +4,7 @@
  * Checkbook.transactions.recurrence.manager ( Component )
  *
  * Control system for managing recurring transactions. Handles creation, modification, & deletion.
- *	Requires GTS.database to exist in Checkbook.globals.gts_db
+ *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
 enyo.kind( {
 	name: "Checkbook.transactions.recurrence.manager",
@@ -26,8 +26,8 @@ enyo.kind( {
 	compare: function( r1, r2 ) {
 
 		if(
-			( GTS.Object.isUndefined( r1 ) && !GTS.Object.isUndefined( r2 ) ) ||
-			( !GTS.Object.isUndefined( r1 ) && GTS.Object.isUndefined( r2 ) ) ) {
+			( gts.Object.isUndefined( r1 ) && !gts.Object.isUndefined( r2 ) ) ||
+			( !gts.Object.isUndefined( r1 ) && gts.Object.isUndefined( r2 ) ) ) {
 			//One is undefined. Not equal
 
 			return false;
@@ -42,8 +42,8 @@ enyo.kind( {
 
 		if( match && ( r1['endingCondition'] == "date" || r2['endingCondition'] == "date" ) ) {
 
-			var d1 = GTS.Object.isDate( r1['endDate'] ) ? r1['endDate'] : new Date( r1['endDate'] );
-			var d2 = GTS.Object.isDate( r2['endDate'] ) ? r2['endDate'] : new Date( r2['endDate'] );
+			var d1 = gts.Object.isDate( r1['endDate'] ) ? r1['endDate'] : new Date( r1['endDate'] );
+			var d2 = gts.Object.isDate( r2['endDate'] ) ? r2['endDate'] : new Date( r2['endDate'] );
 
 			match = match && ( d1 === d2 );
 		}
@@ -153,7 +153,7 @@ enyo.kind( {
 						"last_sync": "",
 
 						//Temp data
-						"maxItemId": ( ( GTS.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['itemId'] + 2 : data['itemId'] + 1 )
+						"maxItemId": ( ( gts.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['itemId'] + 2 : data['itemId'] + 1 )
 					};
 
 				sql = sql.concat( this.generateSeriesSQL( [ enyo.clone( repeatInsert ) ] ) );
@@ -206,7 +206,7 @@ enyo.kind( {
 							"terminated": 0,
 
 							//Temp data
-							"maxItemId": ( ( GTS.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['maxItemId'] + 1 : data['maxItemId'] )
+							"maxItemId": ( ( gts.Object.validNumber( data['linkedAccount'] ) && data['linkedAccount'] >= 0 ) ? data['maxItemId'] + 1 : data['maxItemId'] )
 						};
 
 					sql = sql.concat( this._getDeleteFutureSQL( data['itemId'], repeatData['repeatId'], true ) );//Delete only future
@@ -248,7 +248,7 @@ enyo.kind( {
 		acctId = acctId || -1;
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 					{
 						'sql': "SELECT ( SELECT IFNULL( MAX( itemId ), 0 ) FROM transactions LIMIT 1 ) AS maxItemId, *, ( ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NULL AND transactions.date > ? ) +  ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.linkedAccount IS NOT NULL AND transactions.date > ? ) / 2 ) AS futureCount " +
 							"FROM repeats " +
@@ -448,7 +448,7 @@ enyo.kind( {
 						"autoTransferLink": ( repeatArray[i]['rep_autoTrsnLink'] > 0 ? repeatArray[i]['rep_autoTrsnLinkAcct'] : -1 )
 					};
 
-					if( GTS.Object.validNumber( repeatArray[i]['rep_linkedAcctId'] ) && repeatArray[i]['rep_linkedAcctId'] >= 0 ) {
+					if( gts.Object.validNumber( repeatArray[i]['rep_linkedAcctId'] ) && repeatArray[i]['rep_linkedAcctId'] >= 0 ) {
 
 						type = "transfer";
 					} else if( repeatArray[i]['rep_amount'] < 0 ) {
@@ -463,7 +463,7 @@ enyo.kind( {
 
 					serCount++;
 					futureCount++;
-					maxItemId += ( ( GTS.Object.validNumber( trsnData['linkedAccount'] ) && trsnData['linkedAccount'] >= 0 ) ? 2 : 1 );
+					maxItemId += ( ( gts.Object.validNumber( trsnData['linkedAccount'] ) && trsnData['linkedAccount'] >= 0 ) ? 2 : 1 );
 				}
 
 				//update repeat item
@@ -536,14 +536,14 @@ enyo.kind( {
 							}
 						),
 					//Split Transactions
-					new GTS.databaseQuery(
+					new gts.databaseQuery(
 							{
 								'sql': "DELETE FROM transactionSplit WHERE transId = ? OR transId = ( SELECT itemId FROM transactions WHERE linkedRecord = ? )" ,
 								'values': [ transactionId, transactionId ]
 							}
 						),
 					//Decrement recurrence count
-					new GTS.databaseQuery(
+					new gts.databaseQuery(
 							{
 								'sql': "UPDATE repeats SET currCount = MAX( IFNULL( ( SELECT ( sub.currCount - 1 ) FROM repeats sub WHERE sub.repeatId = repeats.repeatId ), 0 ), 0 ) WHERE repeatId = ?" ,
 								'values': [ recurrenceId ]
@@ -601,14 +601,14 @@ enyo.kind( {
 
 		return( [
 				//Decrement recurrence count
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							'sql': "UPDATE repeats SET terminated = 1, currCount = MAX( ( ( SELECT sub.currCount FROM repeats sub WHERE sub.repeatId = repeats.repeatId ) - ( SELECT count( * ) FROM transactions WHERE transactions.repeatId = repeats.repeatId AND transactions.date " + ( onlyFuture ? ">" : ">=" ) + " ( SELECT trsn.date FROM transactions trsn WHERE trsn.itemId = ? ) ) ), 0 ) WHERE repeatId = ?" ,
 							'values': [ transactionId, recurrenceId ]
 						}
 					),
 				//Delete this and future transactions
-				new GTS.databaseQuery(
+				new gts.databaseQuery(
 						{
 							'sql': "DELETE FROM transactions WHERE repeatId = ? AND ( " + ( onlyFuture ? "" : "itemId = ? OR " ) + "itemId IN ( SELECT sub.itemId FROM transactions sub WHERE sub.repeatId = transactions.repeatId AND sub.date " + ( onlyFuture ? ">" : ">=" ) + " ( SELECT sub2.date FROM transactions sub2 WHERE sub2.itemId = ? ) ) )",
 							'values': deleteArgs

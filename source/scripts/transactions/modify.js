@@ -81,7 +81,7 @@ enyo.kind( {
 											//src: "assets/menu_icons/expense.png",
 										}, {
 											name: "amount",
-											kind: "GTS.DecimalInput",
+											kind: "gts.DecimalInput",
 
 											fit: true,
 
@@ -93,7 +93,7 @@ enyo.kind( {
 									]
 								}, {
 									name: "account",
-									kind: "GTS.SelectorBar",
+									kind: "gts.SelectorBar",
 
 									label: "Account",
 									onChange: "accountChanged",
@@ -101,7 +101,7 @@ enyo.kind( {
 									classes: "custom-background bordered"
 								}, {
 									name: "linkedAccount",
-									kind: "GTS.SelectorBar",
+									kind: "gts.SelectorBar",
 
 									label: "Transfer To...",
 									onChange: "linkedAccountChanged",
@@ -189,7 +189,7 @@ enyo.kind( {
 															components: [
 																{
 																	name: "categoryAmount",
-																	kind: "GTS.DecimalInput",
+																	kind: "gts.DecimalInput",
 																	oninput: "categoryAmountChanged",
 
 																	placeholder: "0.00"
@@ -342,7 +342,7 @@ enyo.kind( {
 
 						{
 							name: "cleared",
-							kind: "GTS.ToggleBar",
+							kind: "gts.ToggleBar",
 							classes: "bordered",
 
 							label: "Cleared",
@@ -353,7 +353,7 @@ enyo.kind( {
 							value: false
 						}, {
 							name: "autoTrans",
-							kind: "GTS.ToggleBar",
+							kind: "gts.ToggleBar",
 							classes: "bordered",
 
 							label: "Auto Transfer",
@@ -462,13 +462,13 @@ enyo.kind( {
 			this.$['dateDrawer'].createComponent(
 					{
 						name: "date",
-						kind: "GTS.DatePicker",
+						kind: "gts.DatePicker",
 						onSelect: "dateChanged",
 
 						components: [
 							{
 								name: "time",
-								kind: "GTS.TimePicker",
+								kind: "gts.TimePicker",
 
 								label: "Time",
 
@@ -502,7 +502,7 @@ enyo.kind( {
 							]
 						}, {
 							name: "time",
-							kind: "GTS.TimePicker",
+							kind: "gts.TimePicker",
 
 							label: "Time",
 
@@ -624,7 +624,7 @@ enyo.kind( {
 
 		this.log();
 
-		if( GTS.Object.validNumber( this.trsnObj['amount'] ) ) {
+		if( gts.Object.validNumber( this.trsnObj['amount'] ) ) {
 
 			this.trsnObj['amount_old'] = this.trsnObj['amount'];
 		}
@@ -882,7 +882,7 @@ enyo.kind( {
 			item.$['categoryWrapper'].addRemoveClass( "h-box", !enyo.Panels.isScreenNarrow() );
 			item.$['categoryItemBreak'].setShowing( enyo.Panels.isScreenNarrow() );
 
-			item.$['categoryText'].setContent( row['category'] + " >> " + GTS.String.dirtyString( row['category2'] ) );
+			item.$['categoryText'].setContent( row['category'] + " >> " + gts.String.dirtyString( row['category2'] ) );
 			item.$['categoryText'].addRemoveClass( "margin-half-bottom", enyo.Panels.isScreenNarrow() );
 			item.$['categoryText'].addRemoveClass( "full-width", enyo.Panels.isScreenNarrow() );
 
@@ -1332,7 +1332,7 @@ enyo.kind( {
 
 		//Adjust as if new transaction
 		this.trsnObj['repeatId'] = -1;
-		this.$['date'].setValue( GTS.Object.isDate( this.trsnObj['rObj']['origDate'] ) ? this.trsnObj['rObj']['origDate'].getTime() : this.trsnObj['rObj']['origDate'] );
+		this.$['date'].setValue( gts.Object.isDate( this.trsnObj['rObj']['origDate'] ) ? this.trsnObj['rObj']['origDate'].getTime() : this.trsnObj['rObj']['origDate'] );
 
 		Checkbook.globals.transactionManager.$['recurrence'].deleteAll(
 				repeatId,

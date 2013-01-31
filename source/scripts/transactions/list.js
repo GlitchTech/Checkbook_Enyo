@@ -20,7 +20,7 @@ enyo.kind( {
 	components: [
 		{
 			name: "list",
-			kind: "GTS.LazyList",
+			kind: "gts.LazyList",
 
 			classes: "checkbook-stamp enyo-fit",
 
@@ -44,7 +44,7 @@ enyo.kind( {
 			components: [
 				{
 					name: "transactionWrapper",
-					kind: "GTS.Item",
+					kind: "gts.Item",
 
 					tapHighlight: true,//tap
 					holdHighlight: false,//hold
@@ -130,23 +130,31 @@ enyo.kind( {
 
 		{
 			name: "transactonMenu",
-			kind: "onyx.Menu",
+			kind: "gts.EventMenu",
+
 			showOnTop: true,
 			floating: true,
+			scrim: true,
+			scrimclasses: "onyx-scrim-translucent",
+
 			components: [
 				{
 					name: "tmClear",
-					content: "Clear Transaction",
-					value: "clear"
+					content: "Clear",
+					value: "clear",
+					classes: "bordered"
 				}, {
-					content: "Edit Transaction",
-					value: "edit"
+					content: "Edit",
+					value: "edit",
+					classes: "bordered"
 				}, {
-					content: "Duplicate Transaction",
-					value: "duplicate"
+					content: "Duplicate",
+					value: "duplicate",
+					classes: "bordered"
 				}, {
-					content: "Delete Transaction",
-					value: "delete"
+					content: "Delete",
+					value: "delete",
+					classes: "bordered"
 				}
 			]
 		},
@@ -293,25 +301,25 @@ enyo.kind( {
 
 		switch( this.account['sort'] ) {
 			case 0://oldest >> newest, show newest
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date ASC, itemId ASC;",
 						'values': [ this.account['acctId'], currDate ]
 					});
 				break;
 			case 1://newest >> oldest, show newest
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND CAST( date AS INTEGER ) <= ? ORDER BY date DESC, itemId DESC;",
 						'values': [ this.account['acctId'], currDate ]
 					});
 				break;
 			case 6://cleared first
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 1;",
 						'values': [ this.account['acctId'] ]
 					});
 				break;
 			case 7://pending first
-				qryScrollCount = new GTS.databaseQuery( {
+				qryScrollCount = new gts.databaseQuery( {
 						'sql': "SELECT DISTINCT COUNT( itemId ) AS itemIndex FROM transactions main WHERE account = ? AND cleared = 0;",
 						'values': [ this.account['acctId'] ]
 					});
@@ -534,10 +542,10 @@ results = {
 					results[i]//fetched properties
 				);
 
-			this.transactions[offset + i]['desc'] = GTS.String.dirtyString( this.transactions[offset + i]['desc'] );
-			this.transactions[offset + i]['category'] = GTS.String.dirtyString( this.transactions[offset + i]['category'] );
-			this.transactions[offset + i]['category2'] = GTS.String.dirtyString( this.transactions[offset + i]['category2'] );
-			this.transactions[offset + i]['note'] = GTS.String.dirtyString( this.transactions[offset + i]['note'] );
+			this.transactions[offset + i]['desc'] = gts.String.dirtyString( this.transactions[offset + i]['desc'] );
+			this.transactions[offset + i]['category'] = gts.String.dirtyString( this.transactions[offset + i]['category'] );
+			this.transactions[offset + i]['category2'] = gts.String.dirtyString( this.transactions[offset + i]['category2'] );
+			this.transactions[offset + i]['note'] = gts.String.dirtyString( this.transactions[offset + i]['note'] );
 
 			if( this.account['sort'] !== 0 && this.account['sort'] !== 6 && this.account['sort'] !== 8 ) {
 
@@ -570,7 +578,7 @@ results = {
 
 		var type, newTrsn = enyo.clone( this.transactions[rowIndex] );
 
-		if( GTS.Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
+		if( gts.Object.validNumber( newTrsn['linkedRecord'] ) && newTrsn['linkedRecord'] >= 0 ) {
 
 			type = "transfer";
 		} else if( newTrsn['amount'] < 0 ) {
@@ -681,20 +689,17 @@ results = {
 
 		this.log( arguments );
 
-		this.log( "I DO NOT WORK YET" );
-		return true;
-
 		if( this.transactions[inEvent.index]['cleared'] === 1 ) {
 
-			this.$['tmClear'].setContent( "Unclear Transaction" );
+			this.$['tmClear'].setContent( "Unclear" );
 		} else {
 
-			this.$['tmClear'].setContent( "Clear Transaction" );
+			this.$['tmClear'].setContent( "Clear" );
 		}
 
 		this.$['transactonMenu'].rowIndex = inEvent.index;
 
-		this.waterfallDown( "onRequestShowMenu", { activator: inEvent.originator } );
+		this.$['transactonMenu'].showAtEvent( inEvent );
 	},
 
 	transactionHeldHandler: function( inSender, inEvent ) {
@@ -706,7 +711,7 @@ results = {
 
 		var rowIndex = this.$['transactonMenu'].rowIndex;
 
-		if( !GTS.Object.validNumber( rowIndex ) || rowIndex < 0 ) {
+		if( !gts.Object.validNumber( rowIndex ) || rowIndex < 0 ) {
 
 			return;
 		}

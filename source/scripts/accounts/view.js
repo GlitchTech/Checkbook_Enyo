@@ -84,7 +84,7 @@ enyo.kind( {
 							]
 						}, {
 							name: "sortMenu",
-							kind: "GTS.SelectedMenu",
+							kind: "gts.SelectedMenu",
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
@@ -338,7 +338,7 @@ enyo.kind( {
 		Checkbook.globals.prefs['custom_sort'] = inEvent.selected.value;
 
 		Checkbook.globals.gts_db.query(
-				new GTS.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
+				new gts.databaseQuery( { 'sql': "UPDATE prefs SET custom_sort = ?;", 'values': [ Checkbook.globals.prefs['custom_sort'] ] } ),
 				{
 					"onSuccess": function() {
 

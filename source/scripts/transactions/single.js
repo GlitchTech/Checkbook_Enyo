@@ -14,7 +14,7 @@ enyo.kind( {
 	scrim: true,
 	scrimclasses: "onyx-scrim-translucent",
 
-	autoDismiss: false,
+	autoDismiss: true,
 
 	published: {
 		index: -1,
@@ -183,7 +183,7 @@ enyo.kind( {
 							]
 						}, {
 							name: "cleared",
-							kind: "GTS.ToggleBar",
+							kind: "gts.ToggleBar",
 							classes: "bordered",
 
 							label: "Cleared",

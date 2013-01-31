@@ -206,7 +206,7 @@ enyo.kind({
 
 		{
 			name: "progress",
-			kind: "GTS.ProgressDialog",
+			kind: "gts.ProgressDialog",
 			animateProgress: true,
 			onCancel: "closeExport",
 			cancelText: "Cancel"
@@ -223,7 +223,7 @@ enyo.kind({
 
 		{
 			name: "gapi",
-			kind: "GTS.Gapi",
+			kind: "gts.Gapi",
 			onReady: "gapiReady"
 		},
 
@@ -689,20 +689,20 @@ enyo.kind({
 
 			var row = results[i];
 
-			uploadData['csv'] += '"' + GTS.String.cleanString( row['accountName'] ) + '",' +
-										'"' + GTS.String.cleanString( row['accountCat'] ) + '",' +
+			uploadData['csv'] += '"' + gts.String.cleanString( row['accountName'] ) + '",' +
+										'"' + gts.String.cleanString( row['accountCat'] ) + '",' +
 										'"\'' + ( new Date( parseInt( row['date'] ) ) ).format( "special" ) + '",' +// The \' at the start forces GDocs to treat as a string and not reformat the date
 										'"' + formatAmount( row['amount'] ) + '",' +
-										'"' + GTS.String.cleanString( row['desc'] ) + '",' +
+										'"' + gts.String.cleanString( row['desc'] ) + '",' +
 										'"' + ( row['cleared'] == 1 ? "Yes" : "No" ) + '",' +
-										'"' + GTS.String.cleanString( row['checkNum'] ) + '",' +
-										'"' + GTS.String.cleanString( row['note'] ) + '",' +
-										'"' + GTS.String.cleanString( row['payee'] ) + '",' +
+										'"' + gts.String.cleanString( row['checkNum'] ) + '",' +
+										'"' + gts.String.cleanString( row['note'] ) + '",' +
+										'"' + gts.String.cleanString( row['payee'] ) + '",' +
 										'"' + row['itemId'] + '",' +
 										'"' + enyo.json.stringify( Checkbook.globals.transactionManager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
 										'"' + row['linkedRecord'] + '",' +
-										'"' + GTS.String.cleanString( row['linkedAccountName'] ) + '",' +
-										'"' + GTS.String.cleanString( row['linkedAccountCat'] ) + '"\n';
+										'"' + gts.String.cleanString( row['linkedAccountName'] ) + '",' +
+										'"' + gts.String.cleanString( row['linkedAccountCat'] ) + '"\n';
 		}
 
 		if( endIndex < results.length ) {
@@ -729,7 +729,7 @@ enyo.kind({
 		var docTitle = "[" + enyo.fetchAppInfo()['title'] + "] " + uploadData['accountName'] + " [" + uploadData['accountCategory'] + "] [" + dateObj.format( { date: "long", time: "short" } ) + "]";
 
 		var metadata = {
-				"title": GTS.String.cleanString( docTitle ),
+				"title": gts.String.cleanString( docTitle ),
 				"mimeType": contentType
 			};
 
