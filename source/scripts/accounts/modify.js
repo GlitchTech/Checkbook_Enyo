@@ -85,6 +85,7 @@ enyo.kind( {
 							classes: "custom-background bordered",
 
 							label: "Account Category",
+
 							onChange: "categoryChanged"
 						}, {
 							name: "defaultAccount",
@@ -168,6 +169,9 @@ enyo.kind( {
 									classes: "bordered",
 
 									label: "Sorting",
+									maxHeight: 350,
+									labelWidth: "150px",
+
 									onChange: "transactionSortingUpdateLabel"
 								}, {
 									name: "accountDisplay",
@@ -175,6 +179,9 @@ enyo.kind( {
 									classes: "bordered",
 
 									label: "Display",
+									maxHeight: 350,
+									labelWidth: "150px",
+
 									onChange: "accountDisplayUpdateLabel",
 									value: 0,
 									choices: [
@@ -195,6 +202,9 @@ enyo.kind( {
 									classes: "bordered",
 
 									label: "Balance",
+									maxHeight: 350,
+									labelWidth: "150px",
+
 									onChange: "balanceUpdateLabel",
 									value: 0,
 									choices: [
