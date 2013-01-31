@@ -1339,7 +1339,7 @@ importProps: function(e) {
 e && e.reorderable && (this.touch = !0), this.inherited(arguments);
 },
 create: function() {
-this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged();
+this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged(), this.$.generator.setRowOffset(0), this.$.generator.setCount(this.count);
 },
 initComponents: function() {
 this.createReorderTools(), this.inherited(arguments), this.createSwipeableComponents();
@@ -1429,11 +1429,11 @@ pageForRow: function(e) {
 return Math.floor(e / this.rowsPerPage);
 },
 preserveDraggingRowNode: function(e) {
-this.draggingRowNode && this.pageForRow(this.draggingRowIndex) === e && (this.$.holdingarea.hasNode().appendChild(this.draggingRowNode), this.draggingRowNode = null);
+this.draggingRowNode && this.pageForRow(this.draggingRowIndex) === e && (this.$.holdingarea.hasNode().appendChild(this.draggingRowNode), this.draggingRowNode = null, this.removedInitialPage = !0);
 },
 update: function(e) {
 var t = !1, n = this.positionToPageInfo(e), r = n.pos + this.scrollerHeight / 2, i = Math.floor(r / Math.max(n.height, this.scrollerHeight) + .5) + n.no, s = i % 2 === 0 ? i : i - 1;
-this.p0 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p0), this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p1), this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && !this.fixedHeight && (this.adjustBottomPage(), this.adjustPortSize());
+this.p0 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p0), this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p1), this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && (this.$.generator.setRowOffset(0), this.$.generator.setCount(this.count), this.fixedHeight || (this.adjustBottomPage(), this.adjustPortSize()));
 },
 getPageRowHeights: function(e) {
 var t = {}, n = e.hasNode().querySelectorAll("div[data-enyo-index]");
@@ -1557,12 +1557,7 @@ isSelected: function(e) {
 return this.$.generator.isSelected(e);
 },
 renderRow: function(e) {
-var t, n;
-if (this.p1 == null) {
-if (this.p0 == null) return;
-t = 0, n = this.count;
-} else t = Math.min(this.p0, this.p1) * this.rowsPerPage, n = Math.min(this.count - t, this.rowsPerPage * 2);
-this.$.generator.setRowOffset(t), this.$.generator.setCount(n), this.$.generator.renderRow(e);
+this.$.generator.renderRow(e);
 },
 rowRendered: function(e, t) {
 this.updateRowBounds(t.rowIndex);
@@ -1590,7 +1585,7 @@ shouldStartReordering: function(e, t) {
 return !!this.getReorderable() && t.rowIndex >= 0 && !this.pinnedReorderMode && e === this.$.strategy && t.index >= 0 ? !0 : !1;
 },
 startReordering: function(e) {
-this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.draggingRowNode = e.target, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = this.pageForRow(e.rowIndex), this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
+this.$.strategy.listReordering = !0, this.buildReorderContainer(), this.doSetupReorderComponents(e), this.styleReorderContainer(e), this.draggingRowIndex = this.placeholderRowIndex = e.rowIndex, this.draggingRowNode = e.target, this.removedInitialPage = !1, this.itemMoved = !1, this.initialPageNumber = this.currentPageNumber = this.pageForRow(e.rowIndex), this.prevScrollTop = this.getScrollTop(), this.replaceNodeWithPlaceholder(e.rowIndex);
 },
 buildReorderContainer: function() {
 this.$.reorderContainer.destroyClientControls();
@@ -1674,7 +1669,7 @@ if (this.draggingRowIndex == this.placeholderRowIndex && this.pinnedReorderCompo
 this.beginPinnedReorder(e);
 return;
 }
-this.removeDraggingRowNode(), this.removePlaceholderNode(), this.emptyAndHideReorderContainer(), this.positionReorderedNode(), this.pinnedReorderMode = !1, this.reorderRows(e), this.draggingRowIndex = this.placeholderRowIndex = -1, this.refresh();
+this.removeDraggingRowNode(), this.removePlaceholderNode(), this.emptyAndHideReorderContainer(), this.pinnedReorderMode = !1, this.reorderRows(e), this.draggingRowIndex = this.placeholderRowIndex = -1, this.refresh();
 },
 beginPinnedReorder: function(e) {
 this.buildPinnedReorderContainer(), this.doSetupPinnedReorderComponents(enyo.mixin(e, {
@@ -1692,25 +1687,24 @@ owner: this.owner
 this.$.reorderContainer.render();
 },
 reorderRows: function(e) {
-this.doReorder(this.makeReorderEvent(e)), this.currentPageNumber != this.initialPageNumber && this.moveItemToDiffPage(), this.updateListIndices();
+this.doReorder(this.makeReorderEvent(e)), this.positionReorderedNode(), this.updateListIndices();
 },
 makeReorderEvent: function(e) {
 return e.reorderFrom = this.draggingRowIndex, e.reorderTo = this.placeholderRowIndex, e;
 },
-moveItemToDiffPage: function() {
-var e, t, n = this.pageForPageNumber(this.currentPageNumber), r = this.pageForPageNumber(this.currentPageNumber + 1);
-this.initialPageNumber < this.currentPageNumber ? (e = n.hasNode().firstChild, r.hasNode().appendChild(e)) : (e = n.hasNode().lastChild, t = r.hasNode().firstChild, r.hasNode().insertBefore(e, t)), this.correctPageHeights(), this.updatePagePositions(this.initialPageNumber);
-},
 positionReorderedNode: function() {
-var e = this.hiddenNode;
-this.hiddenNode = null;
-if (!e.parentNode) return;
-var t = this.$.generator.fetchRowNode(this.placeholderRowIndex);
-t && t.parentNode.insertBefore(e, t), this.showNode(e);
+if (!this.removedInitialPage) {
+var e = this.$.generator.fetchRowNode(this.placeholderRowIndex);
+e && (e.parentNode.insertBefore(this.hiddenNode, e), this.showNode(this.hiddenNode)), this.hiddenNode = null;
+if (this.currentPageNumber != this.initialPageNumber) {
+var t, n, r = this.pageForPageNumber(this.currentPageNumber), i = this.pageForPageNumber(this.currentPageNumber + 1);
+this.initialPageNumber < this.currentPageNumber ? (t = r.hasNode().firstChild, i.hasNode().appendChild(t)) : (t = r.hasNode().lastChild, n = i.hasNode().firstChild, i.hasNode().insertBefore(t, n)), this.correctPageHeights(), this.updatePagePositions(this.initialPageNumber);
+}
+}
 },
 updateListIndices: function() {
 if (this.shouldDoRefresh()) {
-this.refresh();
+this.refresh(), this.correctPageHeights();
 return;
 }
 var e = Math.min(this.draggingRowIndex, this.placeholderRowIndex), t = Math.max(this.draggingRowIndex, this.placeholderRowIndex), n = this.draggingRowIndex - this.placeholderRowIndex > 0 ? 1 : -1, r, i, s, o;
@@ -1783,7 +1777,7 @@ updatePageHeight: function(e) {
 if (e < 0) return;
 var t = this.pageForPageNumber(e, !0);
 if (t) {
-var n = this.pageHeights[e], r = t.getBounds().height;
+var n = this.pageHeights[e], r = Math.max(1, t.getBounds().height);
 this.pageHeights[e] = r, this.portSize += r - n;
 }
 },
@@ -6726,19 +6720,23 @@ pageSize: 50
 events: {
 onAcquirePage: ""
 },
-scroll: function(e, t) {
-var n = this.getStrategy().$.scrollMath;
-return (n.isInOverScroll() && n.y < 0 || n.y < n.bottomBoundary + this.$.belowClient.hasNode().offsetHeight) && this.lastLazyLoad < this.pageCount && (this.lastLazyLoad = this.pageCount, this._requestData()), this.inherited(arguments);
+constructor: function() {
+this.inherited(arguments), this.binds = {
+_requestData: enyo.bind(this, this._requestData)
+};
 },
 lazyLoad: function() {
 this.lastLazyLoad = 0, this._requestData();
+},
+scroll: function(e, t) {
+var n = this.getStrategy().$.scrollMath;
+return (n.isInOverScroll() && n.y < 0 || n.y < n.bottomBoundary + this.$.belowClient.hasNode().offsetHeight) && this.lastLazyLoad < this.pageCount && (this.lastLazyLoad = this.pageCount, enyo.job("gts.LazyList#_requestData", this.binds._requestData, 250)), this.inherited(arguments);
 },
 _requestData: function() {
 var e = this.doAcquirePage({
 page: this.lastLazyLoad,
 pageSize: this.pageSize
 });
-this.log(e, new Date);
 },
 reset: function() {
 this.inherited(arguments);
@@ -13460,6 +13458,7 @@ kind: "GTS.LazyList",
 classes: "checkbook-stamp enyo-fit",
 reorderable: !1,
 enableSwipe: !1,
+touchOverscroll: !1,
 onSetupItem: "transactionBuildRow",
 onAcquirePage: "transactionFetchGroup",
 onReorder: "",
@@ -13664,11 +13663,13 @@ return this.$.mainBody.addRemoveClass("repeatTransferIcon", o && u), this.$.main
 }
 },
 transactionFetchGroup: function(e, t) {
-this.log("FETCH", t.page, t.pageSize);
 var n = t.page * t.pageSize;
-return !this.account.acctId || this.account.acctId < 0 ? (this.log("System not ready yet"), !1) : n >= 0 && this.account.itemCount >= this.$.list.getCount() && !this.transactions[n] ? (this.doLoadingStart(), Checkbook.globals.transactionManager.fetchTransactions(this.account, {
+return !this.account.acctId || this.account.acctId < 0 ? (this.log("System not ready yet"), !1) : n >= 0 && this.account.itemCount >= this.$.list.getCount() && !this.transactions[n] ? (this.doLoadingStart(), enyo.asyncMethod(this, this._transactionFetchGroup, t.pageSize, n), !0) : !1;
+},
+_transactionFetchGroup: function(e, t) {
+Checkbook.globals.transactionManager.fetchTransactions(this.account, {
 onSuccess: this.bound.transactionFetchGroupHandler
-}, t.pageSize, n), !0) : !1;
+}, e, t);
 },
 transactionFetchGroupHandler: function(e, t, n) {
 this.log(n.length, t.length);
