@@ -695,18 +695,17 @@ results = {
 
 		if( inEvent.selected.value === "clear" ) {
 
-			this.vsCleared( null, { "rowIndex": rowIndex } );
+			enyo.asyncMethod( this, this.vsCleared, null, { "rowIndex": rowIndex } );
 		} else if( inEvent.selected.value === "edit" ) {
 
-			this.log( "edit" );
-			//this.vsEdit( null, rowIndex );
+			enyo.asyncMethod( this, this.vsEdit, null, { "rowIndex": rowIndex } );
 		} else if( inEvent.selected.value === "duplicate" ) {
 
 			this.log( "duplicate" );
 			//this.duplicateTransaction( rowIndex );
 		} else if( inEvent.selected.value === "delete" ) {
 
-			this.confirmDeletion( rowIndex );
+			enyo.asyncMethod( this, this.confirmDeletion, rowIndex );
 		}
 
 		return true;
