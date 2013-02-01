@@ -405,7 +405,6 @@ enyo.kind( {
 			this.$['cleared'].addRemoveClass( "checked", row['cleared'] === 1 );
 
 			//Categories
-			//Handle split transactions
 			if( this.account['enableCategories'] === 1 ) {
 
 				this.$['category'].show();

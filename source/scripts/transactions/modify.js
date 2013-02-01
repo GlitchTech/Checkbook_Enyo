@@ -255,7 +255,7 @@ enyo.kind( {
 									kind: "enyo.FittableColumns",
 									noStretch: true,
 
-									classes: "padding-std",
+									classes: "padding-std text-middle",
 
 									ontap: "toggleRecurrenceDrawer",
 
@@ -263,11 +263,9 @@ enyo.kind( {
 										{
 											kind: "enyo.Image",
 											src: "assets/repeat.png",
-											classes: "img-icon",
-											style: "margin-right: 1em;"
+											classes: "img-icon margin-right"
 										}, {
 											name: "recurrenceDisplay",
-											style: "margin-top: 2px;",
 											fit: true
 										}, {
 											name: "recurrenceArrow",
@@ -443,7 +441,8 @@ enyo.kind( {
 
 		{
 			name: "categorySystem",
-			kind: "Checkbook.transactionCategory.select"
+			kind: "Checkbook.transactionCategory.select",
+			onHide: "resized"
 		}
 	],
 

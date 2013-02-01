@@ -130,8 +130,22 @@ enyo.kind( {
 								}
 							]
 						}, {
-							showing: false,
-							content: "Repeat"
+							name: "recurrenceWrapper",
+							kind: "enyo.FittableColumns",
+							noStretch: true,
+
+							classes: "bordered padding-std text-middle",
+
+							components: [
+								{
+									kind: "enyo.Image",
+									src: "assets/repeat.png",
+									classes: "img-icon margin-right"
+								}, {
+									name: "recurrenceDisplay",
+									fit: true
+								}
+							]
 						}, {
 							name: "categoryHolder",
 							kind: "enyo.FittableColumns",
@@ -449,6 +463,27 @@ enyo.kind( {
 		} else {
 
 			this.$['noteHolder'].hide();
+		}
+
+		//Recurrence
+		if( this.transaction['repeatId'] && !isNaN( this.transaction['repeatId'] ) && this.transaction['repeatId'] != "" && this.transaction['repeatId'] >= 0 ) {
+
+			Checkbook.globals.transactionManager.$['recurrence'].fetchSummary( this.transaction['repeatId'], { "onSuccess": enyo.bind( this, this.renderRecurrence, finishRender ) } );
+		} else {
+
+			this.renderRecurrence( finishRender, [] );
+		}
+	},
+
+	renderRecurrence: function( finishRender, result ) {
+
+		if( result && result.length > 0 ) {
+
+			this.$['recurrenceWrapper'].show();
+			this.$['recurrenceDisplay'].setContent( result );
+		} else {
+
+			this.$['recurrenceWrapper'].hide();
 		}
 
 		//Show once content is updated
