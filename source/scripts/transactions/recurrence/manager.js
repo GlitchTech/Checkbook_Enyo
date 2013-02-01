@@ -97,6 +97,117 @@ enyo.kind( {
 
 	/**
 	 * @public
+	 * Fetches recurrence summary from the database
+	 *
+	 * @param int	id	ID of recurrence event
+	 *
+	 * @returns string	String description of recurrence
+	 * @param {object}	[options]	Callback functions
+	 * @param {function}	[options.onSuccess]
+	 * @param {function}	[options.onError]
+	 */
+	fetchSummary: function( id, options ) {
+
+		if( isNaN( id ) || id < 0 ) {
+			//Bad or no id
+
+			if( enyo.isFunction( options.onSuccess ) ) {
+
+				options.onSuccess( "" );
+			}
+
+			return;
+		}
+
+		Checkbook.globals.gts_db.query(
+				Checkbook.globals.gts_db.getSelect( "repeats", "*", { "repeatId": id } ),
+				{
+					"onSuccess": function( results ) {
+
+							if( enyo.isFunction( options.onSuccess ) ) {
+
+								if( results.length <= 0 ) {
+
+									options.onSuccess( "" );
+									return;
+								}
+
+								var results = enyo.clone( results[0] );
+
+								var summary = "Repeats every " + ( results['itemSpan'] > 1 ? results['itemSpan'] + " " : "" );
+
+								switch( results['frequency'] ) {
+									case "daily":
+										summary += "day" + ( results['itemSpan'] > 1 ? "s" : "" );
+										break;
+									case "weekly":
+										var dowDate = new Date( 2011, 4, 1 );//Sunday, May 1, 2011
+
+										var days = enyo.json.parse( results['daysOfWeek'] );
+										var dow = [];
+										var dowCheck = [];
+
+										for( i = 0; i < 7; i++ ) {
+
+											if( days.indexOf( i ) >= 0 ) {
+
+												dow.push( dowDate.format( { format: "EEEE" } ) );
+												dowCheck[i] = dowDate.format( { format: "EEEE" } );
+											} else {
+												dowCheck[i] = "";
+											}
+
+											dowDate.setDate( dowDate.getDate() + 1 );
+										}
+
+										if( dowCheck[1] != "" && dowCheck[2] != "" && dowCheck[3] != "" && dowCheck[4] != "" && dowCheck[5] != "" ) {
+
+											dow.splice( dow.indexOf( dowCheck[1] ), 1 );
+											dow.splice( dow.indexOf( dowCheck[2] ), 1 );
+											dow.splice( dow.indexOf( dowCheck[3] ), 1 );
+											dow.splice( dow.indexOf( dowCheck[4] ), 1 );
+											dow.splice( dow.indexOf( dowCheck[5] ), 1 );
+
+											dow.push( "Weekdays" );
+										}
+
+										if( dowCheck[0] != "" && dowCheck[6] != "" ) {
+
+											dow.splice( dow.indexOf( dowCheck[0] ), 1 );
+											dow.splice( dow.indexOf( dowCheck[6] ), 1 );
+
+											dow.push( "Weekends" );
+										}
+
+										var dowStr = dow.join( ", " );
+
+										if( dow.length > 1 ) {
+
+											dowStr = dowStr.substr( 0, dowStr.lastIndexOf( ", " ) ) + ( dow.length > 2 ? "," : "" ) + " and " + dowStr.substr( dowStr.lastIndexOf( ", " ) + 2 );
+										}
+
+										summary += "week" + ( results['itemSpan'] > 1 ? "s" : "" ) + " on " + dowStr;
+										break;
+									case "monthly":
+										summary += "month" + ( results['itemSpan'] > 1 ? "s" : "" ) + " on the " + this.dateSuffix( this.date.getDate() );
+										break;
+									case "yearly":
+										summary += "year" + ( results['itemSpan'] > 1 ? "s" : "" ) + " on " + this.date.format( { format: "MMMM" } ) + " " + this.dateSuffix( this.date.getDate() );
+										break;
+									default:
+										summary += "span" + ( results['itemSpan'] > 1 ? "s" : "" );
+								}
+
+								options.onSuccess( summary );
+							}
+						},
+					"onError": options.onError
+				}
+			);
+	},
+
+	/**
+	 * @public
 	 * Handle SQL for repeat events
 	 *
 	 * @param {object}	data	Object to be readied; Since object, pass by reference situation;
