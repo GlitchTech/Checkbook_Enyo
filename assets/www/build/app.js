@@ -6503,6 +6503,7 @@ return e && !this.isBlank(e) ? (e = e.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4}
 enyo.kind({
 name: "gts.Gapi",
 nextSteps: {},
+phonegapInAppBrowser: !1,
 published: {
 apiKey: "",
 clientId: "",
@@ -6557,9 +6558,9 @@ return gapi.auth.setToken(e);
 },
 auth: function(e) {
 this.nextSteps = e;
-if (window.device && window.plugins.childBrowser && (enyo.platform.android || enyo.platform.androidChrome)) {
+if (window.device && (enyo.platform.android || enyo.platform.androidChrome)) {
 var t = this.getAuthToken();
-this.log("Phonegap-ChildBrowsers Auth");
+this.log("Phonegap-InAppBrowser Auth");
 var n = {
 client_id: encodeURIComponent(this.clientId),
 scope: encodeURIComponent(this.scope.join(" ")),
@@ -6571,9 +6572,7 @@ approval_prompt: "force"
 }, r = this.gapiConfig.endpoint + "?" + Object.keys(n).map(function(e) {
 return e + "=" + n[e];
 }).join("&");
-window.plugins.childBrowser.onClose = function() {}, window.plugins.childBrowser.onLocationChange = this._binds._cbUrlChanged, window.plugins.childBrowser.showWebPage(r, {
-showLocationBar: !1
-});
+this.phonegapInAppBrowser && this.phonegapInAppBrowser.close(), this.phonegapInAppBrowser = window.open(r, "_blank", "location=no"), this.phonegapInAppBrowser.addEventListener("loadstart", this._binds._cbUrlChanged);
 } else gapi.auth.authorize({
 client_id: this.clientId,
 scope: this.scope.join(" "),
@@ -6581,17 +6580,11 @@ immediate: !0
 }, this._binds._handleAuthResult);
 },
 cbUrlChanged: function(e) {
-if (e.indexOf("code=") != -1) {
-this.log("Authenticated");
-var t = this.getParameterByName("code", e);
-enyo.job("refreshFromUrlChange", enyo.bind(this, this.getRefreshToken, t, this.nextSteps), 1e3), window.plugins.childBrowser.close();
-} else if (e.indexOf("error=") != -1) {
-window.plugins.childBrowser.close();
-if (enyo.isFunction(this.nextSteps.onError)) {
-this.nextSteps.onError(this.getParameterByName("error", e));
-return;
-}
-} else this.log("Status unknown: " + e);
+if (e.url.indexOf("code=") != -1) {
+this.log("Authenticated"), this.phonegapInAppBrowser && (this.phonegapInAppBrowser.close(), this.phonegapInAppBrowser = !1);
+var t = this.getParameterByName("code", e.url);
+enyo.job("refreshFromUrlChange", enyo.bind(this, this.getRefreshToken, t, this.nextSteps), 1e3);
+} else e.url.indexOf("error=") != -1 ? (this.phonegapInAppBrowser && (this.phonegapInAppBrowser.close(), this.phonegapInAppBrowser = !1), enyo.isFunction(this.nextSteps.onError) && this.nextSteps.onError(this.getParameterByName("error", e.url))) : this.log("Status unknown: " + e.url);
 },
 getParameterByName: function(e, t) {
 e = e.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -9150,6 +9143,7 @@ kind: "onyx.Menu",
 showOnTop: !0,
 floating: !0,
 scrim: !0,
+modal: !1,
 scrimclasses: "onyx-scrim-translucent",
 components: [ {
 content: "Preferences",
@@ -10142,7 +10136,7 @@ name: "cryptoSystem",
 kind: "Checkbook.encryption"
 } ],
 rendered: function() {
-this.$.pinLock.setValue(Checkbook.globals.prefs.useCode === 1), this.$.pinCode.setValue(Checkbook.globals.prefs.code), this.$.pinLockDrawer.setOpen(this.$.pinLock.getValue()), this.$.transPreview.setValue(Checkbook.globals.prefs.transPreview === 1), this.$.updateNotice.setValue(Checkbook.globals.prefs.updateCheckNotification === 1), this.$.errorReporting.setValue(Checkbook.globals.prefs.errorReporting === 1), this.$.dispColor.setValue(Checkbook.globals.prefs.dispColor === 1), Checkbook.globals.accountManager.fetchAccountsList({
+this.$.pinLock.setValue(Checkbook.globals.prefs.useCode === 1), this.$.pinCode.setValue(Checkbook.globals.prefs.code), this.$.pinLockDrawer.setOpen(this.$.pinLock.getValue()), this.$.transPreview.setValue(Checkbook.globals.prefs.transPreview === 1), this.$.dispColor.setValue(Checkbook.globals.prefs.dispColor === 1), this.$.alwaysFullCalendar.setValue(Checkbook.globals.prefs.alwaysFullCalendar === 1), this.$.updateNotice.setValue(Checkbook.globals.prefs.updateCheckNotification === 1), this.$.errorReporting.setValue(Checkbook.globals.prefs.errorReporting === 1), Checkbook.globals.accountManager.fetchAccountsList({
 onSuccess: enyo.bind(this, this.buildDefaultAccountList)
 }), this.$.seriesDayLimit.setValue(Checkbook.globals.prefs.seriesDayLimit), this.$.seriesCountLimit.setValue(Checkbook.globals.prefs.seriesCountLimit), this.inherited(arguments), this.$.header.addRemoveClass("text-left", enyo.Panels.isScreenNarrow()), this.$.header.addRemoveClass("text-center", !enyo.Panels.isScreenNarrow()), this.systemReady = !0;
 },
@@ -10462,10 +10456,7 @@ this.inherited(arguments), this.$.instructionsButton.setDisabled(!0), this.$.ins
 title: "Import Progress",
 message: "Linking to Google...",
 progress: 25
-}), this.refreshLayout();
-},
-refreshLayout: function() {
-this.waterfall("onresize", "onresize", this);
+}), this.resized();
 },
 gapiReady: function() {
 this.$.progress.setProgress(60), Checkbook.globals.gts_db.query("SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;", {
@@ -10926,10 +10917,7 @@ this.log(), this.inherited(arguments), this.$.instructions.show(), this.$.instru
 title: "Export Progress",
 message: "Linking to Google...",
 progress: 25
-}), this.refreshLayout();
-},
-refreshLayout: function() {
-this.log(), this.waterfall("onresize", "onresize", this);
+}), this.resized();
 },
 gapiReady: function() {
 this.log(), this.$.progress.setProgress(60), Checkbook.globals.gts_db.query("SELECT saveGSheetsData, gSheetPass FROM prefs LIMIT 1;", {
@@ -12364,7 +12352,8 @@ changePinCode: function() {
 this.createComponent({
 name: "pinPopup",
 kind: "Checkbook.pinChangePopup",
-onFinish: "changePinCodeHandler"
+onFinish: "changePinCodeHandler",
+onHide: "resized"
 }), this.$.pinPopup.show();
 },
 changePinCodeHandler: function(e, t) {
@@ -12410,7 +12399,7 @@ if (!e || typeof e == "undefined") {
 this.doFinish(0);
 return;
 }
-this.$.accountName.setValue(e.acctName), this.$.accountCategory.setValue(e.acctCategory), this.$.accountNotes.setValue(e.acctNotes), this.$.freezeAccount.setValue(e.frozen === 1), this.$.pinLock.setValue(e.acctLocked === 1), this.$.pinCode.setValue(e.lockedCode), this.$.transactionSorting.setValue(e.sort), this.$.accountDisplay.setValue(e.hidden), this.$.balance.setValue(e.bal_view), this.$.defaultAccount.setValue(e.defaultAccount === 1), this.$.showTransTime.setValue(e.showTransTime === 1), this.$.showRunningBal.setValue(e.runningBalance === 1), this.$.hideTransNotes.setValue(e.hideNotes === 1), this.$.descriptionMultilineMode.setValue(e.transDescMultiLine === 1), this.$.autoComplete.setValue(e.useAutoComplete === 1), this.$.atmMode.setValue(e.atmEntry === 1), this.$.autoTransfer.setValue(e.auto_savings), this.$.autoTransferLink.setValue(e.auto_savings_link), this.$.checkNumber.setValue(e.checkField === 1), this.$.expenseCategories.setValue(e.enableCategories === 1), this.$.payeeField.setValue(e.payeeField === 1), this.$.hideCleared.setValue(e.hide_cleared === 1), this.transactionSortingUpdateLabel(), this.accountDisplayUpdateLabel(), this.balanceUpdateLabel(), this.togglePINStatus(), this.toggleAutoTransferDrawer(), this.categoryChanged(), this.acctId < 0 && this.$.accountDeleteButton.hide(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.$.accountName.focus(), enyo.asyncMethod(this, this.waterfall, "onresize", "onresize", this);
+this.$.accountName.setValue(e.acctName), this.$.accountCategory.setValue(e.acctCategory), this.$.accountNotes.setValue(e.acctNotes), this.$.freezeAccount.setValue(e.frozen === 1), this.$.pinLock.setValue(e.acctLocked === 1), this.$.pinCode.setValue(e.lockedCode), this.$.transactionSorting.setValue(e.sort), this.$.accountDisplay.setValue(e.hidden), this.$.balance.setValue(e.bal_view), this.$.defaultAccount.setValue(e.defaultAccount === 1), this.$.showTransTime.setValue(e.showTransTime === 1), this.$.showRunningBal.setValue(e.runningBalance === 1), this.$.hideTransNotes.setValue(e.hideNotes === 1), this.$.descriptionMultilineMode.setValue(e.transDescMultiLine === 1), this.$.autoComplete.setValue(e.useAutoComplete === 1), this.$.atmMode.setValue(e.atmEntry === 1), this.$.autoTransfer.setValue(e.auto_savings), this.$.autoTransferLink.setValue(e.auto_savings_link), this.$.checkNumber.setValue(e.checkField === 1), this.$.expenseCategories.setValue(e.enableCategories === 1), this.$.payeeField.setValue(e.payeeField === 1), this.$.hideCleared.setValue(e.hide_cleared === 1), this.transactionSortingUpdateLabel(), this.accountDisplayUpdateLabel(), this.balanceUpdateLabel(), this.togglePINStatus(), this.toggleAutoTransferDrawer(), this.categoryChanged(), this.acctId < 0 && this.$.accountDeleteButton.hide(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.$.accountName.focus(), this.resized();
 },
 saveAccount: function() {
 if (this.$.accountName.getValue().length <= 0) {
@@ -12641,7 +12630,7 @@ ontap: "createNew"
 }, {
 name: "modifyCat",
 kind: "Checkbook.accountCategory.modify",
-onHide: "modifyHidden",
+onHide: "resized",
 onChangeComplete: "modificationComplete"
 }, {
 name: "manager",
@@ -12683,9 +12672,6 @@ action: "delete"
 },
 modificationComplete: function(e, t) {
 this.fetchCategories(), t["action"] != "reorder" && this.$.modifyCat.hide();
-},
-modifyHidden: function() {
-enyo.asyncMethod(this, this.waterfall, "onresize", "onresize", this);
 },
 moveUp: function(e, t) {
 return this.reorder(e, t.index, t.index - 1), !0;
@@ -13935,8 +13921,18 @@ classes: "img-icon margin-right"
 name: "time"
 } ]
 }, {
-showing: !1,
-content: "Repeat"
+name: "recurrenceWrapper",
+kind: "enyo.FittableColumns",
+noStretch: !0,
+classes: "bordered padding-std text-middle",
+components: [ {
+kind: "enyo.Image",
+src: "assets/repeat.png",
+classes: "img-icon margin-right"
+}, {
+name: "recurrenceDisplay",
+fit: !0
+} ]
 }, {
 name: "categoryHolder",
 kind: "enyo.FittableColumns",
@@ -14067,7 +14063,12 @@ var t = new Date(parseInt(this.transaction.date));
 this.$.time.setContent(t.format({
 date: "long",
 time: this.account.showTransTime === 1 ? "short" : ""
-})), this.account.enableCategories === 1 ? (this.$.categoryHolder.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(this.transaction.category, this.transaction.category2, !1, ""))) : this.$.categoryHolder.hide(), this.account.checkField === 1 && this.transaction.checkNum && this.transaction.checkNum !== "" ? (this.$.checkNumHolder.show(), this.$.checkNum.setContent("#" + this.transaction.checkNum)) : (this.$.checkNumHolder.hide(), this.$.checkNum.setContent("")), this.$.cleared.setValue(this.transaction["cleared"] == 1), this.account.payeeField === 1 && this.transaction.payee && this.transaction.payee !== "" ? (this.$.payeeHolder.show(), this.$.payee.setContent(this.transaction.payee)) : this.$.payeeHolder.hide(), this.transaction["note"] != "" ? (this.$.noteHolder.show(), this.$.note.setContent(this.transaction.note.replace(/\n/g, "<br />"))) : this.$.noteHolder.hide(), e();
+})), this.account.enableCategories === 1 ? (this.$.categoryHolder.show(), this.$.category.setContent(Checkbook.globals.transactionManager.formatCategoryDisplay(this.transaction.category, this.transaction.category2, !1, ""))) : this.$.categoryHolder.hide(), this.account.checkField === 1 && this.transaction.checkNum && this.transaction.checkNum !== "" ? (this.$.checkNumHolder.show(), this.$.checkNum.setContent("#" + this.transaction.checkNum)) : (this.$.checkNumHolder.hide(), this.$.checkNum.setContent("")), this.$.cleared.setValue(this.transaction["cleared"] == 1), this.account.payeeField === 1 && this.transaction.payee && this.transaction.payee !== "" ? (this.$.payeeHolder.show(), this.$.payee.setContent(this.transaction.payee)) : this.$.payeeHolder.hide(), this.transaction["note"] != "" ? (this.$.noteHolder.show(), this.$.note.setContent(this.transaction.note.replace(/\n/g, "<br />"))) : this.$.noteHolder.hide(), this.transaction.repeatId && !isNaN(this.transaction.repeatId) && this.transaction["repeatId"] != "" && this.transaction.repeatId >= 0 ? Checkbook.globals.transactionManager.$.recurrence.fetchSummary(this.transaction.repeatId, {
+onSuccess: enyo.bind(this, this.renderRecurrence, e)
+}) : this.renderRecurrence(e, []);
+},
+renderRecurrence: function(e, t) {
+t && t.length > 0 ? (this.$.recurrenceWrapper.show(), this.$.recurrenceDisplay.setContent(t)) : this.$.recurrenceWrapper.hide(), e();
 },
 renderFromAccount: function(e) {
 this.$.fromAccountImg.setSrc("assets/" + e.acctCategoryIcon), this.$.fromAccount.setContent(e.acctName), Checkbook.globals.prefs.dispColor === 1 ? this.$.fromAccountHolder.addClass(e.acctCategoryColor) : this.$.fromAccountHolder.removeClass("custom-background");
@@ -14306,16 +14307,14 @@ classes: "padding-std"
 }, {
 kind: "enyo.FittableColumns",
 noStretch: !0,
-classes: "padding-std",
+classes: "padding-std text-middle",
 ontap: "toggleRecurrenceDrawer",
 components: [ {
 kind: "enyo.Image",
 src: "assets/repeat.png",
-classes: "img-icon",
-style: "margin-right: 1em;"
+classes: "img-icon margin-right"
 }, {
 name: "recurrenceDisplay",
-style: "margin-top: 2px;",
 fit: !0
 }, {
 name: "recurrenceArrow",
@@ -14443,7 +14442,8 @@ classes: "size-double",
 style: "z-index: 2; position: absolute; top: 50%; margin-top: -45px; left: 50%; margin-left: -45px;"
 }, {
 name: "categorySystem",
-kind: "Checkbook.transactionCategory.select"
+kind: "Checkbook.transactionCategory.select",
+onHide: "resized"
 } ],
 create: function() {
 this.inherited(arguments), this.buildDateSystem();
@@ -14980,6 +14980,53 @@ repeatId: e
 }), {
 onSuccess: function(e) {
 enyo.isFunction(t.onSuccess) && t.onSuccess(e[0]);
+},
+onError: t.onError
+});
+},
+fetchSummary: function(e, t) {
+if (isNaN(e) || e < 0) {
+enyo.isFunction(t.onSuccess) && t.onSuccess("");
+return;
+}
+Checkbook.globals.gts_db.query(Checkbook.globals.gts_db.getSelect("repeats", "*", {
+repeatId: e
+}), {
+onSuccess: function(e) {
+if (enyo.isFunction(t.onSuccess)) {
+if (e.length <= 0) {
+t.onSuccess("");
+return;
+}
+var e = enyo.clone(e[0]), n = "Repeats every " + (e.itemSpan > 1 ? e.itemSpan + " " : "");
+switch (e.frequency) {
+case "daily":
+n += "day" + (e.itemSpan > 1 ? "s" : "");
+break;
+case "weekly":
+var r = new Date(2011, 4, 1), s = enyo.json.parse(e.daysOfWeek), o = [], u = [];
+for (i = 0; i < 7; i++) s.indexOf(i) >= 0 ? (o.push(r.format({
+format: "EEEE"
+})), u[i] = r.format({
+format: "EEEE"
+})) : u[i] = "", r.setDate(r.getDate() + 1);
+u[1] != "" && u[2] != "" && u[3] != "" && u[4] != "" && u[5] != "" && (o.splice(o.indexOf(u[1]), 1), o.splice(o.indexOf(u[2]), 1), o.splice(o.indexOf(u[3]), 1), o.splice(o.indexOf(u[4]), 1), o.splice(o.indexOf(u[5]), 1), o.push("Weekdays")), u[0] != "" && u[6] != "" && (o.splice(o.indexOf(u[0]), 1), o.splice(o.indexOf(u[6]), 1), o.push("Weekends"));
+var a = o.join(", ");
+o.length > 1 && (a = a.substr(0, a.lastIndexOf(", ")) + (o.length > 2 ? "," : "") + " and " + a.substr(a.lastIndexOf(", ") + 2)), n += "week" + (e.itemSpan > 1 ? "s" : "") + " on " + a;
+break;
+case "monthly":
+n += "month" + (e.itemSpan > 1 ? "s" : "") + " on the " + this.dateSuffix(this.date.getDate());
+break;
+case "yearly":
+n += "year" + (e.itemSpan > 1 ? "s" : "") + " on " + this.date.format({
+format: "MMMM"
+}) + " " + this.dateSuffix(this.date.getDate());
+break;
+default:
+n += "span" + (e.itemSpan > 1 ? "s" : "");
+}
+t.onSuccess(n);
+}
 },
 onError: t.onError
 });

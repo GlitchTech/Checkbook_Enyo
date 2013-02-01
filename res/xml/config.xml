@@ -54,8 +54,8 @@
             name="Storage"
             value="org.apache.cordova.Storage" />
         <plugin
-            name="ChildBrowser"
-            value="com.phonegap.plugins.childBrowser.ChildBrowser" />
+            name="InAppBrowser"
+            value="org.apache.cordova.InAppBrowser" />
         <plugin
             name="SQLitePlugin"
             value="com.glitchtechscience.gtcheckbook.SQLitePlugin" />
