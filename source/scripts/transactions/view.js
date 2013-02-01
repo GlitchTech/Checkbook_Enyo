@@ -176,7 +176,6 @@ enyo.kind( {
 									showing: false,
 									content: "Budget"
 								}, {
-									showing: false,
 									content: "Search"
 								}, {
 									showing: false,
@@ -649,8 +648,7 @@ enyo.kind( {
 			//enyo.Signals.send( "showReport", { "acctId": this.account['acctId'] } );
 		} else if( inEvent.content.toLowerCase() === "search" ) {
 
-			this.log( "Search system go" );
-			//enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'] } );
+			enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'], "index": this.account['index'] } );
 		} else {
 
 			this.log( inEvent.selected );

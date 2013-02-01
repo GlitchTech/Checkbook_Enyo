@@ -37,9 +37,12 @@ enyo.kind({
 
 									showOnTop: true,
 									floating: true,
-									scrim: true,
 									modal: false,//allow signal events to pass through
+
+									scrim: true,
 									scrimclasses: "onyx-scrim-translucent",
+
+									maxHeight: 250,
 
 									components: [
 										{
@@ -54,12 +57,10 @@ enyo.kind({
 											content: "Export Data",
 											ontap: "openExport"
 										}, {
-											showing: false,
 											classes: "onyx-menu-divider"
 										}, {
-											showing: false,
-											content: "Search (NYI)",
-											ontap: "openSearch"
+											content: "Search",
+											ontap: "triggerSearch"
 										}, {
 											showing: false,
 											content: "Budget (NYI)",
@@ -591,12 +592,17 @@ enyo.kind({
 		}
 	},
 
-	/** Checkbook.search **/
+	/** Checkbook.search.* **/
+
+	triggerSearch: function() {
+
+		//Don't send the tap event arguments
+		enyo.Signals.send( "showSearch", {} );
+	},
 
 	openSearch: function( inSender, inEvent ) {
 
-		this.log( arguments );
-		return;
+		this.log( "Search system go", arguments );
 
 		enyo.asyncMethod(
 				this,
@@ -608,11 +614,7 @@ enyo.kind({
 							name: "search",
 							kind: "Checkbook.search.pane",
 							onModify: "showPanePopup",
-							onFinish: enyo.bind(
-									this,
-									this.closeSearch,
-									( inEvent && enyo.isFunction( inEvent['onFinish'] ) ? inEvent['onFinish'] : null )
-								)
+							onFinish: enyo.bind( this, this.closeSearch )
 						}
 					)
 			);
@@ -627,12 +629,6 @@ enyo.kind({
 
 			enyo.Signals.send( "accountChanged" );
 			this.$['transactions'].reloadSystem();
-		}
-
-		//If a prevous callback existed, call it with any arguments applied
-		if( enyo.isFunction( doNext ) ) {
-
-			doNext( inEvent['changes'] );
 		}
 	},
 

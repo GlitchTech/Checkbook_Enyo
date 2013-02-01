@@ -1,7 +1,7 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
+//TODO: Mimic checkbook.js for this set. Remove the enyo 1 kinds.
 enyo.kind({
-
 	name: "Checkbook.search.pane",
 //	kind: enyo.VFlexBox,
 
