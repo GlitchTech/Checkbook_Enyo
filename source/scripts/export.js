@@ -259,14 +259,7 @@ enyo.kind({
 				"progress": 25
 			});
 
-		this.refreshLayout();
-	},
-
-	refreshLayout: function() {
-
-		this.log();
-
-		this.waterfall( "onresize", "onresize", this );
+		this.resized();
 	},
 
 	gapiReady: function() {

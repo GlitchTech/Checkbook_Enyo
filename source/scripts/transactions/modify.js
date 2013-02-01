@@ -441,7 +441,8 @@ enyo.kind( {
 
 		{
 			name: "categorySystem",
-			kind: "Checkbook.transactionCategory.select"
+			kind: "Checkbook.transactionCategory.select",
+			onHide: "resized"
 		}
 	],
 

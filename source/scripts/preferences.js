@@ -343,9 +343,10 @@ enyo.kind({
 		this.$['pinLockDrawer'].setOpen( this.$['pinLock'].getValue() );
 
 		this.$['transPreview'].setValue( Checkbook.globals.prefs['transPreview'] === 1 );
+		this.$['dispColor'].setValue( Checkbook.globals.prefs['dispColor'] === 1 );
+		this.$['alwaysFullCalendar'].setValue( Checkbook.globals.prefs['alwaysFullCalendar'] === 1 );
 		this.$['updateNotice'].setValue( Checkbook.globals.prefs['updateCheckNotification'] === 1 );
 		this.$['errorReporting'].setValue( Checkbook.globals.prefs['errorReporting'] === 1 );
-		this.$['dispColor'].setValue( Checkbook.globals.prefs['dispColor'] === 1 );
 
 		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
 

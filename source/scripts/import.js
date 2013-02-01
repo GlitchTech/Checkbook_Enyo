@@ -251,12 +251,7 @@ enyo.kind({
 				"progress": 25
 			});
 
-		this.refreshLayout();
-	},
-
-	refreshLayout: function() {
-
-		this.waterfall( "onresize", "onresize", this );
+		this.resized();
 	},
 
 	gapiReady: function() {

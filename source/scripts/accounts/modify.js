@@ -638,7 +638,8 @@ enyo.kind( {
 					name: "pinPopup",
 					kind: "Checkbook.pinChangePopup",
 
-					onFinish: "changePinCodeHandler"
+					onFinish: "changePinCodeHandler",
+					onHide: "resized"
 				}
 			);
 
@@ -778,13 +779,7 @@ enyo.kind( {
 
 		this.$['accountName'].focus();
 
-		enyo.asyncMethod(
-				this,
-				this.waterfall,
-				"onresize",
-				"onresize",
-				this
-			);
+		this.resized();
 	},
 
 	saveAccount: function() {
