@@ -620,7 +620,7 @@ enyo.kind({
 			);
 	},
 
-	closeSearch: function( doNext, inSender, inEvent ) {
+	closeSearch: function( inSender, inEvent ) {
 
 		if( inEvent['changes'] ) {
 			//Update account and transaction information

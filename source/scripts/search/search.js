@@ -1,11 +1,9 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
-//TODO: Mimic checkbook.js for this set. Remove the enyo 1 kinds.
 enyo.kind({
 	name: "Checkbook.search.pane",
-//	kind: enyo.VFlexBox,
-
-	style: "height: 100%;",
+	kind: "enyo.FittableRows",
+	classes: "enyo-fit",
 
 	published: {
 		acctId: null,
@@ -22,50 +20,56 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.PageHeader,
-			pack: "start",
+			name: "menubar",
+			kind: "onyx.Toolbar",
+			layoutKind: "enyo.FittableColumnsLayout",
+			noStretch: true,
 			components: [
-				{
-					showing: true,
-
+				{//Swap between icon for account & spinner when loading data in the background.
 					name: "systemIcon",
-					kind: enyo.Image,
-					src: "assets/search.png",
-					className: "img-icon",
+					kind: "enyo.Image",
+					src: "assets/dollar_sign_1.png",
+					classes: "img-icon",
 					style: "margin: 0 15px 0 0;"
 				}, {
-					showing: false,
-
 					name: "loadingSpinner",
-					kind: "gts.Spinner",
-					className: "img-icon",
-					style: "margin: 0px 15px 5px 0;"
+					kind: "onyx.Spinner",
+					showing: false,
+					classes: " img-icon",
+					style: "margin: 0 15px 0 0;"
 				}, {
 					content: "Search System",
-					className: "bigger",
-					flex: 1,
-					style: "margin-top: -6px;"
+					classes: "enyo-text-ellipsis",
+					fit: true
 				}, {
 					name: "resultCount",
-					className: "enyo-button enyo-button-dark",
-					showing: false
+					kind: "onyx.Button",
+					className: "onyx-dark",
+					showing: false,
+					style: "padding: 0 8px; margin: 0;"
 				}
 			]
 		}, {
-			kind: enyo.SlidingPane,
-			flex: 1,
+			name: "mainViews",
+			kind: "Panels",
+
+			fit: true,
+			animate: false,
+			draggable: false,
+
+			classes: "app-panels",
+			arrangerKind: "CollapsingArranger",
+
 			components: [
 				{
 					name: "search",
-					kind: "Checkbook.search.filter",
-					flex: 1,
+					//kind: "Checkbook.search.filter",
 
 					onSearch: "searchTransactions",
 					onFinish: "closeSearch"
 				}, {
 					name: "results",
-					kind: "Checkbook.search.results",
-					flex: 2,
+					//kind: "Checkbook.search.results",
 
 					onModify: "modifyTransaction",
 					onResultsFound: "resultCount",
@@ -78,7 +82,7 @@ enyo.kind({
 	rendered: function() {
 
 		this.inherited( arguments );
-
+return;
 		this.$['search'].load( this.acctId, this.category, this.category2, this.dateStart, this.dateEnd );
 	},
 

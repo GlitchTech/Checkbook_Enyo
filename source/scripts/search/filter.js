@@ -1,17 +1,14 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.search.filter",
-//	kind: enyo.SlidingView,
-//	layoutKind: enyo.VFlexLayout,
-
-	flex: 1,
+//	layoutKind: "FittableRowsLayout",
+	classes: "v-box",//don't want to use this here, but FittableRowsLayout is causing trouble
 
 	acctList: {
-			count: 0,
-			items: []
-		},
+		count: 0,
+		items: []
+	},
 
 	events: {
 		onSearch: "",
