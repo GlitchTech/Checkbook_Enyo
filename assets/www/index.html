@@ -37,11 +37,7 @@
 				//PhoneGap is loaded and it is now safe to make calls PhoneGap methods
 				function onDeviceReady() {
 
-					if( !enyo.fetchAppInfo()['id'].match( "beta" ) ) {
-						//Disable log statements on production releases
-
-						enyo.setLogLevel( enyo.logging['levels']['error'] );
-					}
+					enyo.setLogLevel( enyo.logging['levels']['error'] );
 
 					if( !window.Checkbook.app ) {
 
