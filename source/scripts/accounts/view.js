@@ -33,8 +33,7 @@ enyo.kind( {
 					kind: "enyo.Image",
 					src: "assets/dollar_sign_1.png",
 					classes: "img-icon",
-					style: "margin-right: 0.25em; height: 32px;",
-					ontap: "triggerMenu"
+					style: "margin-right: 0.25em; height: 32px;"
 				}, {
 					content: "Checkbook",
 					classes: "big enyo-text-ellipsis",
@@ -68,6 +67,7 @@ enyo.kind( {
 		}, {
 			kind: "onyx.MoreToolbar",
 			classes: "rich-brown",
+			noStretch: true,
 			components: [
 				{
 					kind: "onyx.MenuDecorator",
@@ -152,6 +152,9 @@ enyo.kind( {
 									content: "Toggle Edit Mode"
 								}, {
 									showing: false,
+									classes: "onyx-menu-divider"
+								}, {
+									showing: false,
 									content: "Reports"
 								}, {
 									showing: false,
@@ -161,6 +164,17 @@ enyo.kind( {
 									content: "Search"
 								}
 							]
+						}
+					]
+				}, {
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
 						}
 					]
 				}
@@ -271,19 +285,6 @@ enyo.kind( {
 	},
 
 	/** Header Control **/
-
-
-	/**
-	 * @protected
-	 * @name Checkbook.accounts.view#triggerMenu
-	 *
-	 * Alternate trigger for the menu
-	 */
-	triggerMenu: function() {
-
-		enyo.Signals.send( "onmenubutton" );
-		return true;
-	},
 
 	buildBalanceButton: function( callbackFn, results ) {
 
@@ -415,7 +416,13 @@ enyo.kind( {
 
 		var item = inEvent.content.toLowerCase();
 
-		if( item === "search" ) {
+		if( item === "toggle hidden" ) {
+
+			this.$['entries'].setShowHidden( !this.$['entries'].getShowHidden() );
+		} else if( item === "toggle edit mode" ) {
+
+			this.toggleLock();
+		} else if( item === "search" ) {
 
 			this.log( "launch search system (overlay like modify account)" );
 		} else if( item === "budget" ) {
@@ -424,14 +431,20 @@ enyo.kind( {
 		} else if( item === "reports" ) {
 
 			this.log( "launch report system (overlay like modify account)" );
-		} else if( item === "toggle hidden" ) {
-
-			this.$['entries'].setShowHidden( !this.$['entries'].getShowHidden() );
-		} else if( item === "toggle edit mode" ) {
-
-			this.toggleLock();
 		}
 
 		return true;
 	},
+
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#triggerAppMenu
+	 *
+	 * Alternate trigger for the menu
+	 */
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
+		return true;
+	}
 });

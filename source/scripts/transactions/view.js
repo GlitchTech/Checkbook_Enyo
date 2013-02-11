@@ -67,6 +67,7 @@ enyo.kind( {
 			name: "footer",
 			kind: "onyx.MoreToolbar",
 			classes: "deep-green",
+			noStretch: true,
 			components: [
 				{
 					name: "backButton",
@@ -194,6 +195,18 @@ enyo.kind( {
 							]
 						}
 					]
+				}, {
+					name: "menuButton",
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
+						}
+					]
 				}
 			]
 		},
@@ -275,6 +288,7 @@ enyo.kind( {
 		}
 
 		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
+		this.$['menuButton'].setShowing( enyo.Panels.isScreenNarrow() );
 		this.showLoadingScrim();
 
 		if( !this.account['acctId'] ) {
@@ -656,6 +670,12 @@ enyo.kind( {
 			this.log( inEvent.selected );
 		}
 
+		return true;
+	},
+
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
 		return true;
 	},
 
