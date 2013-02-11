@@ -211,9 +211,7 @@
 	width: 100% !important;
 	height: 100% !important;
 	min-width: 0 !important;
-	max-width: none !important;
 	min-height: 0 !important;
-	max-height: none !important;
 }
 
 
@@ -852,7 +850,6 @@
 
   white-space: nowrap;
   overflow-y: visible;
-  overflow-x: hidden;
   font-size: 20px;
 }
 .onyx-toolbar-inline > *,

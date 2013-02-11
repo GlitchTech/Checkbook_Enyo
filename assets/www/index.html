@@ -9,7 +9,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<!-- phonegap -->
-		<script src="lib/cordova-2.3.0.js"></script>
+		<script src="lib/cordova-2.4.0.js"></script>
 		<script src="lib/childbrowser.js"></script>
 		<!-- css -->
 		<link href="build/enyo.css" rel="stylesheet" />
@@ -37,7 +37,11 @@
 				//PhoneGap is loaded and it is now safe to make calls PhoneGap methods
 				function onDeviceReady() {
 
-					enyo.setLogLevel( enyo.logging['levels']['error'] );
+					if( !enyo.fetchAppInfo()['id'].match( "beta" ) ) {
+						//Disable log statements on production releases
+
+						enyo.setLogLevel( enyo.logging['levels']['error'] );
+					}
 
 					if( !window.Checkbook.app ) {
 

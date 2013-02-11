@@ -4048,6 +4048,7 @@ strategyKind: "TouchScrollStrategy",
 components: [ {
 name: "flyweight",
 kind: "FlyweightRepeater",
+noSelect: !0,
 ontap: "itemTap"
 } ]
 } ],
@@ -4073,9 +4074,9 @@ this.item = e;
 },
 selectedChanged: function(e) {
 if (!this.item) return;
-e !== undefined && (this.item.removeClass("selected"), this.$.flyweight.renderRow(e)), this.item.addClass("selected"), this.$.flyweight.renderRow(this.selected), this.item.removeClass("selected");
-var t = this.$.flyweight.fetchRowNode(this.selected);
-this.doChange({
+e != null && (this.item.removeClass("selected"), this.$.flyweight.renderRow(e));
+var t;
+this.selected != null && (this.item.addClass("selected"), this.$.flyweight.renderRow(this.selected), this.item.removeClass("selected"), t = this.$.flyweight.fetchRowNode(this.selected)), this.doChange({
 selected: this.selected,
 content: t && t.textContent || this.item.content
 });
@@ -9465,7 +9466,9 @@ onError: enyo.bind(this, this.buildInitialDB)
 },
 checkDBSuccess: function(e) {
 var t = -1;
-e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer), this.versionCheck = 30, t == this.versionCheck ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.alwaysFullCalendar = e[0].alwaysFullCalendar, Checkbook.globals.prefs.seriesCountLimit = e[0].seriesCountLimit, Checkbook.globals.prefs.seriesDayLimit = e[0].seriesDayLimit, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), enyo.asyncMethod(this, this.doFinish)) : t >= 1 ? (this.log("DB out of date, preparing to update: " + t + " to " + this.versionCheck), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
+e.length > 0 && e[0].dbVer && e[0].dbVer !== "undefined" && (t = e[0].dbVer);
+var n = 31;
+t == n ? (this.$.splashProgress.animateProgressTo(75), this.log("DB up to date, preparing to return"), Checkbook.globals.prefs.version = t, Checkbook.globals.prefs.useCode = e[0].useCode, Checkbook.globals.prefs.code = e[0].code, Checkbook.globals.prefs.transPreview = e[0].previewTransaction, Checkbook.globals.prefs.updateCheck = e[0].updateCheck, Checkbook.globals.prefs.updateCheckNotification = e[0].updateCheckNotification, Checkbook.globals.prefs.errorReporting = e[0].errorReporting, Checkbook.globals.prefs.dispColor = e[0].dispColor, Checkbook.globals.prefs.bsSave = e[0].bsSave, Checkbook.globals.prefs.alwaysFullCalendar = e[0].alwaysFullCalendar, Checkbook.globals.prefs.seriesCountLimit = e[0].seriesCountLimit, Checkbook.globals.prefs.seriesDayLimit = e[0].seriesDayLimit, Checkbook.globals.prefs.custom_sort = e[0].custom_sort, this.$.message.setContent("Updating transaction data..."), this.$.splashProgress.animateProgressTo(85), enyo.asyncMethod(this, this.doFinish)) : t >= 1 ? (n >= 26 && n <= 30 && (gts.Object.isUndefined(e[0].alwaysFullCalendar) || gts.Object.isUndefined(e[0].seriesCountLimit)) && (t = 26), this.log("DB out of date, preparing to update: " + t + " to " + n), this.updateDBStructure(t)) : (this.log("DB does not exist, preparing to create"), this.buildInitialDB());
 },
 buildInitialDB: function() {
 this.log(), this.firstRun = !0, this.$.message.setContent("Creating application database..."), this.$.splashProgress.animateProgressTo(50);
@@ -9846,60 +9849,62 @@ onError: this._binds.splashCrash
 });
 },
 updateDBStructure: function(e) {
-this.log(), this.$.message.setContent("Updating database..."), this.$.splashProgress.animateProgressTo(50);
-var t = [], n = {
+this.log(e), this.$.message.setContent("Updating database..."), this.$.splashProgress.animateProgressTo(50), e = parseInt(e);
+var t = e, n = [], r = {
 onSuccess: this._binds.checkDB,
 onError: this._binds.splashCrash
 };
 switch (e) {
 case 15:
-t.push("ALTER TABLE accounts ADD COLUMN auto_savings INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE accounts ADD COLUMN auto_savings_link INTEGER NOT NULL DEFAULT 0;"), t.push("DROP TABLE IF EXISTS repeats;"), t.push("CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurance TEXT, desc TEXT, amount REAL, note TEXT, category TEXT, acctId INTEGER, linkedAcctId INTEGER );");
+n.push("ALTER TABLE accounts ADD COLUMN auto_savings INTEGER NOT NULL DEFAULT 0;"), n.push("ALTER TABLE accounts ADD COLUMN auto_savings_link INTEGER NOT NULL DEFAULT 0;"), n.push("DROP TABLE IF EXISTS repeats;"), n.push("CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCout INTEGER, origDate TEXT, lastOccurance TEXT, desc TEXT, amount REAL, note TEXT, category TEXT, acctId INTEGER, linkedAcctId INTEGER );");
 case 16:
-t.push("ALTER TABLE expenses ADD COLUMN repeatUnlinked INTEGER NOT NULL DEFAULT 0;"), this.versionCheck = 17;
+n.push("ALTER TABLE expenses ADD COLUMN repeatUnlinked INTEGER NOT NULL DEFAULT 0;"), t = 17;
 case 17:
-t.push("ALTER TABLE prefs ADD COLUMN errorReporting INTEGER NOT NULL DEFAULT 1;"), t.push("ALTER TABLE expenses ADD COLUMN atSource INTEGER;"), t.push("UPDATE accounts SET auto_savings_link = -1;"), this.versionCheck = 18;
+n.push("ALTER TABLE prefs ADD COLUMN errorReporting INTEGER NOT NULL DEFAULT 1;"), n.push("ALTER TABLE expenses ADD COLUMN atSource INTEGER;"), n.push("UPDATE accounts SET auto_savings_link = -1;"), t = 18;
 case 18:
-t.push("ALTER TABLE expenses RENAME TO transactions;"), t.push("ALTER TABLE expenseCategories RENAME TO transactionCategories;"), t.push("DROP TABLE IF EXISTS transactionSplit;"), t.push("CREATE TABLE transactionSplit( transId INTEGER, genCat TEXT, specCat TEXT, amount REAL, last_sync TEXT );"), t.push("ALTER TABLE transactions ADD COLUMN category2 TEXT;"), this.versionCheck = 19;
+n.push("ALTER TABLE expenses RENAME TO transactions;"), n.push("ALTER TABLE expenseCategories RENAME TO transactionCategories;"), n.push("DROP TABLE IF EXISTS transactionSplit;"), n.push("CREATE TABLE transactionSplit( transId INTEGER, genCat TEXT, specCat TEXT, amount REAL, last_sync TEXT );"), n.push("ALTER TABLE transactions ADD COLUMN category2 TEXT;"), t = 19;
 case 19:
-t.push("ALTER TABLE prefs ADD COLUMN previewTransaction INTEGER NOT NULL DEFAULT 1;"), this.versionCheck = 20;
+n.push("ALTER TABLE prefs ADD COLUMN previewTransaction INTEGER NOT NULL DEFAULT 1;"), t = 20;
 case 20:
-t.push("ALTER TABLE budgets ADD COLUMN category2 TEXT;"), this.versionCheck = 21;
+n.push("ALTER TABLE budgets ADD COLUMN category2 TEXT;"), t = 21;
 case 21:
-t.push(Checkbook.globals.gts_db.getUpdate("acctTrsnSortOptn", {
+n.push(Checkbook.globals.gts_db.getUpdate("acctTrsnSortOptn", {
 qry: "IFNULL( NULLIF( checkNum, '' ), ( SELECT IFNULL( MAX( checkNum ), 0 ) FROM transactions LIMIT 1 ) ) ASC, itemId ASC"
 }, {
 sortId: 9
-})), this.versionCheck = 22;
+})), t = 22;
 case 22:
-t.push("DROP TABLE IF EXISTS repeats;"), t.push("CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCount INTEGER, origDate TEXT, lastOccurrence TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER, lastUpdated TEXT, last_sync TEXT );"), this.versionCheck = 23;
+n.push("DROP TABLE IF EXISTS repeats;"), n.push("CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCount INTEGER, origDate TEXT, lastOccurrence TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER, lastUpdated TEXT, last_sync TEXT );"), t = 23;
 case 23:
-t.push(Checkbook.globals.gts_db.getUpdate("accounts", {
+n.push(Checkbook.globals.gts_db.getUpdate("accounts", {
 acctLocked: 0,
 lockedCode: ""
-}, {})), t.push(Checkbook.globals.gts_db.getUpdate("prefs", {
+}, {})), n.push(Checkbook.globals.gts_db.getUpdate("prefs", {
 useCode: 0,
 code: "",
 saveGSheetsData: 0,
 gSheetUser: "depreciated",
 gSheetPass: ""
-}, {})), this.versionCheck = 24;
+}, {})), t = 24;
 case 24:
-t.push("ALTER TABLE accounts ADD COLUMN payeeField INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE transactions ADD COLUMN payee TEXT;"), this.versionCheck = 25;
+n.push("ALTER TABLE accounts ADD COLUMN payeeField INTEGER NOT NULL DEFAULT 0;"), n.push("ALTER TABLE transactions ADD COLUMN payee TEXT;"), t = 25;
 case 25:
-t.push("ALTER TABLE transactions RENAME TO expenses;"), t.push("ALTER TABLE transactionCategories RENAME TO expenseCategories;"), this.versionCheck = 26;
+n.push("ALTER TABLE transactions RENAME TO expenses;"), n.push("ALTER TABLE transactionCategories RENAME TO expenseCategories;"), t = 26;
 case 26:
-t.push("ALTER TABLE expenses RENAME TO transactions;"), t.push("ALTER TABLE expenseCategories RENAME TO transactionCategories;"), this.versionCheck = 27;
+n.push("ALTER TABLE expenses RENAME TO transactions;"), n.push("ALTER TABLE expenseCategories RENAME TO transactionCategories;"), t = 27;
 case 27:
-t.push("ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;"), this.versionCheck = 28;
+n.push("ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;"), t = 28;
 case 28:
-t.push("ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;"), t.push("ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;"), this.versionCheck = 29;
+n.push("ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;"), n.push("ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;"), t = 29;
 case 29:
-t.push("ALTER TABLE prefs ADD COLUMN seriesCountLimit INTEGER NOT NULL DEFAULT 3;"), t.push("ALTER TABLE prefs ADD COLUMN seriesDayLimit INTEGER NOT NULL DEFAULT 45;"), this.versionCheck = 30;
+n.push("ALTER TABLE prefs ADD COLUMN seriesCountLimit INTEGER NOT NULL DEFAULT 3;"), n.push("ALTER TABLE prefs ADD COLUMN seriesDayLimit INTEGER NOT NULL DEFAULT 45;"), t = 30;
 case 30:
+t = 31;
+case 31:
 }
-t.push(Checkbook.globals.gts_db.getUpdate("prefs", {
-dbVer: this.versionCheck
-}, {})), Checkbook.globals.gts_db.queries(t, n);
+n.push(Checkbook.globals.gts_db.getUpdate("prefs", {
+dbVer: t
+}, {})), Checkbook.globals.gts_db.queries(n, r);
 },
 splashCrash: function(e) {
 this.error(arguments), this.$.splashProgress.hide(), this.$.spinner.hide(), this.$.icon.show(), this.$.title.setContent("Checkbook Load Error"), this.$.message.setContent("Checkbook has failed to load.<br />Please contact <a href='mailto:glitchtechscience@gmail.com'>GlitchTech Science</a> for assistant with the following error:<br /><br />Code: " + e.code + "<br />" + "Message: " + e.message);
