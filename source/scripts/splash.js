@@ -696,7 +696,7 @@ enyo.kind({
 
 	updateDBStructure: function( currVersion ) {
 
-		this.error( currVersion );
+		this.log( currVersion );
 
 		this.$['message'].setContent( "Updating database..." );
 		this.$['splashProgress'].animateProgressTo( 50 );
