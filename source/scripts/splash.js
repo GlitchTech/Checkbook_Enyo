@@ -160,9 +160,9 @@ enyo.kind({
 		}
 
 		//DB Version
-		this.versionCheck = 30;
+		var versionCheck = 31;
 
-		if( currVersion == this.versionCheck ) {
+		if( currVersion == versionCheck ) {
 
 			this.$['splashProgress'].animateProgressTo( 75 );
 
@@ -198,7 +198,13 @@ enyo.kind({
 				);
 		} else if( currVersion >= 1 ) {
 
-			this.log( "DB out of date, preparing to update: " + currVersion + " to " + this.versionCheck );
+			if( versionCheck >= 26 && versionCheck <= 30 && ( gts.Object.isUndefined( results[0]['alwaysFullCalendar'] ) || gts.Object.isUndefined( results[0]['seriesCountLimit'] ) ) ) {
+				//Android 2.x fix attempt: for db versions 26 (java) to 30 (gutoc start)
+
+				currVersion = 26;
+			}
+
+			this.log( "DB out of date, preparing to update: " + currVersion + " to " + versionCheck );
 
 			this.updateDBStructure( currVersion );
 		} else {
@@ -690,10 +696,13 @@ enyo.kind({
 
 	updateDBStructure: function( currVersion ) {
 
-		this.log();
+		this.log( currVersion );
 
 		this.$['message'].setContent( "Updating database..." );
 		this.$['splashProgress'].animateProgressTo( 50 );
+
+		currVersion = parseInt( currVersion );
+		var newVersion = currVersion;
 
 		var querySet = [];
 		var updateOptions = {
@@ -702,7 +711,7 @@ enyo.kind({
 				};
 
 		//If system needs to run an external function, override updateOptions['onSuccess']
-			//Optionally break early to force this.versionCheck to not be max version, will force another db update
+			//Optionally break early to force newVersion to not be max version, will force another db update
 
 		switch( currVersion ) {
 			case 15:
@@ -716,13 +725,13 @@ enyo.kind({
 			case 16:
 				querySet.push( "ALTER TABLE expenses ADD COLUMN repeatUnlinked INTEGER NOT NULL DEFAULT 0;" );
 
-				this.versionCheck = 17;
+				newVersion = 17;
 			case 17:
 				querySet.push( "ALTER TABLE prefs ADD COLUMN errorReporting INTEGER NOT NULL DEFAULT 1;" );
 				querySet.push( "ALTER TABLE expenses ADD COLUMN atSource INTEGER;" );
 				querySet.push( "UPDATE accounts SET auto_savings_link = -1;" );
 
-				this.versionCheck = 18;
+				newVersion = 18;
 			case 18:
 				//Rename table
 				querySet.push( "ALTER TABLE expenses RENAME TO transactions;" );
@@ -735,16 +744,16 @@ enyo.kind({
 				//Add secondary trans cat to system
 				querySet.push( "ALTER TABLE transactions ADD COLUMN category2 TEXT;" );
 
-				this.versionCheck = 19;
+				newVersion = 19;
 			case 19:
 				querySet.push( "ALTER TABLE prefs ADD COLUMN previewTransaction INTEGER NOT NULL DEFAULT 1;" );
 
-				this.versionCheck = 20;
+				newVersion = 20;
 			case 20:
 				//Add secondary trans cat to budget system
 				querySet.push( "ALTER TABLE budgets ADD COLUMN category2 TEXT;" );
 
-				this.versionCheck = 21;
+				newVersion = 21;
 			case 21:
 				querySet.push(
 						Checkbook.globals.gts_db.getUpdate(
@@ -758,13 +767,13 @@ enyo.kind({
 							)
 					);
 
-				this.versionCheck = 22;
+				newVersion = 22;
 			case 22:
 				//Repeat System (ignore cleared, checknum)
 				querySet.push( "DROP TABLE IF EXISTS repeats;" );
 				querySet.push( "CREATE TABLE repeats( repeatId INTEGER PRIMARY KEY ASC, frequency TEXT, daysOfWeek TEXT, itemSpan INTEGER, endingCondition TEXT, endDate TEXT, endCount INTEGER, currCount INTEGER, origDate TEXT, lastOccurrence TEXT, rep_desc TEXT, rep_amount REAL, rep_note TEXT, rep_category TEXT, rep_acctId INTEGER, rep_linkedAcctId INTEGER, rep_autoTrsnLink INTEGER, lastUpdated TEXT, last_sync TEXT );" );
 
-				this.versionCheck = 23;
+				newVersion = 23;
 			case 23:
 				//Remove set passwords (encryption system changed)
 				querySet.push(
@@ -791,50 +800,53 @@ enyo.kind({
 							)
 					);
 
-				this.versionCheck = 24;
+				newVersion = 24;
 			case 24:
 				//Payee field option
 				querySet.push( "ALTER TABLE accounts ADD COLUMN payeeField INTEGER NOT NULL DEFAULT 0;" );
 				querySet.push( "ALTER TABLE transactions ADD COLUMN payee TEXT;" );
 
-				this.versionCheck = 25;
+				newVersion = 25;
 			case 25:
 				querySet.push( "ALTER TABLE transactions RENAME TO expenses;" );
 				querySet.push( "ALTER TABLE transactionCategories RENAME TO expenseCategories;" );
 
-				this.versionCheck = 26;
+				newVersion = 26;
 			case 26:
 				querySet.push( "ALTER TABLE expenses RENAME TO transactions;" );
 				querySet.push( "ALTER TABLE expenseCategories RENAME TO transactionCategories;" );
 
-				this.versionCheck = 27;
+				newVersion = 27;
 			case 27:
 				querySet.push( "ALTER TABLE prefs ADD COLUMN alwaysFullCalendar INTEGER NOT NULL DEFAULT 0;" );
 
-				this.versionCheck = 28;
+				newVersion = 28;
 			case 28:
 				querySet.push( "ALTER TABLE repeats ADD COLUMN terminated INTEGER NOT NULL DEFAULT 0;" );
 				querySet.push( "ALTER TABLE repeats ADD COLUMN rep_autoTrsnLinkAcct INTEGER;" );
 
-				this.versionCheck = 29;
+				newVersion = 29;
 			case 29:
 				querySet.push( "ALTER TABLE prefs ADD COLUMN seriesCountLimit INTEGER NOT NULL DEFAULT 3;" );
 				querySet.push( "ALTER TABLE prefs ADD COLUMN seriesDayLimit INTEGER NOT NULL DEFAULT 45;" );
 
-				this.versionCheck = 30;
+				newVersion = 30;
 			case 30:
+				//No structure updates. This is only to fix an Android 2.x issue
+				newVersion = 31;
+			case 31:
 				//GTS Sync System
 				//querySet.push( "DROP TABLE IF EXISTS syncQueue;" );
 				//querySet.push( "CREATE TABLE syncQueue( syncId INTEGER PRIMARY KEY ASC, action TEXT, table TEXT, data TEXT, where TEXT, ts INTEGER, sourceTable TEXT, sourceId INTEGER );" );
 
-				//this.versionCheck = ??;
+				//newVersion = ??;
 		}
 
 		querySet.push(
 				Checkbook.globals.gts_db.getUpdate(
 						"prefs",
 						{
-							"dbVer": this.versionCheck
+							"dbVer": newVersion
 						},
 						{}
 					)
