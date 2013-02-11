@@ -690,10 +690,12 @@ enyo.kind({
 
 	updateDBStructure: function( currVersion ) {
 
-		this.log();
+		this.error( currVersion );
 
 		this.$['message'].setContent( "Updating database..." );
 		this.$['splashProgress'].animateProgressTo( 50 );
+
+		currVersion = parseInt( currVersion );
 
 		var querySet = [];
 		var updateOptions = {
