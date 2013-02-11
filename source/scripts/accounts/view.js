@@ -33,7 +33,8 @@ enyo.kind( {
 					kind: "enyo.Image",
 					src: "assets/dollar_sign_1.png",
 					classes: "img-icon",
-					style: "margin-right: 0.25em; height: 32px;"
+					style: "margin-right: 0.25em; height: 32px;",
+					ontap: "triggerMenu"
 				}, {
 					content: "Checkbook",
 					classes: "big enyo-text-ellipsis",
@@ -147,6 +148,8 @@ enyo.kind( {
 							components: [
 								{
 									content: "Toggle Hidden"
+								}, {
+									content: "Toggle Edit Mode"
 								}, {
 									showing: false,
 									content: "Reports"
@@ -268,6 +271,19 @@ enyo.kind( {
 	},
 
 	/** Header Control **/
+
+
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#triggerMenu
+	 *
+	 * Alternate trigger for the menu
+	 */
+	triggerMenu: function() {
+
+		enyo.Signals.send( "onmenubutton" );
+		return true;
+	},
 
 	buildBalanceButton: function( callbackFn, results ) {
 
@@ -411,6 +427,9 @@ enyo.kind( {
 		} else if( item === "toggle hidden" ) {
 
 			this.$['entries'].setShowHidden( !this.$['entries'].getShowHidden() );
+		} else if( item === "toggle edit mode" ) {
+
+			this.toggleLock();
 		}
 
 		return true;

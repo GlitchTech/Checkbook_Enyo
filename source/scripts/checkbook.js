@@ -38,7 +38,6 @@ enyo.kind({
 									showOnTop: true,
 									floating: true,
 									scrim: true,
-									modal: false,//allow signal events to pass through
 									scrimclasses: "onyx-scrim-translucent",
 
 									components: [
