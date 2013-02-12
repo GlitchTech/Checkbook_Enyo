@@ -106,14 +106,16 @@ enyo.kind( {
 					]
 				}, {
 					classes: "text-center",
+					style: "min-width: 145px;",
 					fit: true,
+					unmoveable: true,
 					components: [
 						{
 							name: "addIncomeButton",
 							kind: "onyx.Button",
 
 							ontap: "addIncome",
-							classes: "margin-half-left margin-half-right padding-none transparent",
+							classes: "padding-none margin-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -125,7 +127,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addTransfer",
-							classes: "margin-half-left margin-half-right padding-none transparent",
+							classes: "padding-none margin-half-left margin-half-right transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -137,7 +139,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addExpense",
-							classes: "margin-half-left margin-half-right padding-none transparent",
+							classes: "padding-none margin-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -287,8 +289,8 @@ enyo.kind( {
 			return;
 		}
 
-		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
-		this.$['menuButton'].setShowing( enyo.Panels.isScreenNarrow() );
+		this.adjustViewForScreenSize();
+
 		this.showLoadingScrim();
 
 		if( !this.account['acctId'] ) {
@@ -362,6 +364,19 @@ enyo.kind( {
 		this.$['header'].reflow();
 		this.$['footer'].reflow();
 		this.reflow();
+	},
+
+	resized: function() {
+
+		this.inherited( arguments );
+
+		this.adjustViewForScreenSize();
+	},
+
+	adjustViewForScreenSize: function() {
+
+		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
+		this.$['menuButton'].setShowing( enyo.Panels.isScreenNarrow() );
 	},
 
 	getAccountId: function() {

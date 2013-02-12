@@ -67,7 +67,6 @@ enyo.kind( {
 		}, {
 			kind: "onyx.MoreToolbar",
 			classes: "rich-brown",
-			noStretch: true,
 			components: [
 				{
 					kind: "onyx.MenuDecorator",
@@ -96,6 +95,7 @@ enyo.kind( {
 				}, {
 					classes: "text-center",
 					fit: true,
+					unmoveable: true,
 					components: [
 						{
 							name: "addAccountButton",
@@ -120,8 +120,8 @@ enyo.kind( {
 								{
 									name: "editModeButtonIcon",
 									kind: "onyx.Icon",
-									src: "assets/menu_icons/lock.png",
-									classes: "onyx-icon-button onyx-icon-toggle"
+									src: "assets/menu_icons/lock_closed.png",
+									classes: "onyx-icon-button"
 								}
 							]
 						}
@@ -407,7 +407,8 @@ enyo.kind( {
 			this.$['entries'].setEditMode( true );
 		}
 
-		this.$['editModeButtonIcon'].addRemoveClass( "active", this.$['entries'].getEditMode() );
+		this.$['editModeButtonIcon'].setSrc( this.$['entries'].getEditMode() ? "assets/menu_icons/lock_open.png" : "assets/menu_icons/lock_closed.png" );
+
 		this.$['editOverlay'].setShowing( this.$['entries'].getEditMode() );
 		this.$['header'].reflow();
 	},
