@@ -156,7 +156,7 @@ enyo.kind({
 		if( inEvent.which === 18 ) {
 			//alt key
 
-			enyo.Signals.send( "onmenubutton", { "centerX": 10, "centerY": 10 } );
+			enyo.Signals.send( "onmenubutton" );
 			return true;
 		} else if( inEvent.which === 27 ) {
 			//escape key
@@ -169,6 +169,8 @@ enyo.kind({
 	menuHandler: function( inSender, inEvent ) {
 
 		if( !this.appReady ) { return; }
+
+		inEvent = enyo.mixin( { "pageX": 10, "pageY": 10 }, inEvent );
 
 		if( this.paneStack.length <= 0 ) {
 			//Menu is only available on Accounts or Transaction list screens.
