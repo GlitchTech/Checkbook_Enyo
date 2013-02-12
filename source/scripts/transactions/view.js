@@ -67,6 +67,7 @@ enyo.kind( {
 			name: "footer",
 			kind: "onyx.MoreToolbar",
 			classes: "deep-green",
+			noStretch: true,
 			components: [
 				{
 					name: "backButton",
@@ -105,14 +106,16 @@ enyo.kind( {
 					]
 				}, {
 					classes: "text-center",
+					style: "min-width: 145px;",
 					fit: true,
+					unmoveable: true,
 					components: [
 						{
 							name: "addIncomeButton",
 							kind: "onyx.Button",
 
 							ontap: "addIncome",
-							classes: "margin-half-left margin-half-right padding-none transparent",
+							classes: "padding-none margin-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -124,7 +127,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addTransfer",
-							classes: "margin-half-left margin-half-right padding-none transparent",
+							classes: "padding-none margin-half-left margin-half-right transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -136,7 +139,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addExpense",
-							classes: "margin-half-left margin-half-right padding-none transparent",
+							classes: "padding-none margin-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -192,6 +195,18 @@ enyo.kind( {
 									content: "Clear Multiple"
 								}
 							]
+						}
+					]
+				}, {
+					name: "menuButton",
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
 						}
 					]
 				}
@@ -274,7 +289,8 @@ enyo.kind( {
 			return;
 		}
 
-		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
+		this.adjustViewForScreenSize();
+
 		this.showLoadingScrim();
 
 		if( !this.account['acctId'] ) {
@@ -348,6 +364,19 @@ enyo.kind( {
 		this.$['header'].reflow();
 		this.$['footer'].reflow();
 		this.reflow();
+	},
+
+	resized: function() {
+
+		this.inherited( arguments );
+
+		this.adjustViewForScreenSize();
+	},
+
+	adjustViewForScreenSize: function() {
+
+		this.$['backButton'].setShowing( enyo.Panels.isScreenNarrow() );
+		this.$['menuButton'].setShowing( enyo.Panels.isScreenNarrow() );
 	},
 
 	getAccountId: function() {
@@ -656,6 +685,12 @@ enyo.kind( {
 			this.log( inEvent.selected );
 		}
 
+		return true;
+	},
+
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
 		return true;
 	},
 
