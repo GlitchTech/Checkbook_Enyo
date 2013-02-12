@@ -1679,6 +1679,12 @@ body {
   border-width: 0;
 }
 /*****************/
+.onyx-button.active .onyx-icon,
+.onyx-button.pressed .onyx-icon,
+.onyx-button:active:hover .onyx-icon {
+  background-position: 0 -32px;
+}
+/*****************/
 .enyo-label-fullsize {
   color: #1879cd;
   text-transform: uppercase;

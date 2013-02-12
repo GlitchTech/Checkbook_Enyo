@@ -9119,32 +9119,42 @@ enyo.kind({
 name: "Checkbook.app",
 kind: "enyo.Control",
 components: [ {
-name: "container",
-layoutKind: "enyo.FittableRowsLayout",
-classes: "enyo-fit",
+name: "mainViews",
+kind: "Panels",
+classes: "enyo-fit app-panels",
 showing: !1,
+fit: !0,
+animate: !1,
+draggable: !1,
+arrangerKind: "CollapsingArranger",
 components: [ {
-name: "menubar",
-kind: "onyx.Toolbar",
-classes: "padding-none",
-components: [ {
-name: "appMenu",
-kind: "onyx.MenuDecorator",
-components: [ {
-name: "appMenuButton",
-kind: "onyx.Button",
-components: [ {
-kind: "enyo.Image",
-src: "assets/favicon.ico"
-}, {
-content: "Checkbook"
+name: "destroyChild",
+content: "I am a dummy component so the panel structure doesn't crash on load."
 } ]
 }, {
-kind: "onyx.Menu",
+name: "splash",
+kind: "Checkbook.splash",
+onFinish: "splashFinisher"
+}, {
+name: "about",
+kind: "Checkbook.about",
+onFinish: "closePopup"
+}, {
+name: "criticalError",
+kind: "Checkbook.systemError",
+errTitle: "~|p2t|~",
+errMessage: "",
+errMessage2: "~|mt|~",
+onFinish: "closePopup"
+}, {
+name: "security",
+kind: "Checkbook.login"
+}, {
+name: "appMenu",
+kind: "gts.EventMenu",
 showOnTop: !0,
 floating: !0,
 scrim: !0,
-modal: !1,
 scrimclasses: "onyx-scrim-translucent",
 components: [ {
 content: "Preferences",
@@ -9185,39 +9195,6 @@ classes: "onyx-menu-divider"
 content: "About",
 ontap: "showAbout"
 } ]
-} ]
-} ]
-}, {
-name: "mainViews",
-kind: "Panels",
-fit: !0,
-animate: !1,
-draggable: !1,
-classes: "app-panels",
-arrangerKind: "CollapsingArranger",
-components: [ {
-name: "destroyChild",
-content: "I am a dummy component so the panel structure doesn't crash on load."
-} ]
-} ]
-}, {
-name: "splash",
-kind: "Checkbook.splash",
-onFinish: "splashFinisher"
-}, {
-name: "about",
-kind: "Checkbook.about",
-onFinish: "closePopup"
-}, {
-name: "criticalError",
-kind: "Checkbook.systemError",
-errTitle: "~|p2t|~",
-errMessage: "",
-errMessage2: "~|mt|~",
-onFinish: "closePopup"
-}, {
-name: "security",
-kind: "Checkbook.login"
 }, {
 kind: "Signals",
 viewAccount: "viewAccount",
@@ -9242,19 +9219,22 @@ if (!this.appReady) return;
 if (t.which === 18) return enyo.Signals.send("onmenubutton"), !0;
 if (t.which === 27) return enyo.Signals.send("onbackbutton"), !0;
 },
-menuHandler: function() {
+menuHandler: function(e, t) {
 if (!this.appReady) return;
-return this.paneStack.length <= 0 && (this.$.appMenuButton.getActive() === !0 ? this.hideAppMenu() : this.showAppMenu()), !0;
+return t = enyo.mixin({
+pageX: 10,
+pageY: 10
+}, t), this.paneStack.length <= 0 && (this.$.appMenu.getShowing() ? this.hideAppMenu() : this.showAppMenu(e, t)), !0;
 },
-showAppMenu: function() {
-this.$.appMenuButton.waterfall("ontap", "ontap", this);
+showAppMenu: function(e, t) {
+this.$.appMenu.showAtEvent(t);
 },
 hideAppMenu: function() {
-this.$.appMenuButton.setActive(!1), this.$.appMenu.requestHideMenu();
+this.$.appMenu.hide();
 },
 backHandler: function() {
 if (!this.appReady) return;
-return this.$.appMenu.menuActive === !0 ? this.hideAppMenu() : this.paneStack.length > 0 ? this.$[this.paneStack[this.paneStack.length - 1]].doFinish() : this.$.mainViews.getIndex() > 0 ? this.$.mainViews.previous() : enyo.platform.android || enyo.platform.androidChrome ? this.$.exitConfirmation ? this.exitConfirmationHandler() : (this.createComponent({
+return this.$.appMenu.getShowing() ? this.hideAppMenu() : this.paneStack.length > 0 ? this.$[this.paneStack[this.paneStack.length - 1]].doFinish() : this.$.mainViews.getIndex() > 0 ? this.$.mainViews.previous() : enyo.platform.android || enyo.platform.androidChrome ? this.$.exitConfirmation ? this.exitConfirmationHandler() : (this.createComponent({
 name: "exitConfirmation",
 kind: "gts.ConfirmDialog",
 title: "Exit Checkbook",
@@ -9294,7 +9274,7 @@ name: "transactions",
 kind: "Checkbook.transactions.view"
 } ], {
 owner: this
-}), this.$.mainViews.render(), this.$.container.show(), this.$.container.render(), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, Checkbook.globals.transactionManager.$.recurrence.updateSeriesTransactions(-1, {
+}), this.$.mainViews.show(), this.$.mainViews.render(), Checkbook.globals.criticalError = this.$.criticalError, Checkbook.globals.accountManager = new Checkbook.accounts.manager, Checkbook.globals.transactionManager = new Checkbook.transactions.manager, Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager, Checkbook.globals.transactionManager.$.recurrence.updateSeriesTransactions(-1, {
 onSuccess: enyo.bind(this, this.loadCheckbookStage2)
 });
 },
@@ -9341,14 +9321,14 @@ flex: 1,
 onFinish: "hidePanePopup",
 onFinishFollower: enyo.isFunction(t.onFinish) ? t.onFinish : null
 });
-this.createComponent(n), this.$[n.name].render(), this.$.container.hide();
+this.createComponent(n), this.$[n.name].render(), this.$.mainViews.hide();
 for (var r = 0; r < this.paneStack.length; r++) this.$[this.paneStack[r]].hide();
 return this.$[n.name].show(), this.paneStack.push(n.name), !0;
 },
 hidePanePopup: function(e) {
 enyo.isFunction(e.onFinishFollower) && e.onFinishFollower.apply(null, arguments), this.paneStack.splice(this.paneStack.indexOf(e.name), 1), e.destroy();
 var t = this.paneStack.length;
-t > 0 ? this.$[this.paneStack[t - 1]].show() : this.$.container.show(), this.resized();
+t > 0 ? this.$[this.paneStack[t - 1]].show() : this.$.mainViews.show(), this.resized();
 },
 viewAccount: function() {
 enyo.Panels.isScreenNarrow() && this.$.mainViews.setIndex(1);
@@ -11803,6 +11783,7 @@ components: accountSortOptions
 }, {
 classes: "text-center",
 fit: !0,
+unmoveable: !0,
 components: [ {
 name: "addAccountButton",
 kind: "onyx.Button",
@@ -11819,8 +11800,8 @@ classes: "margin-half-left padding-none transparent",
 components: [ {
 name: "editModeButtonIcon",
 kind: "onyx.Icon",
-src: "assets/menu_icons/lock.png",
-classes: "onyx-icon-button onyx-icon-toggle"
+src: "assets/menu_icons/lock_closed.png",
+classes: "onyx-icon-button"
 } ]
 } ]
 }, {
@@ -11841,6 +11822,11 @@ scrimclasses: "onyx-scrim-translucent",
 components: [ {
 content: "Toggle Hidden"
 }, {
+content: "Toggle Edit Mode"
+}, {
+showing: !1,
+classes: "onyx-menu-divider"
+}, {
 showing: !1,
 content: "Reports"
 }, {
@@ -11850,6 +11836,14 @@ content: "Budget"
 showing: !1,
 content: "Search"
 } ]
+} ]
+}, {
+kind: "onyx.Button",
+classes: "padding-none transparent",
+ontap: "triggerAppMenu",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/menu.png"
 } ]
 } ]
 }, {
@@ -11951,11 +11945,14 @@ addAccountComplete: function(e, t) {
 this.$.addAccountButton.setDisabled(!1), t.action === 1 && t.actionStatus === !0 && enyo.Signals.send("accountChanged");
 },
 toggleLock: function() {
-this.$.entries.getEditMode() ? this.$.entries.setEditMode(!1) : this.$.entries.setEditMode(!0), this.$.editModeButtonIcon.addRemoveClass("active", this.$.entries.getEditMode()), this.$.editOverlay.setShowing(this.$.entries.getEditMode()), this.$.header.reflow();
+this.$.entries.getEditMode() ? this.$.entries.setEditMode(!1) : this.$.entries.setEditMode(!0), this.$.editModeButtonIcon.setSrc(this.$.entries.getEditMode() ? "assets/menu_icons/lock_open.png" : "assets/menu_icons/lock_closed.png"), this.$.editOverlay.setShowing(this.$.entries.getEditMode()), this.$.header.reflow();
 },
 searchMenuSelected: function(e, t) {
 var n = t.content.toLowerCase();
-return n === "search" ? this.log("launch search system (overlay like modify account)") : n === "budget" ? this.log("launch budget system (overlay like modify account)") : n === "reports" ? this.log("launch report system (overlay like modify account)") : n === "toggle hidden" && this.$.entries.setShowHidden(!this.$.entries.getShowHidden()), !0;
+return n === "toggle hidden" ? this.$.entries.setShowHidden(!this.$.entries.getShowHidden()) : n === "toggle edit mode" ? this.toggleLock() : n === "search" ? this.log("launch search system (overlay like modify account)") : n === "budget" ? this.log("launch budget system (overlay like modify account)") : n === "reports" && this.log("launch report system (overlay like modify account)"), !0;
+},
+triggerAppMenu: function(e, t) {
+return enyo.Signals.send("onmenubutton", t), !0;
 }
 });
 
@@ -13158,6 +13155,7 @@ onCloneTransaction: "cloneTransaction"
 name: "footer",
 kind: "onyx.MoreToolbar",
 classes: "deep-green",
+noStretch: !0,
 components: [ {
 name: "backButton",
 kind: "onyx.Button",
@@ -13187,12 +13185,14 @@ style: "min-width: 225px;"
 } ]
 }, {
 classes: "text-center",
+style: "min-width: 145px;",
 fit: !0,
+unmoveable: !0,
 components: [ {
 name: "addIncomeButton",
 kind: "onyx.Button",
 ontap: "addIncome",
-classes: "margin-half-left margin-half-right padding-none transparent",
+classes: "padding-none margin-none transparent",
 components: [ {
 kind: "onyx.Icon",
 src: "assets/menu_icons/income.png"
@@ -13201,7 +13201,7 @@ src: "assets/menu_icons/income.png"
 name: "addTransferButton",
 kind: "onyx.Button",
 ontap: "addTransfer",
-classes: "margin-half-left margin-half-right padding-none transparent",
+classes: "padding-none margin-half-left margin-half-right transparent",
 components: [ {
 kind: "onyx.Icon",
 src: "assets/menu_icons/transfer.png"
@@ -13210,7 +13210,7 @@ src: "assets/menu_icons/transfer.png"
 name: "addExpenseButton",
 kind: "onyx.Button",
 ontap: "addExpense",
-classes: "margin-half-left margin-half-right padding-none transparent",
+classes: "padding-none margin-none transparent",
 components: [ {
 kind: "onyx.Icon",
 src: "assets/menu_icons/expense.png"
@@ -13259,6 +13259,15 @@ showing: !1,
 content: "Clear Multiple"
 } ]
 } ]
+}, {
+name: "menuButton",
+kind: "onyx.Button",
+classes: "padding-none transparent",
+ontap: "triggerAppMenu",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/menu.png"
+} ]
 } ]
 }, {
 name: "loadingScrim",
@@ -13290,9 +13299,15 @@ if (!t.account || !t.account.acctId) {
 this.unloadSystem();
 return;
 }
-this.$.backButton.setShowing(enyo.Panels.isScreenNarrow()), this.showLoadingScrim(), this.account.acctId || (this.$.header.show(), this.$.footer.show());
+this.adjustViewForScreenSize(), this.showLoadingScrim(), this.account.acctId || (this.$.header.show(), this.$.footer.show());
 if (t.force || !this.account.acctId || this.account.acctId !== t.account.acctId) this.account = enyo.clone(t.account), this.$.entries.account = enyo.clone(this.account), this.$.acctName.setContent(this.account.acctName), this.$.acctTypeIcon.setSrc("assets/" + this.account.acctCategoryIcon), this.renderBalanceButton(), this.renderSortButton(), this.$.entries.reloadSystem(), this.account.frozen === 1 ? (this.$.addIncomeButton.setDisabled(!0), this.$.addTransferButton.setDisabled(!0), this.$.addExpenseButton.setDisabled(!0)) : (this.$.addIncomeButton.setDisabled(!1), this.$.addTransferButton.setDisabled(!1), this.$.addExpenseButton.setDisabled(!1));
 this.hideLoadingScrim(), this.$.header.reflow(), this.$.footer.reflow(), this.reflow();
+},
+resized: function() {
+this.inherited(arguments), this.adjustViewForScreenSize();
+},
+adjustViewForScreenSize: function() {
+this.$.backButton.setShowing(enyo.Panels.isScreenNarrow()), this.$.menuButton.setShowing(enyo.Panels.isScreenNarrow());
 },
 getAccountId: function() {
 return this.account.acctId;
@@ -13425,6 +13440,9 @@ force: !0
 });
 } else t.content.toLowerCase() === "budget" ? this.log("Budget system go") : t.content.toLowerCase() === "reports" ? this.log("Report system go") : t.content.toLowerCase() === "search" ? this.log("Search system go") : this.log(t.selected);
 return !0;
+},
+triggerAppMenu: function(e, t) {
+return enyo.Signals.send("onmenubutton", t), !0;
 },
 newTransaction: function(e) {
 this.cloneTransaction(null, {
