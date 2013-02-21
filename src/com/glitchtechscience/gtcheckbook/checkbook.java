@@ -9,11 +9,6 @@ public class checkbook extends Application {
 	/** System Vars **/
 	private SQLiteDatabase cbDB;
 
-	public checkbook() {
-
-		super();
-	}
-
 	public void setAppDatabase() {
 
 		try {

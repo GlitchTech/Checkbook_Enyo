@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="16" />
+        android:targetSdkVersion="17" />
 
     <supports-screens
         android:anyDensity="true"
@@ -23,7 +23,6 @@
     <application
         android:name="checkbook"
         android:allowBackup="false"
-        android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
