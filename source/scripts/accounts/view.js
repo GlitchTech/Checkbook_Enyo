@@ -50,6 +50,17 @@ enyo.kind( {
 					content: "Edit Accounts",
 					classes: "enyo-fit text-center header-overlay",
 					showing: false
+				}, {
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
+						}
+					]
 				}
 			]
 		}, {
@@ -164,17 +175,6 @@ enyo.kind( {
 									content: "Search"
 								}
 							]
-						}
-					]
-				}, {
-					kind: "onyx.Button",
-					classes: "padding-none transparent",
-					ontap: "triggerAppMenu",
-
-					components: [
-						{
-							kind: "onyx.Icon",
-							src: "assets/menu_icons/menu.png"
 						}
 					]
 				}
@@ -337,6 +337,18 @@ enyo.kind( {
 		this.$['entries'].refresh();
 	},
 
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#triggerAppMenu
+	 *
+	 * Alternate trigger for the menu
+	 */
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
+		return true;
+	},
+
 	/** Footer Control **/
 
 	updateSortMenu: function() {
@@ -434,18 +446,6 @@ enyo.kind( {
 			this.log( "launch report system (overlay like modify account)" );
 		}
 
-		return true;
-	},
-
-	/**
-	 * @protected
-	 * @name Checkbook.accounts.view#triggerAppMenu
-	 *
-	 * Alternate trigger for the menu
-	 */
-	triggerAppMenu: function( inSender, inEvent ) {
-
-		enyo.Signals.send( "onmenubutton", inEvent );
 		return true;
 	}
 });

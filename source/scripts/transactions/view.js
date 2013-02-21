@@ -42,6 +42,18 @@ enyo.kind( {
 					onChange: "handleBalanceButton",
 
 					style: "padding: 0 8px; margin: 0;"
+				}, {
+					name: "menuButton",
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
+						}
+					]
 				}
 			]
 		}, {
@@ -195,18 +207,6 @@ enyo.kind( {
 									content: "Clear Multiple"
 								}
 							]
-						}
-					]
-				}, {
-					name: "menuButton",
-					kind: "onyx.Button",
-					classes: "padding-none transparent",
-					ontap: "triggerAppMenu",
-
-					components: [
-						{
-							kind: "onyx.Icon",
-							src: "assets/menu_icons/menu.png"
 						}
 					]
 				}
@@ -553,6 +553,12 @@ enyo.kind( {
 		return true;
 	},
 
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
+		return true;
+	},
+
 	/* Loading Indicators */
 
 	showLoadingIcon: function() {
@@ -685,12 +691,6 @@ enyo.kind( {
 			this.log( inEvent.selected );
 		}
 
-		return true;
-	},
-
-	triggerAppMenu: function( inSender, inEvent ) {
-
-		enyo.Signals.send( "onmenubutton", inEvent );
 		return true;
 	},
 

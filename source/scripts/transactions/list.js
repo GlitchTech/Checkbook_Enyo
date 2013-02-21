@@ -704,6 +704,7 @@ results = {
 	transactionCleared: function( inSender, inEvent ) {
 
 		this.vsCleared( null, inEvent );
+		//enyo.asyncMethod( this, this.vsCleared, null, inEvent );
 
 		//Don't 'click' the row
 		inEvent.preventDefault();
