@@ -383,7 +383,6 @@ enyo.kind( {
 											style: "vertical-align: top;"
 										}
 									]
-
 								}
 							]
 						},
