@@ -1056,6 +1056,154 @@ for (i = 0; i < n.length; i++) r.push(n[i]);
 return r.length > 2 && this.style === "full" && (r[r.length - 2] = this.parts.finalSeparator), r.join("") || "";
 };
 
+// ContextualLayout.js
+
+enyo.kind({
+name: "enyo.ContextualLayout",
+kind: "Layout",
+adjustPosition: function() {
+if (this.container.showing && this.container.hasNode()) {
+this.resetPositioning();
+var e = this.getViewWidth(), t = this.getViewHeight(), n = this.container.vertFlushMargin, r = t - this.container.vertFlushMargin, i = this.container.horizFlushMargin, s = e - this.container.horizFlushMargin;
+if (this.offset.top + this.offset.height < n || this.offset.top > r) {
+if (this.applyVerticalFlushPositioning(i, s)) return;
+if (this.applyHorizontalFlushPositioning(i, s)) return;
+if (this.applyVerticalPositioning()) return;
+} else if (this.offset.left + this.offset.width < i || this.offset.left > s) if (this.applyHorizontalPositioning()) return;
+var o = this.getBoundingRect(this.container.node);
+if (o.width > this.container.widePopup) {
+if (this.applyVerticalPositioning()) return;
+} else if (o.height > this.container.longPopup && this.applyHorizontalPositioning()) return;
+if (this.applyVerticalPositioning()) return;
+if (this.applyHorizontalPositioning()) return;
+}
+},
+initVerticalPositioning: function() {
+this.resetPositioning(), this.container.addClass("vertical");
+var e = this.getBoundingRect(this.container.node), t = this.getViewHeight();
+return this.container.floating ? this.offset.top < t / 2 ? (this.applyPosition({
+top: this.offset.top + this.offset.height,
+bottom: "auto"
+}), this.container.addClass("below")) : (this.applyPosition({
+top: this.offset.top - e.height,
+bottom: "auto"
+}), this.container.addClass("above")) : e.top + e.height > t && t - e.bottom < e.top - e.height ? this.container.addClass("above") : this.container.addClass("below"), e = this.getBoundingRect(this.container.node), e.top + e.height > t || e.top < 0 ? !1 : !0;
+},
+applyVerticalPositioning: function() {
+if (!this.initVerticalPositioning()) return !1;
+var e = this.getBoundingRect(this.container.node), t = this.getViewWidth();
+if (this.container.floating) {
+var n = this.offset.left + this.offset.width / 2 - e.width / 2;
+n + e.width > t ? (this.applyPosition({
+left: this.offset.left + this.offset.width - e.width
+}), this.container.addClass("left")) : n < 0 ? (this.applyPosition({
+left: this.offset.left
+}), this.container.addClass("right")) : this.applyPosition({
+left: n
+});
+} else {
+var r = this.offset.left + this.offset.width / 2 - e.left - e.width / 2;
+e.right + r > t ? (this.applyPosition({
+left: this.offset.left + this.offset.width - e.right
+}), this.container.addRemoveClass("left", !0)) : e.left + r < 0 ? this.container.addRemoveClass("right", !0) : this.applyPosition({
+left: r
+});
+}
+return !0;
+},
+applyVerticalFlushPositioning: function(e, t) {
+if (!this.initVerticalPositioning()) return !1;
+var n = this.getBoundingRect(this.container.node), r = this.getViewWidth();
+return this.offset.left + this.offset.width / 2 < e ? (this.offset.left + this.offset.width / 2 < this.container.horizBuffer ? this.applyPosition({
+left: this.container.horizBuffer + (this.container.floating ? 0 : -n.left)
+}) : this.applyPosition({
+left: this.offset.width / 2 + (this.container.floating ? this.offset.left : 0)
+}), this.container.addClass("right"), this.container.addClass("corner"), !0) : this.offset.left + this.offset.width / 2 > t ? (this.offset.left + this.offset.width / 2 > r - this.container.horizBuffer ? this.applyPosition({
+left: r - this.container.horizBuffer - n.right
+}) : this.applyPosition({
+left: this.offset.left + this.offset.width / 2 - n.right
+}), this.container.addClass("left"), this.container.addClass("corner"), !0) : !1;
+},
+initHorizontalPositioning: function() {
+this.resetPositioning();
+var e = this.getBoundingRect(this.container.node), t = this.getViewWidth();
+return this.container.floating ? this.offset.left + this.offset.width < t / 2 ? (this.applyPosition({
+left: this.offset.left + this.offset.width
+}), this.container.addRemoveClass("left", !0)) : (this.applyPosition({
+left: this.offset.left - e.width
+}), this.container.addRemoveClass("right", !0)) : this.offset.left - e.width > 0 ? (this.applyPosition({
+left: this.offset.left - e.left - e.width
+}), this.container.addRemoveClass("right", !0)) : (this.applyPosition({
+left: this.offset.width
+}), this.container.addRemoveClass("left", !0)), this.container.addRemoveClass("horizontal", !0), e = this.getBoundingRect(this.container.node), e.left < 0 || e.left + e.width > t ? !1 : !0;
+},
+applyHorizontalPositioning: function() {
+if (!this.initHorizontalPositioning()) return !1;
+var e = this.getBoundingRect(this.container.node), t = this.getViewHeight(), n = this.offset.top + this.offset.height / 2;
+return this.container.floating ? n >= t / 2 - .05 * t && n <= t / 2 + .05 * t ? this.applyPosition({
+top: this.offset.top + this.offset.height / 2 - e.height / 2,
+bottom: "auto"
+}) : this.offset.top + this.offset.height < t / 2 ? (this.applyPosition({
+top: this.offset.top - this.offset.height,
+bottom: "auto"
+}), this.container.addRemoveClass("high", !0)) : (this.applyPosition({
+top: this.offset.top - e.height + this.offset.height * 2,
+bottom: "auto"
+}), this.container.addRemoveClass("low", !0)) : n >= t / 2 - .05 * t && n <= t / 2 + .05 * t ? this.applyPosition({
+top: (this.offset.height - e.height) / 2
+}) : this.offset.top + this.offset.height < t / 2 ? (this.applyPosition({
+top: -this.offset.height
+}), this.container.addRemoveClass("high", !0)) : (this.applyPosition({
+top: e.top - e.height - this.offset.top + this.offset.height
+}), this.container.addRemoveClass("low", !0)), !0;
+},
+applyHorizontalFlushPositioning: function(e, t) {
+if (!this.initHorizontalPositioning()) return !1;
+var n = this.getBoundingRect(this.container.node), r = this.getViewHeight();
+return this.container.floating ? this.offset.top < r / 2 ? (this.applyPosition({
+top: this.offset.top + this.offset.height / 2
+}), this.container.addRemoveClass("high", !0)) : (this.applyPosition({
+top: this.offset.top + this.offset.height / 2 - n.height
+}), this.container.addRemoveClass("low", !0)) : n.top + n.height > r && r - n.bottom < n.top - n.height ? (this.applyPosition({
+top: n.top - n.height - this.offset.top - this.offset.height / 2
+}), this.container.addRemoveClass("low", !0)) : (this.applyPosition({
+top: this.offset.height / 2
+}), this.container.addRemoveClass("high", !0)), this.offset.left + this.offset.width < e ? (this.container.addClass("left"), this.container.addClass("corner"), !0) : this.offset.left > t ? (this.container.addClass("right"), this.container.addClass("corner"), !0) : !1;
+},
+getBoundingRect: function(e) {
+var t = e.getBoundingClientRect();
+return !t.width || !t.height ? {
+left: t.left,
+right: t.right,
+top: t.top,
+bottom: t.bottom,
+width: t.right - t.left,
+height: t.bottom - t.top
+} : t;
+},
+getViewHeight: function() {
+return window.innerHeight === undefined ? document.documentElement.clientHeight : window.innerHeight;
+},
+getViewWidth: function() {
+return window.innerWidth === undefined ? document.documentElement.clientWidth : window.innerWidth;
+},
+applyPosition: function(e) {
+var t = "";
+for (n in e) t += n + ":" + e[n] + (isNaN(e[n]) ? "; " : "px; ");
+this.container.addStyles(t);
+},
+resetPositioning: function() {
+this.container.removeClass("right"), this.container.removeClass("left"), this.container.removeClass("high"), this.container.removeClass("low"), this.container.removeClass("corner"), this.container.removeClass("below"), this.container.removeClass("above"), this.container.removeClass("vertical"), this.container.removeClass("horizontal"), this.applyPosition({
+left: "auto"
+}), this.applyPosition({
+top: "auto"
+});
+},
+reflow: function() {
+this.offset = this.container.activatorOffset, this.adjustPosition();
+}
+});
+
 // FittableLayout.js
 
 enyo.kind({
@@ -1134,7 +1282,8 @@ multiSelect: !1,
 toggleSelected: !1,
 clientClasses: "",
 clientStyle: "",
-rowOffset: 0
+rowOffset: 0,
+orient: "v"
 },
 events: {
 onSetupItem: "",
@@ -1172,7 +1321,7 @@ selected: this.isSelected(e)
 generateChildHtml: function() {
 var e = "";
 this.index = null;
-for (var t = 0, n = 0; t < this.count; t++) n = this.rowOffset + (this.bottomUp ? this.count - t - 1 : t), this.setupItem(n), this.$.client.setAttribute("data-enyo-index", n), e += this.inherited(arguments), this.$.client.teardownRender();
+for (var t = 0, n = 0; t < this.count; t++) n = this.rowOffset + (this.bottomUp ? this.count - t - 1 : t), this.setupItem(n), this.$.client.setAttribute("data-enyo-index", n), this.orient == "h" && this.$.client.setStyle("display:inline-block;"), e += this.inherited(arguments), this.$.client.teardownRender();
 return e;
 },
 previewDomEvent: function(e) {
@@ -1218,7 +1367,7 @@ t = t.parentNode;
 return -1;
 },
 prepareRow: function(e) {
-if (e < 0 || e >= this.count) return;
+if (e < this.rowOffset || e >= this.count + this.rowOffset) return;
 this.setupItem(e);
 var t = this.fetchRowNode(e);
 enyo.FlyweightRepeater.claimNode(this.$.client, t);
@@ -1227,7 +1376,7 @@ lockRow: function() {
 this.$.client.teardownChildren();
 },
 performOnRow: function(e, t, n) {
-if (e < 0 || e >= this.count) return;
+if (e < this.rowOffset || e >= this.count + this.rowOffset) return;
 t && (this.prepareRow(e), enyo.call(n || null, t), this.lockRow());
 },
 statics: {
@@ -1248,11 +1397,12 @@ classes: "enyo-list",
 published: {
 count: 0,
 rowsPerPage: 50,
+orient: "v",
 bottomUp: !1,
 noSelect: !1,
 multiSelect: !1,
 toggleSelected: !1,
-fixedHeight: !1,
+fixedSize: !1,
 reorderable: !1,
 centerReorderContainer: !0,
 reorderComponents: [],
@@ -1278,9 +1428,10 @@ ondragstart: "dragstart",
 ondrag: "drag",
 ondragfinish: "dragfinish",
 onup: "up",
-onholdpulse: "holdpulse"
+onholdpulse: "holdpulse",
+onflick: "flick"
 },
-rowHeight: 0,
+rowSize: 0,
 listTools: [ {
 name: "port",
 classes: "enyo-list-port enyo-border-box",
@@ -1305,7 +1456,8 @@ name: "page1",
 allowHtml: !0,
 classes: "enyo-list-page"
 }, {
-name: "placeholder"
+name: "placeholder",
+classes: "enyo-list-placeholder"
 }, {
 name: "swipeableComponents",
 style: "position:absolute; display:block; top:-1000px; left:0;"
@@ -1313,6 +1465,9 @@ style: "position:absolute; display:block; top:-1000px; left:0;"
 } ],
 reorderHoldTimeMS: 600,
 draggingRowIndex: -1,
+initHoldCounter: 3,
+holdCounter: 3,
+holding: !1,
 draggingRowNode: null,
 placeholderRowIndex: -1,
 dragToScrollThreshold: .1,
@@ -1339,7 +1494,7 @@ importProps: function(e) {
 e && e.reorderable && (this.touch = !0), this.inherited(arguments);
 },
 create: function() {
-this.pageHeights = [], this.inherited(arguments), this.getStrategy().translateOptimized = !0, this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged(), this.$.generator.setRowOffset(0), this.$.generator.setCount(this.count);
+this.pageSizes = [], this.orientV = this.orient == "v", this.vertical = this.orientV ? "default" : "hidden", this.inherited(arguments), this.$.generator.orient = this.orient, this.getStrategy().translateOptimized = !0, this.pageBound = this.orientV ? "top" : "left", this.$.port.addRemoveClass("horizontal", !this.orientV), this.$.page0.addRemoveClass("vertical", this.orientV), this.$.page1.addRemoveClass("vertical", this.orientV), this.bottomUpChanged(), this.noSelectChanged(), this.multiSelectChanged(), this.toggleSelectedChanged(), this.$.generator.setRowOffset(0), this.$.generator.setCount(this.count);
 },
 initComponents: function() {
 this.createReorderTools(), this.inherited(arguments), this.createSwipeableComponents();
@@ -1370,7 +1525,7 @@ resizeHandler: function() {
 this.inherited(arguments), this.refresh();
 },
 bottomUpChanged: function() {
-this.$.generator.bottomUp = this.bottomUp, this.$.page0.applyStyle(this.pageBound, null), this.$.page1.applyStyle(this.pageBound, null), this.pageBound = this.bottomUp ? "bottom" : "top", this.hasNode() && this.reset();
+this.$.generator.bottomUp = this.bottomUp, this.$.page0.applyStyle(this.pageBound, null), this.$.page1.applyStyle(this.pageBound, null), this.pageBound = this.orientV ? this.bottomUp ? "bottom" : "top" : this.bottomUp ? "right" : "left", !this.orientV && this.bottomUp && (this.$.page0.applyStyle("left", "auto"), this.$.page1.applyStyle("left", "auto")), this.hasNode() && this.reset();
 },
 noSelectChanged: function() {
 this.$.generator.setNoSelect(this.noSelect);
@@ -1388,8 +1543,8 @@ sendToStrategy: function(e, t) {
 this.$.strategy.dispatchEvent("on" + t.type, t, e);
 },
 updateMetrics: function() {
-this.defaultPageHeight = this.rowsPerPage * (this.rowHeight || 100), this.pageCount = Math.ceil(this.count / this.rowsPerPage), this.portSize = 0;
-for (var e = 0; e < this.pageCount; e++) this.portSize += this.getPageHeight(e);
+this.defaultPageSize = this.rowsPerPage * (this.rowSize || 100), this.pageCount = Math.ceil(this.count / this.rowsPerPage), this.portSize = 0;
+for (var e = 0; e < this.pageCount; e++) this.portSize += this.getPageSize(e);
 this.adjustPortSize();
 },
 holdpulse: function(e, t) {
@@ -1418,11 +1573,11 @@ var r = Math.min(this.count - n, this.rowsPerPage);
 this.$.generator.setCount(r);
 var i = this.$.generator.generateChildHtml();
 t.setContent(i), this.getReorderable() && this.draggingRowIndex > -1 && this.hideReorderingRow();
-var s = t.getBounds().height;
-!this.rowHeight && s > 0 && (this.rowHeight = Math.floor(s / r), this.updateMetrics());
-if (!this.fixedHeight) {
-var o = this.getPageHeight(e);
-this.pageHeights[e] = s, this.portSize += s - o;
+var s = t.getBounds(), o = this.orientV ? s.height : s.width;
+!this.rowSize && o > 0 && (this.rowSize = Math.floor(o / r), this.updateMetrics());
+if (!this.fixedSize) {
+var u = this.getPageSize(e);
+u != o && o > 0 && (this.pageSizes[e] = o, this.portSize += o - u);
 }
 },
 pageForRow: function(e) {
@@ -1432,10 +1587,10 @@ preserveDraggingRowNode: function(e) {
 this.draggingRowNode && this.pageForRow(this.draggingRowIndex) === e && (this.$.holdingarea.hasNode().appendChild(this.draggingRowNode), this.draggingRowNode = null, this.removedInitialPage = !0);
 },
 update: function(e) {
-var t = !1, n = this.positionToPageInfo(e), r = n.pos + this.scrollerHeight / 2, i = Math.floor(r / Math.max(n.height, this.scrollerHeight) + .5) + n.no, s = i % 2 === 0 ? i : i - 1;
-this.p0 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p0), this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowHeights(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p1), this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowHeights(this.$.page1)), t && (this.$.generator.setRowOffset(0), this.$.generator.setCount(this.count), this.fixedHeight || (this.adjustBottomPage(), this.adjustPortSize()));
+var t = !1, n = this.positionToPageInfo(e), r = n.pos + this.scrollerSize / 2, i = Math.floor(r / Math.max(n.size, this.scrollerSize) + .5) + n.no, s = i % 2 === 0 ? i : i - 1;
+this.p0 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p0), this.generatePage(s, this.$.page0), this.positionPage(s, this.$.page0), this.p0 = s, t = !0, this.p0RowBounds = this.getPageRowSizes(this.$.page0)), s = i % 2 === 0 ? Math.max(1, i - 1) : i, this.p1 != s && this.isPageInRange(s) && (this.preserveDraggingRowNode(this.p1), this.generatePage(s, this.$.page1), this.positionPage(s, this.$.page1), this.p1 = s, t = !0, this.p1RowBounds = this.getPageRowSizes(this.$.page1)), t && (this.$.generator.setRowOffset(0), this.$.generator.setCount(this.count), this.fixedSize || (this.adjustBottomPage(), this.adjustPortSize()));
 },
-getPageRowHeights: function(e) {
+getPageRowSizes: function(e) {
 var t = {}, n = e.hasNode().querySelectorAll("div[data-enyo-index]");
 for (var r = 0, i, s; r < n.length; r++) i = n[r].getAttribute("data-enyo-index"), i !== null && (s = enyo.dom.getBounds(n[r]), t[parseInt(i, 10)] = {
 height: s.height,
@@ -1454,16 +1609,16 @@ updateForPosition: function(e) {
 this.update(this.calcPos(e));
 },
 calcPos: function(e) {
-return this.bottomUp ? this.portSize - this.scrollerHeight - e : e;
+return this.bottomUp ? this.portSize - this.scrollerSize - e : e;
 },
 adjustBottomPage: function() {
 var e = this.p0 >= this.p1 ? this.$.page0 : this.$.page1;
 this.positionPage(e.pageNo, e);
 },
 adjustPortSize: function() {
-this.scrollerHeight = this.getBounds().height;
-var e = Math.max(this.scrollerHeight, this.portSize);
-this.$.port.applyStyle("height", e + "px");
+this.scrollerSize = this.orientV ? this.getBounds().height : this.getBounds().width;
+var e = Math.max(this.scrollerSize, this.portSize);
+this.$.port.applyStyle(this.orientV ? "height" : "width", e + "px"), this.orientV || this.$.port.applyStyle("height", this.getBounds().height + "px");
 },
 positionPage: function(e, t) {
 t.pageNo = e;
@@ -1472,15 +1627,15 @@ t.applyStyle(this.pageBound, n + "px");
 },
 pageToPosition: function(e) {
 var t = 0, n = e;
-while (n > 0) n--, t += this.getPageHeight(n);
+while (n > 0) n--, t += this.getPageSize(n);
 return t;
 },
 positionToPageInfo: function(e) {
-var t = -1, n = this.calcPos(e), r = this.defaultPageHeight;
-while (n >= 0) t++, r = this.getPageHeight(t), n -= r;
+var t = -1, n = this.calcPos(e), r = this.defaultPageSize;
+while (n >= 0) t++, r = this.getPageSize(t), n -= r;
 return t = Math.max(t, 0), {
 no: t,
-height: r,
+size: r,
 pos: n + r,
 startRow: t * this.rowsPerPage,
 endRow: Math.min((t + 1) * this.rowsPerPage - 1, this.count - 1)
@@ -1489,11 +1644,11 @@ endRow: Math.min((t + 1) * this.rowsPerPage - 1, this.count - 1)
 isPageInRange: function(e) {
 return e == Math.max(0, Math.min(this.pageCount - 1, e));
 },
-getPageHeight: function(e) {
-var t = this.pageHeights[e];
+getPageSize: function(e) {
+var t = this.pageSizes[e];
 if (!t) {
 var n = this.rowsPerPage * e, r = Math.min(this.count - n, this.rowsPerPage);
-t = this.defaultPageHeight * (r / this.rowsPerPage);
+t = this.defaultPageSize * (r / this.rowsPerPage);
 }
 return Math.max(1, t);
 },
@@ -1501,20 +1656,20 @@ invalidatePages: function() {
 this.p0 = this.p1 = null, this.p0RowBounds = {}, this.p1RowBounds = {}, this.$.page0.setContent(""), this.$.page1.setContent("");
 },
 invalidateMetrics: function() {
-this.pageHeights = [], this.rowHeight = 0, this.updateMetrics();
+this.pageSizes = [], this.rowSize = 0, this.updateMetrics();
 },
 scroll: function(e, t) {
-var n = this.inherited(arguments), r = this.getScrollTop();
+var n = this.inherited(arguments), r = this.orientV ? this.getScrollTop() : this.getScrollLeft();
 return this.lastPos === r ? n : (this.lastPos = r, this.update(r), this.pinnedReorderMode && this.reorderScroll(e, t), n);
 },
 setScrollTop: function(e) {
 this.update(e), this.inherited(arguments), this.twiddle();
 },
 getScrollPosition: function() {
-return this.calcPos(this.getScrollTop());
+return this.calcPos(this[this.orientV ? "getScrollTop" : "getScrollLeft"]());
 },
 setScrollPosition: function(e) {
-this.setScrollTop(this.calcPos(e));
+this[this.orientV ? "setScrollTop" : "setScrollLeft"](this.calcPos(e));
 },
 scrollToBottom: function() {
 this.update(this.getScrollBounds().maxTop), this.inherited(arguments);
@@ -1525,21 +1680,21 @@ this.updateForPosition(r), r = this.pageToPosition(t), this.setScrollPosition(r)
 if (t == this.p0 || t == this.p1) {
 var i = this.$.generator.fetchRowNode(e);
 if (i) {
-var s = i.offsetTop;
-this.bottomUp && (s = this.getPageHeight(t) - i.offsetHeight - s);
+var s = this.orientV ? i.offsetTop : i.offsetLeft;
+this.bottomUp && (s = this.getPageSize(t) - (this.orientV ? i.offsetHeight : i.offsetWidth) - s);
 var o = this.getScrollPosition() + s;
 this.setScrollPosition(o);
 }
 }
 },
 scrollToStart: function() {
-this[this.bottomUp ? "scrollToBottom" : "scrollToTop"]();
+this[this.bottomUp ? this.orientV ? "scrollToBottom" : "scrollToRight" : "scrollToTop"]();
 },
 scrollToEnd: function() {
-this[this.bottomUp ? "scrollToTop" : "scrollToBottom"]();
+this[this.bottomUp ? this.orientV ? "scrollToTop" : "scrollToLeft" : this.orientV ? "scrollToBottom" : "scrollToRight"]();
 },
 refresh: function() {
-this.invalidatePages(), this.update(this.getScrollTop()), this.stabilize(), enyo.platform.android === 4 && this.twiddle();
+this.invalidatePages(), this.update(this[this.orientV ? "getScrollTop" : "getScrollLeft"]()), this.stabilize(), enyo.platform.android === 4 && this.twiddle();
 },
 reset: function() {
 this.getSelection().clear(), this.invalidateMetrics(), this.invalidatePages(), this.stabilize(), this.scrollToStart();
@@ -1653,7 +1808,7 @@ var t, n;
 if (e < 0) return;
 e >= this.count ? (t = null, n = this.pageForPageNumber(this.pageForRow(this.count - 1)).hasNode()) : (t = this.$.generator.fetchRowNode(e), n = t.parentNode);
 var r = this.pageForRow(e);
-r >= this.pageCount && (r = this.currentPageNumber), n.insertBefore(this.placeholderNode, t), this.currentPageNumber !== r && (this.updatePageHeight(this.currentPageNumber), this.updatePageHeight(r), this.updatePagePositions(r)), this.placeholderRowIndex = e, this.currentPageNumber = r, this.itemMoved = !0;
+r >= this.pageCount && (r = this.currentPageNumber), n.insertBefore(this.placeholderNode, t), this.currentPageNumber !== r && (this.updatePageSize(this.currentPageNumber), this.updatePageSize(r), this.updatePagePositions(r)), this.placeholderRowIndex = e, this.currentPageNumber = r, this.itemMoved = !0;
 },
 finishReordering: function(e, t) {
 if (!this.isReordering() || this.pinnedReorderMode || this.completeReorderTimeout) return;
@@ -1698,13 +1853,13 @@ var e = this.$.generator.fetchRowNode(this.placeholderRowIndex);
 e && (e.parentNode.insertBefore(this.hiddenNode, e), this.showNode(this.hiddenNode)), this.hiddenNode = null;
 if (this.currentPageNumber != this.initialPageNumber) {
 var t, n, r = this.pageForPageNumber(this.currentPageNumber), i = this.pageForPageNumber(this.currentPageNumber + 1);
-this.initialPageNumber < this.currentPageNumber ? (t = r.hasNode().firstChild, i.hasNode().appendChild(t)) : (t = r.hasNode().lastChild, n = i.hasNode().firstChild, i.hasNode().insertBefore(t, n)), this.correctPageHeights(), this.updatePagePositions(this.initialPageNumber);
+this.initialPageNumber < this.currentPageNumber ? (t = r.hasNode().firstChild, i.hasNode().appendChild(t)) : (t = r.hasNode().lastChild, n = i.hasNode().firstChild, i.hasNode().insertBefore(t, n)), this.correctPageSizes(), this.updatePagePositions(this.initialPageNumber);
 }
 }
 },
 updateListIndices: function() {
 if (this.shouldDoRefresh()) {
-this.refresh(), this.correctPageHeights();
+this.refresh(), this.correctPageSizes();
 return;
 }
 var e = Math.min(this.draggingRowIndex, this.placeholderRowIndex), t = Math.max(this.draggingRowIndex, this.placeholderRowIndex), n = this.draggingRowIndex - this.placeholderRowIndex > 0 ? 1 : -1, r, i, s, o;
@@ -1773,19 +1928,20 @@ removeNode: function(e) {
 if (!e || !e.parentNode) return;
 e.parentNode.removeChild(e);
 },
-updatePageHeight: function(e) {
+updatePageSize: function(e) {
 if (e < 0) return;
 var t = this.pageForPageNumber(e, !0);
 if (t) {
-var n = this.pageHeights[e], r = Math.max(1, t.getBounds().height);
-this.pageHeights[e] = r, this.portSize += r - n;
+var n = this.pageSizes[e], r = Math.max(1, t.getBounds().height);
+this.pageSizes[e] = r, this.portSize += r - n;
 }
 },
 updatePagePositions: function(e) {
 this.positionPage(this.currentPageNumber, this.pageForPageNumber(this.currentPageNumber)), this.positionPage(e, this.pageForPageNumber(e));
 },
-correctPageHeights: function() {
-this.updatePageHeight(this.currentPageNumber), this.initialPageNumber != this.currentPageNumber && this.updatePageHeight(this.initialPageNumber);
+correctPageSizes: function() {
+var e = this.initialPageNumber % 2;
+this.updatePageSize(this.currentPageNumber, this.$["page" + this.currentPage]), e != this.currentPageNumber && this.updatePageSize(this.initialPageNumber, this.$["page" + e]);
 },
 hideNode: function(e) {
 return e.style.display = "none", e;
@@ -1830,7 +1986,7 @@ var n = this.getNodeStyle(t), r = "width:" + n.w + "px; height:" + n.h + "px;";
 e.addStyles(r);
 },
 reorderScroll: function(e, t) {
-this.getStrategyKind() == "ScrollStrategy" && this.$.reorderContainer.addStyles("top:" + (this.initialPinPosition + this.getScrollTop() - this.rowHeight) + "px;"), this.updatePlaceholderPosition(this.initialPinPosition);
+this.getStrategyKind() == "ScrollStrategy" && this.$.reorderContainer.addStyles("top:" + (this.initialPinPosition + this.getScrollTop() - this.rowSize) + "px;"), this.updatePlaceholderPosition(this.initialPinPosition);
 },
 hideReorderingRow: function() {
 var e = this.hasNode().querySelector('[data-enyo-index="' + this.draggingRowIndex + '"]');
@@ -2098,8 +2254,8 @@ owner: this.owner
 });
 },
 updateMetrics: function() {
-this.defaultPageHeight = this.rowsPerPage * (this.rowHeight || 100), this.pageCount = Math.ceil(this.count / this.rowsPerPage), this.aboveHeight = this.$.aboveClient.getBounds().height, this.belowHeight = this.$.belowClient.getBounds().height, this.portSize = this.aboveHeight + this.belowHeight;
-for (var e = 0; e < this.pageCount; e++) this.portSize += this.getPageHeight(e);
+this.defaultPageSize = this.rowsPerPage * (this.rowSize || 100), this.pageCount = Math.ceil(this.count / this.rowsPerPage), this.aboveHeight = this.$.aboveClient.getBounds().height, this.belowHeight = this.$.belowClient.getBounds().height, this.portSize = this.aboveHeight + this.belowHeight;
+for (var e = 0; e < this.pageCount; e++) this.portSize += this.getPageSize(e);
 this.adjustPortSize();
 },
 positionPage: function(e, t) {
@@ -2110,6 +2266,252 @@ n += r, t.applyStyle(this.pageBound, n + "px");
 scrollToContentStart: function() {
 var e = this.bottomUp ? this.belowHeight : this.aboveHeight;
 this.setScrollPosition(e);
+}
+});
+
+// GridFlyweightRepeater.js
+
+enyo.kind({
+name: "enyo.GridFlyWeightRepeater",
+kind: "enyo.FlyweightRepeater",
+events: {
+onSizeupItem: ""
+},
+itemsPerRow: 0,
+_itemsFromPreviousPage: 0,
+generateChildHtml: function() {
+return this.itemFluidWidth || this.itemFixedSize ? this._generateChildHtmlEqualSizedItems() : this._generateChildHtmlVariableSizedItems();
+},
+_generateChildHtmlEqualSizedItems: function() {
+var e = this.owner.hasNode().clientWidth, t = this.$.client, n = "", r = 0, i = this.itemWidth, s = this.itemHeight;
+if (this.itemFluidWidth) {
+r = 100 / this.itemsPerRow;
+var o = 0;
+this.itemSpacing >= 0 && (o = (this.itemsPerRow + 1) * this.itemSpacing, r = 100 / this.itemsPerRow - 100 * o / (this.itemsPerRow * e)), i = r / 100 * e, s = i * (this.itemHeight / this.itemWidth);
+}
+for (var u = this.rowOffset; u < this.rowOffset + this.count; u++) t.setAttribute("data-enyo-index", u), this.doSetupItem({
+index: u,
+selected: this.isSelected(u)
+}), this.itemFluidWidth ? t.addStyles("width:" + r + "%;height:" + s + "px;") : t.addStyles("width:" + this.itemWidth + "px;height:" + this.itemHeight + "px;"), this.itemSpacing >= 0 && (t.addStyles("margin-top:" + this.itemSpacing + "px; margin-left:" + this.itemSpacing + "px;"), u % this.itemsPerRow == this.itemsPerRow - 1 ? t.addStyles("margin-right:" + this.itemSpacing + "px;") : t.addStyles("margin-right: 0px;"), u >= this.count - this.itemsPerRow && t.addStyles("margin-bottom:" + this.itemSpacing + "px;")), n += t.generateHtml(), t.teardownRender();
+return n;
+},
+_generateChildHtmlVariableSizedItems: function() {
+this.index = null;
+var e = null, t = this.$.client, n = this.owner.hasNode().clientWidth, r = 0, i = 0, s = 0, o = 0, u = 0, a = 0, f = 0, l = 0, c = 0, h = this.itemMinWidth / this.itemMinHeight, p = [ {
+index: 0,
+items: []
+} ], d = !1, v = this.owner.$._dummy_.hasNode();
+this.owner.page == 0 && (this._itemsFromPreviousPage = 0);
+var m = this.count + this._itemsFromPreviousPage;
+for (var g = 0, y = g + this.rowOffset - this._itemsFromPreviousPage; g < m; g++, y++) {
+l = 0, c = 0, this.doSizeupItem({
+index: y,
+selected: this.isSelected(y)
+}), l = this.itemWidth, c = this.itemHeight;
+if (!l || l == undefined || isNaN(l) || l <= 0) this.doSetupItem({
+index: y,
+selected: this.isSelected(y)
+}), v.innerHTML = t.generateChildHtml(), l = v.clientWidth, c = v.clientHeight;
+if (!l || l == undefined || isNaN(l) || l <= 0) l = this.itemMinWidth, c = this.itemMinHeight;
+if (!c || c == undefined || isNaN(c) || c <= 0) c = this.itemMinHeight;
+h = l / c, r = Math.min(l, n), this.itemMinWidth && this.itemMinWidth > 0 && (r = Math.max(l, this.itemMinWidth)), lastRowInPage = g == m - 1, s = r / h, i += r, o += s, e = {
+index: y,
+pageIndex: g,
+width: r,
+height: s
+}, p[f].items.push(e);
+if (!this.normalizeRows) continue;
+u = i / p[f].items.length, a = o / p[f].items.length;
+if (i >= n || lastRowInPage) {
+p[f].avgHeight = a, p[f].index = f;
+var b = p[f].items.length, w = (n - i) / b, E = y == this.owner.count - 1;
+this._itemsFromPreviousPage = 0;
+if (lastRowInPage && w + u > 1.5 * u) {
+this._itemsFromPreviousPage = b, p[f] = {
+avgHeight: 0,
+index: f,
+items: []
+};
+break;
+}
+this._normalizeRow(p[f]), lastRowInPage || (f++, p[f] = {
+avgHeight: 0,
+index: 0,
+items: []
+}), i = 0, o = 0, a = 0, u = 0, r = 0, s = 0, l = 0, c = 0;
+}
+}
+v.innerHTML = "";
+var S = "", x = "", T;
+for (var g = 0; g < p.length; g++) {
+T = p[g];
+if (!T.items || T.items.length == 0) continue;
+for (var N = 0; N < T.items.length; N++) e = T.items[N], this.doSetupItem({
+index: e.index,
+selected: this.isSelected(e.index)
+}), t.setAttribute("data-enyo-index", e.index), t.addStyles("width:" + e.width + "px;height:" + e.height + "px;"), this.itemSpacing >= 0 && t.addStyles("margin-top:" + this.itemSpacing + "px;margin-left:" + this.itemSpacing + "px;"), x = t.generateHtml(), t.teardownRender(), S += x;
+}
+return S;
+},
+_normalizeRow: function(e) {
+if (!this.normalizeRows) return;
+if (!e.items || e.items.length == 0) return;
+var t = this.owner.hasNode().clientWidth, n, r = 0, i = 0, s = "", o = 0, u = 0, a = 0, f = 0;
+for (var l = 0; l < e.items.length; l++) n = e.items[l], o = n.width, u = n.height, i = Math.floor(e.avgHeight / u * o), s += " " + i, n.width = i, n.height = e.avgHeight, r += i, this.itemSpacing >= 0 && (r += this.itemSpacing, l == e.items.length - 1 && (r += this.itemSpacing));
+f = t - r;
+var a = t / (t - f);
+r = 0, i = 0, s = "";
+for (var l = 0; l < e.items.length; l++) {
+n = e.items[l], o = n.width, u = n.height, i = Math.floor(o * a), s += " " + i;
+var c = Math.floor(u * a);
+n.width = i, n.height = c, r += i, this.itemSpacing >= 0 && (r += this.itemSpacing, l == e.items.length - 1 && (r += this.itemSpacing));
+}
+f = t - r, n = e.items[e.items.length - 1], o = n.width, u = n.height, n.width = o + f, n.height = u;
+}
+});
+
+// GridList.js
+
+enyo.kind({
+name: "enyo.GridList",
+kind: "enyo.List",
+classes: "enyo-gridlist",
+published: {
+itemFluidWidth: !1,
+itemFixedSize: !1,
+itemMinWidth: 160,
+itemMinHeight: 160,
+itemWidth: 160,
+itemHeight: 160,
+itemSpacing: 0,
+normalizeRows: !1
+},
+horizontal: "hidden",
+events: {
+onSizeupItem: ""
+},
+show: function(e) {
+this._calculateItemsPerRow(), this.setCount(e), this.reset();
+},
+create: function() {
+this._setComponents(), this.inherited(arguments), this.itemFluidWidthChanged(), this.itemFixedSizeChanged(), this.itemMinWidthChanged(), this.itemMinHeightChanged(), this.itemWidthChanged(), this.itemHeightChanged(), this.itemSpacingChanged(), this.normalizeRowsChanged(), this.$.generator.setClientClasses("enyo-gridlist-row");
+},
+itemFluidWidthChanged: function() {
+this.$.generator.itemFluidWidth = this.itemFluidWidth, this.setNormalizeRows(!this.itemFluidWidth && !this.itemFixedSize);
+},
+itemFixedSizeChanged: function() {
+this.$.generator.itemFixedSize = this.itemFixedSize, this.setNormalizeRows(!this.itemFluidWidth && !this.itemFixedSize);
+},
+itemWidthChanged: function() {
+this.$.generator.itemWidth = this.itemWidth;
+},
+itemHeightChanged: function() {
+this.$.generator.itemHeight = this.itemHeight;
+},
+itemMinWidthChanged: function() {
+var e = this.hasNode();
+if (e) {
+if (!this.itemMinWidth || isNaN(this.itemMinWidth) || this.itemMinWidth == 0) this.itemMinWidth = 160;
+this.itemMinWidth = Math.min(this.itemMinWidth, e.clientWidth);
+}
+this.$.generator.itemMinWidth = this.itemMinWidth;
+},
+itemMinHeightChanged: function() {
+var e = this.hasNode();
+if (e) {
+if (!this.itemMinHeight || isNaN(this.itemMinHeight) || this.itemMinHeight == 0) this.itemMinHeight = 160;
+this.itemMinHeight = Math.min(this.itemMinHeight, e.clientHeight);
+}
+this.$.generator.itemMinHeight = this.itemMinHeight;
+},
+itemSpacingChanged: function() {
+this.itemSpacing < 0 && (this.itemSpacing = 0), this.itemSpacing = this.itemSpacing, this.$.generator.itemSpacing = this.itemSpacing;
+},
+normalizeRowsChanged: function() {
+this.$.generator.normalizeRows = this.normalizeRows;
+},
+bottomUpChanged: function() {
+this.bottomUp = !1, this.pageBound = "top";
+},
+reflow: function() {
+this._calculateItemsPerRow(), this.inherited(arguments);
+},
+_calculateItemsPerRow: function() {
+var e = this.hasNode();
+if (e) {
+this.itemsPerRow = Math.floor((e.clientWidth - this.itemSpacing) / (this.itemMinWidth + this.itemSpacing));
+var t = Math.round((e.clientHeight - this.itemSpacing) / (this.itemMinHeight + this.itemSpacing));
+if (this.itemFixedSize || this.itemFluidWidth) {
+var n = Math.floor((e.clientWidth - this.itemSpacing) / (this.itemWidth + this.itemSpacing)), r = Math.floor(n), i = Math.ceil(n), s = e.clientWidth - this.itemSpacing - i * (this.itemWidth + this.itemSpacing);
+this.itemsPerRow = s > 0 ? i : r, t = Math.round((e.clientHeight - this.itemSpacing) / (this.itemHeight + this.itemSpacing));
+}
+this.itemsPerRow = Math.max(1, this.itemsPerRow), this.rowsPerPage = 3 * this.itemsPerRow * t, this.$.generator.itemsPerRow = this.itemsPerRow;
+}
+},
+_setComponents: function() {
+var e = this.listTools[0].components, t;
+this.createComponent(new enyo.Component({
+name: "_dummy_",
+allowHtml: !0,
+classes: "enyo-gridlist-dummy",
+showing: !1
+}, {
+owner: this
+}));
+for (var n = 0; n < e.length; n++) {
+t = e[n];
+if (t.name == "generator") {
+t.kind = "enyo.GridFlyWeightRepeater";
+return;
+}
+}
+}
+});
+
+// GridListImageItem.js
+
+enyo.kind({
+name: "enyo.GridList.ImageItem",
+classes: "enyo-gridlist-imageitem",
+components: [ {
+name: "image",
+kind: "enyo.Image"
+}, {
+name: "caption",
+classes: "caption"
+}, {
+name: "subCaption",
+classes: "sub-caption"
+} ],
+create: function() {
+this.inherited(arguments), this.sourceChanged();
+},
+published: {
+source: "",
+caption: "",
+subCaption: "",
+selected: !1
+},
+sourceChanged: function() {
+if (!this.source || this.source == "") return;
+this.$.image.setAttribute("src", this.source);
+},
+captionChanged: function() {
+if (!this.caption || this.caption == "") {
+this.$.caption.setContent(this.caption), this.$.caption.setShowing(!1);
+return;
+}
+this.$.caption.setShowing(!0), this.$.caption.setContent(this.caption);
+},
+subCaptionChanged: function() {
+if (!this.subCaption || this.subCaption == "") {
+this.$.subCaption.setContent(this.subCaption), this.$.subCaption.setShowing(!1);
+return;
+}
+this.$.subCaption.setShowing(!0), this.$.subCaption.setContent(this.subCaption);
+},
+selectedChanged: function() {
+this.addRemoveClass("selected", this.selected);
 }
 });
 
@@ -2851,6 +3253,11 @@ this.setPropertyValue("index", e, "indexChanged");
 setIndexDirect: function(e) {
 this.setIndex(e), this.completed();
 },
+selectPanelByName: function(e) {
+if (!e) return;
+var t = 0, n = this.getPanels(), r = n.length;
+for (; t < r; ++t) if (e === n[t].name) return this.setIndex(t), t;
+},
 previous: function() {
 this.setIndex(this.index - 1);
 },
@@ -2870,7 +3277,7 @@ step: function(e) {
 this.fraction = e.value, this.stepTransition();
 },
 completed: function() {
-this.$.animator.isAnimating() && this.$.animator.stop(), this.fraction = 1, this.stepTransition(), this.finishTransition();
+return this.$.animator.isAnimating() && this.$.animator.stop(), this.fraction = 1, this.stepTransition(), this.finishTransition(), !0;
 },
 dragstart: function(e, t) {
 if (this.draggable && this.layout && this.layout.canDragEvent(t)) return t.preventDefault(), this.dragstartTransition(t), this.dragging = !0, this.$.animator.stop(), !0;
@@ -3459,13 +3866,22 @@ name: "onyx.Button",
 kind: "enyo.Button",
 classes: "onyx-button enyo-unselectable",
 create: function() {
-enyo.platform.firefoxOS && (this.handlers.ondown = "down", this.handlers.onleave = "leave"), this.inherited(arguments);
+enyo.platform.firefoxOS && (this.handlers.ondown = "fxosDown", this.handlers.onenter = "fxosEnter", this.handlers.ondrag = "fxosDrag", this.handlers.onleave = "fxosLeave", this.handlers.onup = "fxosUp"), this.inherited(arguments);
 },
-down: function(e, t) {
-this.addClass("pressed");
+fxosDown: function(e, t) {
+this.addClass("pressed"), this._isInControl = !0;
 },
-leave: function(e, t) {
-this.removeClass("pressed");
+fxosEnter: function(e, t) {
+this._isInControl = !0;
+},
+fxosDrag: function(e, t) {
+this.addRemoveClass("pressed", this._isInControl);
+},
+fxosLeave: function(e, t) {
+this.removeClass("pressed"), this._isInControl = !1;
+},
+fxosUp: function(e, t) {
+this.removeClass("pressed"), this._isInControl = !1;
 }
 });
 
@@ -3479,13 +3895,22 @@ active: !1
 },
 classes: "onyx-icon-button",
 create: function() {
-enyo.platform.firefoxOS && (this.handlers.ondown = "down", this.handlers.onleave = "leave"), this.inherited(arguments);
+enyo.platform.firefoxOS && (this.handlers.ondown = "fxosDown", this.handlers.onenter = "fxosEnter", this.handlers.ondrag = "fxosDrag", this.handlers.onleave = "fxosLeave", this.handlers.onup = "fxosUp"), this.inherited(arguments);
 },
-down: function(e, t) {
-this.addClass("pressed");
+fxosDown: function(e, t) {
+this.addClass("pressed"), this._isInControl = !0;
 },
-leave: function(e, t) {
-this.removeClass("pressed");
+fxosEnter: function(e, t) {
+this._isInControl = !0;
+},
+fxosDrag: function(e, t) {
+this.addRemoveClass("pressed", this._isInControl);
+},
+fxosLeave: function(e, t) {
+this.removeClass("pressed"), this._isInControl = !1;
+},
+fxosUp: function(e, t) {
+this.removeClass("pressed"), this._isInControl = !1;
 },
 rendered: function() {
 this.inherited(arguments), this.activeChanged();
@@ -3519,64 +3944,7 @@ dragstart: function() {}
 
 enyo.kind({
 name: "onyx.Drawer",
-published: {
-open: !0,
-orient: "v",
-animated: !0
-},
-style: "overflow: hidden; position: relative;",
-tools: [ {
-kind: "Animator",
-onStep: "animatorStep",
-onEnd: "animatorEnd"
-}, {
-name: "client",
-style: "position: relative;",
-classes: "enyo-border-box"
-} ],
-create: function() {
-this.inherited(arguments), this.animatedChanged(), this.openChanged();
-},
-initComponents: function() {
-this.createChrome(this.tools), this.inherited(arguments);
-},
-animatedChanged: function() {
-!this.animated && this.hasNode() && this.$.animator.isAnimating() && (this.$.animator.stop(), this.animatorEnd());
-},
-openChanged: function() {
-this.$.client.show();
-if (this.hasNode()) if (this.$.animator.isAnimating()) this.$.animator.reverse(); else {
-var e = this.orient == "v", t = e ? "height" : "width", n = e ? "top" : "left";
-this.applyStyle(t, null);
-var r = this.hasNode()[e ? "scrollHeight" : "scrollWidth"];
-this.animated ? this.$.animator.play({
-startValue: this.open ? 0 : r,
-endValue: this.open ? r : 0,
-dimension: t,
-position: n
-}) : this.animatorEnd();
-} else this.$.client.setShowing(this.open);
-},
-animatorStep: function(e) {
-if (this.hasNode()) {
-var t = e.dimension;
-this.node.style[t] = this.domStyles[t] = e.value + "px";
-}
-var n = this.$.client.hasNode();
-if (n) {
-var r = e.position, i = this.open ? e.endValue : e.startValue;
-n.style[r] = this.$.client.domStyles[r] = e.value - i + "px";
-}
-this.container && this.container.resized();
-},
-animatorEnd: function() {
-if (!this.open) this.$.client.hide(); else {
-this.$.client.domCssText = enyo.Control.domStylesToCssText(this.$.client.domStyles);
-var e = this.orient == "v", t = e ? "height" : "width", n = e ? "top" : "left", r = this.$.client.hasNode();
-r && (r.style[n] = this.$.client.domStyles[n] = null), this.node && (this.node.style[t] = this.domStyles[t] = null);
-}
-this.container && this.container.resized();
-}
+kind: "enyo.Drawer"
 });
 
 // Grabber.js
@@ -4136,7 +4504,7 @@ monthLength: function(e, t) {
 return 32 - (new Date(e, t, 32)).getDate();
 },
 setupYear: function(e, t) {
-this.$.year.setContent(this.minYear + t.index);
+return this.$.year.setContent(this.minYear + t.index), !0;
 },
 setupPickers: function(e) {
 var t = e.split(""), n, r, i;
@@ -4836,7 +5204,7 @@ name: "knob",
 classes: "onyx-slider-knob"
 } ],
 create: function() {
-this.inherited(arguments), enyo.platform.firefoxOS && (this.moreComponents[2].ondown = "down", this.moreComponents[2].onleave = "leave"), this.createComponents(this.moreComponents), this.valueChanged();
+this.inherited(arguments), enyo.platform.firefoxOS && (this.moreComponents[2].ondown = "fxosDown", this.moreComponents[2].onenter = "fxosEnter", this.moreComponents[2].ondrag = "fxosDrag", this.moreComponents[2].onleave = "fxosLeave", this.moreComponents[2].onup = "fxosUp"), this.createComponents(this.moreComponents), this.valueChanged();
 },
 valueChanged: function() {
 this.value = this.clampValue(this.min, this.max, this.value);
@@ -4872,11 +5240,20 @@ var n = this.calcKnobPosition(t);
 return n = this.increment ? this.calcIncrement(n) : n, this.tapped = !0, this.animateTo(n), !0;
 }
 },
-down: function(e, t) {
-this.addClass("pressed");
+fxosDown: function(e, t) {
+this.$.knob.addClass("pressed"), this._isInControl = !0;
 },
-leave: function(e, t) {
-this.removeClass("pressed");
+fxosEnter: function(e, t) {
+this._isInControl = !0;
+},
+fxosDrag: function(e, t) {
+this.$.knob.addRemoveClass("pressed", this._isInControl);
+},
+fxosLeave: function(e, t) {
+this.$.knob.removeClass("pressed"), this._isInControl = !1;
+},
+fxosUp: function(e, t) {
+this.$.knob.removeClass("pressed"), this._isInControl = !1;
 },
 animateTo: function(e) {
 this.$.animator.play({
@@ -5257,7 +5634,6 @@ events: {
 onTap: ""
 },
 handlers: {
-onActivate: "itemActivated",
 onRequestShowMenu: "requestShow",
 onRequestHideMenu: "requestHide"
 },
@@ -5295,7 +5671,7 @@ content: this.actionButtons[e].content,
 classes: this.actionButtons[e].classes + " onyx-contextual-popup-action-button",
 name: this.actionButtons[e].name ? this.actionButtons[e].name : "ActionButton" + e,
 index: e,
-tap: enyo.bind(this, this.tapHandler)
+tap: this.actionButtons[e].ontap ? enyo.bind(this.owner, this.actionButtons[e].ontap) : enyo.bind(this, this.tapHandler)
 });
 },
 tapHandler: function(e, t) {
@@ -5303,9 +5679,6 @@ return t.actionButton = !0, t.popup = this, this.bubble("ontap", t), !0;
 },
 maxHeightChanged: function() {
 this.scrolling && this.getScroller().setMaxHeight(this.maxHeight + "px");
-},
-itemActivated: function(e, t) {
-return t.originator.setActive(!1), !0;
 },
 showingChanged: function() {
 this.inherited(arguments), this.scrolling && this.getScroller().setShowing(this.showing), this.adjustPosition();
@@ -7563,18 +7936,17 @@ min: 0,
 max: !1,
 step: !0,
 precision: 2,
-atm: !1,
-selectAllOnFocus: !1
+atm: !1
 },
 handlers: {
 onkeypress: "filterInput",
-oninput: "inputValueUpdated",
+oninput: "input",
 onchange: "inputValueChanged",
-onfocus: "inputFocused",
-onblur: "inputBlurred"
+onfocus: "focused",
+onblur: "blurred"
 },
 rendered: function() {
-this.inherited(arguments), this.minChanged(), this.maxChanged(), this.precisionChanged(), this.inputBlurred();
+this.inherited(arguments), this.minChanged(), this.maxChanged(), this.precisionChanged(), this.blurred();
 },
 minChanged: function() {
 this.setAttribute("min", this.min);
@@ -7600,7 +7972,8 @@ this.setAttribute("step", e);
 filterInput: function(e, t) {
 !(t.keyCode >= 48 && t.keyCode <= 57) && t.keyCode !== 46 && t.preventDefault();
 },
-inputValueUpdated: function(e, t) {
+input: function(e, t) {
+this.inherited(arguments);
 if (this.atm) {
 var n = this.getValue();
 n = n.replace(/[^0-9]/g, ""), n = n.replace(/^0*/, ""), n = parseInt(n) / Math.pow(10, this.precision), isNaN(n) && (n = 0), n = n.toFixed(this.precision), this.setValue(n);
@@ -7615,11 +7988,11 @@ inputValueChanged: function(e, t) {
 var n = this.getValueAsNumber();
 this.max !== !1 && n > this.max ? n = this.max : n < this.min && (n = this.min), this.setValue(n);
 },
-inputFocused: function(e, t) {
-this.oldType === "number" && this.setType(this.oldType), this.selectAllOnFocus && this.hasNode() && this.hasNode().setSelectionRange(0, this.getValue().length);
+focused: function(e, t) {
+this.inherited(arguments), this.oldType === "number" && this.setType(this.oldType);
 },
-inputBlurred: function(e, t) {
-this.oldType = this.type, this.oldType === "number" && this.setType("text");
+blurred: function(e, t) {
+this.oldType = this.type, this.oldType === "number" && this.setType("text"), this.inherited(arguments);
 },
 getValueAsNumber: function() {
 var e = this.getValue().replace(/^\s\s*/, "").replace(/\s\s*$/, "").replace(/[^0-9\.]/g, "");
@@ -8032,6 +8405,11 @@ estimatedSize: 5242880,
 debug: enyo.fetchAppInfo().id.match("beta")
 };
 if (enyo.platform.android || enyo.platform.androidChrome) window.openDatabase = window.sqlitePlugin.openDatabase;
+return e;
+}
+
+function getLocale() {
+if (!enyo.platform.android && !enyo.platform.androidChrome) var e = enyo.g11n.currentLocale().getLocale();
 return e;
 }
 
@@ -11748,6 +12126,14 @@ name: "editOverlay",
 content: "Edit Accounts",
 classes: "enyo-fit text-center header-overlay",
 showing: !1
+}, {
+kind: "onyx.Button",
+classes: "padding-none transparent",
+ontap: "triggerAppMenu",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/menu.png"
+} ]
 } ]
 }, {
 name: "entries",
@@ -11837,14 +12223,6 @@ showing: !1,
 content: "Search"
 } ]
 } ]
-}, {
-kind: "onyx.Button",
-classes: "padding-none transparent",
-ontap: "triggerAppMenu",
-components: [ {
-kind: "onyx.Icon",
-src: "assets/menu_icons/menu.png"
-} ]
 } ]
 }, {
 name: "loadingScrim",
@@ -11919,6 +12297,9 @@ value: 2
 handleBalanceButton: function(e, t) {
 this.balanceView = t.value, this.$.entries.setBalanceView(this.balanceView), this.$.entries.refresh();
 },
+triggerAppMenu: function(e, t) {
+return enyo.Signals.send("onmenubutton", t), !0;
+},
 updateSortMenu: function() {
 this.$.sortMenu.setValue(Checkbook.globals.prefs.custom_sort);
 },
@@ -11950,9 +12331,6 @@ this.$.entries.getEditMode() ? this.$.entries.setEditMode(!1) : this.$.entries.s
 searchMenuSelected: function(e, t) {
 var n = t.content.toLowerCase();
 return n === "toggle hidden" ? this.$.entries.setShowHidden(!this.$.entries.getShowHidden()) : n === "toggle edit mode" ? this.toggleLock() : n === "search" ? this.log("launch search system (overlay like modify account)") : n === "budget" ? this.log("launch budget system (overlay like modify account)") : n === "reports" && this.log("launch report system (overlay like modify account)"), !0;
-},
-triggerAppMenu: function(e, t) {
-return enyo.Signals.send("onmenubutton", t), !0;
 }
 });
 
@@ -13136,6 +13514,15 @@ name: "balanceMenu",
 kind: "Checkbook.balanceMenu",
 onChange: "handleBalanceButton",
 style: "padding: 0 8px; margin: 0;"
+}, {
+name: "menuButton",
+kind: "onyx.Button",
+classes: "padding-none transparent",
+ontap: "triggerAppMenu",
+components: [ {
+kind: "onyx.Icon",
+src: "assets/menu_icons/menu.png"
+} ]
 } ]
 }, {
 name: "entries",
@@ -13259,15 +13646,6 @@ showing: !1,
 content: "Clear Multiple"
 } ]
 } ]
-}, {
-name: "menuButton",
-kind: "onyx.Button",
-classes: "padding-none transparent",
-ontap: "triggerAppMenu",
-components: [ {
-kind: "onyx.Icon",
-src: "assets/menu_icons/menu.png"
-} ]
 } ]
 }, {
 name: "loadingScrim",
@@ -13388,6 +13766,9 @@ mode: this.account.bal_view,
 callbackFn: enyo.bind(this, this.setAccountIndex)
 }), !0);
 },
+triggerAppMenu: function(e, t) {
+return enyo.Signals.send("onmenubutton", t), !0;
+},
 showLoadingIcon: function() {
 this.$.acctTypeIcon.hide(), this.$.loadingSpinner.show();
 },
@@ -13440,9 +13821,6 @@ force: !0
 });
 } else t.content.toLowerCase() === "budget" ? this.log("Budget system go") : t.content.toLowerCase() === "reports" ? this.log("Report system go") : t.content.toLowerCase() === "search" ? this.log("Search system go") : this.log(t.selected);
 return !0;
-},
-triggerAppMenu: function(e, t) {
-return enyo.Signals.send("onmenubutton", t), !0;
 },
 newTransaction: function(e) {
 this.cloneTransaction(null, {
@@ -14547,7 +14925,7 @@ onSuccess: enyo.bind(this, this.loadRecurrenceData)
 }) : this.trsnObj["repeatUnlinked"] == 1 && this.$.recurrenceWrapper.hide(), this.trsnObj.category = Checkbook.globals.transactionManager.parseCategoryDB(this.trsnObj.category, this.trsnObj.category2), this.trsnObj.categoryOriginal = this.trsnObj.category, this.renderCategories = !0, this.$.transTypeIcon.setSrc("assets/menu_icons/" + this.transactionType + ".png"), this.adjustSystemViews(), this.dateChanged(), this.$.loadingScrim.hide(), this.$.loadingSpinner.hide(), this.reflow();
 },
 adjustSystemViews: function() {
-this.$.linkedAccount.setShowing(this.transactionType === "transfer"), this.$.autocomplete.setEnabled(this.accountObj.useAutoComplete === 1), this.$.autoTrans.setShowing(this.trsnObj.itemId < 0 && this.transactionType !== "transfer" && this.accountObj.auto_savings > 0 && this.accountObj.auto_savings_link > -1), this.accountObj["atmEntry"] == 1 ? (this.$.amount.setAtm(!0), this.$.amount.setSelectAllOnFocus(!1)) : (this.$.amount.setAtm(!1), this.$.amount.setSelectAllOnFocus(!0)), this.accountObj["enableCategories"] == 1 ? (this.categoryChanged(), this.$.categoryHolder.show()) : this.$.categoryHolder.hide(), this.accountObj["checkField"] == 1 ? (this.$.checkNumHolder.show(), Checkbook.globals.transactionManager.fetchMaxCheckNumber(this.$.account.getValue(), {
+this.$.linkedAccount.setShowing(this.transactionType === "transfer"), this.$.autocomplete.setEnabled(this.accountObj.useAutoComplete === 1), this.$.autoTrans.setShowing(this.trsnObj.itemId < 0 && this.transactionType !== "transfer" && this.accountObj.auto_savings > 0 && this.accountObj.auto_savings_link > -1), this.accountObj["atmEntry"] == 1 ? (this.$.amount.setAtm(!0), this.$.amount.setSelectOnFocus(!1)) : (this.$.amount.setAtm(!1), this.$.amount.setSelectOnFocus(!0)), this.accountObj["enableCategories"] == 1 ? (this.categoryChanged(), this.$.categoryHolder.show()) : this.$.categoryHolder.hide(), this.accountObj["checkField"] == 1 ? (this.$.checkNumHolder.show(), Checkbook.globals.transactionManager.fetchMaxCheckNumber(this.$.account.getValue(), {
 onSuccess: enyo.bind(this, this.adjustMaxCheckNumber)
 })) : this.$.checkNumHolder.hide(), this.accountObj["payeeField"] == 1 ? this.$.payeeFieldHolder.show() : this.$.payeeFieldHolder.hide(), Checkbook.globals.prefs.dispColor === 1 ? (this.$.account.addClass(this.accountObj.acctCategoryColor), this.$.linkedAccount.getDisabled() || Checkbook.globals.accountManager.fetchAccount(this.$.linkedAccount.getValue(), {
 onSuccess: enyo.bind(this, this.linkedAccountChangedFollower, "set")

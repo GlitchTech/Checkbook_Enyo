@@ -15,6 +15,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
+// Plugings & Threading -- http://docs.phonegap.com/en/2.4.0/guide_plugin-development_android_index.md.html#Developing%20a%20Plugin%20on%20Android
+
 public class SQLitePlugin extends CordovaPlugin {
 
 	/**
@@ -126,9 +128,13 @@ public class SQLitePlugin extends CordovaPlugin {
 				String dbname = o.getString( "name" );
 
 				this.openDatabase( dbname, null );
+
+				return true;
 			} else if( action.equals( "close" ) ) {
 
 				this.closeDatabase( args.getString( 0 ) );
+
+				return true;
 			} else if( action.equals( "executePragmaStatement" ) ) {
 
 				String dbName = args.getString( 0 );
@@ -136,6 +142,8 @@ public class SQLitePlugin extends CordovaPlugin {
 
 				Cursor myCursor = this.getDatabase( dbName ).rawQuery( query, null );
 				this.processPragmaResults( myCursor, id );
+
+				return true;
 			} else if( action.equals( "executeSqlBatch" ) ) {
 
 				String[] queries = null;
@@ -174,19 +182,23 @@ public class SQLitePlugin extends CordovaPlugin {
 				if( trans_id != null ) {
 
 					this.executeSqlBatch( dbName, queries, jsonparams, queryIDs, trans_id );
+
+					return true;
 				} else {
 
 					Log.v( "error", "null trans_id" );
+
+					return false;
 				}
 			}
-
-			return true;
 		}
 		catch( JSONException e ) {
 			// TODO: signal JSON problem to JS
 
-			return false;
+			Log.e( "error", e.getMessage() );
 		}
+
+		return false;
 	}
 
 	/**

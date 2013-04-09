@@ -44,11 +44,11 @@ do t = !1, s = s.replace(this.rewritePattern, i); while (t);
 return s;
 }
 }, enyo.path = new enyo.pathResolverFactory, enyo.loaderFactory = function(e, t) {
-this.machine = e, this.packages = [], this.modules = [], this.sheets = [], this.stack = [], this.pathResolver = t || enyo.path, this.packageName = "", this.packageFolder = "", this.finishCallbacks = {};
+this.machine = e, this.packages = [], this.modules = [], this.sheets = [], this.designs = [], this.stack = [], this.pathResolver = t || enyo.path, this.packageName = "", this.packageFolder = "", this.finishCallbacks = {};
 }, enyo.loaderFactory.prototype = {
 verbose: !1,
-loadScript: function(e) {
-this.machine.script(e);
+loadScript: function(e, t, n) {
+this.machine.script(e, t, n);
 },
 loadSheet: function(e) {
 this.machine.sheet(e);
@@ -66,11 +66,11 @@ depends: arguments || []
 more: function(e) {
 if (e && this.continueBlock(e)) return;
 var t = this.stack.pop();
-t ? (this.verbose && console.groupEnd("* finish package (" + (t.packageName || "anon") + ")"), this.packageFolder = t.folder, this.packageName = "", this.more(t)) : this.finish();
+t ? (enyo.runtimeLoading && e.failed && (t.failed = t.failed || [], t.failed.push.apply(t.failed, e.failed)), this.verbose && console.groupEnd("* finish package (" + (t.packageName || "anon") + ")"), this.packageFolder = t.folder, this.packageName = "", this.more(t)) : this.finish(e);
 },
-finish: function() {
+finish: function(e) {
 this.packageFolder = "", this.verbose && console.log("-------------- fini");
-for (var e in this.finishCallbacks) this.finishCallbacks[e] && (this.finishCallbacks[e](), this.finishCallbacks[e] = null);
+for (var t in this.finishCallbacks) this.finishCallbacks[t] && (this.finishCallbacks[t](e), this.finishCallbacks[t] = null);
 },
 continueBlock: function(e) {
 while (e.index < e.depends.length) {
@@ -84,8 +84,9 @@ require: function(e, t) {
 var n = this.pathResolver.rewrite(e), r = this.getPathPrefix(e);
 n = r + n;
 if (n.slice(-4) == ".css" || n.slice(-5) == ".less") this.verbose && console.log("+ stylesheet: [" + r + "][" + e + "]"), this.requireStylesheet(n); else {
-if (n.slice(-3) != ".js" || n.slice(-10) == "package.js") return this.requirePackage(n, t), !0;
-this.verbose && console.log("+ module: [" + r + "][" + e + "]"), this.requireScript(e, n);
+if (n.slice(-3) == ".js" && n.slice(-10) != "package.js") return this.verbose && console.log("+ module: [" + r + "][" + e + "]"), this.requireScript(e, n, t);
+if (n.slice(-7) != ".design") return this.requirePackage(n, t), !0;
+this.verbose && console.log("+ design metadata: [" + r + "][" + e + "]"), this.requireDesign(n);
 }
 },
 getPathPrefix: function(e) {
@@ -95,12 +96,27 @@ return t != "/" && t != "\\" && t != "$" && !/^https?:/i.test(e) ? this.packageF
 requireStylesheet: function(e) {
 this.sheets.push(e), this.loadSheet(e);
 },
-requireScript: function(e, t) {
+requireScript: function(e, t, n) {
 this.modules.push({
 packageName: this.packageName,
 rawPath: e,
 path: t
-}), this.loadScript(t);
+});
+if (enyo.runtimeLoading) {
+var r = this, i = function() {
+r.more(n);
+}, s = function() {
+n.failed = n.failed || [], n.failed.push(t), r.more(n);
+};
+this.loadScript(t, i, s);
+} else this.loadScript(t);
+return enyo.runtimeLoading;
+},
+requireDesign: function(e) {
+this.designs.push({
+packageName: this.packageName,
+path: e
+});
 },
 decodePackagePath: function(e) {
 var t = "", n = "", r = "", i = "package.js", s = e.replace(/\\/g, "/").replace(/\/\//g, "/").replace(/:\//, "://").split("/"), o, u;
@@ -175,9 +191,9 @@ function n(r) {
 r && r();
 if (t.length) {
 var i = t.shift(), s = i[0], o = e.isArray(s) ? s : [ s ], u = i[1];
-e.loader.finishCallbacks.runtimeLoader = function() {
+e.loader.finishCallbacks.runtimeLoader = function(e) {
 n(function() {
-u && u(s);
+u && u(e);
 });
 }, e.loader.packageFolder = "./", e.depends.apply(this, o);
 } else e.runtimeLoading = !1, e.loader.packageFolder = "";
@@ -522,6 +538,7 @@ _unnamedKindNumber: 0
 },
 defaultKind: "Component",
 handlers: {},
+__jobs: {},
 toString: function() {
 return this.kindName;
 },
@@ -555,7 +572,7 @@ getInstanceOwner: function() {
 return !this.owner || this.owner.notInstanceOwner ? this : this.owner;
 },
 destroy: function() {
-this.destroyComponents(), this.setOwner(null), this.destroyed = !0;
+this.destroyComponents(), this.setOwner(null), this.stopAllJobs(), this.destroyed = !0;
 },
 destroyComponents: function() {
 enyo.forEach(this.getComponents(), function(e) {
@@ -631,6 +648,9 @@ if (s) return s.delegateEvent(e, t, n, r, i);
 delegateEvent: function(e, t, n, r, i) {
 return this.decorateEvent(n, r, i), e == this ? this.dispatch(t, r, i) : this.bubbleDelegation(e, t, n, r, i);
 },
+stopAllJobs: function() {
+for (var e in this.__jobs) this.stopJob(e);
+},
 dispatch: function(e, t, n) {
 var r = e && this[e];
 if (r) return r.call(this, n || this, t);
@@ -641,6 +661,14 @@ this.waterfallDown(e, t, n || this);
 },
 waterfallDown: function(e, t, n) {
 for (var r in this.$) this.$[r].waterfall(e, t, n);
+},
+startJob: function(e, t, n) {
+enyo.isString(t) && (t = this[t]), this.stopJob(e), this.__jobs[e] = setTimeout(enyo.bind(this, function() {
+this.stopJob(e), t.call(this);
+}), n);
+},
+stopJob: function(e) {
+this.__jobs[e] && (clearTimeout(this.__jobs[e]), delete this.__jobs[e]);
 }
 }), enyo.defaultCtor = enyo.Component, enyo.create = enyo.Component.create = function(e) {
 if (!e.kind && "kind" in e) throw "enyo.create: Attempt to create a null kind. Check dependencies for [" + (e.name || "") + "].";
@@ -982,7 +1010,7 @@ return n;
 },
 simplifyFileURL: function(e) {
 var t = document.createElement("a"), n = !1;
-return t.href = e, t.protocol === "file:" || t.protocol === ":" && window.location.protocol === "file:" ? t.protocol + "//" + t.host + t.pathname : e;
+return t.href = e, t.protocol === "file:" || t.protocol === ":" && window.location.protocol === "file:" ? t.protocol + "//" + t.host + t.pathname : t.protocol === ":" && window.location.protocol === "x-wmapp0:" ? window.location.protocol + "//" + window.location.pathname.split("/")[0] + "/" + t.host + t.pathname : e;
 },
 getXMLHttpRequest: function(e) {
 try {
@@ -1276,6 +1304,10 @@ height: e.offsetHeight
 } : null;
 },
 getComputedStyle: function(e) {
+if (enyo.platform.ie < 9 && e && e.currentStyle) {
+var t = enyo.clone(e.currentStyle);
+return t.getPropertyValue = e.currentStyle.getAttribute, t.setProperty = e.currentStyle.setExpression, t.removeProperty = e.currentStyle.removeAttribute, t;
+}
 return window.getComputedStyle && e && window.getComputedStyle(e, null);
 },
 getComputedStyleValue: function(e, t, n) {
@@ -1556,6 +1588,18 @@ if (o || o === 0) n[u] = o + (enyo.isString(o) ? "" : r);
 }
 this.domStylesChanged();
 },
+getAbsoluteBounds: function() {
+var e = 0, t = 0, n = this.hasNode(), r = n ? n.offsetWidth : 0, i = n ? n.offsetHeight : 0;
+while (n) e += n.offsetLeft - (n.offsetParent ? n.offsetParent.scrollLeft : 0), t += n.offsetTop - (n.offsetParent ? n.offsetParent.scrollTop : 0), n = n.offsetParent;
+return {
+top: t,
+left: e,
+bottom: document.body.offsetHeight - t - i,
+right: document.body.offsetWidth - e - r,
+height: i,
+width: r
+};
+},
 findNodeById: function() {
 return this.id && (this.node = enyo.dom.byId(this.id));
 },
@@ -1658,6 +1702,10 @@ this.syncDisplayToShowing();
 getShowing: function() {
 return this.showing = this.domStyles.display != "none";
 },
+getAbsoluteShowing: function() {
+var e = this.getBounds();
+return this.getShowing() === !1 || e.height === 0 && e.width === 0 ? !1 : this.parent && this.parent.getAbsoluteShowing ? this.parent.getAbsoluteShowing() : !0;
+},
 fitChanged: function(e) {
 this.parent.reflow();
 },
@@ -1756,6 +1804,9 @@ forceVersion: 4,
 extra: {
 silk: 2
 }
+}, {
+platform: "windowsPhone",
+regex: /Windows Phone (?:OS )?(\d+)[.\d]+/
 }, {
 platform: "ie",
 regex: /MSIE (\d+)/
@@ -3426,14 +3477,14 @@ version: 1e9
 } ],
 hasTouchScrolling: function() {
 for (var e = 0, t, n; t = this.osInfo[e]; e++) if (enyo.platform[t.os]) return !0;
-if (enyo.platform.ie >= 10 && enyo.platform.touch) return !0;
+if ((enyo.platform.ie >= 10 || enyo.platform.windowsPhone >= 8) && enyo.platform.touch) return !0;
 },
 hasNativeScrolling: function() {
 for (var e = 0, t, n; t = this.osInfo[e]; e++) if (enyo.platform[t.os] < t.version) return !1;
 return !0;
 },
 getTouchStrategy: function() {
-return enyo.platform.android >= 3 ? "TranslateScrollStrategy" : "TouchScrollStrategy";
+return enyo.platform.android >= 3 || enyo.platform.windowsPhone === 8 ? "TranslateScrollStrategy" : "TouchScrollStrategy";
 }
 },
 controlParentName: "strategy",
@@ -3668,7 +3719,7 @@ onclear: "clear",
 ondragstart: "dragstart"
 },
 create: function() {
-enyo.platform.ie && (this.handlers.onkeyup = "iekeyup"), this.inherited(arguments), this.placeholderChanged(), this.type && this.typeChanged(), this.valueChanged();
+enyo.platform.ie && (this.handlers.onkeyup = "iekeyup"), enyo.platform.windowsPhone && (this.handlers.onkeydown = "iekeydown"), this.inherited(arguments), this.placeholderChanged(), this.type && this.typeChanged(), this.valueChanged();
 },
 rendered: function() {
 this.inherited(arguments), enyo.makeBubble(this, "focus", "blur"), enyo.platform.ie == 8 && this.setAttribute("onchange", enyo.bubbler), this.disabledChanged(), this.defaultFocus && this.focus();
@@ -3691,6 +3742,10 @@ this.setAttribute("value", this.value), this.setNodeProperty("value", this.value
 iekeyup: function(e, t) {
 var n = enyo.platform.ie, r = t.keyCode;
 (n <= 8 || n == 9 && (r == 8 || r == 46)) && this.bubble("oninput", t);
+},
+iekeydown: function(e, t) {
+var n = enyo.platform.windowsPhone, r = t.keyCode, i = t.dispatchTarget;
+n <= 8 && r == 13 && this.tag == "input" && i.hasNode() && i.node.blur();
 },
 clear: function() {
 this.setValue("");
@@ -4272,5 +4327,69 @@ remove: function(e) {
 var t = {};
 for (var n in this.selected) n < e ? t[n] = this.selected[n] : n > e && (t[n - 1] = this.selected[n]);
 this.selected = t;
+}
+});
+
+// Drawer.js
+
+enyo.kind({
+name: "enyo.Drawer",
+published: {
+open: !0,
+orient: "v",
+animated: !0
+},
+style: "overflow: hidden; position: relative;",
+tools: [ {
+kind: "Animator",
+onStep: "animatorStep",
+onEnd: "animatorEnd"
+}, {
+name: "client",
+style: "position: relative;",
+classes: "enyo-border-box"
+} ],
+create: function() {
+this.inherited(arguments), this.animatedChanged(), this.openChanged();
+},
+initComponents: function() {
+this.createChrome(this.tools), this.inherited(arguments);
+},
+animatedChanged: function() {
+!this.animated && this.hasNode() && this.$.animator.isAnimating() && (this.$.animator.stop(), this.animatorEnd());
+},
+openChanged: function() {
+this.$.client.show();
+if (this.hasNode()) if (this.$.animator.isAnimating()) this.$.animator.reverse(); else {
+var e = this.orient == "v", t = e ? "height" : "width", n = e ? "top" : "left";
+this.applyStyle(t, null);
+var r = this.hasNode()[e ? "scrollHeight" : "scrollWidth"];
+this.animated ? this.$.animator.play({
+startValue: this.open ? 0 : r,
+endValue: this.open ? r : 0,
+dimension: t,
+position: n
+}) : this.animatorEnd();
+} else this.$.client.setShowing(this.open);
+},
+animatorStep: function(e) {
+if (this.hasNode()) {
+var t = e.dimension;
+this.node.style[t] = this.domStyles[t] = e.value + "px";
+}
+var n = this.$.client.hasNode();
+if (n) {
+var r = e.position, i = this.open ? e.endValue : e.startValue;
+n.style[r] = this.$.client.domStyles[r] = e.value - i + "px";
+}
+this.container && this.container.resized();
+},
+animatorEnd: function() {
+if (!this.open) this.$.client.hide(); else {
+this.$.client.domCssText = enyo.Control.domStylesToCssText(this.$.client.domStyles);
+var e = this.orient == "v", t = e ? "height" : "width", n = e ? "top" : "left", r = this.$.client.hasNode();
+r && (r.style[n] = this.$.client.domStyles[n] = null), this.node && (this.node.style[t] = this.domStyles[t] = null);
+}
+this.container && this.container.resized();
 }
 });
