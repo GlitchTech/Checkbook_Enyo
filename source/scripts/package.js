@@ -4,6 +4,7 @@ enyo.depends(
 	"modules/",
 
 	"checkbook.js",
+	"menu.js",
 	"splash.js",
 
 	"preferences.js",

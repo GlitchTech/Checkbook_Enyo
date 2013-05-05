@@ -48,54 +48,7 @@ enyo.kind({
 
 		{
 			name: "appMenu",
-			kind: "gts.EventMenu",
-
-			showOnTop: true,
-			floating: true,
-			scrim: true,
-			scrimclasses: "onyx-scrim-translucent",
-
-			components: [
-				{
-					content: "Preferences",
-					ontap: "openPreferences"
-				}, {
-					classes: "onyx-menu-divider"
-				}, {
-					content: "Import Data",
-					ontap: "openImport"
-				}, {
-					content: "Export Data",
-					ontap: "openExport"
-				}, {
-					showing: false,
-					classes: "onyx-menu-divider"
-				}, {
-					showing: false,
-					content: "Search (NYI)",
-					ontap: "openSearch"
-				}, {
-					showing: false,
-					content: "Budget (NYI)",
-					ontap: "openBudget"
-				}, {
-					showing: false,
-					content: "Reports (NYI)",
-					ontap: "openReport"
-				}, {
-					showing: false,
-					classes: "onyx-menu-divider"
-				}, {
-					showing: false,
-					content: "Report Bug (NYI)",
-					ontap: "errorReport"
-				}, {
-					classes: "onyx-menu-divider"
-				}, {
-					content: "About",
-					ontap: "showAbout"
-				}
-			]
+			kind: "Checkbook.appmenu"
 		},
 
 		{
@@ -104,11 +57,15 @@ enyo.kind({
 			viewAccount: "viewAccount",
 			modifyAccount: "showPanePopup",
 			modifyTransaction: "showPanePopup",
+
+			resetSystem: "resetSystem",
+
 			showBudget: "openBudget",
 			showSearch: "openSearch",
 			showReport: "openReport",
 
 			showPanePopup: "showPanePopup",
+			showPopup: "showPopup",
 
 			onbackbutton: "backHandler",
 			onmenubutton: "menuHandler",
@@ -403,20 +360,29 @@ enyo.kind({
 		}
 	},
 
-	/** PopUp Controls **/
+	resetSystem: function( inSender, inEvent ) {
 
-	showAbout: function() {
+		this.$['transactions'].unloadSystem();
 
-		this.showPopup( { "popup": "about" } );
+		Checkbook.globals.accountManager.updateAccountModTime();
+		this.notificationType = null;
+
+		enyo.asyncMethod(
+				this,
+				this.loadCheckbookStage2
+			);
 	},
 
-	showPopup: function( inSender ) {
+	/** PopUp Controls **/
 
-		var popup = this.$[inSender.popup];
+	showPopup: function( inSender, inEvent ) {
 
-		if( popup ) {
+		if( this.$[inSender.popup] ) {
 
-			popup.show();
+			this.$[inSender.popup].show();
+		} else if( this.$[inEvent.popup] ) {
+
+			this.$[inEvent.popup].show();
 		}
 	},
 
@@ -504,65 +470,6 @@ enyo.kind({
 		}
 	},
 
-	/** Checkbook.preferences **/
-
-	openPreferences: function() {
-
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
-				null,
-				{
-					name: "preferences",
-					kind: "Checkbook.preferences"
-				}
-			);
-	},
-
-	/** Checkbook.Import && Checkbook.Export **/
-
-	openExport: function( inSender, inEvent ) {
-
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
-				null,
-				{
-					name: "export",
-					kind: "Checkbook.export"
-				}
-			);
-	},
-
-	openImport: function( inSender, inEvent ) {
-
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
-				null,
-				{
-					name: "import",
-					kind: "Checkbook.import",
-					onFinish: enyo.bind( this, this.importComplete )
-				}
-			);
-	},
-
-	importComplete: function( inSender, importStatus ) {
-
-		if( importStatus['success'] === true ) {
-
-			this.$['transactions'].unloadSystem();
-
-			this.notificationType = null;
-
-			enyo.asyncMethod(
-					this,
-					this.loadCheckbookStage2
-				);
-		}
-	},
-
 	/** Checkbook.search.* **/
 
 	triggerSearch: function() {
@@ -573,7 +480,7 @@ enyo.kind({
 
 	openSearch: function( inSender, inEvent ) {
 
-		this.log( "Search system go", arguments );
+		this.log( "Search", arguments );
 
 		enyo.asyncMethod(
 				this,
@@ -594,12 +501,8 @@ enyo.kind({
 	closeSearch: function( inSender, inEvent ) {
 
 		if( inEvent['changes'] ) {
-			//Update account and transaction information
 
-			Checkbook.globals.accountManager.updateAccountModTime();
-
-			enyo.Signals.send( "accountChanged" );
-			this.$['transactions'].reloadSystem();
+			this.resetSystem();
 		}
 	},
 
@@ -607,7 +510,7 @@ enyo.kind({
 
 	openBudget: function( inSender, inEvent ) {
 
-		this.log( arguments );
+		this.log( "Budget", arguments );
 		return;
 
 		enyo.asyncMethod(
@@ -628,7 +531,7 @@ enyo.kind({
 
 	openReport: function( inSender, inEvent ) {
 
-		this.log( arguments );
+		this.log( "Report", arguments );
 		return;
 
 		enyo.asyncMethod(
