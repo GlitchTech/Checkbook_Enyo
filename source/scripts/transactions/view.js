@@ -28,7 +28,7 @@ enyo.kind( {
 					name: "loadingSpinner",
 					kind: "onyx.Spinner",
 					showing: false,
-					classes: " img-icon",
+					classes: "img-icon",
 					style: "margin: 0 15px 0 0;"
 				}, {
 					name: "acctName",
@@ -42,18 +42,6 @@ enyo.kind( {
 					onChange: "handleBalanceButton",
 
 					style: "padding: 0 8px; margin: 0;"
-				}, {
-					name: "menuButton",
-					kind: "onyx.Button",
-					classes: "padding-none transparent",
-					ontap: "triggerAppMenu",
-
-					components: [
-						{
-							kind: "onyx.Icon",
-							src: "assets/menu_icons/menu.png"
-						}
-					]
 				}
 			]
 		}, {
@@ -207,6 +195,18 @@ enyo.kind( {
 									content: "Clear Multiple"
 								}
 							]
+						}
+					]
+				}, {
+					name: "menuButton",
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
 						}
 					]
 				}

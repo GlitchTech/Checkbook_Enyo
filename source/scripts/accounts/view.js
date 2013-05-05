@@ -50,17 +50,6 @@ enyo.kind( {
 					content: "Edit Accounts",
 					classes: "enyo-fit text-center header-overlay",
 					showing: false
-				}, {
-					kind: "onyx.Button",
-					classes: "padding-none transparent",
-					ontap: "triggerAppMenu",
-
-					components: [
-						{
-							kind: "onyx.Icon",
-							src: "assets/menu_icons/menu.png"
-						}
-					]
 				}
 			]
 		}, {
@@ -175,6 +164,17 @@ enyo.kind( {
 									content: "Search"
 								}
 							]
+						}
+					]
+				}, {
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
 						}
 					]
 				}
