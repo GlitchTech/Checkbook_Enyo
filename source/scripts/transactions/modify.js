@@ -383,7 +383,6 @@ enyo.kind( {
 											style: "vertical-align: top;"
 										}
 									]
-
 								}
 							]
 						},
@@ -697,11 +696,11 @@ enyo.kind( {
 		if( this.accountObj['atmEntry'] == 1 ) {
 
 			this.$['amount'].setAtm( true );
-			this.$['amount'].setSelectAllOnFocus( false );
+			this.$['amount'].setSelectOnFocus( false );
 		} else {
 
 			this.$['amount'].setAtm( false );
-			this.$['amount'].setSelectAllOnFocus( true );
+			this.$['amount'].setSelectOnFocus( true );
 		}
 
 		if( this.accountObj['enableCategories'] == 1 ) {

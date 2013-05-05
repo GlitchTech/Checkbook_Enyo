@@ -1,45 +1,30 @@
-/** Horizontal Box **/
+/** Box Setup **/
+
+.h-box, .v-box {
+	display: inline-block;/* fallback for crappy browsers */
+
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+
+	-webkit-box-align: stretch;
+	-moz-box-align: stretch;
+	box-align: stretch;
+}
 
 .h-box {
-	display: inline-block;/* fallback for crappy browsers */
-
-	display: -webkit-box;
 	-webkit-box-orient: horizontal;
-	-webkit-box-align: stretch;
-
-	display: -moz-box;
 	-moz-box-orient: horizontal;
-	-moz-box-align: stretch;
-
-	display: box;
 	box-orient: horizontal;
-	box-align: stretch;
 }
-
-.h-box > * {
-	.box-flex-generator( 0 );
-	display: block;
-}
-
-/** Vertical Box **/
 
 .v-box {
-	display: inline-block;/* fallback for crappy browsers */
-
-	display: -webkit-box;
 	-webkit-box-orient: vertical;
-	-webkit-box-align: stretch;
-
-	display: -moz-box;
 	-moz-box-orient: vertical;
-	-moz-box-align: stretch;
-
-	display: box;
 	box-orient: vertical;
-	box-align: stretch;
 }
 
-.v-box > * {
+.h-box > *, .v-box > * {
 	.box-flex-generator( 0 );
 	display: block;
 }

@@ -95,6 +95,7 @@ enyo.kind( {
 				}, {
 					classes: "text-center",
 					fit: true,
+					unmoveable: true,
 					components: [
 						{
 							name: "addAccountButton",
@@ -119,8 +120,8 @@ enyo.kind( {
 								{
 									name: "editModeButtonIcon",
 									kind: "onyx.Icon",
-									src: "assets/menu_icons/lock.png",
-									classes: "onyx-icon-button onyx-icon-toggle"
+									src: "assets/menu_icons/lock_closed.png",
+									classes: "onyx-icon-button"
 								}
 							]
 						}
@@ -148,6 +149,11 @@ enyo.kind( {
 								{
 									content: "Toggle Hidden"
 								}, {
+									content: "Toggle Edit Mode"
+								}, {
+									showing: false,
+									classes: "onyx-menu-divider"
+								}, {
 									showing: false,
 									content: "Reports"
 								}, {
@@ -157,6 +163,17 @@ enyo.kind( {
 									content: "Search"
 								}
 							]
+						}
+					]
+				}, {
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "triggerAppMenu",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/menu.png"
 						}
 					]
 				}
@@ -319,6 +336,18 @@ enyo.kind( {
 		this.$['entries'].refresh();
 	},
 
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#triggerAppMenu
+	 *
+	 * Alternate trigger for the menu
+	 */
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
+		return true;
+	},
+
 	/** Footer Control **/
 
 	updateSortMenu: function() {
@@ -389,7 +418,8 @@ enyo.kind( {
 			this.$['entries'].setEditMode( true );
 		}
 
-		this.$['editModeButtonIcon'].addRemoveClass( "active", this.$['entries'].getEditMode() );
+		this.$['editModeButtonIcon'].setSrc( this.$['entries'].getEditMode() ? "assets/menu_icons/lock_open.png" : "assets/menu_icons/lock_closed.png" );
+
 		this.$['editOverlay'].setShowing( this.$['entries'].getEditMode() );
 		this.$['header'].reflow();
 	},
@@ -398,7 +428,13 @@ enyo.kind( {
 
 		var item = inEvent.content.toLowerCase();
 
-		if( item === "search" ) {
+		if( item === "toggle hidden" ) {
+
+			this.$['entries'].setShowHidden( !this.$['entries'].getShowHidden() );
+		} else if( item === "toggle edit mode" ) {
+
+			this.toggleLock();
+		} else if( item === "search" ) {
 
 			enyo.Signals.send( "showSearch", {} );
 		} else if( item === "budget" ) {
@@ -407,11 +443,8 @@ enyo.kind( {
 		} else if( item === "reports" ) {
 
 			this.log( "launch report system (overlay like modify account)" );
-		} else if( item === "toggle hidden" ) {
-
-			this.$['entries'].setShowHidden( !this.$['entries'].getShowHidden() );
 		}
 
 		return true;
-	},
+	}
 });

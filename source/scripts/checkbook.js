@@ -6,101 +6,19 @@ enyo.kind({
 
 	components: [
 		{
-			name: "container",
-			layoutKind: "enyo.FittableRowsLayout",
-			classes: "enyo-fit",
+			name: "mainViews",
+			kind: "Panels",
+
+			classes: "enyo-fit app-panels",
 			showing: false,
-			components: [
-				{
-					name: "menubar",
-					kind: "onyx.Toolbar",
-					classes: "padding-none",
-					components: [
-						{
-							name: "appMenu",
-							kind: "onyx.MenuDecorator",
 
-							components: [
-								{
-									name: "appMenuButton",
-									kind: "onyx.Button",
-									components: [
-										{
-											kind: "enyo.Image",
-											src: "assets/favicon.ico"
-										}, {
-											content: "Checkbook"
-										}
-									]
-								}, {
-									kind: "onyx.Menu",
+			fit: true,
+			animate: false,
+			draggable: false,
 
-									showOnTop: true,
-									floating: true,
-									modal: false,//allow signal events to pass through
+			arrangerKind: "CollapsingArranger",
 
-									scrim: true,
-									scrimclasses: "onyx-scrim-translucent",
-
-									maxHeight: 250,
-
-									components: [
-										{
-											content: "Preferences",
-											ontap: "openPreferences"
-										}, {
-											classes: "onyx-menu-divider"
-										}, {
-											content: "Import Data",
-											ontap: "openImport"
-										}, {
-											content: "Export Data",
-											ontap: "openExport"
-										}, {
-											classes: "onyx-menu-divider"
-										}, {
-											content: "Search",
-											ontap: "triggerSearch"
-										}, {
-											showing: false,
-											content: "Budget (NYI)",
-											ontap: "openBudget"
-										}, {
-											showing: false,
-											content: "Reports (NYI)",
-											ontap: "openReport"
-										}, {
-											showing: false,
-											classes: "onyx-menu-divider"
-										}, {
-											showing: false,
-											content: "Report Bug (NYI)",
-											ontap: "errorReport"
-										}, {
-											classes: "onyx-menu-divider"
-										}, {
-											content: "About",
-											ontap: "showAbout"
-										}
-									]
-								}
-							]
-						}
-					]
-				}, {
-					name: "mainViews",
-					kind: "Panels",
-
-					fit: true,
-					animate: false,
-					draggable: false,
-
-					classes: "app-panels",
-					arrangerKind: "CollapsingArranger",
-
-					components: [ { name: "destroyChild", content: "I am a dummy component so the panel structure doesn't crash on load." } ]
-				}
-			]
+			components: [ { name: "destroyChild", content: "I am a dummy component so the panel structure doesn't crash on load." } ]
 		},
 
 		{
@@ -126,6 +44,58 @@ enyo.kind({
 		{
 			name: "security",
 			kind: "Checkbook.login"
+		},
+
+		{
+			name: "appMenu",
+			kind: "gts.EventMenu",
+
+			showOnTop: true,
+			floating: true,
+			scrim: true,
+			scrimclasses: "onyx-scrim-translucent",
+
+			components: [
+				{
+					content: "Preferences",
+					ontap: "openPreferences"
+				}, {
+					classes: "onyx-menu-divider"
+				}, {
+					content: "Import Data",
+					ontap: "openImport"
+				}, {
+					content: "Export Data",
+					ontap: "openExport"
+				}, {
+					showing: false,
+					classes: "onyx-menu-divider"
+				}, {
+					showing: false,
+					content: "Search (NYI)",
+					ontap: "openSearch"
+				}, {
+					showing: false,
+					content: "Budget (NYI)",
+					ontap: "openBudget"
+				}, {
+					showing: false,
+					content: "Reports (NYI)",
+					ontap: "openReport"
+				}, {
+					showing: false,
+					classes: "onyx-menu-divider"
+				}, {
+					showing: false,
+					content: "Report Bug (NYI)",
+					ontap: "errorReport"
+				}, {
+					classes: "onyx-menu-divider"
+				}, {
+					content: "About",
+					ontap: "showAbout"
+				}
+			]
 		},
 
 		{
@@ -182,6 +152,7 @@ enyo.kind({
 
 		if( !this.appReady ) { return; }
 
+
 		if( inEvent.which === 18 ) {
 			//alt key
 
@@ -195,41 +166,42 @@ enyo.kind({
 		}
 	},
 
-	menuHandler: function() {
+	menuHandler: function( inSender, inEvent ) {
 
 		if( !this.appReady ) { return; }
+
+		inEvent = enyo.mixin( { "pageX": 10, "pageY": 10 }, inEvent );
 
 		if( this.paneStack.length <= 0 ) {
 			//Menu is only available on Accounts or Transaction list screens.
 
-			if( this.$['appMenuButton'].getActive() === true ) {
+			if( this.$['appMenu'].getShowing() ) {
 
 				this.hideAppMenu();
 			} else {
 
-				this.showAppMenu();
+				this.showAppMenu( inSender, inEvent );
 			}
 		}
 
 		return true;
 	},
 
-	showAppMenu: function() {
+	showAppMenu: function( inSender, inEvent ) {
 
-		this.$['appMenuButton'].waterfall( "ontap", "ontap", this );
+		this.$['appMenu'].showAtEvent( inEvent );
 	},
 
 	hideAppMenu: function() {
 
-		this.$['appMenuButton'].setActive( false );
-		this.$['appMenu'].requestHideMenu();
+		this.$['appMenu'].hide();
 	},
 
 	backHandler: function() {
 
 		if( !this.appReady ) { return; }
 
-		if( this.$['appMenu'].menuActive === true ) {
+		if( this.$['appMenu'].getShowing() ) {
 			//Hide app menu
 
 			this.hideAppMenu();
@@ -349,9 +321,8 @@ enyo.kind({
 				}
 			);
 
+		this.$['mainViews'].show();
 		this.$['mainViews'].render();
-		this.$['container'].show();
-		this.$['container'].render();
 
 		Checkbook.globals.criticalError = this.$['criticalError'];
 		Checkbook.globals.accountManager = new Checkbook.accounts.manager();
@@ -477,7 +448,7 @@ enyo.kind({
 		this.$[paneArgs['name']].render();
 
 		//Hide other panes
-		this.$['container'].hide();
+		this.$['mainViews'].hide();
 
 		for( var i = 0; i < this.paneStack.length; i++ ) {
 
@@ -517,7 +488,7 @@ enyo.kind({
 		} else {
 
 			//show base view
-			this.$['container'].show();
+			this.$['mainViews'].show();
 		}
 
 		this.resized();
