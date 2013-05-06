@@ -472,15 +472,7 @@ enyo.kind({
 
 	/** Checkbook.search.* **/
 
-	triggerSearch: function() {
-
-		//Don't send the tap event arguments
-		enyo.Signals.send( "showSearch", {} );
-	},
-
 	openSearch: function( inSender, inEvent ) {
-
-		this.log( "Search", arguments );
 
 		enyo.asyncMethod(
 				this,

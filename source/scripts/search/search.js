@@ -62,8 +62,8 @@ enyo.kind({
 
 			components: [
 				{
-					name: "search",
-					//kind: "Checkbook.search.filter",
+					name: "filter",
+					kind: "Checkbook.search.filter",
 
 					onSearch: "searchTransactions",
 					onFinish: "closeSearch"
@@ -83,7 +83,7 @@ enyo.kind({
 
 		this.inherited( arguments );
 return;
-		this.$['search'].load( this.acctId, this.category, this.category2, this.dateStart, this.dateEnd );
+		this.$['filter'].load( this.acctId, this.category, this.category2, this.dateStart, this.dateEnd );
 	},
 
 	searchTransactions: function( inSender, qryStrs, qryArgs ) {
