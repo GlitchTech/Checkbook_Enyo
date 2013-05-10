@@ -303,6 +303,7 @@ enyo.kind( {
 			//Make a clone; else unable to modify account
 			this.account = enyo.clone( inEvent['account'] );
 			this.$['entries'].account = enyo.clone( this.account );
+			this.$['entries'].initialScrollCompleted = false;
 
 			this.$['acctName'].setContent( this.account['acctName'] );
 			this.$['acctTypeIcon'].setSrc( "assets/" + this.account['acctCategoryIcon'] );
