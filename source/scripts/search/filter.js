@@ -27,7 +27,7 @@ enyo.kind({
 					components: [
 						{
 							name: "searchString",
-							kind: "onyx.TextArea",
+							kind: "onyx.Input",
 
 							fit: true,
 
@@ -42,6 +42,9 @@ enyo.kind({
 					name: "accountDrawer",
 					kind: "gts.DividerDrawer",
 					caption: "Accounts",
+
+					open: false,
+
 					components: [
 						{
 							name: "accounts",
@@ -105,7 +108,31 @@ enyo.kind({
 					name: "startDateDrawer",
 					kind: "onyx.Drawer",
 					open: false,
-					components: []
+					components: [
+						{
+							classes: "onyx-toolbar-inline",
+							components: [
+								{
+									classes: "label",
+									content: "Date"
+								}, {
+									name: "fromDate",
+									kind: "onyx.DatePicker",
+									onSelect: "dateChanged"
+								}
+							]
+						}, {
+							name: "fromTime",
+							kind: "gts.TimePicker",
+
+							label: "Time",
+
+							minuteInterval: 5,
+							is24HrMode: false,
+
+							onSelect: "dateChanged"
+						}
+					]
 				}, {
 					name: "toToggle",
 					kind: "gts.ToggleBar",
@@ -123,44 +150,77 @@ enyo.kind({
 					name: "endDateDrawer",
 					kind: "onyx.Drawer",
 					open: false,
-					components: []
+					components: [
+						{
+							classes: "onyx-toolbar-inline",
+							components: [
+								{
+									classes: "label",
+									content: "Date"
+								}, {
+									name: "toDate",
+									kind: "onyx.DatePicker",
+									onSelect: "dateChanged"
+								}
+							]
+						}, {
+							name: "toTime",
+							kind: "gts.TimePicker",
+
+							label: "Time",
+
+							minuteInterval: 5,
+							is24HrMode: false,
+
+							onSelect: "dateChanged"
+						}
+					]
 				}, {
 					name: "cleared",
-					//kind: "gts.ListSelectorBar",
-					labelText: "Include Transaction Status",
-					classes: "force-left-padding",
+					kind: "gts.SelectorBar",
+					label: "Include Transaction Status",
+					classes: "bordered",
 
 					value: 2,
 					choices: [
 						{
-							caption: "All",
+							content: "All",
 							value: 2
 						}, {
-							caption: "Cleared Only",
+							content: "Cleared Only",
 							value: 1
 						}, {
-							caption: "Pending Only",
+							content: "Pending Only",
 							value: 0
 						}
 					]
 				}, {
 					name: "includeNeg",
-					//kind: "gts.ToggleBar",
-					mainText: "Include Expenses",
+					kind: "gts.ToggleBar",
+
+					classes: "bordered",
+
+					label: "Include Expenses",
 					onText: "Yes",
 					offText: "No",
 					value: true
 				}, {
 					name: "includePos",
-					//kind: "gts.ToggleBar",
-					mainText: "Include Income",
+					kind: "gts.ToggleBar",
+
+					classes: "bordered",
+
+					label: "Include Income",
 					onText: "Yes",
 					offText: "No",
 					value: true
 				}, {
 					name: "includeTrans",
-					//kind: "gts.ToggleBar",
-					mainText: "Include Transfers",
+					kind: "gts.ToggleBar",
+
+					classes: "bordered",
+
+					label: "Include Transfers",
 					onText: "Yes",
 					offText: "No",
 					value: true
@@ -187,10 +247,10 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		if( false ) {
-		//if( !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs['alwaysFullCalendar'] ) {
+		if( !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs['alwaysFullCalendar'] ) {
 			//Big Screen
 
+			this.$['startDateDrawer'].destroyClientControls();
 			this.$['startDateDrawer'].createComponent(
 					{
 						name: "fromDate",
@@ -215,6 +275,7 @@ enyo.kind({
 					}
 				);
 
+			this.$['endDateDrawer'].destroyClientControls();
 			this.$['endDateDrawer'].createComponent(
 					{
 						name: "toDate",
@@ -235,70 +296,6 @@ enyo.kind({
 							}
 						]
 					}, {
-						owner: this
-					}
-				);
-		} else {
-			//Small Screen
-
-			this.$['startDateDrawer'].createComponents(
-					[
-						{
-							classes: "onyx-toolbar-inline",
-							components: [
-								{
-									name: "label",
-									classes: "label",
-									content: "Date"
-								}, {
-									name: "fromDate",
-									kind: "onyx.DatePicker",
-									onSelect: "dateChanged"
-								}
-							]
-						}, {
-							name: "fromTime",
-							kind: "gts.TimePicker",
-
-							label: "Time",
-
-							minuteInterval: 5,
-							is24HrMode: false,
-
-							onSelect: "dateChanged"
-						}
-					], {
-						owner: this
-					}
-				);
-
-			this.$['endDateDrawer'].createComponents(
-					[
-						{
-							classes: "onyx-toolbar-inline",
-							components: [
-								{
-									name: "label",
-									classes: "label",
-									content: "Date"
-								}, {
-									name: "toDate",
-									kind: "onyx.DatePicker",
-									onSelect: "dateChanged"
-								}
-							]
-						}, {
-							name: "toTime",
-							kind: "gts.TimePicker",
-
-							label: "Time",
-
-							minuteInterval: 5,
-							is24HrMode: false,
-
-							onSelect: "dateChanged"
-						}
-					], {
 						owner: this
 					}
 				);
@@ -394,9 +391,9 @@ enyo.kind({
 	toggleToggles: function() {
 
 		this.$['startDateDrawer'].setOpen( this.$['fromToggle'].getValue() );
-		this.$['endDateDrawer'].setOpen( this.$['toToggle'].getValue() );
-
 		this.$['startDateDrawer'].render();
+
+		this.$['endDateDrawer'].setOpen( this.$['toToggle'].getValue() );
 		this.$['endDateDrawer'].render();
 	},
 
