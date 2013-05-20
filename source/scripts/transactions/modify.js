@@ -581,9 +581,6 @@ enyo.kind( {
 			this.$['linkedAccount'].setChoices( this.accountList );
 
 			this.$['linkedAccount'].setDisabled( false );
-
-			this.$['linkedAccount'].render();
-
 		} else {
 
 			this.$['linkedAccount'].setDisabled( true );
@@ -741,7 +738,14 @@ enyo.kind( {
 
 			if( !this.$['linkedAccount'].getDisabled() ) {
 
-				Checkbook.globals.accountManager.fetchAccount( this.$['linkedAccount'].getValue(), { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "set" ) } );
+				for( var i = 0; i < this.accountList.length; i++ ) {
+
+					if( this.accountList[i]['value'] == this.$['linkedAccount'].getValue() ) {
+
+						this.linkedAccountChanged( null, { "selected": { color: this.accountList[i]['color'] } } );
+						break;
+					}
+				}
 			}
 		} else {
 
@@ -749,7 +753,46 @@ enyo.kind( {
 			this.$['linkedAccount'].removeClass( "custom-background" );
 		}
 
+		this.adjustLinkedAccountList();
+
 		enyo.asyncMethod( this.$['desc'], this.$['desc'].focus );
+	},
+
+	adjustLinkedAccountList: function() {
+
+		if( this.accountList.length <= 1 ) {
+
+			this.log( "not enough accounts" );
+
+			return;
+		}
+
+		var accountId = this.$['account'].getValue();
+
+		for( var i = 0; i < this.accountList.length; i++ ) {
+
+			if( this.accountList[i]['value'] == accountId ) {
+
+				this.accountList[i]['disabled'] = true;
+			} else {
+
+				this.accountList[i]['disabled'] = false;
+			}
+		}
+
+		if( this.$['linkedAccount'].getValue() == accountId ) {
+
+			this.trsnObj['linkedAccount'] = null;
+			this.$['linkedAccount'].setValue( null );
+		}
+
+		this.$['linkedAccount'].setChoices( this.accountList );
+		this.$['linkedAccount'].render();
+
+		for( var i = 0; i < this.accountList.length; i++ ) {
+
+			this.accountList[i]['disabled'] = false;
+		}
 	},
 
 	/** Data Change Handlers **/
@@ -801,15 +844,17 @@ enyo.kind( {
 
 	/** Account Controls **/
 
-	accountChanged: function( inSender, newIndex, oldIndex ) {
+	accountChanged: function( inSender, inEvent ) {
 
 		Checkbook.globals.accountManager.fetchAccount( this.$['account'].getValue(), { "onSuccess": enyo.bind( this, this.accountChangedFollower ) } );
 	},
 
 	accountChangedFollower: function( result ) {
 
-		//Remove old color (if set)
-		this.$['account'].removeClass( this.accountObj['acctCategoryColor'] );
+		for( var i = 0; i < appColors.length; i++ ) {
+
+			this.$['account'].removeClass( appColors[i]['name'] );
+		}
 
 		this.accountObj = result;
 
@@ -819,21 +864,14 @@ enyo.kind( {
 
 	/** Linked Account Controls **/
 
-	linkedAccountChanged: function( inSender, newAcctId, oldAcctId ) {
+	linkedAccountChanged: function( inSender, inEvent ) {
 
-		Checkbook.globals.accountManager.fetchAccount( oldAcctId, { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "unset" ) } );
-	},
+		for( var i = 0; i < appColors.length; i++ ) {
 
-	linkedAccountChangedFollower: function( mode, result ) {
-
-		if( mode === "unset" ) {
-
-			this.$['linkedAccount'].removeClass( result['acctCategoryColor'] );
-			Checkbook.globals.accountManager.fetchAccount( this.$['linkedAccount'].getValue(), { "onSuccess": enyo.bind( this, this.linkedAccountChangedFollower, "set" ) } );
-		} else if( mode === "set" ) {
-
-			this.$['linkedAccount'].addClass( result['acctCategoryColor'] );
+			this.$['linkedAccount'].removeClass( appColors[i]['name'] );
 		}
+
+		this.$['linkedAccount'].addClass( inEvent.selected['color'] );
 	},
 
 	/** Date Controls **/
