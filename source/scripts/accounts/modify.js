@@ -491,17 +491,11 @@ enyo.kind( {
 
 				this.categories['choices'].push(
 						{
-							components: [
-								{
-									kind: "onyx.Icon",
-									src: "assets/" + row['icon'],
-									classes: "margin-right"
-								}, {
-									content: row['name'],
-								}
-							],
+							kind: "gts.MenuImageItem",
+
 							content: row['name'],
-							icon: "assets/" + row['icon'],
+							src: "assets/" + row['icon'],
+
 							color: row['color'],
 							value: row['name']
 						}
