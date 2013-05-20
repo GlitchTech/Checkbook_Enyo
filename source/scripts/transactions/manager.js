@@ -819,8 +819,12 @@ enyo.kind({
 
 				transactionSortOptions.push(
 							{
-								icon: "assets/sort_icons/" + row['sortGroup'].toLowerCase().replace( " ", "" ) + ".png",
+								kind: "gts.MenuImageItem",
+								classes: "transactionSortMenuItem",
+
 								content: row['label'],
+								src: "assets/sort_icons/" + row['sortGroup'].toLowerCase().replace( " ", "" ) + ".png",
+
 								value: row['sortId'],
 								qry: row['qry'],
 								sortGroup: row['sortGroup']

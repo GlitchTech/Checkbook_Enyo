@@ -95,6 +95,7 @@ enyo.kind( {
 						}, {
 							name: "sortMenu",
 							kind: "gts.SelectedMenu",
+							classes: "bordered-menu",
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
@@ -168,7 +169,9 @@ enyo.kind( {
 							onSelect: "footerMenuSelected",
 							components: [
 								{
-									content: "Refresh"
+									kind: "gts.MenuImageItem",
+									content: "Refresh",
+									src: "assets/menu_icons/refresh.png"
 								}, {
 									showing: false,
 									classes: "onyx-menu-divider"

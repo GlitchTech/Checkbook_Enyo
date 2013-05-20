@@ -35,6 +35,7 @@ enyo.depends(
 	"$lib/gts-plugins/AutoComplete",
 	"$lib/gts-plugins/Item",
 	"$lib/gts-plugins/EventMenu",
+	"$lib/gts-plugins/MenuImageItem",
 
 	"$lib/private",
 
