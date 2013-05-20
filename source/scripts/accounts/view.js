@@ -150,17 +150,6 @@ enyo.kind( {
 									content: "Toggle Hidden"
 								}, {
 									content: "Toggle Edit Mode"
-								}, {
-									showing: false,
-									classes: "onyx-menu-divider"
-								}, {
-									showing: false,
-									content: "Reports"
-								}, {
-									showing: false,
-									content: "Budget"
-								}, {
-									content: "Search"
 								}
 							]
 						}

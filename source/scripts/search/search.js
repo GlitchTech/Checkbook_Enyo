@@ -14,7 +14,6 @@ enyo.kind({
 	},
 
 	events: {
-		onModify: "",
 		onFinish: ""
 	},
 
@@ -69,9 +68,8 @@ enyo.kind({
 					onFinish: "closeSearch"
 				}, {
 					name: "results",
-					//kind: "Checkbook.search.results",
+					kind: "Checkbook.search.results",
 
-					onModify: "modifyTransaction",
 					onResultsFound: "resultCount",
 					onLoading: "loadingDisplay"
 				}
@@ -82,30 +80,25 @@ enyo.kind({
 	rendered: function() {
 
 		this.inherited( arguments );
-return;
+
 		this.$['filter'].load( this.acctId, this.category, this.category2, this.dateStart, this.dateEnd );
 	},
 
-	searchTransactions: function( inSender, qryStrs, qryArgs ) {
+	searchTransactions: function( inSender, inEvent ) {
 
-		this.$['results'].search( qryStrs, qryArgs );
+		this.$['results'].search( inEvent['strings'], inEvent['args'] );
 	},
 
-	resultCount: function( inSender, count ) {
+	resultCount: function( inSender, inEvent ) {
 
 		this.$['resultCount'].show();
-		this.$['resultCount'].setContent( count + " transactions" );
+		this.$['resultCount'].setContent( inEvent['count'] + " transactions" );
 	},
 
-	loadingDisplay: function( inSender, status ) {
+	loadingDisplay: function( inSender, inEvent ) {
 
-		this.$['loadingSpinner'].setShowing( status );
-		this.$['systemIcon'].setShowing( !status );
-	},
-
-	modifyTransaction: function( inSender, args ) {
-
-		this.doModify( args );
+		this.$['loadingSpinner'].setShowing( inEvent['status'] );
+		this.$['systemIcon'].setShowing( !inEvent['status'] );
 	},
 
 	closeSearch: function() {

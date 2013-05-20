@@ -174,17 +174,6 @@ enyo.kind( {
 									classes: "onyx-menu-divider"
 								}, {
 									showing: false,
-									content: "Reports"
-								}, {
-									showing: false,
-									content: "Budget"
-								}, {
-									content: "Search"
-								}, {
-									showing: false,
-									classes: "onyx-menu-divider"
-								}, {
-									showing: false,
 									content: "Purge"
 								}, {
 									showing: false,

@@ -22,8 +22,10 @@ enyo.kind({
 			content: "Export Data",
 			ontap: "openExport"
 		}, {
+			showing: false,
 			classes: "onyx-menu-divider"
 		}, {
+			showing: false,
 			content: "Search",
 			ontap: "openSearch"
 		}, {
@@ -105,6 +107,8 @@ enyo.kind({
 				}
 			);
 	},
+
+	/** Other modules **/
 
 	openSearch: function( inSender, inEvent ) {
 

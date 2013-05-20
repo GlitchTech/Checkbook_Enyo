@@ -35,7 +35,8 @@ enyo.kind({
 							onchange:"searchChanged"
 						}, {
 							kind: "Image",
-							src: "assets/search.png"
+							src: "assets/search.png",
+							classes: "img-icon"
 						}
 					]
 				}, {
@@ -233,11 +234,11 @@ enyo.kind({
 				{
 					kind: "onyx.Button",
 					content: "Back",
-					//ontap: "doFinish"
+					ontap: "doFinish"
 				}, {
 					kind: "onyx.Button",
 					content: "Search",
-					//ontap: "search"
+					ontap: "search"
 				}
 			]
 		}
@@ -304,11 +305,13 @@ enyo.kind({
 
 	load: function( acctId, category, category2, dateStart, dateEnd ) {
 
-		this.$['accountDrawer'].close();
 		Checkbook.globals.accountManager.fetchAccounts( { "onSuccess": enyo.bind( this, this.renderAccountList, acctId, category, category2, dateStart, dateEnd ) } );
 	},
 
 	renderAccountList: function( acctId, category, category2, dateStart, dateEnd, results ) {
+
+		this.log( arguments );
+		return;
 
 		//Account List
 		this.acctList['items'] = [];
@@ -454,6 +457,9 @@ enyo.kind({
 	/** Search Controls **/
 
 	search: function() {
+
+		this.log();
+		return;
 
 		var whereStrs = "";
 		var whereArgs = [];
@@ -613,6 +619,6 @@ enyo.kind({
 		//remove first AND/OR
 		whereStrs = whereStrs.replace( /^ (or|and) (.*)/i, "$2" );
 
-		this.doSearch( whereStrs, whereArgs );
+		this.doSearch( { "strings": whereStrs, "args": whereArgs } );
 	}
 });

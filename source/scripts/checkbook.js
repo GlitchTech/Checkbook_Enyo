@@ -474,16 +474,13 @@ enyo.kind({
 
 	openSearch: function( inSender, inEvent ) {
 
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
+		this.showPanePopup(
 				null,
 				enyo.mixin(
 						inEvent,
 						{
 							name: "search",
 							kind: "Checkbook.search.pane",
-							onModify: "showPanePopup",
 							onFinish: enyo.bind( this, this.closeSearch )
 						}
 					)
