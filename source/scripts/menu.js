@@ -22,7 +22,6 @@ enyo.kind({
 			content: "Export Data",
 			ontap: "openExport"
 		}, {
-			showing: false,
 			classes: "onyx-menu-divider"
 		}, {
 			content: "Search",
