@@ -774,20 +774,13 @@ enyo.kind({
 			this.accountObject.idTable[offset + i] = row['acctId'];
 
 			this.accountObject.accountsList[offset + i] = {
-					"content": row['acctName'],
-					"icon": "assets/" + row['acctCategoryIcon'],
-					"color": row['acctCategoryColor'],
-					"value": row['acctId'],
+					"kind": "gts.MenuImageItem",
 
-					components: [
-						{
-							kind: "onyx.Icon",
-							src: "assets/" + row['acctCategoryIcon'],
-							classes: "margin-right img-icon"
-						}, {
-							content: row['acctName']
-						}
-					]
+					"content": row['acctName'],
+					"src": "assets/" + row['acctCategoryIcon'],
+
+					"color": row['acctCategoryColor'],
+					"value": row['acctId']
 				};
 
 			this.accountObject.accounts[offset + i] = enyo.clone( row );

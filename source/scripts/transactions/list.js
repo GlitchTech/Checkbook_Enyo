@@ -257,7 +257,7 @@ enyo.kind( {
 
 	initialScroll: function() {
 
-		enyo.job( "initialScroll", this.bound.initialScroll, 100 );
+		this.startJob( "initialScroll", this.bound.initialScroll, 100 );
 	},
 
 	_initialScroll: function() {
@@ -548,7 +548,7 @@ results = {
 			this.initialScroll();
 		} else if( this.savedScrollPosition ) {
 
-			enyo.job( "moveToSavedScrollPosition", this.bound.moveToSavedScrollPosition, 1000 );
+			this.startJob( "moveToSavedScrollPosition", this.bound.moveToSavedScrollPosition, 1000 );
 		}
 
 		enyo.asyncMethod( this, this.doLoadingFinish );

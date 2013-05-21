@@ -1,11 +1,9 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.search.pane",
-//	kind: enyo.VFlexBox,
-
-	style: "height: 100%;",
+	kind: "enyo.FittableRows",
+	classes: "enyo-fit",
 
 	published: {
 		acctId: null,
@@ -16,58 +14,62 @@ enyo.kind({
 	},
 
 	events: {
-		onModify: "",
 		onFinish: ""
 	},
 
 	components: [
 		{
-			kind: enyo.PageHeader,
-			pack: "start",
+			name: "menubar",
+			kind: "onyx.Toolbar",
+			layoutKind: "enyo.FittableColumnsLayout",
+			noStretch: true,
 			components: [
-				{
-					showing: true,
-
+				{//Swap between icon for account & spinner when loading data in the background.
 					name: "systemIcon",
-					kind: enyo.Image,
-					src: "assets/search.png",
-					className: "img-icon",
+					kind: "enyo.Image",
+					src: "assets/dollar_sign_1.png",
+					classes: "img-icon",
 					style: "margin: 0 15px 0 0;"
 				}, {
-					showing: false,
-
 					name: "loadingSpinner",
-					kind: "gts.Spinner",
-					className: "img-icon",
-					style: "margin: 0px 15px 5px 0;"
+					kind: "onyx.Spinner",
+					showing: false,
+					classes: " img-icon",
+					style: "margin: 0 15px 0 0;"
 				}, {
 					content: "Search System",
-					className: "bigger",
-					flex: 1,
-					style: "margin-top: -6px;"
+					classes: "enyo-text-ellipsis",
+					fit: true
 				}, {
 					name: "resultCount",
-					className: "enyo-button enyo-button-dark",
-					showing: false
+					kind: "onyx.Button",
+					className: "onyx-dark",
+					showing: false,
+					style: "padding: 0 8px; margin: 0;"
 				}
 			]
 		}, {
-			kind: enyo.SlidingPane,
-			flex: 1,
+			name: "mainViews",
+			kind: "Panels",
+
+			fit: true,
+			animate: false,
+			draggable: false,
+
+			classes: "app-panels",
+			arrangerKind: "CollapsingArranger",
+
 			components: [
 				{
-					name: "search",
+					name: "filter",
 					kind: "Checkbook.search.filter",
-					flex: 1,
 
 					onSearch: "searchTransactions",
 					onFinish: "closeSearch"
 				}, {
 					name: "results",
 					kind: "Checkbook.search.results",
-					flex: 2,
 
-					onModify: "modifyTransaction",
 					onResultsFound: "resultCount",
 					onLoading: "loadingDisplay"
 				}
@@ -79,29 +81,24 @@ enyo.kind({
 
 		this.inherited( arguments );
 
-		this.$['search'].load( this.acctId, this.category, this.category2, this.dateStart, this.dateEnd );
+		this.$['filter'].load( this.acctId, this.category, this.category2, this.dateStart, this.dateEnd );
 	},
 
-	searchTransactions: function( inSender, qryStrs, qryArgs ) {
+	searchTransactions: function( inSender, inEvent ) {
 
-		this.$['results'].search( qryStrs, qryArgs );
+		this.$['results'].search( inEvent['strings'], inEvent['args'] );
 	},
 
-	resultCount: function( inSender, count ) {
+	resultCount: function( inSender, inEvent ) {
 
 		this.$['resultCount'].show();
-		this.$['resultCount'].setContent( count + " transactions" );
+		this.$['resultCount'].setContent( inEvent['count'] + " transactions" );
 	},
 
-	loadingDisplay: function( inSender, status ) {
+	loadingDisplay: function( inSender, inEvent ) {
 
-		this.$['loadingSpinner'].setShowing( status );
-		this.$['systemIcon'].setShowing( !status );
-	},
-
-	modifyTransaction: function( inSender, args ) {
-
-		this.doModify( args );
+		this.$['loadingSpinner'].setShowing( inEvent['status'] );
+		this.$['systemIcon'].setShowing( !inEvent['status'] );
 	},
 
 	closeSearch: function() {

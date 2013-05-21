@@ -150,18 +150,6 @@ enyo.kind( {
 									content: "Toggle Hidden"
 								}, {
 									content: "Toggle Edit Mode"
-								}, {
-									showing: false,
-									classes: "onyx-menu-divider"
-								}, {
-									showing: false,
-									content: "Reports"
-								}, {
-									showing: false,
-									content: "Budget"
-								}, {
-									showing: false,
-									content: "Search"
 								}
 							]
 						}
@@ -437,7 +425,7 @@ enyo.kind( {
 			this.toggleLock();
 		} else if( item === "search" ) {
 
-			this.log( "launch search system (overlay like modify account)" );
+			enyo.Signals.send( "showSearch", {} );
 		} else if( item === "budget" ) {
 
 			this.log( "launch budget system (overlay like modify account)" );
