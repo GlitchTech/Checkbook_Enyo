@@ -4,6 +4,9 @@ enyo.kind({
 	name: "Checkbook.app",
 	kind: "enyo.Control",
 
+	appReady: false,
+	paneStack: [],
+
 	components: [
 		{
 			name: "mainViews",
@@ -73,9 +76,6 @@ enyo.kind({
 			onkeydown: "keyboardHandler"//for testing only
 		}
 	],
-
-	appReady: false,
-	paneStack: [],
 
 	/**
 	 * @protected
