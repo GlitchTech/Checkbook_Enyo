@@ -68,7 +68,7 @@ enyo.kind({
 		{name: "client", noStretch:true, fit: true, classes: "onyx-toolbar-inline"},
 		{name: "nard", kind: "onyx.MenuDecorator", showing: false, onActivate: "activated", components: [
 			{kind: "onyx.IconButton", classes: "onyx-more-button"},
-			{name: "menu", kind: "onyx.Menu", scrolling:true, classes: "onyx-more-menu"}
+			{name: "menu", kind: "onyx.Menu", scrolling:false, classes: "onyx-more-menu"}
 		]}
 	],
 	initComponents: function() {
@@ -93,8 +93,8 @@ enyo.kind({
 		} else if (this.tryPushItem()) {
 			this.reflow();
 		} else if (!this.$.menu.children.length) {
-			//this.$.nard.hide();
-			//this.$.menu.hide();
+			this.$.nard.hide();
+			this.$.menu.hide();
 		}
 	},
 	activated: function(inSender, inEvent) {
