@@ -1,7 +1,7 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-	name: "Checkbook.import",
+	name: "Checkbook.sync.import",
 	kind: "FittableRows",
 	classes: "enyo-fit",
 

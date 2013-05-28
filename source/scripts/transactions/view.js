@@ -28,7 +28,7 @@ enyo.kind( {
 					name: "loadingSpinner",
 					kind: "onyx.Spinner",
 					showing: false,
-					classes: " img-icon",
+					classes: "img-icon",
 					style: "margin: 0 15px 0 0;"
 				}, {
 					name: "acctName",
@@ -65,7 +65,7 @@ enyo.kind( {
 			onCloneTransaction: "cloneTransaction"
 		}, {
 			name: "footer",
-			kind: "onyx.MoreToolbar",
+			kind: "Checkbook.MoreToolbar",
 			classes: "deep-green",
 			noStretch: true,
 			components: [
@@ -95,6 +95,7 @@ enyo.kind( {
 						}, {
 							name: "sortMenu",
 							kind: "gts.SelectedMenu",
+							classes: "bordered-menu",
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
@@ -168,19 +169,9 @@ enyo.kind( {
 							onSelect: "footerMenuSelected",
 							components: [
 								{
-									content: "Refresh"
-								}, {
-									showing: false,
-									classes: "onyx-menu-divider"
-								}, {
-									showing: false,
-									content: "Reports"
-								}, {
-									showing: false,
-									content: "Budget"
-								}, {
-									showing: false,
-									content: "Search"
+									kind: "gts.MenuImageItem",
+									content: "Refresh",
+									src: "assets/menu_icons/refresh.png"
 								}, {
 									showing: false,
 									classes: "onyx-menu-divider"
@@ -304,6 +295,7 @@ enyo.kind( {
 			//Make a clone; else unable to modify account
 			this.account = enyo.clone( inEvent['account'] );
 			this.$['entries'].account = enyo.clone( this.account );
+			this.$['entries'].initialScrollCompleted = false;
 
 			this.$['acctName'].setContent( this.account['acctName'] );
 			this.$['acctTypeIcon'].setSrc( "assets/" + this.account['acctCategoryIcon'] );
@@ -553,6 +545,12 @@ enyo.kind( {
 		return true;
 	},
 
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
+		return true;
+	},
+
 	/* Loading Indicators */
 
 	showLoadingIcon: function() {
@@ -678,19 +676,12 @@ enyo.kind( {
 			//enyo.Signals.send( "showReport", { "acctId": this.account['acctId'] } );
 		} else if( inEvent.content.toLowerCase() === "search" ) {
 
-			this.log( "Search system go" );
-			//enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'] } );
+			enyo.Signals.send( "showSearch", { "acctId": this.account['acctId'], "index": this.account['index'] } );
 		} else {
 
 			this.log( inEvent.selected );
 		}
 
-		return true;
-	},
-
-	triggerAppMenu: function( inSender, inEvent ) {
-
-		enyo.Signals.send( "onmenubutton", inEvent );
 		return true;
 	},
 

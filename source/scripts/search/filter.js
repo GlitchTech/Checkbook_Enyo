@@ -1,17 +1,13 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.search.filter",
-//	kind: enyo.SlidingView,
-//	layoutKind: enyo.VFlexLayout,
-
-	flex: 1,
+	kind: "FittableRows",
 
 	acctList: {
-			count: 0,
-			items: []
-		},
+		count: 0,
+		items: []
+	},
 
 	events: {
 		onSearch: "",
@@ -20,39 +16,47 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Scroller,
-			flex: 1,
+			kind: "enyo.Scroller",
+			fit: true,
 			components: [
 				{
-					kind: enyo.Item,
-					tapHightlight: false,
+					kind: "onyx.InputDecorator",
+					layoutKind: "FittableColumnsLayout",
+					noStretch: true,
+					style: "width: 95%",
 					components: [
 						{
 							name: "searchString",
-							kind: enyo.RichText,
-							hint: "Search",
+							kind: "onyx.Input",
 
-							oninput: "searchChanged",
-							autoKeyModifier: "shift-single",
+							fit: true,
 
-							flex: 1
+							placeholder: "Search phrase",
+							onchange:"searchChanged"
+						}, {
+							kind: "Image",
+							src: "assets/search.png",
+							classes: "img-icon"
 						}
 					]
 				}, {
 					name: "accountDrawer",
-					kind: enyo.DividerDrawer,
+					kind: "gts.DividerDrawer",
 					caption: "Accounts",
+
+					open: false,
+
 					components: [
 						{
 							name: "accounts",
-							kind: enyo.VirtualRepeater,
+							//kind: enyo.VirtualRepeater,
 
 							onSetupRow: "setupRow",
 
 							components: [
 								{
-									kind: enyo.Item,
-									layoutKind: enyo.HFlexLayout,
+									//kind: enyo.Item,
+									//layoutKind: enyo.HFlexLayout,
 
 									tapHighlight: true,
 									ontap: "accountSelectedChanged",
@@ -60,13 +64,13 @@ enyo.kind({
 									components: [
 										{
 											name: "icon",
-											kind: enyo.Image,
-											className: "accountIcon"
+											kind: "enyo.Image",
+											classes: "accountIcon"
 										}, {
 											name: "iconLock",
-											kind: enyo.Image,
+											kind: "enyo.Image",
 											src: "assets/padlock_1.png",
-											className: "accountLockIcon unlocked"
+											classes: "accountLockIcon unlocked"
 										}, {
 											flex: 1,
 											components: [
@@ -74,12 +78,12 @@ enyo.kind({
 													name: "accountName"
 												}, {
 													name: "accountNote",
-													className: "smaller"
+													classes: "smaller"
 												}
 											]
 										}, {
 											name: "accountSelected",
-											kind: enyo.CheckBox,
+											//kind: enyo.CheckBox,
 
 											style: "margin-right: 10px;"
 										}
@@ -91,108 +95,223 @@ enyo.kind({
 				}, {
 					name: "fromToggle",
 					kind: "gts.ToggleBar",
-					mainText: "Limit Start Date",
-					subText: "Limit the earliest date that can appear in search query.",
-					onText: "Yes",
-					offText: "No",
+					classes: "bordered",
+
+					label: "Limit Start Date",
+					sublabel: "Limit the earliest date that can appear in search query.",
+					onContent: "Yes",
+					offContent: "No",
+
+					value: false,
+
 					onChange: "toggleToggles"
 				}, {
-					name: "fromDrawer",
-					kind: enyo.BasicDrawer,
-					style: "padding: 0px 25px 0px 5px;",
+					name: "startDateDrawer",
+					kind: "onyx.Drawer",
+					open: false,
 					components: [
 						{
-							name: "fromDate",
-							kind: "gts.DateTimePicker",
-							//showTime: false
+							classes: "onyx-toolbar-inline",
+							components: [
+								{
+									classes: "label",
+									content: "Date"
+								}, {
+									name: "fromDate",
+									kind: "onyx.DatePicker",
+									onSelect: "dateChanged"
+								}
+							]
+						}, {
+							name: "fromTime",
+							kind: "gts.TimePicker",
+
+							label: "Time",
+
+							minuteInterval: 5,
+							is24HrMode: false,
+
+							onSelect: "dateChanged"
 						}
 					]
 				}, {
 					name: "toToggle",
 					kind: "gts.ToggleBar",
-					mainText: "Limit End Date",
-					subText: "Limit the latest date that can appear in search query.",
-					onText: "Yes",
-					offText: "No",
+					classes: "bordered",
+
+					label: "Limit End Date",
+					sublabel: "Limit the latest date that can appear in search query.",
+					onContent: "Yes",
+					offContent: "No",
+
+					value: false,
+
 					onChange: "toggleToggles"
 				}, {
-					name: "toDrawer",
-					kind: enyo.BasicDrawer,
-					style: "padding: 0px 25px 0px 5px;",
+					name: "endDateDrawer",
+					kind: "onyx.Drawer",
+					open: false,
 					components: [
 						{
-							name: "toDate",
-							kind: "gts.DateTimePicker",
-							//showTime: false
+							classes: "onyx-toolbar-inline",
+							components: [
+								{
+									classes: "label",
+									content: "Date"
+								}, {
+									name: "toDate",
+									kind: "onyx.DatePicker",
+									onSelect: "dateChanged"
+								}
+							]
+						}, {
+							name: "toTime",
+							kind: "gts.TimePicker",
+
+							label: "Time",
+
+							minuteInterval: 5,
+							is24HrMode: false,
+
+							onSelect: "dateChanged"
 						}
 					]
 				}, {
 					name: "cleared",
-					kind: "gts.ListSelectorBar",
-					labelText: "Include Transaction Status",
-					className: "force-left-padding",
+					kind: "gts.SelectorBar",
+					label: "Include Transaction Status",
+					classes: "bordered",
 
 					value: 2,
 					choices: [
 						{
-							caption: "All",
+							content: "All",
 							value: 2
 						}, {
-							caption: "Cleared Only",
+							content: "Cleared Only",
 							value: 1
 						}, {
-							caption: "Pending Only",
+							content: "Pending Only",
 							value: 0
 						}
 					]
 				}, {
 					name: "includeNeg",
 					kind: "gts.ToggleBar",
-					mainText: "Include Expenses",
+
+					classes: "bordered",
+
+					label: "Include Expenses",
 					onText: "Yes",
 					offText: "No",
 					value: true
 				}, {
 					name: "includePos",
 					kind: "gts.ToggleBar",
-					mainText: "Include Income",
+
+					classes: "bordered",
+
+					label: "Include Income",
 					onText: "Yes",
 					offText: "No",
 					value: true
 				}, {
 					name: "includeTrans",
 					kind: "gts.ToggleBar",
-					mainText: "Include Transfers",
+
+					classes: "bordered",
+
+					label: "Include Transfers",
 					onText: "Yes",
 					offText: "No",
 					value: true
 				}
 			]
 		}, {
-			kind: "onyx.Button",
-			caption: "Search",
-			className: "enyo-button-dark",
-			ontap: "search"
-		}, {
-			kind: enyo.Toolbar,
-			className: "tardis-blue",
-			pack: "start",
+			kind: "onyx.Toolbar",
+			classes: "tardis-blue text-center",
 			components: [
 				{
+					kind: "onyx.Button",
 					content: "Back",
 					ontap: "doFinish"
+				}, {
+					kind: "onyx.Button",
+					content: "Search",
+					ontap: "search"
 				}
 			]
 		}
 	],
 
+	create: function() {
+
+		this.inherited( arguments );
+
+		if( !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs['alwaysFullCalendar'] ) {
+			//Big Screen
+
+			this.$['startDateDrawer'].destroyClientControls();
+			this.$['startDateDrawer'].createComponent(
+					{
+						name: "fromDate",
+						kind: "gts.DatePicker",
+						onSelect: "",
+
+						components: [
+							{
+								name: "fromTime",
+								kind: "gts.TimePicker",
+
+								label: "Time",
+
+								minuteInterval: 5,
+								is24HrMode: false,
+
+								onSelect: ""
+							}
+						]
+					}, {
+						owner: this
+					}
+				);
+
+			this.$['endDateDrawer'].destroyClientControls();
+			this.$['endDateDrawer'].createComponent(
+					{
+						name: "toDate",
+						kind: "gts.DatePicker",
+						onSelect: "",
+
+						components: [
+							{
+								name: "toTime",
+								kind: "gts.TimePicker",
+
+								label: "Time",
+
+								minuteInterval: 5,
+								is24HrMode: false,
+
+								onSelect: ""
+							}
+						]
+					}, {
+						owner: this
+					}
+				);
+		}
+	},
+
 	load: function( acctId, category, category2, dateStart, dateEnd ) {
 
-		this.$['accountDrawer'].close();
 		Checkbook.globals.accountManager.fetchAccounts( { "onSuccess": enyo.bind( this, this.renderAccountList, acctId, category, category2, dateStart, dateEnd ) } );
 	},
 
 	renderAccountList: function( acctId, category, category2, dateStart, dateEnd, results ) {
+
+		this.log( arguments );
+		return;
 
 		//Account List
 		this.acctList['items'] = [];
@@ -274,8 +393,11 @@ enyo.kind({
 
 	toggleToggles: function() {
 
-		this.$['fromDrawer'].setOpen( this.$['fromToggle'].getValue() );
-		this.$['toDrawer'].setOpen( this.$['toToggle'].getValue() );
+		this.$['startDateDrawer'].setOpen( this.$['fromToggle'].getValue() );
+		this.$['startDateDrawer'].render();
+
+		this.$['endDateDrawer'].setOpen( this.$['toToggle'].getValue() );
+		this.$['endDateDrawer'].render();
 	},
 
 	/** Account List Control **/
@@ -335,6 +457,9 @@ enyo.kind({
 	/** Search Controls **/
 
 	search: function() {
+
+		this.log();
+		return;
 
 		var whereStrs = "";
 		var whereArgs = [];
@@ -494,6 +619,6 @@ enyo.kind({
 		//remove first AND/OR
 		whereStrs = whereStrs.replace( /^ (or|and) (.*)/i, "$2" );
 
-		this.doSearch( whereStrs, whereArgs );
+		this.doSearch( { "strings": whereStrs, "args": whereArgs } );
 	}
 });

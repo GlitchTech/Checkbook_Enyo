@@ -257,7 +257,7 @@ enyo.kind( {
 
 	initialScroll: function() {
 
-		enyo.job( "initialScroll", this.bound.initialScroll, 100 );
+		this.startJob( "initialScroll", this.bound.initialScroll, 100 );
 	},
 
 	_initialScroll: function() {
@@ -548,7 +548,7 @@ results = {
 			this.initialScroll();
 		} else if( this.savedScrollPosition ) {
 
-			enyo.job( "moveToSavedScrollPosition", this.bound.moveToSavedScrollPosition, 1000 );
+			this.startJob( "moveToSavedScrollPosition", this.bound.moveToSavedScrollPosition, 1000 );
 		}
 
 		enyo.asyncMethod( this, this.doLoadingFinish );
@@ -726,10 +726,18 @@ results = {
 		//Update cleared value
 		var cleared = this.transactions[index]['cleared'] !== 1;
 		this.transactions[index]['cleared'] = cleared ? 1 : 0;
-		Checkbook.globals.transactionManager.clearTransaction( this.transactions[index]['itemId'], cleared );
 
 		//Update row UI
 		this.$['list'].renderRow( index );
+
+		enyo.asyncMethod( this, this.transactionClearedDatabaseUpdate, inEvent, index, cleared );
+
+		return true;
+	},
+
+	transactionClearedDatabaseUpdate: function( inEvent, index, cleared ) {
+
+		Checkbook.globals.transactionManager.clearTransaction( this.transactions[index]['itemId'], cleared );
 
 		enyo.Signals.send(
 				"accountBalanceChanged",
@@ -745,8 +753,6 @@ results = {
 
 			inEvent.callback( cleared );
 		}
-
-		return true;
 	},
 
 	confirmDeletion: function( index ) {

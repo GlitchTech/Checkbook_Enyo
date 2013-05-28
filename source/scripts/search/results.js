@@ -3,10 +3,7 @@
 enyo.kind({
 
 	name: "Checkbook.search.results",
-//	kind: enyo.SlidingView,
-//	layoutKind: enyo.VFlexLayout,
-
-	flex: 1,
+	kind: "FittableRows",
 
 	where: {
 		strings: "",
@@ -23,7 +20,6 @@ enyo.kind({
 	},
 
 	events: {
-		onModify: "",//Add/Edit Transaction
 		onResultsFound: "",//Update header with result count
 		onLoading: ""//Loading icon
 	},
@@ -31,10 +27,10 @@ enyo.kind({
 	components: [
 		{
 			name: "entries",
-			kind: enyo.VirtualList,
+			//kind: enyo.VirtualList,
 
-			flex: 1,
-			className: "checkbook-stamp",
+			fit: true,
+			classes: "checkbook-stamp",
 
 			onSetupRow: "setupRow",
 			onAcquirePage: "acquirePage",
@@ -42,7 +38,7 @@ enyo.kind({
 
 			components: [
 				{
-					kind: enyo.SwipeableItem,
+					//kind: enyo.SwipeableItem,
 
 					tapHighlight: true,
 					ontap: "transactiontapped",
@@ -54,8 +50,8 @@ enyo.kind({
 					components: [
 						{
 							name: "mainBody",
-							layoutKind: enyo.HFlexLayout,
-							className: "transactionItemTop",
+							//layoutKind: enyo.HFlexLayout,
+							classes: "transactionItemTop",
 
 							components: [
 								{
@@ -64,23 +60,23 @@ enyo.kind({
 									components: [
 										{
 											name: "desc",
-											className: "description enyo-text-ellipsis bold"
+											classes: "description enyo-text-ellipsis bold"
 										}, {
 											name: "time",
-											className: "date smaller"
+											classes: "date smaller"
 										}, {
-											layoutKind: enyo.HFlexLayout,
+											//layoutKind: enyo.HFlexLayout,
 											align: "center",
 											pack: "start",
 											components: [
 												{
 													name: "accountIcon",
-													kind: enyo.Image,
+													kind: "enyo.Image",
 													src: "",
 													style: "height: 16px; width: 16px; margin: 0 5px 0 0;"
 												}, {
 													name: "account",
-													className: "small",
+													classes: "small",
 													content: "Account Name"
 												}
 											]
@@ -91,7 +87,7 @@ enyo.kind({
 									style: "text-align: right;"
 								}, {
 									name: "cleared",
-									kind: enyo.CheckBox,
+									//kind: enyo.CheckBox,
 									ontap: "transactionCleared",
 
 									style: "margin-left: 15px;"
@@ -102,30 +98,30 @@ enyo.kind({
 							allowHtml: true
 						}, {
 							name: "checkNum",
-							className: "small"
+							classes: "small"
 						}, {
 							name: "note",
-							className: "small",
+							classes: "small",
 							allowHtml: true
 						}
 					]
 				}
 			]
 		}, {
-			kind: enyo.Toolbar,
-			className: "tardis-blue",
+			//kind: enyo.Toolbar,
+			classes: "tardis-blue",
 			pack: "start",
 			components: [
 				{
-					kind: enyo.GrabButton
+					//kind: enyo.GrabButton
 				}, {
-					kind: enyo.ToolButtonGroup,
+					//kind: enyo.ToolButtonGroup,
 					style: "margin-left: 50px;",
 					components: [
 						{
 							ontap: "sortClicked",
 							icon: "assets/menu_icons/sort.png",
-							className: "enyo-grouped-toolbutton-dark"
+							classes: "enyo-grouped-toolbutton-dark"
 						}
 					]
 				}
@@ -134,12 +130,12 @@ enyo.kind({
 
 		{
 			name: "sortMenu",
-			kind: "Checkbook.selectedMenu"
+			//kind: "Checkbook.selectedMenu"
 		},
 
 		{
 			name: "viewSingle",
-			kind: "Checkbook.transactions.viewSingle",
+			//kind: "Checkbook.transactions.viewSingle",
 			onClear: "vsCleared",
 			onEdit: "vsEdit",
 			onDelete: "transactionDeleted"
@@ -149,6 +145,8 @@ enyo.kind({
 	rendered: function() {
 
 		this.inherited( arguments );
+
+		return;
 
 		if( transactionSortOptions.length <= 0 ) {
 
@@ -304,6 +302,7 @@ enyo.kind({
 					repeatId: row['repeatId']
 				};
 
+			//Change to signal
 			enyo.asyncMethod(
 					this,
 					this.doModify,

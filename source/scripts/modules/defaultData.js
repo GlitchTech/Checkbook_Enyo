@@ -18,6 +18,20 @@ function getDBArgs() {
 	return args;
 }
 
+function getLocale() {
+
+	if( enyo.platform.android || enyo.platform.androidChrome ) {
+		//Use android override
+
+		//use phonegap
+	} else {
+
+		var lang = enyo.g11n.currentLocale().getLocale();
+	}
+
+	return lang;
+}
+
 /** Default Data **/
 var defaultAccountCategories = [
 		{

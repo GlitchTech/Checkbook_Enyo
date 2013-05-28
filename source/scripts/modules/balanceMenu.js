@@ -24,10 +24,10 @@ enyo.kind({
 		}, {
 			name: "menu",
 			kind: "gts.SelectedMenu",
+			classes: "onyx-menu-wider",
 			floating: true,
 			scrim: true,
 			scrimclasses: "onyx-scrim-translucent",
-			style: "min-width: 200px;",
 			onChange: "balanceSelectionChanged"
 		}
 	],

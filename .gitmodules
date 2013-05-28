@@ -16,3 +16,6 @@
 [submodule "lib/private"]
 	path = lib/private
 	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/checkbook_private.git
+[submodule "lib/MachiApps"]
+	path = lib/MachiApps
+	url = https://github.com/MachiApps/Enyo-2-Components.git

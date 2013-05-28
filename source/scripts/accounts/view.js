@@ -65,7 +65,7 @@ enyo.kind( {
 			onLoadStart: "showLoading",
 			onLoadStop: "hideLoading"
 		}, {
-			kind: "onyx.MoreToolbar",
+			kind: "Checkbook.MoreToolbar",
 			classes: "rich-brown",
 			components: [
 				{
@@ -142,26 +142,19 @@ enyo.kind( {
 							]
 						}, {
 							kind: "onyx.Menu",
+							classes: "onyx-menu-wider",
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
 							components: [
 								{
-									content: "Toggle Hidden"
+									kind: "gts.MenuImageItem",
+									content: "Toggle Hidden",
+									src: "assets/menu_icons/search.png"
 								}, {
-									content: "Toggle Edit Mode"
-								}, {
-									showing: false,
-									classes: "onyx-menu-divider"
-								}, {
-									showing: false,
-									content: "Reports"
-								}, {
-									showing: false,
-									content: "Budget"
-								}, {
-									showing: false,
-									content: "Search"
+									kind: "gts.MenuImageItem",
+									content: "Toggle Edit Mode",
+									src: "assets/menu_icons/lock_closed.png"
 								}
 							]
 						}
@@ -337,6 +330,18 @@ enyo.kind( {
 		this.$['entries'].refresh();
 	},
 
+	/**
+	 * @protected
+	 * @name Checkbook.accounts.view#triggerAppMenu
+	 *
+	 * Alternate trigger for the menu
+	 */
+	triggerAppMenu: function( inSender, inEvent ) {
+
+		enyo.Signals.send( "onmenubutton", inEvent );
+		return true;
+	},
+
 	/** Footer Control **/
 
 	updateSortMenu: function() {
@@ -425,7 +430,7 @@ enyo.kind( {
 			this.toggleLock();
 		} else if( item === "search" ) {
 
-			this.log( "launch search system (overlay like modify account)" );
+			enyo.Signals.send( "showSearch", {} );
 		} else if( item === "budget" ) {
 
 			this.log( "launch budget system (overlay like modify account)" );
@@ -434,18 +439,6 @@ enyo.kind( {
 			this.log( "launch report system (overlay like modify account)" );
 		}
 
-		return true;
-	},
-
-	/**
-	 * @protected
-	 * @name Checkbook.accounts.view#triggerAppMenu
-	 *
-	 * Alternate trigger for the menu
-	 */
-	triggerAppMenu: function( inSender, inEvent ) {
-
-		enyo.Signals.send( "onmenubutton", inEvent );
 		return true;
 	}
 });

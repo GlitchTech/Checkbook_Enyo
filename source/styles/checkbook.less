@@ -4,7 +4,7 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-image: url( "../../assets/trans_bg.png" );
+	background-image: url( "../assets/trans_bg.png" );
 	background-repeat: no-repeat;
 	background-position: center;
 	text-align: center;
@@ -13,7 +13,7 @@
 .header-overlay {
 	background-color: #333333;
 	background-color: rgba( 51, 51, 51, 0.75 );
-	color: #ffffff;
+	color: @white;
 	line-height: 55px;
 }
 
@@ -29,26 +29,29 @@
 
 .account-item {
 	padding: 0px;
-}
 
-.account-item.hiddenAccount .accountName {
-	color: #cc0000;
-}
+	&.hiddenAccount .accountName {
+		color: @naka-red;
+	}
 
-.account-item.maskedAccount .accountName {
-	color: #0000cc;
-}
+	&.maskedAccount .accountName {
+		color: @deep-blue;
+	}
 
-.account-item .account {
-	border-top: 1px solid rgba(255, 255, 255, 0.5);
+	.account {
+		border-top: 1px solid rgba(255, 255, 255, 0.5);
 
-	padding: 8px 14px;
+		padding: 8px 14px;
+	}
+
+	.note {
+		padding: 0px 14px 5px 14px;
+	}
 }
 
 .accountLockIcon,
 .accountIcon {
-	height: 32px !important;
-	width: 32px !important;
+	.img-icon;
 }
 
 .accountIcon {
@@ -57,14 +60,11 @@
 
 .accountLockIcon {
 	margin-left: -42px;
-}
+	margin-right: 10px;
 
-.accountLockIcon.unlocked {
-	display: none;
-}
-
-.account-item .note {
-	padding: 0px 14px 5px 14px;
+	&.unlocked {
+		display: none;
+	}
 }
 
 /** Transaction List **/
@@ -75,83 +75,94 @@
 
 	margin-top: -5px;
 	padding-top: 5px;
-}
 
-.transaction-item-top .amount-block {
-	display: inline-block;
-}
+	.amount-block {
+		display: inline-block;
+	}
 
-.transaction-item-top .checkbox-clone.checked {
-	background-position: 0px -32px;
+	.checkbox-clone.checked {
+		background-position: 0px -32px;
+	}
 }
 
 .repeatIcon {
-	background-image: url( "../../assets/calendar.png" );
+	background-image: url( "../assets/calendar.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .repeatTransferIcon {
-	background-image: url( "../../assets/future_transfer_1.png" );
+	background-image: url( "../assets/future_transfer_1.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .transferIcon {
-	background-image: url( "../../assets/transfer_3.png" );
+	background-image: url( "../assets/transfer_3.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .expenseIcon {
-	background-image: url( "../../assets/icon-expense.png" );
+	background-image: url( "../assets/icon-expense.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .incomeIcon {
-	background-image: url( "../../assets/icon-income.png" );
+	background-image: url( "../assets/icon-income.png" );
 	background-repeat: no-repeat;
 	background-position: top left;
 }
 
 .futureTransaction .date {
-	color: #000000;
+	color: @black;
 }
 
 .date,
 .futureTransaction .description {
-	color: #0000cc;
+	color: @deep-blue;
 }
 
-.splitCatContainer .categoryGroup {
-	margin-left: -10px;
-}
+.splitCatContainer {
 
-.splitCatContainer .categoryGroup div {
-	.border-radius ( top-left, 5px );
-	.border-radius ( bottom-left, 5px );
+	.categoryGroup {
+		margin-left: -10px;
+	}
 
-	border-left: 1px solid rgba( 0, 0, 0, 0.2 );
-}
+	.categoryGroup div {
+		.border-radius ( top-left, 5px );
+		.border-radius ( bottom-left, 5px );
 
-.splitCatContainer .categoryAmount {
-}
+		border-left: 1px solid rgba( 0, 0, 0, 0.2 );
+	}
 
-.splitCatContainer .categoryAmount div {
-	.border-radius ( top-right, 5px );
-	.border-radius ( bottom-right, 5px );
+	.categoryAmount {
+	}
 
-	border-right: 1px solid rgba( 0, 0, 0, 0.2 );
-}
+	.categoryAmount div {
+		.border-radius ( top-right, 5px );
+		.border-radius ( bottom-right, 5px );
 
-.splitCatContainer .cat-item {
-	border-top: 1px solid rgba( 255, 255, 255, 0.5 );
-	border-bottom: 1px solid rgba( 0, 0, 0, 0.2 );
-	padding: 10px;
+		border-right: 1px solid rgba( 0, 0, 0, 0.2 );
+	}
+
+	.cat-item {
+		border-top: 1px solid rgba( 255, 255, 255, 0.5 );
+		border-bottom: 1px solid rgba( 0, 0, 0, 0.2 );
+		padding: 10px;
+	}
 }
 
 .block-buttons .onyx-button {
 	width: 75%;
 	margin: @std-spacing / 2;
+}
+
+.onyx-menu.onyx-menu-wider {
+	min-width: 200px;
+}
+
+.transactionSortMenuItem.gts-menuimageitem .gts-mii-text {
+	width: 150px;
 }

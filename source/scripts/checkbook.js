@@ -4,6 +4,10 @@ enyo.kind({
 	name: "Checkbook.app",
 	kind: "enyo.Control",
 
+	launched: false,
+	appReady: false,
+	paneStack: [],
+
 	components: [
 		{
 			name: "mainViews",
@@ -48,93 +52,55 @@ enyo.kind({
 
 		{
 			name: "appMenu",
-			kind: "gts.EventMenu",
-
-			showOnTop: true,
-			floating: true,
-			scrim: true,
-			scrimclasses: "onyx-scrim-translucent",
-
-			components: [
-				{
-					content: "Preferences",
-					ontap: "openPreferences"
-				}, {
-					classes: "onyx-menu-divider"
-				}, {
-					content: "Import Data",
-					ontap: "openImport"
-				}, {
-					content: "Export Data",
-					ontap: "openExport"
-				}, {
-					showing: false,
-					classes: "onyx-menu-divider"
-				}, {
-					showing: false,
-					content: "Search (NYI)",
-					ontap: "openSearch"
-				}, {
-					showing: false,
-					content: "Budget (NYI)",
-					ontap: "openBudget"
-				}, {
-					showing: false,
-					content: "Reports (NYI)",
-					ontap: "openReport"
-				}, {
-					showing: false,
-					classes: "onyx-menu-divider"
-				}, {
-					showing: false,
-					content: "Report Bug (NYI)",
-					ontap: "errorReport"
-				}, {
-					classes: "onyx-menu-divider"
-				}, {
-					content: "About",
-					ontap: "showAbout"
-				}
-			]
+			kind: "Checkbook.appmenu"
 		},
 
 		{
 			kind: "Signals",
 
+			//App startup handlers
+			ondeviceready: "deviceReady",
+			webworksready: "deviceReady",
+
+			//Android control handles
+			onbackbutton: "backHandler",
+			onmenubutton: "menuHandler",
+			onsearchbutton: "searchHandler",
+			onkeydown: "keyboardHandler",
+
+			//Internal Signals
 			viewAccount: "viewAccount",
 			modifyAccount: "showPanePopup",
 			modifyTransaction: "showPanePopup",
+
+			resetSystem: "resetSystem",
+
 			showBudget: "openBudget",
 			showSearch: "openSearch",
 			showReport: "openReport",
 
 			showPanePopup: "showPanePopup",
-
-			onbackbutton: "backHandler",
-			onmenubutton: "menuHandler",
-			onsearchbutton: "searchHandler",
-			onkeydown: "keyboardHandler"//for testing only
+			showPopup: "showPopup"
 		}
 	],
 
-	appReady: false,
-	paneStack: [],
+	deviceReady: function() {
 
-	/**
-	 * @protected
-	 * Builds UI
-	 */
-	rendered: function() {
+		if( this.launched ) {
 
-		this.inherited( arguments );
+			return;
+		}
+
+		this.launched = true;
+
+		if( !enyo.fetchAppInfo()['id'].match( "beta" ) ) {
+			//Disable log statements on production releases
+
+			enyo.setLogLevel( enyo.logging['levels']['error'] );
+		}
 
 		//Force touch scrolling
 		enyo.Scroller.touchScrolling = true;
-
-		//Bind phonegap events (should auto-bind)
-		enyo.dispatcher.listen( document, "backbutton" );
-		enyo.dispatcher.listen( document, "menubutton" );
-		enyo.dispatcher.listen( document, "searchbutton" );
 
 		//Start app
 		this.$['splash'].show();
@@ -151,7 +117,6 @@ enyo.kind({
 	keyboardHandler: function( inSender, inEvent ) {
 
 		if( !this.appReady ) { return; }
-
 
 		if( inEvent.which === 18 ) {
 			//alt key
@@ -403,20 +368,29 @@ enyo.kind({
 		}
 	},
 
-	/** PopUp Controls **/
+	resetSystem: function( inSender, inEvent ) {
 
-	showAbout: function() {
+		this.$['transactions'].unloadSystem();
 
-		this.showPopup( { "popup": "about" } );
+		Checkbook.globals.accountManager.updateAccountModTime();
+		this.notificationType = null;
+
+		enyo.asyncMethod(
+				this,
+				this.loadCheckbookStage2
+			);
 	},
 
-	showPopup: function( inSender ) {
+	/** PopUp Controls **/
 
-		var popup = this.$[inSender.popup];
+	showPopup: function( inSender, inEvent ) {
 
-		if( popup ) {
+		if( this.$[inSender.popup] ) {
 
-			popup.show();
+			this.$[inSender.popup].show();
+		} else if( this.$[inEvent.popup] ) {
+
+			this.$[inEvent.popup].show();
 		}
 	},
 
@@ -504,107 +478,28 @@ enyo.kind({
 		}
 	},
 
-	/** Checkbook.preferences **/
-
-	openPreferences: function() {
-
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
-				null,
-				{
-					name: "preferences",
-					kind: "Checkbook.preferences"
-				}
-			);
-	},
-
-	/** Checkbook.Import && Checkbook.Export **/
-
-	openExport: function( inSender, inEvent ) {
-
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
-				null,
-				{
-					name: "export",
-					kind: "Checkbook.export"
-				}
-			);
-	},
-
-	openImport: function( inSender, inEvent ) {
-
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
-				null,
-				{
-					name: "import",
-					kind: "Checkbook.import",
-					onFinish: enyo.bind( this, this.importComplete )
-				}
-			);
-	},
-
-	importComplete: function( inSender, importStatus ) {
-
-		if( importStatus['success'] === true ) {
-
-			this.$['transactions'].unloadSystem();
-
-			this.notificationType = null;
-
-			enyo.asyncMethod(
-					this,
-					this.loadCheckbookStage2
-				);
-		}
-	},
-
-	/** Checkbook.search **/
+	/** Checkbook.search.* **/
 
 	openSearch: function( inSender, inEvent ) {
 
-		this.log( arguments );
-		return;
-
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
+		this.showPanePopup(
 				null,
 				enyo.mixin(
 						inEvent,
 						{
 							name: "search",
 							kind: "Checkbook.search.pane",
-							onModify: "showPanePopup",
-							onFinish: enyo.bind(
-									this,
-									this.closeSearch,
-									( inEvent && enyo.isFunction( inEvent['onFinish'] ) ? inEvent['onFinish'] : null )
-								)
+							onFinish: enyo.bind( this, this.closeSearch )
 						}
 					)
 			);
 	},
 
-	closeSearch: function( doNext, inSender, inEvent ) {
+	closeSearch: function( inSender, inEvent ) {
 
 		if( inEvent['changes'] ) {
-			//Update account and transaction information
 
-			Checkbook.globals.accountManager.updateAccountModTime();
-
-			enyo.Signals.send( "accountChanged" );
-			this.$['transactions'].reloadSystem();
-		}
-
-		//If a prevous callback existed, call it with any arguments applied
-		if( enyo.isFunction( doNext ) ) {
-
-			doNext( inEvent['changes'] );
+			this.resetSystem();
 		}
 	},
 
@@ -612,7 +507,7 @@ enyo.kind({
 
 	openBudget: function( inSender, inEvent ) {
 
-		this.log( arguments );
+		this.log( "Budget", arguments );
 		return;
 
 		enyo.asyncMethod(
@@ -633,7 +528,7 @@ enyo.kind({
 
 	openReport: function( inSender, inEvent ) {
 
-		this.log( arguments );
+		this.log( "Report", arguments );
 		return;
 
 		enyo.asyncMethod(
