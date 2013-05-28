@@ -4,6 +4,7 @@ enyo.kind({
 	name: "Checkbook.app",
 	kind: "enyo.Control",
 
+	launched: false,
 	appReady: false,
 	paneStack: [],
 
@@ -57,6 +58,17 @@ enyo.kind({
 		{
 			kind: "Signals",
 
+			//App startup handlers
+			ondeviceready: "deviceReady",
+			webworksready: "deviceReady",
+
+			//Android control handles
+			onbackbutton: "backHandler",
+			onmenubutton: "menuHandler",
+			onsearchbutton: "searchHandler",
+			onkeydown: "keyboardHandler",
+
+			//Internal Signals
 			viewAccount: "viewAccount",
 			modifyAccount: "showPanePopup",
 			modifyTransaction: "showPanePopup",
@@ -68,30 +80,27 @@ enyo.kind({
 			showReport: "openReport",
 
 			showPanePopup: "showPanePopup",
-			showPopup: "showPopup",
-
-			onbackbutton: "backHandler",
-			onmenubutton: "menuHandler",
-			onsearchbutton: "searchHandler",
-			onkeydown: "keyboardHandler"//for testing only
+			showPopup: "showPopup"
 		}
 	],
 
-	/**
-	 * @protected
-	 * Builds UI
-	 */
-	rendered: function() {
+	deviceReady: function() {
 
-		this.inherited( arguments );
+		if( this.launched ) {
+
+			return;
+		}
+
+		this.launched = true;
+
+		if( !enyo.fetchAppInfo()['id'].match( "beta" ) ) {
+			//Disable log statements on production releases
+
+			enyo.setLogLevel( enyo.logging['levels']['error'] );
+		}
 
 		//Force touch scrolling
 		enyo.Scroller.touchScrolling = true;
-
-		//Bind phonegap events (should auto-bind)
-		enyo.dispatcher.listen( document, "backbutton" );
-		enyo.dispatcher.listen( document, "menubutton" );
-		enyo.dispatcher.listen( document, "searchbutton" );
 
 		//Start app
 		this.$['splash'].show();
@@ -108,7 +117,6 @@ enyo.kind({
 	keyboardHandler: function( inSender, inEvent ) {
 
 		if( !this.appReady ) { return; }
-
 
 		if( inEvent.which === 18 ) {
 			//alt key
