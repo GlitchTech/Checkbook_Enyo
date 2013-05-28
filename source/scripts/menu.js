@@ -16,6 +16,7 @@ enyo.kind({
 		}, {
 			classes: "onyx-menu-divider"
 		}, {
+			showing: false,
 			content: "Sync",
 			ontap: "openSync"
 		}, {
