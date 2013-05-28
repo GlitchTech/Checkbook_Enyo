@@ -16,10 +16,13 @@ enyo.kind({
 		}, {
 			classes: "onyx-menu-divider"
 		}, {
-			content: "Import Data",
+			content: "Sync",
+			ontap: "openSync"
+		}, {
+			content: "Import",
 			ontap: "openImport"
 		}, {
-			content: "Export Data",
+			content: "Export",
 			ontap: "openExport"
 		}, {
 			showing: false,
@@ -75,7 +78,27 @@ enyo.kind({
 			);
 	},
 
-	/** Checkbook.import && Checkbook.export **/
+	/** Checkbook.sync.* **/
+
+	openSync: function( inSender, inEvent ) {
+
+		enyo.Signals.send(
+				"showPanePopup",
+				{
+					name: "sync",
+					kind: "Checkbook.sync.main",
+					onFinish: enyo.bind( this, this.syncComplete )
+				}
+			);
+	},
+
+	syncComplete: function( inSender, importStatus ) {
+
+		if( importStatus['success'] === true ) {
+
+			enyo.Signals.send( "resetSystem", {} );
+		}
+	},
 
 	openImport: function( inSender, inEvent ) {
 
@@ -83,7 +106,7 @@ enyo.kind({
 				"showPanePopup",
 				{
 					name: "import",
-					kind: "Checkbook.import",
+					kind: "Checkbook.sync.import",
 					onFinish: enyo.bind( this, this.importComplete )
 				}
 			);
@@ -103,7 +126,7 @@ enyo.kind({
 				"showPanePopup",
 				{
 					name: "export",
-					kind: "Checkbook.export"
+					kind: "Checkbook.sync.export"
 				}
 			);
 	},

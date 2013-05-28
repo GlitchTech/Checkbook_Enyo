@@ -8,14 +8,15 @@ enyo.depends(
 	"splash.js",
 
 	"preferences.js",
-	"import.js",
-	"export.js",
 
 	"about.js",
 
 	"accounts/",
 	"transactions/",
+
 	"search/",
 	"budget/",
-	"reports/"
+	"reports/",
+
+	"sync/"
 );
