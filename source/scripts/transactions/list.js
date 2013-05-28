@@ -704,7 +704,6 @@ results = {
 	transactionCleared: function( inSender, inEvent ) {
 
 		this.vsCleared( null, inEvent );
-		//enyo.asyncMethod( this, this.vsCleared, null, inEvent );
 
 		//Don't 'click' the row
 		inEvent.preventDefault();
@@ -727,10 +726,18 @@ results = {
 		//Update cleared value
 		var cleared = this.transactions[index]['cleared'] !== 1;
 		this.transactions[index]['cleared'] = cleared ? 1 : 0;
-		Checkbook.globals.transactionManager.clearTransaction( this.transactions[index]['itemId'], cleared );
 
 		//Update row UI
 		this.$['list'].renderRow( index );
+
+		enyo.asyncMethod( this, this.transactionClearedDatabaseUpdate, inEvent, index, cleared );
+
+		return true;
+	},
+
+	transactionClearedDatabaseUpdate: function( inEvent, index, cleared ) {
+
+		Checkbook.globals.transactionManager.clearTransaction( this.transactions[index]['itemId'], cleared );
 
 		enyo.Signals.send(
 				"accountBalanceChanged",
@@ -746,8 +753,6 @@ results = {
 
 			inEvent.callback( cleared );
 		}
-
-		return true;
 	},
 
 	confirmDeletion: function( index ) {
