@@ -65,7 +65,7 @@ enyo.kind( {
 			onLoadStart: "showLoading",
 			onLoadStop: "hideLoading"
 		}, {
-			kind: "onyx.MoreToolbar",
+			kind: "Checkbook.MoreToolbar",
 			classes: "rich-brown",
 			components: [
 				{

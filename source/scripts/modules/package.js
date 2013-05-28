@@ -5,6 +5,7 @@ enyo.depends(
 	"defaultData.js",
 	"encryption.js",
 	"login.js",
+	"moreToolbar.js",
 	"pinChangePopup.js",
 	"sortOptionData.js",
 	"systemError.js"

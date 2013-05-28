@@ -65,7 +65,7 @@ enyo.kind( {
 			onCloneTransaction: "cloneTransaction"
 		}, {
 			name: "footer",
-			kind: "onyx.MoreToolbar",
+			kind: "Checkbook.MoreToolbar",
 			classes: "deep-green",
 			noStretch: true,
 			components: [
