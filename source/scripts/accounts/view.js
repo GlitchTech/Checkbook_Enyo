@@ -142,14 +142,19 @@ enyo.kind( {
 							]
 						}, {
 							kind: "onyx.Menu",
+							classes: "onyx-menu-wider",
 							floating: true,
 							scrim: true,
 							scrimclasses: "onyx-scrim-translucent",
 							components: [
 								{
-									content: "Toggle Hidden"
+									kind: "gts.MenuImageItem",
+									content: "Toggle Hidden",
+									src: "assets/menu_icons/search.png"
 								}, {
-									content: "Toggle Edit Mode"
+									kind: "gts.MenuImageItem",
+									content: "Toggle Edit Mode",
+									src: "assets/menu_icons/lock_closed.png"
 								}
 							]
 						}
