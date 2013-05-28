@@ -25,15 +25,13 @@ enyo.kind({
 			content: "Export",
 			ontap: "openExport"
 		}, {
-			showing: false,
 			classes: "onyx-menu-divider"
 		}, {
 			showing: false,
 			content: "Search",
 			ontap: "openSearch"
 		}, {
-			showing: false,
-			content: "Budget (NYI)",
+			content: "Budget",
 			ontap: "openBudget"
 		}, {
 			showing: false,
