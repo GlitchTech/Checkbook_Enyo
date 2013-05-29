@@ -27,14 +27,14 @@
 				}
 
 				//BB10 WebWorks event
-				enyo.dispatcher.listen( document, "ondeviceready" );
+				enyo.dispatcher.listen( document, "webworksready" );
 
 				new Checkbook.app().renderInto( document.body );
 
 				if( !enyo.platform.touch ) {
 					//Not a mobile device
 
-					enyo.Signals.send( "", {} );
+					enyo.Signals.send( "ondeviceready", {} );
 				}
 			</script>
 		</div>
