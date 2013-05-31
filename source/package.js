@@ -4,9 +4,7 @@ enyo.depends(
 	"$lib/g11n",
 	"$lib/layout",
 
-	//To theme Onyx using Theme.less, swap commented lines and follow the steps described in Theme.less
-	"$lib/onyx",
-	//"$lib/onyx/source",
+	"$lib/onyx",//"$lib/onyx/source",//(for using onyx .less files)
 	"Theme.less",
 
 	"$lib/SQLitePlugin.android.js",

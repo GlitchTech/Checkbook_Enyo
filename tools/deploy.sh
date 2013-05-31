@@ -12,6 +12,9 @@ ENYO="$TOOLS/../enyo"
 # deploy script location
 DEPLOY="$ENYO/tools/deploy.js"
 
+# release director location
+RELEASEDIR="$TOOLS/../deploy/gutoc"
+
 # Parse command line options.
 while getopts "hro:" OPTION; do
 	case $OPTION in
