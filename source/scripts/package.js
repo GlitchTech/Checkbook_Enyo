@@ -1,7 +1,7 @@
 /* Copyright © 2011-2012, GlitchTech Science */
 
 enyo.depends(
-	"modules/",
+	"start.js",
 
 	"checkbook.js",
 	"menu.js",
@@ -10,6 +10,8 @@ enyo.depends(
 	"preferences.js",
 
 	"about.js",
+
+	"modules/",
 
 	"accounts/",
 	"transactions/",

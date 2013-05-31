@@ -4,7 +4,6 @@ enyo.kind({
 	name: "Checkbook.app",
 	kind: "enyo.Control",
 
-	launched: false,
 	appReady: false,
 	paneStack: [],
 
@@ -62,7 +61,7 @@ enyo.kind({
 			ondeviceready: "deviceReady",
 			webworksready: "deviceReady",
 
-			//Android control handles
+			//Application control handles
 			onbackbutton: "backHandler",
 			onmenubutton: "menuHandler",
 			onsearchbutton: "searchHandler",
@@ -84,31 +83,13 @@ enyo.kind({
 		}
 	],
 
+	/** Start Up Event **/
+
 	deviceReady: function() {
 
-		if( this.launched ) {
+		if( this.$['splash'] ) {
 
-			return;
-		}
-
-		this.launched = true;
-
-		if( !enyo.fetchAppInfo()['id'].match( "beta" ) ) {
-			//Disable log statements on production releases
-
-			enyo.setLogLevel( enyo.logging['levels']['error'] );
-		}
-
-		//Force touch scrolling
-		enyo.Scroller.touchScrolling = true;
-
-		//Start app
-		this.$['splash'].show();
-
-		if( enyo.platform.android || enyo.platform.androidChrome ) {
-
-			//Use Android bindings instead of UI buttons
-			this.$['menubar'].hide();
+			this.$['splash'].show();
 		}
 	},
 
