@@ -20,23 +20,6 @@
 	<body class="enyo-unselectable">
 		<div class="body-temp">
 			<h1>Loading Checkbook</h1>
-			<script>
-				if( !window.Checkbook.app ) {
-
-					alert( "No application build found." );
-				}
-
-				//BB10 WebWorks event
-				enyo.dispatcher.listen( document, "webworksready" );
-
-				new Checkbook.app().renderInto( document.body );
-
-				if( !enyo.platform.touch ) {
-					//Not a mobile device
-
-					enyo.Signals.send( "ondeviceready", {} );
-				}
-			</script>
 		</div>
 	</body>
 </html>
