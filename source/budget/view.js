@@ -1,0 +1,558 @@
+/* Copyright © 2013, GlitchTech Science */
+
+enyo.kind({
+	name: "Checkbook.budget.view",
+	layoutKind: "FittableRowsLayout",
+
+	sort: 0,
+	budgets: [],
+
+	published: {
+		accountObj: {}
+	},
+
+	events: {
+		onFinish: ""
+	},
+
+	components: [
+		{
+			kind: "onyx.Toolbar",
+			layoutKind: "enyo.FittableColumnsLayout",
+			noStretch: true,
+			components: [
+				{//Swap between icon for account & spinner when loading data in the background.
+					name: "systemIcon",
+					kind: "enyo.Image",
+					src: "assets/icon_4.png",
+					classes: "img-icon",
+					style: "margin: 0 15px 0 0;"
+				}, {
+					name: "loadingSpinner",
+					kind: "onyx.Spinner",
+					showing: false,
+					classes: "img-icon",
+					style: "margin: 0 15px 0 0;"
+				}, {
+					content: "Budget System",
+					classes: "enyo-text-ellipsis text-left",
+					fit: true
+				}, {
+					name: "totalCurrent",
+					style: "margin-top: -5px;"
+				}, {
+					name: "totalProgress",
+					kind: "onyx.ProgressBar",
+
+					classes: "big",
+					style: "width: 200px; margin-left: 10px; margin-right: 10px;",
+
+					minimum: 0,
+					maximum: 100,
+					position: 0
+				}, {
+					name: "totalMax",
+					style: "margin-top: -5px;"
+				}
+			]
+		},
+
+		{
+			name: "entries",
+
+			fit: true,
+			/*
+			kind: "ReorderableVirtualList",
+
+			classes: "light narrow-column",//Should this be narrow-column?
+			style: "padding-left: 0px; padding-right: 0px;",
+			flex: 1,
+
+			reorderable: true,
+
+			onReorder: "reorder",
+			onSetupRow: "setupRow",
+			onAcquirePage: "acquirePage",
+
+			components: [
+				{
+					kind: enyo.SwipeableItem,
+
+					style: "padding-right: 7px;",
+
+					tapHighlight: true,
+					ontap: "tapped",
+					onConfirm: "deleted",
+
+					components: [
+						{
+							layoutKind: enyo.HFlexLayout,
+							align: "center",
+
+							components: [
+								{
+									name: "category",
+
+									flex: 1
+								}, {
+									name: "current"
+								}, {
+									content: "of",
+									style: "padding-left: 5px; padding-right: 5px;"
+								}, {
+									name: "total"
+								}
+							]
+						}, {
+							layoutKind: enyo.HFlexLayout,
+							align: "center",
+
+							components: [
+								{
+									name: "progress",
+									kind: "onyx.ProgressBar",
+
+									flex: 1,
+									classes: "big",
+									style: "margin-right: 10px;",
+
+									minimum: 0,
+									maximum: 100,
+									position: 0
+								}, {
+									name: "config",
+									kind: enyo.Image,
+									src: "assets/config.png"
+								}, {
+									name: "search",
+									kind: enyo.Image,
+									src: "assets/search.png"
+								}
+							]
+						}
+					]
+				}
+			]
+			*/
+		},
+
+		{
+			kind: "onyx.Toolbar",
+			layoutKind: "enyo.FittableColumnsLayout",
+			classes: "tardis-blue",
+			noStretch: true,
+			components: [
+				{
+					name: "backButton",
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "doFinish",
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/back.png"
+						}
+					]
+				}, {
+					kind: "onyx.MenuDecorator",
+					components: [
+						{
+							kind: "onyx.Button",
+							classes: "padding-none transparent",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/sort.png"
+								}
+							]
+						}, {
+							name: "sortMenu",
+							kind: "gts.SelectedMenu",
+
+							classes: "bordered-menu",
+							floating: true,
+							scrim: true,
+							scrimclasses: "onyx-scrim-translucent",
+
+							style: "min-width: 225px;",
+
+							onChange: "transactionSortingChanged",
+
+							components: budgetSortOptions
+						}
+					]
+				}
+			/*
+				{
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							caption: "Back",
+							classes: "enyo-grouped-toolbutton-dark",
+							ontap: "doFinish"
+						}, {
+							icon: "assets/menu_icons/sort.png",
+							classes: "enyo-grouped-toolbutton-dark",
+							ontap: "sortButtontaped"
+						}
+					]
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							ontap: "dateBack",
+							classes: "enyo-grouped-toolbutton-dark",
+							icon: "assets/menu_icons/back.png"
+						}
+					]
+				}, {
+					name: "date",
+					kind: enyo.DatePicker,
+
+					classes: "enyo-grouped-toolbutton-dark",
+
+					label: "",
+					hideDay: true,
+					onChange: "dateChanged"
+				}, {
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							ontap: "dateForward",
+							classes: "enyo-grouped-toolbutton-dark",
+							icon: "assets/menu_icons/forward.png"
+						}
+					]
+				}, {
+					kind: enyo.Spacer,
+					flex: 1
+				}, {
+					kind: enyo.ToolButtonGroup,
+					components: [
+						{
+							name: "editModeToggle",
+							toggling: true,
+							classes: "enyo-grouped-toolbutton-dark",
+							icon: "assets/menu_icons/lock.png",
+							ontap: "toggleEdit"
+						}, {
+							icon: "assets/menu_icons/new.png",
+							classes: "enyo-grouped-toolbutton-dark",
+							ontap: "addBudget"
+						}
+					]
+				}
+		*/
+			]
+		},
+
+		{
+			name: "manager",
+			//kind: "Checkbook.budget.manager"
+		},
+
+		{
+			name: "modify",
+			//kind: "Checkbook.budget.modify",
+			onFinish: "modifyComplete"
+		}
+	],
+
+	/**
+	 * @protected
+	 * @constructs
+	 */
+	constructor: function() {
+
+		// Run our default construction
+		this.inherited( arguments );
+
+		// Setup listing of bound methods
+		// Cuts down on memory usage spikes, since bind() creates a new method every call, but causes more initial memory to be allocated
+		this.bound = {
+			modifyComplete: enyo.bind( this, this.modifyComplete )
+		};
+	},
+
+	rendered: function() {
+
+		this.inherited( arguments );
+
+		this.budgets = [];
+return;
+		this.buildHeader();
+	},
+
+	colorize: function( inSender, progress ) {
+
+		//blue from  0% to 24.99%
+		inSender.addRemoveClass( "blue", ( progress < 25 ) );
+		//green from 25% to 74.99%
+		inSender.addRemoveClass( "green", ( progress >= 25 && progress < 75 ) );
+		//yellow from 75% to 99.99%
+		inSender.addRemoveClass( "yellow", ( progress >= 75 && progress <= 100 ) );
+		//red over 100%
+		inSender.addRemoveClass( "red", ( progress > 100 ) );
+	},
+
+	menuItemClick: function() {
+		//All menu items come here
+
+		var inSender = arguments[arguments.length === 2 ? 0 : 1];
+
+		if( inSender.menuParent.toLowerCase() === "budgetsortoptions" ) {
+			//Sort menu
+
+			console.log( inSender );
+
+			if( this.sort === inSender.value ) {
+				//No change, abort
+				return;
+			}
+
+			this.sort = inSender.value;
+
+			this.budgets = [];
+			this.$['entries'].punt();
+		}
+	},
+
+	/** Header Controls **/
+
+	buildHeader: function() {
+
+		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
+	},
+
+	buildHeaderHandler: function( result ) {
+
+		//result['budgetCount']
+
+		var progress = result['spent'] / result['spending_limit'] * 100;
+
+		this.$['totalCurrent'].setContent( formatAmount( result['spent'] ) );
+		this.$['totalMax'].setContent( formatAmount( result['spending_limit'] ) );
+
+		this.$['totalProgress'].animateProgressTo( progress );
+
+		this.colorize( this.$['totalProgress'], progress );
+		this.colorize( this.$['totalCurrent'], progress );
+	},
+
+	/** Footer Controls **/
+
+	dateBack: function() {
+
+		var date = this.$['date'].getValue();
+
+		date.setDate( 5 );
+		date.setMonth( date.getMonth() - 1 );
+
+		this.$['date'].setValue( date );
+
+		this.dateChanged( null, date );
+	},
+
+	dateForward: function() {
+
+		var date = this.$['date'].getValue();
+
+		date.setDate( 5 );
+		date.setMonth( date.getMonth() + 1 );
+
+		this.$['date'].setValue( date );
+
+		this.dateChanged( null, date );
+	},
+
+	dateChanged: function( inSender, date ) {
+
+		this.budgets = [];
+		this.$['entries'].punt();
+
+		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeader ) } );
+	},
+
+	toggleEdit: function() {
+
+		if( this.$['editModeToggle'].getDepressed() ) {
+
+			this.$['editModeToggle'].setIcon( "assets/menu_icons/unlock.png" );
+		} else {
+
+			this.$['editModeToggle'].setIcon( "assets/menu_icons/lock.png" );
+		}
+
+		this.$['entries'].refresh();
+	},
+
+	addBudget: function() {
+
+		this.$['modify'].openAtCenter();
+	},
+
+	/** List Control **/
+
+	reorder: function( inSender, toIndex, fromIndex ) {
+
+		if( toIndex != fromIndex && toIndex > -1 && toIndex < this.budgets.length ) {
+
+			var temp = this.budgets.splice( fromIndex, 1 );
+			var bottom = this.budgets.slice( toIndex );
+
+			this.budgets.length = toIndex;
+			this.budgets.push.apply( this.budgets, temp );
+			this.budgets.push.apply( this.budgets, bottom );
+
+			var qryOrder = [];
+
+			for( var i = 0; i < this.budgets.length; i++ ) {
+
+				qryOrder.push(
+						Checkbook.globals.gts_db.getUpdate(
+								"budgets",
+								{ "budgetOrder": i },
+								{ "budgetId": this.budgets[i]['budgetId'] }
+							)
+					);
+			}
+
+			Checkbook.globals.gts_db.queries( qryOrder );
+
+			this.sort = 0;
+
+			this.$['entries'].refresh();
+		}
+	},
+
+	tapped: function( inSender, inEvent, rowIndex ) {
+
+		var row = this.budgets[rowIndex];
+
+		if( row ) {
+
+			if( this.$['editModeToggle'].getDepressed() ) {
+
+				this.$['modify'].openAtCenter( row );
+			} else {
+
+				enyo.Signals.send(
+						"showSearch",
+						{
+							"category": row['category'],
+							"category2": row['category2'],
+							"dateStart": this.$['date'].getValue().setStartOfMonth(),
+							"dateEnd": this.$['date'].getValue().setEndOfMonth(),
+							"onFinish": enyo.bind( this, this.dateChanged, null, this.$['date'].getValue() )
+						}
+					);
+			}
+		}
+	},
+
+	deleted: function( inSender, rowIndex ) {
+
+		var row = this.budgets[rowIndex];
+
+		if( row ) {
+
+			this.$['manager'].deleteBudget( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
+		}
+	},
+
+	modifyComplete: function() {
+
+		this.budgets = [];
+		this.$['entries'].punt();
+
+		this.buildHeader();
+	},
+
+	setupRow: function( inSender, inIndex ) {
+
+		var row = this.budgets[inIndex];
+
+		if( row ) {
+
+			var progress = 100 * row['spent'] / row['spending_limit'];
+
+			this.$['category'].setContent( row['category'] + ( row['category2'] !== "%" ? " >> " + row['category2'] : "" ) );
+
+			this.$['current'].setContent( formatAmount( row['spent'] ) );
+			this.$['total'].setContent( formatAmount( row['spending_limit'] ) );
+
+			this.colorize( this.$['progress'], progress );
+			this.colorize( this.$['current'], progress );
+
+			this.$['progress'].animateProgressTo( progress );
+
+			this.$['search'].setShowing( !this.$['editModeToggle'].getDepressed() );
+			this.$['config'].setShowing( this.$['editModeToggle'].getDepressed() );
+
+			return true;
+		}
+	},
+
+	acquirePage: function( inSender, inPage ) {
+
+		var index = inPage * inSender.getPageSize();
+
+		if( index < 0 ) {
+			//No indexes below zero, don't bother calling
+
+			return;
+		}
+
+		if( !this.budgets[index] ) {
+
+			this.loadingDisplay( true );
+
+			this.$['manager'].fetchBudgets(
+					this.$['date'].getValue().setStartOfMonth(),
+					this.$['date'].getValue().setEndOfMonth(),
+					{
+						"onSuccess": enyo.bind( this, this.buildPage, index )
+					},
+					this.sort,
+					inSender.getPageSize(),//Limit
+					index//Offset
+				);
+		}
+	},
+
+	buildPage: function( offset, results ) {
+		//Parse page data
+
+		for( var i = 0; i < results.length; i++ ) {
+/*
+results = {
+	budgetId: 2
+	budgetOrder: null
+	category: "Auto & Transport"
+	category2: "Gas & Fuel"
+	rollOver: null
+	span: null
+	spending_limit: 30
+	spent: 98.4
+}
+*/
+			this.budgets[offset + i] =  results[i];
+
+			this.budgets[offset + i]['category'] = gts.String.dirtyString( this.budgets[offset + i]['category'] );
+			this.budgets[offset + i]['category2'] = gts.String.dirtyString( this.budgets[offset + i]['category2'] );
+		}
+
+		this.$['entries'].refresh();
+
+		this.loadingDisplay( false );
+	},
+
+	loadingDisplay: function( status ) {
+
+		this.$['loadingSpinner'].setShowing( status );
+		this.$['systemIcon'].setShowing( !status );
+	}
+});
