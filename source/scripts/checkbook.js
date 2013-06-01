@@ -57,6 +57,17 @@ enyo.kind({
 		{
 			kind: "Signals",
 
+			//App startup handlers
+			ondeviceready: "deviceReady",
+			webworksready: "deviceReady",
+
+			//Application control handles
+			onbackbutton: "backHandler",
+			onmenubutton: "menuHandler",
+			onsearchbutton: "searchHandler",
+			onkeydown: "keyboardHandler",
+
+			//Internal Signals
 			viewAccount: "viewAccount",
 			modifyAccount: "showPanePopup",
 			modifyTransaction: "showPanePopup",
@@ -68,38 +79,17 @@ enyo.kind({
 			showReport: "openReport",
 
 			showPanePopup: "showPanePopup",
-			showPopup: "showPopup",
-
-			onbackbutton: "backHandler",
-			onmenubutton: "menuHandler",
-			onsearchbutton: "searchHandler",
-			onkeydown: "keyboardHandler"//for testing only
+			showPopup: "showPopup"
 		}
 	],
 
-	/**
-	 * @protected
-	 * Builds UI
-	 */
-	rendered: function() {
+	/** Start Up Event **/
 
-		this.inherited( arguments );
+	deviceReady: function() {
 
-		//Force touch scrolling
-		enyo.Scroller.touchScrolling = true;
+		if( this.$['splash'] ) {
 
-		//Bind phonegap events (should auto-bind)
-		enyo.dispatcher.listen( document, "backbutton" );
-		enyo.dispatcher.listen( document, "menubutton" );
-		enyo.dispatcher.listen( document, "searchbutton" );
-
-		//Start app
-		this.$['splash'].show();
-
-		if( enyo.platform.android || enyo.platform.androidChrome ) {
-
-			//Use Android bindings instead of UI buttons
-			this.$['menubar'].hide();
+			this.$['splash'].show();
 		}
 	},
 
@@ -108,7 +98,6 @@ enyo.kind({
 	keyboardHandler: function( inSender, inEvent ) {
 
 		if( !this.appReady ) { return; }
-
 
 		if( inEvent.which === 18 ) {
 			//alt key

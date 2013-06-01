@@ -374,7 +374,10 @@ enyo.kind({
 				"progress": 25
 			});
 
-		var initialRequest = gapi.client.drive.files.list();
+		var initialRequest = gapi.client.drive.files.list( {
+				'maxResults': 15
+			});
+
 		this.retrievePageOfFiles( initialRequest, [] );
 	},
 
@@ -386,15 +389,21 @@ enyo.kind({
 
 				result = result.concat( resp.items );
 
+				var progress = self.$['progress'].getProgress() + 5;
+
+				self.$['progress'].setProgress( progress > 75 ? 75 : progress );
+				self.$['progress'].setMessage( result.length + " items retrieved..." );
+
 				var nextPageToken = resp.nextPageToken;
 
 				if( nextPageToken ) {
 
 					request = gapi.client.drive.files.list( {
+							'maxResults': 15,
 							'pageToken': nextPageToken
 						});
 
-					this.retrievePageOfFiles( request, result );
+					self.retrievePageOfFiles( request, result );
 				} else {
 
 					self.rendersheetList( result );
@@ -428,7 +437,15 @@ enyo.kind({
 		this.$['instructions'].hide();
 		this.$['sheetList'].show();
 
-		this.allSheetsList = gapiSheetList;
+		for( var i = 0; i < gapiSheetList.length; i++ ) {
+
+			if( gapiSheetList[i]['mimeType'] !== "application/vnd.google-apps.folder" ) {
+
+				this.allSheetsList.push( gapiSheetList[i] );
+			}
+		}
+
+		this.$['progress'].setProgress( 95 );
 
 		this.$['sheetList'].setCount( this.allSheetsList.length );
 
@@ -524,7 +541,7 @@ enyo.kind({
 		this.errorCount = 0;
 
 		try {
-			//Convert to Phonegap API
+			//TODO Convert to Phonegap API
 
 			enyo.windows.blockScreenTimeout( true );
 			this.log( "Window: blockScreenTimeout: true" );
@@ -1174,6 +1191,7 @@ enyo.kind({
 	closeImport: function( success ) {
 
 		try {
+			//TODO Convert to Phonegap API
 
 			enyo.windows.blockScreenTimeout( false );
 			this.log( "Window: blockScreenTimeout: false" );
