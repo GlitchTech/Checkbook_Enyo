@@ -1,8 +1,10 @@
 /* Copyright © 2013, GlitchTech Science */
 
 enyo.depends(
+	//Styles
 	"Theme.less",
 
+	//Scripts
 	"start.js",
 
 	"checkbook.js",
@@ -13,7 +15,8 @@ enyo.depends(
 
 	"about.js",
 
-	"modules/",
+	//Modules
+	"misc/",
 
 	"accounts/",
 	"transactions/",
