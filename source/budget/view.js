@@ -9,6 +9,7 @@ enyo.kind({
 
 	sort: 0,
 	budgets: [],
+	editMode: false,
 
 	published: {
 		accountObj: {}
@@ -54,7 +55,7 @@ enyo.kind({
 					maximum: 100,
 					position: 0,
 
-					classes: "big",
+					classes: "big margin-vert-none",
 					style: "width: 200px; margin-left: 10px; margin-right: 10px;"
 				}, {
 					name: "totalMax"
@@ -63,7 +64,7 @@ enyo.kind({
 				{
 					name: "editOverlay",
 					content: "Edit Budgets",
-					classes: "enyo-fit text-center header-overlay",
+					classes: "enyo-fit text-center header-overlay rounded",
 					showing: false
 				}
 			]
@@ -409,15 +410,11 @@ enyo.kind({
 
 	toggleEdit: function() {
 
-		if( this.$['editModeToggle'].getDepressed() ) {
+		this.editMode = !this.editMode;
 
-			this.$['editModeToggle'].setIcon( "assets/menu_icons/unlock.png" );
-		} else {
-
-			this.$['editModeToggle'].setIcon( "assets/menu_icons/lock.png" );
-		}
-
-		this.$['entries'].refresh();
+		this.$['editModeButtonIcon'].setSrc( this.editMode ? "assets/menu_icons/lock_open.png" : "assets/menu_icons/lock_closed.png" );
+		this.$['editOverlay'].setShowing( this.editMode );
+		this.$['header'].reflow();
 	},
 
 	addBudget: function() {

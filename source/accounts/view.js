@@ -48,7 +48,7 @@ enyo.kind( {
 				}, {
 					name: "editOverlay",
 					content: "Edit Accounts",
-					classes: "enyo-fit text-center header-overlay",
+					classes: "enyo-fit text-center header-overlay rounded",
 					showing: false
 				}
 			]
