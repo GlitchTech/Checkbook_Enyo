@@ -11,7 +11,6 @@
  * @requires Checkbook.encrypt
  */
 enyo.kind({
-
 	name: "Checkbook.accounts.manager",
 	kind: enyo.Component,
 

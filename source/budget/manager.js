@@ -1,7 +1,6 @@
 /* Copyright © 2013, GlitchTech Science */
 
 enyo.kind({
-
 	name: "Checkbook.budget.manager",
 	kind: enyo.Component,
 

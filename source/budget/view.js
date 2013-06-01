@@ -3,6 +3,9 @@
 enyo.kind({
 	name: "Checkbook.budget.view",
 	layoutKind: "FittableRowsLayout",
+	classes: "enyo-fit budget-view",
+
+	style: "height: 100%;",
 
 	sort: 0,
 	budgets: [],
@@ -17,6 +20,7 @@ enyo.kind({
 
 	components: [
 		{
+			name: "header",
 			kind: "onyx.Toolbar",
 			layoutKind: "enyo.FittableColumnsLayout",
 			noStretch: true,
@@ -38,21 +42,29 @@ enyo.kind({
 					classes: "enyo-text-ellipsis text-left",
 					fit: true
 				}, {
-					name: "totalCurrent",
-					style: "margin-top: -5px;"
+					name: "totalCurrent"
 				}, {
 					name: "totalProgress",
 					kind: "onyx.ProgressBar",
 
-					classes: "big",
-					style: "width: 200px; margin-left: 10px; margin-right: 10px;",
+					animateStripes: false,
+					showStripes: false,
 
 					minimum: 0,
 					maximum: 100,
-					position: 0
+					position: 0,
+
+					classes: "big",
+					style: "width: 200px; margin-left: 10px; margin-right: 10px;"
 				}, {
-					name: "totalMax",
-					style: "margin-top: -5px;"
+					name: "totalMax"
+				},
+
+				{
+					name: "editOverlay",
+					content: "Edit Budgets",
+					classes: "enyo-fit text-center header-overlay",
+					showing: false
 				}
 			]
 		},
@@ -61,6 +73,8 @@ enyo.kind({
 			name: "entries",
 
 			fit: true,
+
+			content: "TEST"
 			/*
 			kind: "ReorderableVirtualList",
 
@@ -137,7 +151,7 @@ enyo.kind({
 		},
 
 		{
-			kind: "onyx.Toolbar",
+			kind: "Checkbook.MoreToolbar",
 			layoutKind: "enyo.FittableColumnsLayout",
 			classes: "tardis-blue",
 			noStretch: true,
@@ -145,7 +159,6 @@ enyo.kind({
 				{
 					name: "backButton",
 					kind: "onyx.Button",
-					classes: "padding-none transparent",
 					ontap: "doFinish",
 					components: [
 						{
@@ -155,10 +168,10 @@ enyo.kind({
 					]
 				}, {
 					kind: "onyx.MenuDecorator",
+					classes: "padding-none margin-vert-none",
 					components: [
 						{
 							kind: "onyx.Button",
-							classes: "padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -176,85 +189,85 @@ enyo.kind({
 
 							style: "min-width: 225px;",
 
-							onChange: "transactionSortingChanged",
+							onChange: "budgetSortingChanged",
 
 							components: budgetSortOptions
 						}
 					]
-				}
-			/*
+				},
+
 				{
-					kind: enyo.ToolButtonGroup,
+					classes: "text-middle text-center padding-none margin-vert-none",
+					fit: true,
+					unmoveable: true,
 					components: [
 						{
-							caption: "Back",
-							classes: "enyo-grouped-toolbutton-dark",
-							ontap: "doFinish"
-						}, {
-							icon: "assets/menu_icons/sort.png",
-							classes: "enyo-grouped-toolbutton-dark",
-							ontap: "sortButtontaped"
-						}
-					]
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
-					kind: enyo.ToolButtonGroup,
-					components: [
-						{
+							kind: "onyx.Button",
 							ontap: "dateBack",
-							classes: "enyo-grouped-toolbutton-dark",
-							icon: "assets/menu_icons/back.png"
-						}
-					]
-				}, {
-					name: "date",
-					kind: enyo.DatePicker,
-
-					classes: "enyo-grouped-toolbutton-dark",
-
-					label: "",
-					hideDay: true,
-					onChange: "dateChanged"
-				}, {
-					kind: enyo.ToolButtonGroup,
-					components: [
-						{
-							ontap: "dateForward",
-							classes: "enyo-grouped-toolbutton-dark",
-							icon: "assets/menu_icons/forward.png"
-						}
-					]
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
-					kind: enyo.ToolButtonGroup,
-					components: [
-						{
-							name: "editModeToggle",
-							toggling: true,
-							classes: "enyo-grouped-toolbutton-dark",
-							icon: "assets/menu_icons/lock.png",
-							ontap: "toggleEdit"
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/back.png"
+								}
+							]
 						}, {
-							icon: "assets/menu_icons/new.png",
-							classes: "enyo-grouped-toolbutton-dark",
-							ontap: "addBudget"
+							name: "date",
+							kind: "onyx.DatePicker",
+
+							classes: "padding-none date-picker",
+							style: "display: inline-block;",
+
+							onchange: "dateChanged",
+							dayHidden: true
+						}, {
+							kind: "onyx.Button",
+							ontap: "dateForward",
+							components: [
+								{
+									kind: "onyx.Icon",
+									src: "assets/menu_icons/forward.png"
+								}
+							]
+						}
+					]
+				},
+
+				{
+					kind: "onyx.Button",
+
+					ontap: "toggleEdit",
+
+					components: [
+						{
+							name: "editModeButtonIcon",
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/lock_closed.png",
+							classes: "onyx-icon-button"
+						}
+					]
+				}, {
+					name: "addAccountButton",
+					kind: "onyx.Button",
+
+					ontap: "addBudget",
+
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/new.png"
 						}
 					]
 				}
-		*/
 			]
 		},
 
 		{
 			name: "manager",
-			//kind: "Checkbook.budget.manager"
+			kind: "Checkbook.budget.manager"
 		},
 
 		{
+			//Change to panel
 			name: "modify",
 			//kind: "Checkbook.budget.modify",
 			onFinish: "modifyComplete"
@@ -271,7 +284,6 @@ enyo.kind({
 		this.inherited( arguments );
 
 		// Setup listing of bound methods
-		// Cuts down on memory usage spikes, since bind() creates a new method every call, but causes more initial memory to be allocated
 		this.bound = {
 			modifyComplete: enyo.bind( this, this.modifyComplete )
 		};
@@ -282,42 +294,61 @@ enyo.kind({
 		this.inherited( arguments );
 
 		this.budgets = [];
-return;
+
 		this.buildHeader();
 	},
 
-	colorize: function( inSender, progress ) {
+	colorText: function( inSender, progress ) {
 
 		//blue from  0% to 24.99%
-		inSender.addRemoveClass( "blue", ( progress < 25 ) );
+		inSender.addRemoveClass( "text-onyx-blue", ( progress < 25 ) );
 		//green from 25% to 74.99%
-		inSender.addRemoveClass( "green", ( progress >= 25 && progress < 75 ) );
+		inSender.addRemoveClass( "text-onyx-green", ( progress >= 25 && progress < 75 ) );
 		//yellow from 75% to 99.99%
-		inSender.addRemoveClass( "yellow", ( progress >= 75 && progress <= 100 ) );
+		inSender.addRemoveClass( "text-onyx-yellow", ( progress >= 75 && progress <= 100 ) );
 		//red over 100%
-		inSender.addRemoveClass( "red", ( progress > 100 ) );
+		inSender.addRemoveClass( "text-onyx-red", ( progress > 100 ) );
 	},
 
-	menuItemClick: function() {
-		//All menu items come here
+	colorBar: function( inSender, progress ) {
 
-		var inSender = arguments[arguments.length === 2 ? 0 : 1];
+		var barClass = "";
 
-		if( inSender.menuParent.toLowerCase() === "budgetsortoptions" ) {
-			//Sort menu
+		if( progress < 25 ) {
+			//blue from  0% to 24.99%
 
-			console.log( inSender );
+			barClass = "onyx-blue";
+		} else if( progress >= 25 && progress < 75 ) {
+			//green from 25% to 74.99%
 
-			if( this.sort === inSender.value ) {
-				//No change, abort
-				return;
-			}
+			barClass = "onyx-green";
+		} else if( progress >= 75 && progress <= 100 ) {
+			//yellow from 75% to 99.99%
 
-			this.sort = inSender.value;
+			barClass = "onyx-yellow";
+		} else if( progress > 100 ) {
+			//red over 100%
 
-			this.budgets = [];
-			this.$['entries'].punt();
+			barClass = "onyx-red";
 		}
+
+		inSender.setBarClasses( barClass );
+	},
+
+	budgetSortingChanged: function() {
+
+		this.log( arguments );
+		return;
+
+		if( this.sort === inSender.value ) {
+			//No change, abort
+			return;
+		}
+
+		this.sort = inSender.value;
+
+		this.budgets = [];
+		this.$['entries'].punt();
 	},
 
 	/** Header Controls **/
@@ -332,14 +363,17 @@ return;
 		//result['budgetCount']
 
 		var progress = result['spent'] / result['spending_limit'] * 100;
+		progress = progress || 0;
 
 		this.$['totalCurrent'].setContent( formatAmount( result['spent'] ) );
 		this.$['totalMax'].setContent( formatAmount( result['spending_limit'] ) );
 
 		this.$['totalProgress'].animateProgressTo( progress );
 
-		this.colorize( this.$['totalProgress'], progress );
-		this.colorize( this.$['totalCurrent'], progress );
+		this.colorBar( this.$['totalProgress'], progress );
+		this.colorText( this.$['totalCurrent'], progress );
+
+		this.$['header'].reflow();
 	},
 
 	/** Footer Controls **/
@@ -484,8 +518,8 @@ return;
 			this.$['current'].setContent( formatAmount( row['spent'] ) );
 			this.$['total'].setContent( formatAmount( row['spending_limit'] ) );
 
-			this.colorize( this.$['progress'], progress );
-			this.colorize( this.$['current'], progress );
+			this.colorBar( this.$['progress'], progress );
+			this.colorText( this.$['current'], progress );
 
 			this.$['progress'].animateProgressTo( progress );
 
