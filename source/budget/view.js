@@ -295,7 +295,7 @@ enyo.kind({
 
 		this.budgets = [];
 
-		this.buildHeader();
+		this.dateChanged();
 	},
 
 	colorText: function( inSender, progress ) {
@@ -335,28 +335,7 @@ enyo.kind({
 		inSender.setBarClasses( barClass );
 	},
 
-	budgetSortingChanged: function() {
-
-		this.log( arguments );
-		return;
-
-		if( this.sort === inSender.value ) {
-			//No change, abort
-			return;
-		}
-
-		this.sort = inSender.value;
-
-		this.budgets = [];
-		this.$['entries'].punt();
-	},
-
 	/** Header Controls **/
-
-	buildHeader: function() {
-
-		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
-	},
 
 	buildHeaderHandler: function( result ) {
 
@@ -378,6 +357,22 @@ enyo.kind({
 
 	/** Footer Controls **/
 
+	budgetSortingChanged: function() {
+
+		this.log( arguments );
+		return;
+
+		if( this.sort === inSender.value ) {
+			//No change, abort
+			return;
+		}
+
+		this.sort = inSender.value;
+
+		this.budgets = [];
+		//this.$['entries'].punt();
+	},
+
 	dateBack: function() {
 
 		var date = this.$['date'].getValue();
@@ -386,8 +381,9 @@ enyo.kind({
 		date.setMonth( date.getMonth() - 1 );
 
 		this.$['date'].setValue( date );
+		this.$['date'].valueChanged();
 
-		this.dateChanged( null, date );
+		this.dateChanged();
 	},
 
 	dateForward: function() {
@@ -398,16 +394,17 @@ enyo.kind({
 		date.setMonth( date.getMonth() + 1 );
 
 		this.$['date'].setValue( date );
+		this.$['date'].valueChanged();
 
-		this.dateChanged( null, date );
+		this.dateChanged();
 	},
 
-	dateChanged: function( inSender, date ) {
+	dateChanged: function() {
 
 		this.budgets = [];
-		this.$['entries'].punt();
+		//this.$['entries'].punt();
 
-		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeader ) } );
+		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
 	},
 
 	toggleEdit: function() {
@@ -500,7 +497,7 @@ enyo.kind({
 	modifyComplete: function() {
 
 		this.budgets = [];
-		this.$['entries'].punt();
+		//this.$['entries'].punt();
 
 		this.buildHeader();
 	},
