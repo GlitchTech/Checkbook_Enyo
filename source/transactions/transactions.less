@@ -1,0 +1,86 @@
+/** Transaction List **/
+
+.transaction-item-top {
+	margin-left: -25px;
+	padding-left: 10px;
+
+	margin-top: -5px;
+	padding-top: 5px;
+
+	.amount-block {
+		display: inline-block;
+	}
+
+	.checkbox-clone.checked {
+		background-position: 0px -32px;
+	}
+}
+
+.repeatIcon {
+	background-image: url( "../assets/calendar.png" );
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.repeatTransferIcon {
+	background-image: url( "../assets/future_transfer_1.png" );
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.transferIcon {
+	background-image: url( "../assets/transfer_3.png" );
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.expenseIcon {
+	background-image: url( "../assets/icon-expense.png" );
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.incomeIcon {
+	background-image: url( "../assets/icon-income.png" );
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+.futureTransaction .date {
+	color: @black;
+}
+
+.date,
+.futureTransaction .description {
+	color: @deep-blue;
+}
+
+.splitCatContainer {
+
+	.categoryGroup {
+		margin-left: -10px;
+	}
+
+	.categoryGroup div {
+		.border-radius ( top-left, 5px );
+		.border-radius ( bottom-left, 5px );
+
+		border-left: 1px solid rgba( 0, 0, 0, 0.2 );
+	}
+
+	.categoryAmount {
+	}
+
+	.categoryAmount div {
+		.border-radius ( top-right, 5px );
+		.border-radius ( bottom-right, 5px );
+
+		border-right: 1px solid rgba( 0, 0, 0, 0.2 );
+	}
+
+	.cat-item {
+		border-top: 1px solid rgba( 255, 255, 255, 0.5 );
+		border-bottom: 1px solid rgba( 0, 0, 0, 0.2 );
+		padding: 10px;
+	}
+}

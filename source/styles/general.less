@@ -163,6 +163,16 @@ html, body {
 	margin-right: @std-spacing / 2;
 }
 
+.margin-vert-none {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+.margin-horiz-none {
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
 .margin-none {
 	margin: 0;
 }
@@ -265,6 +275,42 @@ html, body {
 
 /*****************/
 
+.text-onyx-blue {
+	color: @onyx-blue;
+}
+
+.text-onyx-green {
+	color: @onyx-green;
+}
+
+.text-onyx-yellow {
+	color: @onyx-yellow;
+}
+
+.text-onyx-red {
+	color: @onyx-red;
+}
+
+/*****************/
+
+.onyx-blue {
+	background-color: @onyx-blue;
+}
+
+.onyx-green {
+	background-color: @onyx-green;
+}
+
+.onyx-yellow {
+	background-color: @onyx-yellow;
+}
+
+.onyx-red {
+	background-color: @onyx-red;
+}
+
+/*****************/
+
 .popup-header .enyo-header-inner {
 	padding: 0px;
 	min-height: 0px;
@@ -278,6 +324,10 @@ html, body {
 	background-color: #eeeeee;
 	color: @charcoal;
 
+	.border-radius( 5px );
+}
+
+.rounded {
 	.border-radius( 5px );
 }
 
