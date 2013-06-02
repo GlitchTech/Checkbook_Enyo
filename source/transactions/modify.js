@@ -98,7 +98,8 @@ enyo.kind( {
 									label: "Account",
 									onChange: "accountChanged",
 
-									classes: "custom-background bordered"
+									classes: "custom-background bordered",
+									menuClasses: "onyx-menu-wider"
 								}, {
 									name: "linkedAccount",
 									kind: "gts.SelectorBar",
@@ -106,7 +107,8 @@ enyo.kind( {
 									label: "Transfer To...",
 									onChange: "linkedAccountChanged",
 
-									classes: "custom-background"
+									classes: "custom-background",
+									menuClasses: "onyx-menu-wider"
 								}
 							]
 						}, {
