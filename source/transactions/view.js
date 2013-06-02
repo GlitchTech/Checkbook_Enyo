@@ -701,7 +701,7 @@ enyo.kind( {
 			this.showLoadingScrim();
 
 			enyo.Signals.send(
-					"modifyTransaction",
+					"showPanePopup",
 					{
 						name: "createTransaction",
 						kind: "Checkbook.transactions.modify",

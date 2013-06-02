@@ -607,7 +607,7 @@ results = {
 			this.doScrimShow();
 
 			enyo.Signals.send(
-					"modifyTransaction",
+					"showPanePopup",
 					{
 						name: "editTransaction",
 						kind: "Checkbook.transactions.modify",

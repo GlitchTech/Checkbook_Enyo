@@ -69,8 +69,6 @@ enyo.kind({
 
 			//Internal Signals
 			viewAccount: "viewAccount",
-			modifyAccount: "showPanePopup",
-			modifyTransaction: "showPanePopup",
 
 			resetSystem: "resetSystem",
 

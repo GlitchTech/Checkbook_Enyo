@@ -381,7 +381,7 @@ enyo.kind( {
 			this.$['addAccountButton'].setDisabled( true );
 
 			enyo.Signals.send(
-					"modifyAccount",
+					"showPanePopup",
 					{
 						name: "newAccount",
 						kind: "Checkbook.accounts.modify",

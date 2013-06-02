@@ -256,7 +256,7 @@ enyo.kind({
 			if( this.editMode ) {
 				//Edit Account
 
-				nextAction = "modifyAccount";
+				nextAction = "showPanePopup";
 				nextActionEvent = {
 						name: "editAccount",
 						kind: "Checkbook.accounts.modify",

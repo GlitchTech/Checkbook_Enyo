@@ -192,7 +192,8 @@ enyo.kind({
 
 							onChange: "budgetSortingChanged",
 
-							components: budgetSortOptions
+							components: budgetSortOptions,
+							value: 0
 						}
 					]
 				},
@@ -265,13 +266,6 @@ enyo.kind({
 		{
 			name: "manager",
 			kind: "Checkbook.budget.manager"
-		},
-
-		{
-			//Change to panel
-			name: "modify",
-			//kind: "Checkbook.budget.modify",
-			onFinish: "modifyComplete"
 		}
 	],
 
@@ -419,7 +413,24 @@ enyo.kind({
 
 	addBudget: function() {
 
-		this.$['modify'].openAtCenter();
+		enyo.Signals.send(
+				"showPanePopup",
+				{
+					name: "modifyBudgetItem",
+					kind: "Checkbook.budget.modify",
+
+					budgetId: null,
+					category: "Uncategorized",
+					category2: "%",
+					spending_limit: "",
+					span: 1,
+					rollOver: 0,
+
+					onFinish: this.bound['modifyComplete']
+				}
+			);
+
+		return true;
 	},
 
 	/** List Control **/
@@ -479,6 +490,53 @@ enyo.kind({
 					);
 			}
 		}
+		/*
+		var row = this.accounts[inEvent.index];
+
+		if( row ) {
+
+			var nextAction;
+			var nextActionEvent = {};
+
+			if( this.editMode ) {
+				//Edit Account
+
+				nextAction = "showPanePopup";
+				nextActionEvent = {
+						name: "editAccount",
+						kind: "Checkbook.accounts.modify",
+						acctId: this.accounts[inEvent.index]['acctId'],
+						onFinish: enyo.bind( this, this.editAccountComplete, inEvent.index )
+					};
+			} else {
+				//View Account
+
+				nextAction = "showSearch";
+				nextActionEvent = {
+						account: row
+					};
+			}
+
+			enyo.Signals.send(
+					"showPanePopup",
+					{
+						name: "modifyBudgetItem",
+						kind: "Checkbook.budget.modify",
+
+						budgetId: null,
+						category: "Uncategorized",
+						category2: "%",
+						spending_limit: "",
+						span: 1,
+						rollOver: 0,
+
+						onFinish: this.bound['modifyComplete']
+					}
+				);
+		}
+
+		return true;
+		*/
 	},
 
 	deleted: function( inSender, rowIndex ) {
