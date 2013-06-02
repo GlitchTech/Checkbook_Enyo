@@ -31,7 +31,7 @@ enyo.singleton({
 
 		console.log( arguments );
 
-		var id = Checkbook.globals.gts_db.lastInsertID();
+		var id = Checkbook.globals.gts_db.lastInsertId();
 
 		if( id ) {
 

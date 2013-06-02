@@ -152,6 +152,22 @@ enyo.kind({
 
 			var children = Checkbook.transactionCategory.manager.trsnCategories['subCats'][parents[i]['content']];
 
+			if( this.entireGeneral ) {
+
+				parentNode['components'].push(
+						{
+							style: "padding: 0.25em;",//must override style declared in enyo.Node
+							classes: "padding-half-std margin-left margin-right bordered",
+
+							icon: "assets/tag.png",
+							allowHtml: true,
+
+							content: "<strong>All</strong>",
+							parentNode: parents[i]['content']
+						}
+					);
+			}
+
 			for( var j = 0; j < children.length; j++ ) {
 
 				parentNode['components'].push(

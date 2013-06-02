@@ -12,3 +12,61 @@
 		}
 	}
 }
+
+.budget-modify {
+
+	.enyo-fittable-columns-layout > * {
+		vertical-align: middle;
+	}
+
+	img {
+		margin-right: 0.25em;
+		height: 32px !important;
+	}
+
+	.label {
+		color: #1879cd;
+		font-size: .7rem;
+		text-transform: uppercase;
+	}
+
+	.sub-label {
+		font-size: 75%;
+		margin-top: 0.5em;
+	}
+
+	.arrow,
+	.arrow:active:hover:not( [disabled] ),
+	.arrow.active {
+		padding-right: 32px;
+
+		background-repeat: no-repeat;
+		background-position: center right;
+
+		background-image: url( "../assets/menu-arrow.png" );
+	}
+
+	.onyx-menu-item {
+		text-align: left;
+	}
+}
+
+@media all and ( max-width: 350px ) {
+
+	.budget-modify {
+
+		.enyo-fittable-columns-layout > div {
+
+			&:first-child {
+				width: 90% !important;
+			}
+
+			&:last-child {
+				display: block;
+
+				margin-top: 10px;
+				text-align: right;
+			}
+		}
+	}
+}

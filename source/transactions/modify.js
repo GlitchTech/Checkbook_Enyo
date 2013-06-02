@@ -454,6 +454,13 @@ enyo.kind( {
 		this.buildDateSystem();
 	},
 
+	destroy: function() {
+
+		this.$['categorySystem'].hide();
+
+		this.inherited( arguments );
+	},
+
 	buildDateSystem: function() {
 
 		if( !enyo.Panels.isScreenNarrow() || Checkbook.globals.prefs['alwaysFullCalendar'] ) {
