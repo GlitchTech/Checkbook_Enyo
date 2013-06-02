@@ -102,9 +102,6 @@ enyo.kind({
 
 											components: [
 												{
-													name: "parent",
-													showing: false
-												}, {
 													name: "subContent"
 												}
 											]
@@ -194,12 +191,12 @@ enyo.kind({
 		}
 
 		var index = item.index;
-		var row = Checkbook.transactionCategory.manager.trsnCategories['subCats'][inSender.parentContent][index];
+		var row = Checkbook.transactionCategory.manager.trsnCategories['subCats'][inEvent.originator.parentContent][index];
 
 		if( row && index >= 0 ) {
 
 			item.$['subContent'].setContent( row['content'] );
-			item.$['parent'].setContent( row['parent'] );
+			item.$['subContent'].parentContent = row['parent'];
 
 			return true;
 		}
@@ -227,18 +224,16 @@ enyo.kind({
 
 	editChildCategory: function( inSender, inEvent ) {
 
-		var parent = Checkbook.transactionCategory.manager.trsnCategories['mainCats'][inEvent.index];
+		var parent = Checkbook.transactionCategory.manager.trsnCategories['subCats'][inEvent.originator.parentContent];
 
 		if( !parent ) {
 
 			return;
 		}
 
-		var row = Checkbook.transactionCategory.manager.trsnCategories['subCats'][parent['content']];
+		var row = parent[inEvent.index];
 
-		if( row[inSender.parent.index] ) {
-
-			row = row[inSender.parent.index];
+		if( row ) {
 
 			this.$['modifyCat'].show( row['id'], row['parent'], row['content'] );
 
