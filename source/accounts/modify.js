@@ -508,7 +508,7 @@ enyo.kind( {
 		//Transaction Sort Options
 		if( transactionSortOptions.length <= 0 ) {
 
-			Checkbook.globals.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
+			Checkbook.transactions.manager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
 		} else {
 
 			this.buildTransactionSorting();
@@ -520,7 +520,7 @@ enyo.kind( {
 		this.$['transactionSorting'].setChoices( transactionSortOptions );
 
 		//Transaction Sort Options
-		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAutoTransferLink ) } );
+		Checkbook.accounts.manager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAutoTransferLink ) } );
 	},
 
 	buildAutoTransferLink: function( accounts ) {
@@ -677,7 +677,7 @@ enyo.kind( {
 
 		if( this.acctId >= 0 ) {
 
-			Checkbook.globals.accountManager.fetchAccount(
+			Checkbook.accounts.manager.fetchAccount(
 					this.acctId,
 					{
 						"onSuccess": enyo.bind( this, this.renderDisplayItems ),
@@ -817,10 +817,10 @@ enyo.kind( {
 
 		if( this.acctId < 0 ) {
 
-			Checkbook.globals.accountManager.createAccount( data, options );
+			Checkbook.accounts.manager.createAccount( data, options );
 		} else {
 
-			Checkbook.globals.accountManager.updateAccount( data, this.acctId, this.pinChanged, options );
+			Checkbook.accounts.manager.updateAccount( data, this.acctId, this.pinChanged, options );
 		}
 	},
 
@@ -867,7 +867,7 @@ enyo.kind( {
 
 		this.deleteAccountConfirmClose();
 
-		Checkbook.globals.accountManager.deleteAccount(
+		Checkbook.accounts.manager.deleteAccount(
 				this.acctId,
 				{
 					"onSuccess": enyo.bind( this, this.deleteFinished )

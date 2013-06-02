@@ -305,7 +305,7 @@ enyo.kind({
 
 	load: function( acctId, category, category2, dateStart, dateEnd ) {
 
-		Checkbook.globals.accountManager.fetchAccounts( { "onSuccess": enyo.bind( this, this.renderAccountList, acctId, category, category2, dateStart, dateEnd ) } );
+		Checkbook.accounts.manager.fetchAccounts( { "onSuccess": enyo.bind( this, this.renderAccountList, acctId, category, category2, dateStart, dateEnd ) } );
 	},
 
 	renderAccountList: function( acctId, category, category2, dateStart, dateEnd, results ) {

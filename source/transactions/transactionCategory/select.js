@@ -84,20 +84,20 @@ enyo.kind({
 
 	loadCategories: function( callbackFn ) {
 
-		if( Checkbook.globals.transactionCategoryManager.trsnCategories ) {
+		if( Checkbook.transactionCategory.manager.trsnCategories ) {
 
 			this.log( "transaction categories already built" );
 
 			callbackFn();
 		} else {
 
-			Checkbook.globals.transactionCategoryManager.load( null, { "onSuccess": callbackFn }, null, null );
+			Checkbook.transactionCategory.manager.load( null, { "onSuccess": callbackFn }, null, null );
 		}
 	},
 
 	getCategoryChoice: function( callbackFn, subheader ) {
 
-		this.dispCategories = enyo.clone( Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'] );
+		this.dispCategories = enyo.clone( Checkbook.transactionCategory.manager.trsnCategories['mainCats'] );
 		//this.dispCategories.push( { "content": "Add/Edit Categories", "parent": "|-add_edit-|" } );
 
 		this._generateTree();
@@ -129,7 +129,7 @@ enyo.kind({
 
 		var tree = [];
 
-		var parents = Checkbook.globals.transactionCategoryManager.trsnCategories['mainCats'];
+		var parents = Checkbook.transactionCategory.manager.trsnCategories['mainCats'];
 
 		for( var i = 0; i < parents.length; i++ ) {
 
@@ -150,7 +150,7 @@ enyo.kind({
 					components: []
 				};
 
-			var children = Checkbook.globals.transactionCategoryManager.trsnCategories['subCats'][parents[i]['content']];
+			var children = Checkbook.transactionCategory.manager.trsnCategories['subCats'][parents[i]['content']];
 
 			for( var j = 0; j < children.length; j++ ) {
 

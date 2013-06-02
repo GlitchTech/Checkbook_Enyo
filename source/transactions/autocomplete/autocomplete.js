@@ -124,7 +124,7 @@ enyo.kind( {
 					"data": true,
 					"desc": desc,
 					"linkedAccount": results[0]['linkedAccount'],
-					"category": Checkbook.globals.transactionManager.parseCategoryDB( gts.String.dirtyString( results[0]['category'] ), gts.String.dirtyString( results[0]['category2'] ) )
+					"category": Checkbook.transactions.manager.parseCategoryDB( gts.String.dirtyString( results[0]['category'] ), gts.String.dirtyString( results[0]['category2'] ) )
 				};
 		}
 

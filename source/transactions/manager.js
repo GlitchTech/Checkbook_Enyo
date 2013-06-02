@@ -6,29 +6,9 @@
  * Control system for managing transactions. Handles creation, modification, & deletion.
  *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
-enyo.kind({
+enyo.singleton({
 	name: "Checkbook.transactions.manager",
 	kind: "enyo.Component",
-
-	components: [
-		{
-			name: "recurrence",
-			kind: "Checkbook.transactions.recurrence.manager"
-		}
-	],
-
-	/** @protected */
-	constructor: function() {
-
-		this.inherited( arguments );
-
-		if( !Checkbook.globals.gts_db ) {
-
-			this.log( "creating database object." );
-
-			var db = new gts.database( getDBArgs() );
-		}
-	},
 
 	/**
 	 * @public
@@ -93,7 +73,7 @@ enyo.kind({
 		var sql = this._prepareData( data, inEvent['type'] );
 
 		//Handle recurrence events
-		sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data, autoTransfer, autoTransferLink ) );
+		sql = sql.concat( Checkbook.transactions.recurrence.manager.handleRecurrenceSystem( data, autoTransfer, autoTransferLink ) );
 
 		//Handle split transactions
 		sql = sql.concat( this.handleCategoryData( data ) );
@@ -256,7 +236,7 @@ enyo.kind({
 		if( data['repeatUnlinked'] != 1 && data['terminated'] != 1 ) {
 			//Handle recurrence events
 
-			sql = sql.concat( this.$['recurrence'].handleRecurrenceSystem( data ) );
+			sql = sql.concat( Checkbook.transactions.recurrence.manager.handleRecurrenceSystem( data ) );
 		} else {
 
 			delete data['rObj'];

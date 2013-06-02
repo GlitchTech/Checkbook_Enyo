@@ -150,7 +150,7 @@ enyo.kind({
 
 		if( transactionSortOptions.length <= 0 ) {
 
-			Checkbook.globals.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
+			Checkbook.transactions.manager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
 		} else {
 
 			this.buildTransactionSorting();
@@ -171,7 +171,7 @@ enyo.kind({
 			this.fetchSearchCountHandler();
 		} else {
 
-			Checkbook.globals.transactionManager.searchTransactionsCount(
+			Checkbook.transactions.manager.searchTransactionsCount(
 					this.where['strings'],
 					this.where['arguments'],
 					this.sortQry,
@@ -268,7 +268,7 @@ enyo.kind({
 
 		this.transactions[rowIndex]['cleared'] = this.transactions[rowIndex]['cleared'] === 1 ? 0 : 1;
 
-		Checkbook.globals.transactionManager.clearTransaction( this.transactions[rowIndex]['itemId'], ( this.transactions[rowIndex]['cleared'] === 1 ) );
+		Checkbook.transactions.manager.clearTransaction( this.transactions[rowIndex]['itemId'], ( this.transactions[rowIndex]['cleared'] === 1 ) );
 
 		this.$['entries'].refresh();
 
@@ -364,7 +364,7 @@ enyo.kind({
 		this.doLoading( true );
 
 		//update database;
-		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+		Checkbook.transactions.manager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
 
 		//update list
 		this.transactions.splice( rowIndex, 1 );//Causing dynamic fetch to stop working...
@@ -374,7 +374,7 @@ enyo.kind({
 		this.doResultsFound( this.resultCount );
 
 		//Fetch row to fix dynamic fetch
-		Checkbook.globals.transactionManager.searchTransactions(
+		Checkbook.transactions.manager.searchTransactions(
 				this.where['strings'],
 				this.where['arguments'],
 				this.sortQry,
@@ -431,7 +431,7 @@ enyo.kind({
 			if( row['enableCategories'] === 1 ) {
 
 				this.$['category'].show();
-				this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( row['category'], row['category2'] ) );
+				this.$['category'].setContent( Checkbook.transactions.manager.formatCategoryDisplay( row['category'], row['category2'] ) );
 			} else {
 
 				this.$['category'].hide();
@@ -471,7 +471,7 @@ enyo.kind({
 
 			this.doLoading( true );
 
-			Checkbook.globals.transactionManager.searchTransactions(
+			Checkbook.transactions.manager.searchTransactions(
 					this.where['strings'],
 					this.where['arguments'],
 					this.sortQry,

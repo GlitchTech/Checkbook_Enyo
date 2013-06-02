@@ -692,7 +692,7 @@ enyo.kind({
 										'"' + gts.String.cleanString( row['note'] ) + '",' +
 										'"' + gts.String.cleanString( row['payee'] ) + '",' +
 										'"' + row['itemId'] + '",' +
-										'"' + enyo.json.stringify( Checkbook.globals.transactionManager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
+										'"' + enyo.json.stringify( Checkbook.transactions.manager.parseCategoryDB( row['category'], row['category2'] ) ).replace( /"/g, '""' ) + '",' +
 										'"' + row['linkedRecord'] + '",' +
 										'"' + gts.String.cleanString( row['linkedAccountName'] ) + '",' +
 										'"' + gts.String.cleanString( row['linkedAccountCat'] ) + '"\n';

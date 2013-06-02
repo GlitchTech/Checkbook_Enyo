@@ -272,7 +272,7 @@ enyo.kind( {
 	accountBalanceForceUpdate: function() {
 
 		//build balance object
-		Checkbook.globals.accountManager.fetchOverallBalances( {
+		Checkbook.accounts.manager.fetchOverallBalances( {
 				"onSuccess": enyo.bind( this, this.buildBalanceButton, enyo.bind( this, this.renderBalanceButton ) )
 			});
 	},
@@ -364,7 +364,7 @@ enyo.kind( {
 				{
 					"onSuccess": function() {
 
-						Checkbook.globals.accountManager.updateAccountModTime();
+						Checkbook.accounts.manager.updateAccountModTime();
 						enyo.Signals.send( "accountSortChanged" );
 					}
 				}

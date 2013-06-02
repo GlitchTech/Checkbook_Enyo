@@ -307,7 +307,7 @@ enyo.kind( {
 
 			if( count <= 5 ) {
 
-				Checkbook.globals.accountManager.fetchAccount( this.account['acctId'], { "onSuccess": enyo.bind( this, this.loadAccount, finishRender ) } );
+				Checkbook.accounts.manager.fetchAccount( this.account['acctId'], { "onSuccess": enyo.bind( this, this.loadAccount, finishRender ) } );
 			} else {
 
 				this.renderDisplay( finishRender );
@@ -390,7 +390,7 @@ enyo.kind( {
 		this.$['desc'].setContent( this.transaction['desc'] );
 
 		//Amount
-		this.transactionType = Checkbook.globals.transactionManager.determineTransactionType( this.transaction );
+		this.transactionType = Checkbook.transactions.manager.determineTransactionType( this.transaction );
 
 		this.$['transTypeIcon'].setSrc( "assets/menu_icons/" + this.transactionType + ".png" );
 		this.$['amount'].setContent( formatAmount( Math.abs( this.transaction['amount'] ) ) );
@@ -404,11 +404,11 @@ enyo.kind( {
 				//from here
 
 				this._binds['renderFromAccount']( this.account );
-				Checkbook.globals.accountManager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderToAccount'] } );
+				Checkbook.accounts.manager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderToAccount'] } );
 			} else {
 				//to here
 
-				Checkbook.globals.accountManager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderFromAccount'] } );
+				Checkbook.accounts.manager.fetchAccount( this.transaction.linkedAccount, { "onSuccess": this._binds['renderFromAccount'] } );
 				this._binds['renderToAccount']( this.account );
 			}
 		} else {
@@ -425,7 +425,7 @@ enyo.kind( {
 		if( this.account['enableCategories'] === 1 ) {
 
 			this.$['categoryHolder'].show();
-			this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( this.transaction['category'], this.transaction['category2'], false, "" ) );
+			this.$['category'].setContent( Checkbook.transactions.manager.formatCategoryDisplay( this.transaction['category'], this.transaction['category2'], false, "" ) );
 		} else {
 
 			this.$['categoryHolder'].hide();
@@ -468,7 +468,7 @@ enyo.kind( {
 		//Recurrence
 		if( this.transaction['repeatId'] && !isNaN( this.transaction['repeatId'] ) && this.transaction['repeatId'] != "" && this.transaction['repeatId'] >= 0 ) {
 
-			Checkbook.globals.transactionManager.$['recurrence'].fetchSummary( this.transaction['repeatId'], { "onSuccess": enyo.bind( this, this.renderRecurrence, finishRender ) } );
+			Checkbook.transactions.recurrence.manager.fetchSummary( this.transaction['repeatId'], { "onSuccess": enyo.bind( this, this.renderRecurrence, finishRender ) } );
 		} else {
 
 			this.renderRecurrence( finishRender, [] );

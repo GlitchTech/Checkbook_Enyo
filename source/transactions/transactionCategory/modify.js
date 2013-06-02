@@ -289,7 +289,7 @@ enyo.kind({
 
 		this.deleteCategoryConfirmClose();
 
-		Checkbook.globals.transactionCategoryManager.deleteCategory( this.catId, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "delete" } ) } );
+		Checkbook.transactionCategory.manager.deleteCategory( this.catId, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "delete" } ) } );
 	},
 
 	save: function() {
@@ -321,13 +321,13 @@ enyo.kind({
 
 		if( this.mode === "new" ) {
 
-			Checkbook.globals.transactionCategoryManager.createCategory( newGeneral, newSpecific, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "new" } ) } );
+			Checkbook.transactionCategory.manager.createCategory( newGeneral, newSpecific, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "new" } ) } );
 		} else if( this.mode === "category" ) {
 
-			Checkbook.globals.transactionCategoryManager.editCategory( this.catId, newGeneral, newSpecific, this.general, this.specific, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "category" } ) } );
+			Checkbook.transactionCategory.manager.editCategory( this.catId, newGeneral, newSpecific, this.general, this.specific, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "category" } ) } );
 		} else if( this.mode === "group" ) {
 
-			Checkbook.globals.transactionCategoryManager.editGroup( newGeneral, this.general, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "group" } ) } );
+			Checkbook.transactionCategory.manager.editGroup( newGeneral, this.general, { "onSuccess": enyo.bind( this, this.doChangeComplete, { action: "group" } ) } );
 		} else {
 
 			this.hide();

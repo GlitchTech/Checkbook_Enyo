@@ -1,21 +1,8 @@
 /* Copyright © 2013, GlitchTech Science */
 
-enyo.kind({
+enyo.singleton({
 	name: "Checkbook.budget.manager",
 	kind: enyo.Component,
-
-	/** @protected */
-	constructor: function() {
-
-		this.inherited( arguments );
-
-		if( !Checkbook.globals.gts_db ) {
-
-			this.log( "creating database object." );
-
-			var db = new gts.database( getDBArgs() );
-		}
-	},
 
 	/**
 	 * @public

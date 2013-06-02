@@ -261,11 +261,6 @@ enyo.kind({
 					]
 				}
 			]
-		},
-
-		{
-			name: "manager",
-			kind: "Checkbook.budget.manager"
 		}
 	],
 
@@ -399,7 +394,7 @@ enyo.kind({
 		this.budgets = [];
 		//this.$['entries'].punt();
 
-		this.$['manager'].fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
+		Checkbook.budget.manager.fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
 	},
 
 	toggleEdit: function() {
@@ -545,7 +540,7 @@ enyo.kind({
 
 		if( row ) {
 
-			this.$['manager'].deleteBudget( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
+			Checkbook.budget.manager.deleteBudget( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
 		}
 	},
 
@@ -554,7 +549,7 @@ enyo.kind({
 		this.budgets = [];
 		//this.$['entries'].punt();
 
-		this.buildHeader();
+		this.dateChanged();
 	},
 
 	setupRow: function( inSender, inIndex ) {
@@ -596,7 +591,7 @@ enyo.kind({
 
 			this.loadingDisplay( true );
 
-			this.$['manager'].fetchBudgets(
+			Checkbook.budget.manager.fetchBudgets(
 					this.$['date'].getValue().setStartOfMonth(),
 					this.$['date'].getValue().setEndOfMonth(),
 					{

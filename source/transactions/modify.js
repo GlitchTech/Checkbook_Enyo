@@ -559,7 +559,7 @@ enyo.kind( {
 			this.$['transTypeText'].setContent( "Modify Transaction" );
 		}
 
-		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAccountSystems ) } );
+		Checkbook.accounts.manager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildAccountSystems ) } );
 	},
 
 	/** Data Load Handlers **/
@@ -599,7 +599,7 @@ enyo.kind( {
 
 		if( count <= 5 ) {
 
-			Checkbook.globals.accountManager.fetchAccount( this.accountObj['acctId'], { "onSuccess": enyo.bind( this, this.initialAccountLoadHandler ) } );
+			Checkbook.accounts.manager.fetchAccount( this.accountObj['acctId'], { "onSuccess": enyo.bind( this, this.initialAccountLoadHandler ) } );
 		} else {
 
 			this.$['categorySystem'].loadCategories( enyo.bind( this, this.loadTransactionData ) );
@@ -626,7 +626,7 @@ enyo.kind( {
 
 		if( this.trsnObj['itemId'] >= 0 ) {
 
-			this.transactionType = Checkbook.globals.transactionManager.determineTransactionType( this.trsnObj );
+			this.transactionType = Checkbook.transactions.manager.determineTransactionType( this.trsnObj );
 		}
 
 		this.trsnObj['amount'] = Math.abs( this.trsnObj['amount'] ).toFixed( 2 );
@@ -651,14 +651,14 @@ enyo.kind( {
 		if( ( this.trsnObj['repeatId'] > 0 || this.trsnObj['repeatId'] === 0 ) && this.trsnObj['repeatUnlinked'] != 1 ) {
 			//Existing recurrence
 
-			Checkbook.globals.transactionManager.$['recurrence'].fetch( this.trsnObj['repeatId'], { "onSuccess": enyo.bind( this, this.loadRecurrenceData ) } );
+			Checkbook.transactions.recurrence.manager.fetch( this.trsnObj['repeatId'], { "onSuccess": enyo.bind( this, this.loadRecurrenceData ) } );
 		} else if( this.trsnObj['repeatUnlinked'] == 1 ) {
 			//Recurrence removed
 
 			this.$['recurrenceWrapper'].hide();
 		}
 
-		this.trsnObj['category'] = Checkbook.globals.transactionManager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
+		this.trsnObj['category'] = Checkbook.transactions.manager.parseCategoryDB( this.trsnObj['category'], this.trsnObj['category2'] );
 		this.trsnObj['categoryOriginal'] = this.trsnObj['category'];
 
 		this.renderCategories = true;
@@ -713,7 +713,7 @@ enyo.kind( {
 
 			this.$['checkNumHolder'].show();
 
-			Checkbook.globals.transactionManager.fetchMaxCheckNumber(
+			Checkbook.transactions.manager.fetchMaxCheckNumber(
 					this.$['account'].getValue(),
 					{
 						"onSuccess": enyo.bind( this, this.adjustMaxCheckNumber )
@@ -846,7 +846,7 @@ enyo.kind( {
 
 	accountChanged: function( inSender, inEvent ) {
 
-		Checkbook.globals.accountManager.fetchAccount( this.$['account'].getValue(), { "onSuccess": enyo.bind( this, this.accountChangedFollower ) } );
+		Checkbook.accounts.manager.fetchAccount( this.$['account'].getValue(), { "onSuccess": enyo.bind( this, this.accountChangedFollower ) } );
 	},
 
 	accountChangedFollower: function( result ) {
@@ -932,11 +932,11 @@ enyo.kind( {
 					item.$['categoryAmount'].setValue( deformatAmount( row['amount'] ) );
 
 					item.$['categoryAmount'].setAtm( true );
-					item.$['categoryAmount'].setSelectAllOnFocus( false );
+					item.$['categoryAmount'].setSelectOnFocus( false );
 				} else {
 
 					item.$['categoryAmount'].setAtm( false );
-					item.$['categoryAmount'].setSelectAllOnFocus( true );
+					item.$['categoryAmount'].setSelectOnFocus( true );
 				}
 
 				item.$['categoryAmount'].setDisabled( false );
@@ -1014,7 +1014,7 @@ enyo.kind( {
 
 	categoryAmountChanged: function( inSender, inEvent ) {
 
-		this.trsnObj['category'][inEvent.index]['amount'] = inSender.getValueAsNumber();
+		this.trsnObj['category'][inEvent.index]['amount'] = inEvent.originator.getValueAsNumber();
 	},
 
 	categoryAddNew: function() {
@@ -1193,7 +1193,7 @@ enyo.kind( {
 					this.updateTransactionObject();
 				}
 
-				Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
+				Checkbook.transactions.manager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
 			} else {
 				//Nonrepeating or single instance
 
@@ -1251,7 +1251,7 @@ enyo.kind( {
 			changes['minor'] = true;
 		}
 
-		if( !Checkbook.globals.transactionManager.$['recurrence'].compare( this.trsnObj['rObj'], this.$['recurrenceSelect'].getValue() ) ) {
+		if( !Checkbook.transactions.recurrence.manager.compare( this.trsnObj['rObj'], this.$['recurrenceSelect'].getValue() ) ) {
 
 			changes['recurrence'] = true;
 		}
@@ -1310,13 +1310,13 @@ enyo.kind( {
 	saveNewTransaction: function() {
 
 		this.updateTransactionObject();
-		Checkbook.globals.transactionManager.createTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
+		Checkbook.transactions.manager.createTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
 	},
 
 	saveModifiedTransaction: function( killRObj ) {
 
 		this.updateTransactionObject( killRObj );
-		Checkbook.globals.transactionManager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
+		Checkbook.transactions.manager.updateTransaction( this.trsnObj, this.transactionType, this.getSaveOptions() );
 	},
 
 	saveCompleteHandler: function( inEvent ) {
@@ -1334,7 +1334,7 @@ enyo.kind( {
 
 		this.closeRecurrenceEventDialog();
 
-		Checkbook.globals.transactionManager.$['recurrence'].deleteOnlyFuture(
+		Checkbook.transactions.recurrence.manager.deleteOnlyFuture(
 				this.trsnObj['itemId'],
 				this.trsnObj['repeatId'],
 				{
@@ -1370,7 +1370,7 @@ enyo.kind( {
 		this.trsnObj['repeatId'] = -1;
 		this.$['date'].setValue( gts.Object.isDate( this.trsnObj['rObj']['origDate'] ) ? this.trsnObj['rObj']['origDate'].getTime() : this.trsnObj['rObj']['origDate'] );
 
-		Checkbook.globals.transactionManager.$['recurrence'].deleteAll(
+		Checkbook.transactions.recurrence.manager.deleteAll(
 				repeatId,
 				{
 					"onSuccess": enyo.bind( this, this.saveNewTransaction )
@@ -1431,7 +1431,7 @@ enyo.kind( {
 
 		this.deleteTransactionConfirmClose();
 
-		Checkbook.globals.transactionManager.deleteTransaction(
+		Checkbook.transactions.manager.deleteTransaction(
 				this.trsnObj['itemId'],
 				{
 					"onSuccess": enyo.bind( this, this.saveCompleteHandler, { "modifyStatus": 2 } )

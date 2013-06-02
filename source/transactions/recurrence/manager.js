@@ -6,13 +6,9 @@
  * Control system for managing recurring transactions. Handles creation, modification, & deletion.
  *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
-enyo.kind( {
+enyo.singleton({
 	name: "Checkbook.transactions.recurrence.manager",
 	kind: "enyo.Component",
-
-	events: {
-		onRequestInsertTransactionSQL: ""
-	},
 
 	/**
 	 * @public
@@ -570,7 +566,7 @@ enyo.kind( {
 						type = "income";
 					}
 
-					sql = sql.concat( Checkbook.globals.transactionManager.generateInsertTransactionSQL( { "data": trsnData, "type": type } ) );
+					sql = sql.concat( Checkbook.transactions.manager.generateInsertTransactionSQL( { "data": trsnData, "type": type } ) );
 
 					serCount++;
 					futureCount++;
@@ -599,7 +595,7 @@ enyo.kind( {
 
 			if( sql.length > 0 ) {
 
-				Checkbook.globals.accountManager.updateAccountModTime();
+				Checkbook.accounts.manager.updateAccountModTime();
 			}
 		}
 

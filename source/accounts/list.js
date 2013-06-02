@@ -201,7 +201,7 @@ enyo.kind({
 
 		this.accounts = [];
 
-		Checkbook.globals.accountManager.fetchAccounts(
+		Checkbook.accounts.manager.fetchAccounts(
 				{
 					"showHidden": this.showHidden,
 					"onSuccess": enyo.bind( this, this.dataResponse )
@@ -302,7 +302,7 @@ enyo.kind({
 			var self = this;
 
 			//Let transactions page know
-			Checkbook.globals.accountManager.fetchAccount(
+			Checkbook.accounts.manager.fetchAccount(
 					this.accounts[rowIndex]['acctId'],
 					{
 						"onSuccess": function() {
@@ -402,7 +402,7 @@ enyo.kind({
 
 		var self = this;
 
-		Checkbook.globals.accountManager.deleteAccount(
+		Checkbook.accounts.manager.deleteAccount(
 				this.accounts[inEvent.index]['acctId'],
 				{
 					"onSuccess": function() {
@@ -534,7 +534,7 @@ enyo.kind({
 		if( typeof( inEvent['account'] ) !== "undefined" ) {
 			//Main Account
 
-			var acctIndex = inEvent['account'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['account'] ) : - 1;
+			var acctIndex = inEvent['account'] >= 0 ? Checkbook.accounts.manager.fetchAccountIndex( inEvent['account'] ) : - 1;
 
 			if( acctIndex >= 0 ) {
 
@@ -543,7 +543,7 @@ enyo.kind({
 					this.accountBalanceChangedHandler( acctIndex, inEvent['accountBal'] );
 				} else {
 
-					Checkbook.globals.accountManager.fetchAccountBalance(
+					Checkbook.accounts.manager.fetchAccountBalance(
 							inEvent['account'],
 							{
 								"onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, acctIndex )
@@ -556,22 +556,22 @@ enyo.kind({
 		if( typeof( inEvent['linkedAccount'] ) !== "undefined" ) {
 			//Linked Account
 
-			var linkedIndex = inEvent['linkedAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['linkedAccount'] ) : - 1;
+			var linkedIndex = inEvent['linkedAccount'] >= 0 ? Checkbook.accounts.manager.fetchAccountIndex( inEvent['linkedAccount'] ) : - 1;
 
 			if( linkedIndex >= 0 ) {
 
-				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
+				Checkbook.accounts.manager.fetchAccountBalance( inEvent['linkedAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
 			}
 		}
 
 		if( typeof( inEvent['atAccount'] ) !== "undefined" && inEvent['linkedAccount'] != inEvent['atAccount'] ) {
 			//Auto-Transfer Account
 
-			var linkedIndex = inEvent['atAccount'] >= 0 ? Checkbook.globals.accountManager.fetchAccountIndex( inEvent['atAccount'] ) : - 1;
+			var linkedIndex = inEvent['atAccount'] >= 0 ? Checkbook.accounts.manager.fetchAccountIndex( inEvent['atAccount'] ) : - 1;
 
 			if( linkedIndex >= 0 ) {
 
-				Checkbook.globals.accountManager.fetchAccountBalance( inEvent['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
+				Checkbook.accounts.manager.fetchAccountBalance( inEvent['atAccount'], { "onSuccess": enyo.bind( this, this.accountBalanceChangedHandler, linkedIndex ) } );
 			}
 		}
 	},

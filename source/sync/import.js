@@ -1079,7 +1079,7 @@ enyo.kind({
 			if( catObj.length > 1 && this.importItems[this.documentIndex]['transactions'][i]['itemId'] ) {
 				//Split Category && item not new
 
-				catQuery = Checkbook.globals.transactionManager.handleCategoryData( this.importItems[this.documentIndex]['transactions'][i] );
+				catQuery = Checkbook.transactions.manager.handleCategoryData( this.importItems[this.documentIndex]['transactions'][i] );
 			} else {
 				//Single Category
 
@@ -1108,7 +1108,7 @@ enyo.kind({
 
 	saveDocDataHandler: function( offset, limit ) {
 
-		Checkbook.globals.accountManager.updateAccountModTime();
+		Checkbook.accounts.manager.updateAccountModTime();
 
 		var trsnProgress = ( offset + limit ) / this.importItems[this.documentIndex]['transactions'].length;
 		trsnProgress = ( trsnProgress > 1 ? 1 : trsnProgress );

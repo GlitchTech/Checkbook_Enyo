@@ -448,7 +448,7 @@ enyo.kind( {
 		if( !results ) {
 			//If not called with results of new balance, fetch them
 
-			Checkbook.globals.accountManager.fetchAccountBalance( this.account['acctId'], { "onSuccess": enyo.bind( this, this.balanceChangedHandler, accounts ) } );
+			Checkbook.accounts.manager.fetchAccountBalance( this.account['acctId'], { "onSuccess": enyo.bind( this, this.balanceChangedHandler, accounts ) } );
 			return;
 		}
 
@@ -524,7 +524,7 @@ enyo.kind( {
 
 		this.account['bal_view'] = inEvent.value;
 
-		Checkbook.globals.accountManager.updateAccountBalView(
+		Checkbook.accounts.manager.updateAccountBalView(
 				this.account['acctId'],
 				this.account['bal_view'],
 				{
@@ -587,7 +587,7 @@ enyo.kind( {
 
 		if( transactionSortOptions.length <= 0 ) {
 
-			Checkbook.globals.transactionManager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
+			Checkbook.transactions.manager.fetchTransactionSorting( { "onSuccess": enyo.bind( this, this.buildTransactionSorting ) } );
 		} else {
 
 			this.buildTransactionSorting();
@@ -615,7 +615,7 @@ enyo.kind( {
 		this.account['sort'] = inEvent.value;
 		this.account['sortQry'] = inEvent.qry;
 
-		Checkbook.globals.accountManager.updateAccountSorting(
+		Checkbook.accounts.manager.updateAccountSorting(
 				this.account['acctId'],
 				this.account['sort']
 			);
@@ -649,12 +649,12 @@ enyo.kind( {
 			var acctId = this.account['acctId'];
 			this.$['entries'].rememberScrollPosition();
 
-			Checkbook.globals.transactionManager.$['recurrence'].updateSeriesTransactions(
+			Checkbook.transactions.recurrence.manager.updateSeriesTransactions(
 					acctId,
 					{
 						"onSuccess": function() {
 
-							Checkbook.globals.accountManager.fetchAccount(
+							Checkbook.accounts.manager.fetchAccount(
 									acctId,
 									{
 										"onSuccess": function( account ) {

@@ -110,7 +110,7 @@ enyo.kind({
 	 */
 	createCategoryFollower: function( options ) {
 
-		Checkbook.globals.accountManager.updateAccountModTime();
+		Checkbook.accounts.manager.updateAccountModTime();
 
 		Checkbook.globals.gts_db.query(
 				new gts.databaseQuery(
@@ -137,7 +137,7 @@ enyo.kind({
 	 */
 	editCategory: function( id, name, icon, color, oldName, options ) {
 
-		Checkbook.globals.accountManager.updateAccountModTime();
+		Checkbook.accounts.manager.updateAccountModTime();
 
 		var qryCategories = [
 				Checkbook.globals.gts_db.getUpdate( "accountCategories", { "name": name, "icon": icon, "color": color }, { "rowid": id } ),
@@ -160,7 +160,7 @@ enyo.kind({
 	 */
 	deleteCategory: function( id, name, options ) {
 
-		Checkbook.globals.accountManager.updateAccountModTime();
+		Checkbook.accounts.manager.updateAccountModTime();
 
 		Checkbook.globals.gts_db.query(
 				Checkbook.globals.gts_db.getDelete( "accountCategories", { "rowid": id, "name": name } ),
@@ -181,7 +181,7 @@ enyo.kind({
 	 */
 	reorderCategories: function( inCats, options ) {
 
-		Checkbook.globals.accountManager.updateAccountModTime();
+		Checkbook.accounts.manager.updateAccountModTime();
 
 		var qryOrder = [];
 

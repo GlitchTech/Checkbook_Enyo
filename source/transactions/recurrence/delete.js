@@ -64,7 +64,7 @@ enyo.kind({
 
 	deleteOne: function() {
 
-		Checkbook.globals.transactionManager.$['recurrence'].deleteOne(
+		Checkbook.transactions.recurrence.manager.deleteOne(
 				this.transactionId,
 				this.recurrenceId,
 				{
@@ -75,7 +75,7 @@ enyo.kind({
 
 	deleteFuture: function() {
 
-		Checkbook.globals.transactionManager.$['recurrence'].deleteFuture(
+		Checkbook.transactions.recurrence.manager.deleteFuture(
 				this.transactionId,
 				this.recurrenceId,
 				{
@@ -86,7 +86,7 @@ enyo.kind({
 
 	deleteAll: function() {
 
-		Checkbook.globals.transactionManager.$['recurrence'].deleteAll(
+		Checkbook.transactions.recurrence.manager.deleteAll(
 				this.recurrenceId,
 				{
 					"onSuccess": enyo.bind( this, this.deleteCompleted, "all" )

@@ -269,11 +269,8 @@ enyo.kind({
 		this.$['mainViews'].render();
 
 		Checkbook.globals.criticalError = this.$['criticalError'];
-		Checkbook.globals.accountManager = new Checkbook.accounts.manager();
-		Checkbook.globals.transactionManager = new Checkbook.transactions.manager();
-		Checkbook.globals.transactionCategoryManager = new Checkbook.transactionCategory.manager();
 
-		Checkbook.globals.transactionManager.$['recurrence'].updateSeriesTransactions( -1, { "onSuccess": enyo.bind( this, this.loadCheckbookStage2 ) } );
+		Checkbook.transactions.recurrence.manager.updateSeriesTransactions( -1, { "onSuccess": enyo.bind( this, this.loadCheckbookStage2 ) } );
 	},
 
 	loadCheckbookStage2: function() {
@@ -283,7 +280,7 @@ enyo.kind({
 			this.$['splash'].$['message'].setContent( "Loading account information..." );
 		}
 
-		Checkbook.globals.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.loadCheckbookStage3 ) } );
+		Checkbook.accounts.manager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.loadCheckbookStage3 ) } );
 	},
 
 	loadCheckbookStage3: function( result ) {
@@ -345,13 +342,15 @@ enyo.kind({
 			this.$['splash'].hide();
 			this.$['splash'].destroy();
 		}
+
+		this.openBudget();
 	},
 
 	resetSystem: function( inSender, inEvent ) {
 
 		this.$['transactions'].unloadSystem();
 
-		Checkbook.globals.accountManager.updateAccountModTime();
+		Checkbook.accounts.manager.updateAccountModTime();
 		this.notificationType = null;
 
 		enyo.asyncMethod(

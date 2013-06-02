@@ -348,7 +348,7 @@ enyo.kind({
 		this.$['updateNotice'].setValue( Checkbook.globals.prefs['updateCheckNotification'] === 1 );
 		this.$['errorReporting'].setValue( Checkbook.globals.prefs['errorReporting'] === 1 );
 
-		Checkbook.globals.accountManager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
+		Checkbook.accounts.manager.fetchAccountsList( { "onSuccess": enyo.bind( this, this.buildDefaultAccountList ) } );
 
 		//this.$['entries'].renderAccountList();
 
@@ -528,7 +528,7 @@ enyo.kind({
 		this.$['defaultAccount'].setDisabled( false );
 		this.$['defaultAccount'].render();
 
-		Checkbook.globals.accountManager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.setDefaultAccount ) } );
+		Checkbook.accounts.manager.fetchDefaultAccount( { "onSuccess": enyo.bind( this, this.setDefaultAccount ) } );
 	},
 
 	setDefaultAccount: function( result ) {
@@ -544,7 +544,7 @@ enyo.kind({
 
 	updateDefaultAccount: function( inSender, inEvent ) {
 
-		Checkbook.globals.accountManager.updateDefaultAccount( this.$['defaultAccount'].getValue() );
+		Checkbook.accounts.manager.updateDefaultAccount( this.$['defaultAccount'].getValue() );
 	},
 
 	addAccount: function() {

@@ -6,25 +6,11 @@
  * Control system for managing transaction categories. Handles creation, modification, & deletion.
  *	Requires gts.database to exist in Checkbook.globals.gts_db
  */
-enyo.kind({
-
+enyo.singleton({
 	name: "Checkbook.transactionCategory.manager",
 	kind: enyo.Component,
 
 	trsnCategories: null,
-
-	/** @protected */
-	constructor: function() {
-
-		this.inherited( arguments );
-
-		if( !Checkbook.globals.gts_db ) {
-
-			this.log( "creating database object." );
-
-			var db = new gts.database( getDBArgs() );
-		}
-	},
 
 	/**
 	 * Returns (via onSuccess callback) result object of transaction categories.

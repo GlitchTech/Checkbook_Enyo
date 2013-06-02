@@ -3,18 +3,21 @@
 enyo.kind({
 
 	name: "Checkbook.budget.modify",
-//	kind: enyo.ModalDialog,
-//	layoutKind: enyo.VFlexLayout,
+	kind: "FittableRows",
+	classes: "enyo-fit",
 
-	modal: true,
-	scrim: true,
-
-	dismissWithClick: true,
-	dismissWithEscape: true,
-
-	style: "width: 400px;",
+	style: "height: 100%;",
 
 	acctList: [],
+
+	published: {
+		budgetId: null,
+		category: "Uncategorized",
+		category2: "%",
+		spending_limit: "",
+		span: 1,
+		rollOver: 0
+	},
 
 	events: {
 		onFinish: ""
@@ -22,154 +25,146 @@ enyo.kind({
 
 	components: [
 		{
-			kind: enyo.Header,
-			layoutKind: enyo.HFlexLayout,
-			align: "center",
-
-			className: "enyo-header-dark popup-header",
-			style: "border-radius: 10px; margin-bottom: 10px;",
-
+			kind: "onyx.Toolbar",
+			classes: "text-center",
 			components: [
 				{
 					name: "title",
 					content: "Modify Budget",
-					className: "bigger",
-					style: "text-align: center; margin-right: -32px;",
-					flex: 1
-				}, {
-					kind: enyo.ToolButton,
-					icon: "assets/menu_icons/close.png",
-					className: "img-icon",
-					style: "text-align: center;",
-					ontap: "close"
+					classes: "bigger"
 				}
 			]
 		}, {
-			kind: enyo.Group,
+			kind: "enyo.Scroller",
+			horizontal: "hidden",
+			classes: "rich-brown-gradient",
+			fit: true,
 			components: [
 				{
-					kind: enyo.Item,
-					layoutKind: enyo.HFlexLayout,
-
-					className: "enyo-first",
-
-					ontap: "categoryTapped",
+					classes: "light narrow-column",
+					style: "min-height: 100%;",
 					components: [
 						{
-							name: "category",
-
-							className: "enyo-text-ellipsis",
-							flex: 1
-						}, {
-							content: "Category",
-							className: "enyo-listselector-label enyo-label"
-						}, {
-							className: "enyo-listselector-arrow"
-						}
-					]
-				}, {
-					kind: enyo.Item,
-					layoutKind: enyo.HFlexLayout,
-					tapHightlight: false,
-					components: [
-						{
-							name: "amount",
-							kind: enyo.Input,
-							hint: "0.00",
-
-							selectAllOnFocus: true,
-							onkeypress: "amountKeyPress",//Key possibility filter
-
-							flex: 1,
+							kind: "onyx.Groupbox",
+							classes: "padding-half-top padding-half-bottom",
 							components: [
-								{
-									content: "Spending Limit",
-									className: "enyo-label"
-								}
+								/*{
+									//////////////////////////////////
+									kind: enyo.Item,
+									layoutKind: enyo.HFlexLayout,
+
+									classes: "enyo-first",
+
+									ontap: "categoryTapped",
+									components: [
+										{
+											name: "category",
+
+											classes: "enyo-text-ellipsis",
+											flex: 1
+										}, {
+											content: "Category",
+											classes: "enyo-listselector-label enyo-label"
+										}, {
+											classes: "enyo-listselector-arrow"
+										}
+									]
+								}, {
+									kind: enyo.Item,
+									layoutKind: enyo.HFlexLayout,
+									tapHightlight: false,
+									components: [
+										{
+											name: "amount",
+											kind: enyo.Input,
+											hint: "0.00",
+
+											selectAllOnFocus: true,
+											onkeypress: "amountKeyPress",//Key possibility filter
+
+											flex: 1,
+											components: [
+												{
+													content: "Spending Limit",
+													classes: "enyo-label"
+												}
+											]
+										}
+									]
+								}, {
+									showing: false,
+
+									name: "span",
+									kind: "gts.ListSelectorBar",
+									labelText: "Time Span",
+									choices: [
+											"1 month", "2 months", "3 months"
+										],
+									value: "1 month",
+
+									style: "padding: 10px !important;"
+								}, {
+									showing: false,
+
+									name: "rollover",
+									kind: "gts.ToggleBar",
+									style: "padding-left: 0;",
+									mainText: "Rollover",
+									subText: "",
+
+									onText: "Yes",
+									offText: "No",
+
+									value: false,
+
+									style: "padding: 10px !important;"
+								}, {
+									name: "delete",
+									kind: "onyx.Button",
+									content: "Delete",
+
+									ontap: "delete",
+
+									classes: "onyx-negative"
+								}*/
+									//////////////////////////////////
 							]
 						}
 					]
-				}, {
-					showing: false,
-
-					name: "span",
-					kind: "gts.ListSelectorBar",
-					labelText: "Time Span",
-					choices: [
-							"1 month", "2 months", "3 months"
-						],
-					value: "1 month",
-
-					style: "padding: 10px !important;"
-				}, {
-					showing: false,
-
-					name: "rollover",
-					kind: "gts.ToggleBar",
-					style: "padding-left: 0;",
-					mainText: "Rollover",
-					subText: "",
-
-					onText: "Yes",
-					offText: "No",
-
-					value: false,
-
-					style: "padding: 10px !important;"
 				}
 			]
 		}, {
-			kind: enyo.HFlexBox,
+			kind: "onyx.Toolbar",
+			classes: "text-center two-button-toolbar",
 			components: [
 				{
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
 					kind: "onyx.Button",
-					caption: "Cancel",
+					content: "Cancel",
 
-					flex: 3,
 					ontap: "close"
 				}, {
-					kind: enyo.Spacer,
-					flex: 1
-				}, {
-					name: "delete",
-					kind: "onyx.Button",
-					caption: "Delete",
-
-					flex: 3,
-					ontap: "delete",
-
-					className: "onyx-negative"
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
+					content: ""
 				}, {
 					kind: "onyx.Button",
-					caption: "Save",
+					content: "Save",
 
-					flex: 3,
 					ontap: "save",
 
-					className: "onyx-affirmative"
-				}, {
-					kind: enyo.Spacer,
-					flex: 1
+					classes: "onyx-affirmative"
 				}
 			]
 		},
 
 		{
 			name: "progress",
-			kind: "gts.progress",
+		//	kind: "gts.progress",
 
 			title: "",
 			message: "",
 			progress: ""
 		}, {
 			name: "errorMessage",
-			kind: "gts.system_error",
+		//	kind: "gts.system_error",
 
 			errTitle: "Budget Error",
 			errMessage: "",
@@ -180,39 +175,20 @@ enyo.kind({
 		{
 			name: "categorySystem",
 			kind: "Checkbook.transactionCategory.select",
-			entireGeneral: true
-		},
-
-		{
-			name: "manager",
-			kind: "Checkbook.budget.manager"
+			onHide: ""
 		}
 	],
 
 	rendered: function() {
 
-		this.$['categorySystem'].loadCategories( enyo.bind( this, this.inherited, arguments ) );
-
-		this.saveComplete = enyo.bind( this, this.saveComplete );
-	},
-
-	openAtCenter: function( inBudget ) {
-
 		this.inherited( arguments );
 
-		this.budgetObj = enyo.mixin(
-				{
-					budgetId: null,
-					category: "Uncategorized",
-					category2: "%",
-					spending_limit: "",
-					span: 1,
-					rollOver: 0
-				},
-				inBudget
-			);
+		this.$['categorySystem'].loadCategories( enyo.bind( this, this.completeLoad ) );
+	},
 
-		this.$['delete'].setShowing( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 );
+	completeLoad: function() {
+
+		this.$['delete'].setShowing( this.budgetId && this.budgetId >= 0 );
 
 		this.renderCategory();
 		this.renderAmount();
@@ -235,7 +211,7 @@ enyo.kind({
 
 		if( this.budgetObj['category2'] === "%" ) {
 
-			this.$['category'].setContent( this.budgetObj['category'] );
+			this.$['category'].setContent( this.category );
 		} else {
 
 			this.$['category'].setContent( this.budgetObj['category2'] );
@@ -254,42 +230,42 @@ enyo.kind({
 
 	renderAmount: function() {
 
-		this.$['amount'].setValue( this.budgetObj['spending_limit'] );
+		this.$['amount'].setValue( this.spending_limit );
 	},
 
 	/** Save System **/
 
 	save: function() {
 
-		this.budgetObj['spending_limit'] = ( gts.Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
+		this.spending_limit = ( gts.Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
 
-		if( this.budgetObj['spending_limit'] === 0 ) {
+		if( this.spending_limit === 0 ) {
 
 			this.$['errorMessage'].load( null, "Spending limit must not be zero.", null, null );
 			return;
 		}
 
-		delete this.budgetObj['spent'];
+		delete this.spent;
 
-		if( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 ) {
+		if( this.budgetId && this.budgetId >= 0 ) {
 
-			this.$['manager'].updateBudget( this.budgetObj, { "onSuccess": this.saveComplete } );
+			Checkbook.budget.manager.updateBudget( this.budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
 		} else {
 
-			delete this.budgetObj['budgetId'];
+			delete this.budgetId;
 
-			this.$['manager'].createBudget( this.budgetObj, { "onSuccess": this.saveComplete } );
+			Checkbook.budget.manager.createBudget( this.budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
 		}
 	},
 
 	delete: function() {
 
-		if( this.budgetObj['budgetId'] && this.budgetObj['budgetId'] >= 0 ) {
+		if( this.budgetId && this.budgetId >= 0 ) {
 
-			this.$['manager'].deleteBudget( this.budgetObj['budgetId'], { "onSuccess": this.saveComplete } );
+			Checkbook.budget.manager.deleteBudget( this.budgetId, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
 		} else {
 
-			this.saveComplete();
+			enyo.bind( this, this.saveComplete )();
 		}
 	},
 

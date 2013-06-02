@@ -408,7 +408,7 @@ enyo.kind( {
 			if( this.account['enableCategories'] === 1 ) {
 
 				this.$['category'].show();
-				this.$['category'].setContent( Checkbook.globals.transactionManager.formatCategoryDisplay( row['category'], row['category2'], true, "smaller" ) );
+				this.$['category'].setContent( Checkbook.transactions.manager.formatCategoryDisplay( row['category'], row['category2'], true, "smaller" ) );
 			} else {
 
 				this.$['category'].hide();
@@ -460,7 +460,7 @@ enyo.kind( {
 
 	_transactionFetchGroup: function( limit, offset ) {
 
-			Checkbook.globals.transactionManager.fetchTransactions(
+			Checkbook.transactions.manager.fetchTransactions(
 					this.account,
 					{
 						"onSuccess": this.bound.transactionFetchGroupHandler
@@ -737,7 +737,7 @@ results = {
 
 	transactionClearedDatabaseUpdate: function( inEvent, index, cleared ) {
 
-		Checkbook.globals.transactionManager.clearTransaction( this.transactions[index]['itemId'], cleared );
+		Checkbook.transactions.manager.clearTransaction( this.transactions[index]['itemId'], cleared );
 
 		enyo.Signals.send(
 				"accountBalanceChanged",
@@ -827,7 +827,7 @@ results = {
 				};
 
 		//update database;
-		Checkbook.globals.transactionManager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
+		Checkbook.transactions.manager.deleteTransaction( this.transactions[rowIndex]['itemId'] );
 
 		if( inEvent['recurrence'] ) {
 
@@ -890,7 +890,7 @@ results = {
 		this.$['list'].refresh();
 
 		//Fetch row
-		Checkbook.globals.transactionManager.fetchTransactions(
+		Checkbook.transactions.manager.fetchTransactions(
 				this.account,
 				{
 					"onSuccess": this.bound.transactionFetchGroupHandler

@@ -10,7 +10,7 @@
  * @requires gts.database to exist in Checkbook.globals.gts_db
  * @requires Checkbook.encrypt
  */
-enyo.kind({
+enyo.singleton( {
 	name: "Checkbook.accounts.manager",
 	kind: enyo.Component,
 
@@ -50,14 +50,6 @@ enyo.kind({
 	constructor: function() {
 
 		this.inherited( arguments );
-
-		//Create DB Object if not build.
-		if( !Checkbook.globals.gts_db ) {
-
-			this.log( "creating database object." );
-
-			var db = new gts.database( getDBArgs() );
-		}
 
 		// Setup listing of bound methods
 		this.bound = {
