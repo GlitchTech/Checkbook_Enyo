@@ -938,8 +938,6 @@ enyo.kind( {
 
 				if( this.accountObj['atmEntry'] == 1 ) {
 
-					item.$['categoryAmount'].setValue( deformatAmount( row['amount'] ) );
-
 					item.$['categoryAmount'].setAtm( true );
 					item.$['categoryAmount'].setSelectOnFocus( false );
 				} else {
@@ -947,6 +945,8 @@ enyo.kind( {
 					item.$['categoryAmount'].setAtm( false );
 					item.$['categoryAmount'].setSelectOnFocus( true );
 				}
+
+				item.$['categoryAmount'].setValue( row['amount'] );
 
 				item.$['categoryAmount'].setDisabled( false );
 				item.$['categoryDelete'].setDisabled( false );
@@ -1049,7 +1049,13 @@ enyo.kind( {
 		this.$['fillValueButton'].setShowing( this.trsnObj['category'].length > 1 );
 		this.$['categoryFooter'].reflow();
 
-		this.$['categoryList'].setCount( this.trsnObj['category'].length );
+		if( this.$['categoryList'].getCount() === this.trsnObj['category'].length ) {
+
+			this.$['categoryList'].build();
+		} else {
+
+			this.$['categoryList'].setCount( this.trsnObj['category'].length );
+		}
 	},
 
 	/** Recurrence Controls **/
