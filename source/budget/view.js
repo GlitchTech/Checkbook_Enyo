@@ -10,7 +10,7 @@ enyo.kind({
 	sort: 0,
 	budgets: [],
 	budgetCount: 0,
-	editMode: false,
+	editMode: true,//false,
 
 	published: {
 		accountObj: {}
@@ -134,16 +134,6 @@ enyo.kind({
 									minimum: 0,
 									maximum: 100,
 									position: 0
-								}, {
-									name: "config",
-									kind: "enyo.Image",
-									src: "assets/config.png",
-									classes: "img-icon"
-								}, {
-									name: "search",
-									kind: "enyo.Image",
-									src: "assets/search.png",
-									classes: "img-icon"
 								}
 							]
 						}
@@ -260,6 +250,7 @@ enyo.kind({
 				},
 
 				{
+					showing: false,//TEMP
 					kind: "onyx.Button",
 
 					ontap: "toggleEdit",
@@ -506,7 +497,7 @@ enyo.kind({
 		}
 	},
 
-	deleted: function( inSender, rowIndex ) {
+	deleted: function( inSender, inEvent ) {
 
 		this.warn( "NOT YET BUILT" );
 		return;
@@ -519,18 +510,35 @@ enyo.kind({
 		}
 	},
 
-	tapped: function( inSender, inEvent, rowIndex ) {
+	tapped: function( inSender, inEvent ) {
 
-		this.warn( "NOT YET BUILT" );
-
-		var row = this.budgets[rowIndex];
+		var row = this.budgets[inEvent.index];
 
 		if( row ) {
 
-			if( this.$['editModeToggle'].getDepressed() ) {
+			if( this.editMode ) {
 
-				this.$['modify'].openAtCenter( row );
+				enyo.Signals.send(
+						"showPanePopup",
+						{
+							name: "modifyBudgetItem",
+							kind: "Checkbook.budget.modify",
+
+							budgetId: row['budgetId'],
+							budgetOrder: row['budgetOrder'],
+							category: row['category'],
+							category2: row['category2'],
+							rollOver: row['rollOver'],
+							span: row['span'],
+							spending_limit: row['spending_limit'],
+
+							onFinish: this.bound['modifyComplete']
+						}
+					);
 			} else {
+
+				this.log( "NYI" );
+				return true;
 
 				enyo.Signals.send(
 						"showSearch",
@@ -544,51 +552,6 @@ enyo.kind({
 					);
 			}
 		}
-		/*
-		var row = this.accounts[inEvent.index];
-
-		if( row ) {
-
-			var nextAction;
-			var nextActionEvent = {};
-
-			if( this.editMode ) {
-				//Edit Account
-
-				nextAction = "showPanePopup";
-				nextActionEvent = {
-						name: "editAccount",
-						kind: "Checkbook.accounts.modify",
-						acctId: this.accounts[inEvent.index]['acctId'],
-						onFinish: enyo.bind( this, this.editAccountComplete, inEvent.index )
-					};
-			} else {
-				//View Account
-
-				nextAction = "showSearch";
-				nextActionEvent = {
-						account: row
-					};
-			}
-
-			enyo.Signals.send(
-					"showPanePopup",
-					{
-						name: "modifyBudgetItem",
-						kind: "Checkbook.budget.modify",
-
-						budgetId: null,
-						category: "Uncategorized",
-						category2: "%",
-						spending_limit: "",
-						span: 1,
-						rollOver: 0,
-
-						onFinish: this.bound['modifyComplete']
-					}
-				);
-		}
-		*/
 
 		return true;
 	},
@@ -618,9 +581,6 @@ enyo.kind({
 			this.colorText( this.$['current'], progress );
 
 			this.$['progress'].setProgress( progress );
-
-			this.$['search'].setShowing( !this.editMode );
-			this.$['config'].setShowing( this.editMode );
 
 			return true;
 		}

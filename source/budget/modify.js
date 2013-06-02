@@ -16,7 +16,8 @@ enyo.kind({
 		category2: "%",
 		spending_limit: "",
 		span: 1,
-		rollOver: 0
+		rollOver: 0,
+		budgetOrder: null
 	},
 
 	events: {
@@ -93,7 +94,8 @@ enyo.kind({
 
 							ontap: "delete",
 
-							classes: "onyx-negative"
+							classes: "onyx-negative margin-top",
+							style: "width: 100%;"
 						}
 
 								, {
