@@ -150,13 +150,6 @@ enyo.kind({
 		},
 
 		{
-			name: "progress",
-		//	kind: "gts.progress",
-
-			title: "",
-			message: "",
-			progress: ""
-		}, {
 			name: "errorMessage",
 		//	kind: "gts.system_error",
 

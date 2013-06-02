@@ -473,8 +473,6 @@ enyo.kind( {
 	transactionFetchGroupHandler: function( offset, results, rbResults ) {
 		//Parse page data
 
-		this.log( rbResults.length, results.length );
-
 		var currentBalance = 0;
 
 		if( rbResults.length > 0 ) {

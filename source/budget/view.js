@@ -9,6 +9,7 @@ enyo.kind({
 
 	sort: 0,
 	budgets: [],
+	budgetCount: 0,
 	editMode: false,
 
 	published: {
@@ -72,43 +73,42 @@ enyo.kind({
 
 		{
 			name: "entries",
+			kind: "gts.LazyList",
 
 			fit: true,
-
-			content: "TEST"
-			/*
-			kind: "ReorderableVirtualList",
-
-			classes: "light narrow-column",//Should this be narrow-column?
-			style: "padding-left: 0px; padding-right: 0px;",
-			flex: 1,
-
 			reorderable: true,
+			enableSwipe: false,
+			touchOverscroll: false,
 
-			onReorder: "reorder",
-			onSetupRow: "setupRow",
 			onAcquirePage: "acquirePage",
+
+			onSetupItem: "setupRow",
+			onReorder: "reorder",
+			onSetupReorderComponents: "setupReorderComponents",
+			onSetupPinnedReorderComponents: "",
+			onSetupSwipeItem: "",
+			onSwipeComplete: "",
 
 			components: [
 				{
-					kind: enyo.SwipeableItem,
+					kind: "gts.Item",
 
-					style: "padding-right: 7px;",
+					classes: "bordered",
 
-					tapHighlight: true,
+					tapHighlight: true,//tap
+					holdHighlight: false,//hold
+
 					ontap: "tapped",
-					onConfirm: "deleted",
+					//ondelete: "deleted",
 
 					components: [
 						{
-							layoutKind: enyo.HFlexLayout,
-							align: "center",
+							classes: "h-box box-align-center",
 
 							components: [
 								{
 									name: "category",
-
-									flex: 1
+									classes: "box-flex-1"
 								}, {
 									name: "current"
 								}, {
@@ -119,43 +119,67 @@ enyo.kind({
 								}
 							]
 						}, {
-							layoutKind: enyo.HFlexLayout,
-							align: "center",
+							classes: "h-box box-align-center",
 
 							components: [
 								{
 									name: "progress",
 									kind: "onyx.ProgressBar",
 
-									flex: 1,
-									classes: "big",
-									style: "margin-right: 10px;",
+									classes: "box-flex-1 big margin-right",
+
+									animateStripes: false,
+									showStripes: false,
 
 									minimum: 0,
 									maximum: 100,
 									position: 0
 								}, {
 									name: "config",
-									kind: enyo.Image,
-									src: "assets/config.png"
+									kind: "enyo.Image",
+									src: "assets/config.png",
+									classes: "img-icon"
 								}, {
 									name: "search",
-									kind: enyo.Image,
-									src: "assets/search.png"
+									kind: "enyo.Image",
+									src: "assets/search.png",
+									classes: "img-icon"
 								}
 							]
 						}
 					]
 				}
+			],
+
+			reorderComponents: [
+				{
+					name: "reorderContent",
+					classes: "tardis-blue-trans padding-std",
+					style: "max-width: 50%;",
+					components: [
+						{
+							name: "reorderName",
+							classes: "text-ellipsis accountName"
+						}, {
+							name: "reorderProgress",
+							kind: "onyx.ProgressBar",
+
+							animateStripes: false,
+							showStripes: false,
+
+							minimum: 0,
+							maximum: 100,
+							position: 0
+						}
+					]
+				}
 			]
-			*/
 		},
 
 		{
 			kind: "Checkbook.MoreToolbar",
 			layoutKind: "enyo.FittableColumnsLayout",
 			classes: "tardis-blue",
-			noStretch: true,
 			components: [
 				{
 					name: "backButton",
@@ -170,6 +194,9 @@ enyo.kind({
 				}, {
 					kind: "onyx.MenuDecorator",
 					classes: "padding-none margin-vert-none",
+
+					onSelect: "budgetSortingChanged",
+
 					components: [
 						{
 							kind: "onyx.Button",
@@ -189,8 +216,6 @@ enyo.kind({
 							scrimclasses: "onyx-scrim-translucent",
 
 							style: "min-width: 225px;",
-
-							onChange: "budgetSortingChanged",
 
 							components: budgetSortOptions,
 							value: 0
@@ -329,7 +354,7 @@ enyo.kind({
 
 	buildHeaderHandler: function( result ) {
 
-		//result['budgetCount']
+		this.budgetCount = result['budgetCount'];
 
 		var progress = result['spent'] / result['spending_limit'] * 100;
 		progress = progress || 0;
@@ -337,30 +362,29 @@ enyo.kind({
 		this.$['totalCurrent'].setContent( formatAmount( result['spent'] ) );
 		this.$['totalMax'].setContent( formatAmount( result['spending_limit'] ) );
 
-		this.$['totalProgress'].animateProgressTo( progress );
+		this.$['totalProgress'].setProgress( progress );
 
 		this.colorBar( this.$['totalProgress'], progress );
 		this.colorText( this.$['totalCurrent'], progress );
 
 		this.$['header'].reflow();
+
+		this.resetList();
 	},
 
 	/** Footer Controls **/
 
-	budgetSortingChanged: function() {
+	budgetSortingChanged: function( inSender, inEvent ) {
 
-		this.log( arguments );
-		return;
-
-		if( this.sort === inSender.value ) {
+		if( !inEvent.selected || this.sort === inEvent.selected.value ) {
 			//No change, abort
+
 			return;
 		}
 
-		this.sort = inSender.value;
+		this.sort = inEvent.selected.value;
 
-		this.budgets = [];
-		//this.$['entries'].punt();
+		this.resetList();
 	},
 
 	dateBack: function() {
@@ -390,9 +414,6 @@ enyo.kind({
 	},
 
 	dateChanged: function() {
-
-		this.budgets = [];
-		//this.$['entries'].punt();
 
 		Checkbook.budget.manager.fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
 	},
@@ -430,16 +451,24 @@ enyo.kind({
 
 	/** List Control **/
 
-	reorder: function( inSender, toIndex, fromIndex ) {
+	resetList: function() {
 
-		if( toIndex != fromIndex && toIndex > -1 && toIndex < this.budgets.length ) {
+		this.budgets = [];
 
-			var temp = this.budgets.splice( fromIndex, 1 );
-			var bottom = this.budgets.slice( toIndex );
+		this.$['entries'].setCount( 0 );
+		this.$['entries'].reset();
 
-			this.budgets.length = toIndex;
-			this.budgets.push.apply( this.budgets, temp );
-			this.budgets.push.apply( this.budgets, bottom );
+		this.$['entries'].lazyLoad();
+	},
+
+	reorder: function( inSender, inEvent ) {
+		//Row moved
+
+		if( inEvent.reorderTo != inEvent.reorderFrom && inEvent.reorderTo > -1 && inEvent.reorderTo < this.budgets.length ) {
+
+			var movedItem = enyo.clone( this.budgets[inEvent.reorderFrom] );
+			this.budgets.splice( inEvent.reorderFrom, 1 );
+			this.budgets.splice( ( inEvent.reorderTo ), 0, movedItem );
 
 			var qryOrder = [];
 
@@ -462,7 +491,37 @@ enyo.kind({
 		}
 	},
 
+	setupReorderComponents: function( inSender, inEvent ) {
+
+		var row = this.budgets[inEvent.index];
+
+		if( row ) {
+
+			var progress = 100 * row['spent'] / row['spending_limit'];
+
+			this.colorBar( this.$['reorderProgress'], progress );
+			this.$['reorderProgress'].setProgress( progress );
+
+			this.$['reorderName'].setContent( row['category'] + ( row['category2'] !== "%" ? " >> " + row['category2'] : "" ) );
+		}
+	},
+
+	deleted: function( inSender, rowIndex ) {
+
+		this.warn( "NOT YET BUILT" );
+		return;
+
+		var row = this.budgets[rowIndex];
+
+		if( row ) {
+
+			Checkbook.budget.manager.deleteBudget( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
+		}
+	},
+
 	tapped: function( inSender, inEvent, rowIndex ) {
+
+		this.warn( "NOT YET BUILT" );
 
 		var row = this.budgets[rowIndex];
 
@@ -529,19 +588,9 @@ enyo.kind({
 					}
 				);
 		}
+		*/
 
 		return true;
-		*/
-	},
-
-	deleted: function( inSender, rowIndex ) {
-
-		var row = this.budgets[rowIndex];
-
-		if( row ) {
-
-			Checkbook.budget.manager.deleteBudget( row['budgetId'], { "onSuccess": this.bound['modifyComplete'] } );
-		}
 	},
 
 	modifyComplete: function() {
@@ -552,9 +601,9 @@ enyo.kind({
 		this.dateChanged();
 	},
 
-	setupRow: function( inSender, inIndex ) {
+	setupRow: function( inSender, inEvent ) {
 
-		var row = this.budgets[inIndex];
+		var row = this.budgets[inEvent.index];
 
 		if( row ) {
 
@@ -568,26 +617,20 @@ enyo.kind({
 			this.colorBar( this.$['progress'], progress );
 			this.colorText( this.$['current'], progress );
 
-			this.$['progress'].animateProgressTo( progress );
+			this.$['progress'].setProgress( progress );
 
-			this.$['search'].setShowing( !this.$['editModeToggle'].getDepressed() );
-			this.$['config'].setShowing( this.$['editModeToggle'].getDepressed() );
+			this.$['search'].setShowing( !this.editMode );
+			this.$['config'].setShowing( this.editMode );
 
 			return true;
 		}
 	},
 
-	acquirePage: function( inSender, inPage ) {
+	acquirePage: function( inSender, inEvent ) {
 
-		var index = inPage * inSender.getPageSize();
+		var index = inEvent['page'] * inEvent['pageSize'];
 
-		if( index < 0 ) {
-			//No indexes below zero, don't bother calling
-
-			return;
-		}
-
-		if( !this.budgets[index] ) {
+		if( index >= 0 && this.budgets.length < this.budgetCount && !this.budgets[index] ) {
 
 			this.loadingDisplay( true );
 
@@ -601,11 +644,17 @@ enyo.kind({
 					inSender.getPageSize(),//Limit
 					index//Offset
 				);
+
+			return true;
 		}
+
+		return false;
 	},
 
 	buildPage: function( offset, results ) {
 		//Parse page data
+
+		this.log( results );
 
 		for( var i = 0; i < results.length; i++ ) {
 /*
@@ -626,6 +675,7 @@ results = {
 			this.budgets[offset + i]['category2'] = gts.String.dirtyString( this.budgets[offset + i]['category2'] );
 		}
 
+		this.$['entries'].setCount( this.budgets.length );
 		this.$['entries'].refresh();
 
 		this.loadingDisplay( false );
