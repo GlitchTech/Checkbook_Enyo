@@ -25,141 +25,15 @@
 	display: inline-block;
 }
 
-/** Account List **/
-
-.account-item {
-	padding: 0px;
-}
-
-.account-item.hiddenAccount .accountName {
-	color: @naka-red;
-}
-
-.account-item.maskedAccount .accountName {
-	color: @deep-blue;
-}
-
-.account-item .account {
-	border-top: 1px solid rgba(255, 255, 255, 0.5);
-
-	padding: 8px 14px;
-}
-
-.accountLockIcon,
-.accountIcon {
-	.img-icon;
-}
-
-.accountIcon {
-	margin-right: 10px;
-}
-
-.accountLockIcon {
-	margin-left: -42px;
-}
-
-.accountLockIcon.unlocked {
-	display: none;
-}
-
-.account-item .note {
-	padding: 0px 14px 5px 14px;
-}
-
-/** Transaction List **/
-
-.transaction-item-top {
-	margin-left: -25px;
-	padding-left: 10px;
-
-	margin-top: -5px;
-	padding-top: 5px;
-}
-
-.transaction-item-top .amount-block {
-	display: inline-block;
-}
-
-.transaction-item-top .checkbox-clone.checked {
-	background-position: 0px -32px;
-}
-
-.repeatIcon {
-	background-image: url( "../assets/calendar.png" );
-	background-repeat: no-repeat;
-	background-position: top left;
-}
-
-.repeatTransferIcon {
-	background-image: url( "../assets/future_transfer_1.png" );
-	background-repeat: no-repeat;
-	background-position: top left;
-}
-
-.transferIcon {
-	background-image: url( "../assets/transfer_3.png" );
-	background-repeat: no-repeat;
-	background-position: top left;
-}
-
-.expenseIcon {
-	background-image: url( "../assets/icon-expense.png" );
-	background-repeat: no-repeat;
-	background-position: top left;
-}
-
-.incomeIcon {
-	background-image: url( "../assets/icon-income.png" );
-	background-repeat: no-repeat;
-	background-position: top left;
-}
-
-.futureTransaction .date {
-	color: @black;
-}
-
-.date,
-.futureTransaction .description {
-	color: @deep-blue;
-}
-
-.splitCatContainer .categoryGroup {
-	margin-left: -10px;
-}
-
-.splitCatContainer .categoryGroup div {
-	.border-radius ( top-left, 5px );
-	.border-radius ( bottom-left, 5px );
-
-	border-left: 1px solid rgba( 0, 0, 0, 0.2 );
-}
-
-.splitCatContainer .categoryAmount {
-}
-
-.splitCatContainer .categoryAmount div {
-	.border-radius ( top-right, 5px );
-	.border-radius ( bottom-right, 5px );
-
-	border-right: 1px solid rgba( 0, 0, 0, 0.2 );
-}
-
-.splitCatContainer .cat-item {
-	border-top: 1px solid rgba( 255, 255, 255, 0.5 );
-	border-bottom: 1px solid rgba( 0, 0, 0, 0.2 );
-	padding: 10px;
-}
-
 .block-buttons .onyx-button {
 	width: 75%;
 	margin: @std-spacing / 2;
 }
 
-.transactionSortMenuItem.gts-menuimageitem {
-	white-space: nowrap;
+.onyx-menu.onyx-menu-wider {
+	min-width: 200px;
 }
 
 .transactionSortMenuItem.gts-menuimageitem .gts-mii-text {
-	white-space: normal;
 	width: 150px;
 }

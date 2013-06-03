@@ -1,0 +1,41 @@
+/** Account List **/
+
+.account-item {
+	padding: 0px;
+
+	&.hiddenAccount .accountName {
+		color: @naka-red;
+	}
+
+	&.maskedAccount .accountName {
+		color: @deep-blue;
+	}
+
+	.account {
+		border-top: 1px solid rgba(255, 255, 255, 0.5);
+
+		padding: 8px 14px;
+	}
+
+	.note {
+		padding: 0px 14px 5px 14px;
+	}
+}
+
+.accountLockIcon,
+.accountIcon {
+	.img-icon;
+}
+
+.accountIcon {
+	margin-right: 10px;
+}
+
+.accountLockIcon {
+	margin-left: -42px;
+	margin-right: 10px;
+
+	&.unlocked {
+		display: none;
+	}
+}
