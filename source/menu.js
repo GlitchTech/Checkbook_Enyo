@@ -28,6 +28,7 @@ enyo.kind({
 		}, {
 			classes: "onyx-menu-divider"
 		}, {
+			showing: false,
 			content: "Search",
 			ontap: "openSearch"
 		}, {

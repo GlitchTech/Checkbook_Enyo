@@ -21,7 +21,6 @@ enyo.kind({
 
 	components: [
 		{
-			name: "header",
 			kind: "onyx.Toolbar",
 			layoutKind: "enyo.FittableColumnsLayout",
 			noStretch: true,
@@ -57,27 +56,55 @@ enyo.kind({
 		},
 
 		{
-			name: "progressHeader",
-			layoutKind: "enyo.FittableColumnsLayout",
+			classes: "padding-half-bottom padding-half-left padding-half-right",
+			style: "border-bottom: 2px solid #cccccc;",
 			components: [
 				{
-					name: "totalCurrent"
+					name: "progressHeader",
+					layoutKind: "enyo.FittableColumnsLayout",
+					classes: "padding-half-bottom",
+					style: "margin-top: 0.1em;",
+					components: [
+						{
+							name: "currentMonth",
+							classes: "label bold",
+							style: "font-size: 1.15rem;",
+							fit: true
+						}, {
+							name: "totalRemaining",
+							classes: "bold"
+						}
+					]
 				}, {
-					name: "totalProgress",
-					kind: "onyx.ProgressButton",
+					layoutKind: "enyo.FittableColumnsLayout",
+					components: [
+						{
+							name: "totalProgress",
+							kind: "onyx.ProgressButton",
 
-					fit: true,
+							fit: true,
 
-					animateStripes: false,
-					showStripes: false,
+							animateStripes: false,
+							showStripes: false,
 
-					minimum: 0,
-					maximum: 100,
-					position: 0,
+							minimum: 0,
+							maximum: 100,
+							position: 0,
 
-					classes: "margin-vert-none no-cancel"
-				}, {
-					name: "totalMax"
+							classes: "margin-vert-none no-cancel bold",
+
+							components: [
+								{
+									name: "totalCurrent"
+								}, {
+									content: "of",
+									style: "padding-left: 5px; padding-right: 5px;"
+								}, {
+									name: "totalMax"
+								}
+							]
+						}
+					]
 				}
 			]
 		},
@@ -104,7 +131,7 @@ enyo.kind({
 				{
 					kind: "gts.Item",
 
-					classes: "padding-none",
+					classes: "bordered padding-none",
 
 					tapHighlight: true,//tap
 					holdHighlight: false,//hold
@@ -114,15 +141,15 @@ enyo.kind({
 
 					components: [
 						{
-							classes: "h-box box-align-center padding-std",
-							style: "background-color: blue; color: white;",
+							classes: "h-box box-align-center padding-std budget-category",
 
 							components: [
 								{
 									name: "category",
 									classes: "box-flex-1"
 								}, {
-									name: "remaining"
+									name: "remaining",
+									classes: "padding-right bold"
 								}
 							]
 						}, {
@@ -361,16 +388,20 @@ enyo.kind({
 
 		this.budgetCount = result['budgetCount'];
 
+		this.$['currentMonth'].setContent( this.$['date'].getValue().format( { date: "MMMM yyyy", time: "" } ) );
+
 		var progress = result['spent'] / result['spending_limit'] * 100;
 		progress = progress || 0;
+
+		var remaining = result['spending_limit'] - result['spent'];
+		this.$['totalRemaining'].setContent( formatAmount( Math.abs( remaining ) ) + " " + ( remaining >= 0 ? "left" : "over" ) );
+		this.colorText( this.$['totalRemaining'], progress );
 
 		this.$['totalCurrent'].setContent( formatAmount( result['spent'] ) );
 		this.$['totalMax'].setContent( formatAmount( result['spending_limit'] ) );
 
 		this.$['totalProgress'].setProgress( progress );
-
 		this.colorBar( this.$['totalProgress'], progress );
-		this.colorText( this.$['totalCurrent'], progress );
 
 		this.$['progressHeader'].reflow();
 
@@ -582,12 +613,13 @@ enyo.kind({
 		if( row ) {
 
 			var progress = 100 * row['spent'] / row['spending_limit'];
+			progress = progress || 0;
 
 			this.$['category'].setContent( row['category'] + ( row['category2'] !== "%" ? " >> " + row['category2'] : "" ) );
 
 			var remaining = row['spending_limit'] - row['spent'];
 			this.$['remaining'].setContent( formatAmount( Math.abs( remaining ) ) + " " + ( remaining >= 0 ? "left" : "over" ) );
-			//this.colorText( this.$['remaining'], progress );
+			this.colorText( this.$['remaining'], progress );
 
 			this.$['progress'].setProgress( progress );
 			this.colorBar( this.$['progress'], progress );

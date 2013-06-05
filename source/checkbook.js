@@ -343,7 +343,6 @@ enyo.kind({
 			this.$['splash'].destroy();
 		}
 
-		this.openBudget();
 //		this.openSearch();
 	},
 
