@@ -343,7 +343,7 @@ enyo.kind({
 			this.$['splash'].destroy();
 		}
 
-		this.openBudget();
+		this.openSearch();
 	},
 
 	resetSystem: function( inSender, inEvent ) {
