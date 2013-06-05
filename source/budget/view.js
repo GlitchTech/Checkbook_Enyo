@@ -10,7 +10,6 @@ enyo.kind({
 	sort: 0,
 	budgets: [],
 	budgetCount: 0,
-	editMode: true,//false,
 
 	published: {
 		accountObj: {}
@@ -60,13 +59,6 @@ enyo.kind({
 					style: "width: 200px; margin-left: 10px; margin-right: 10px;"
 				}, {
 					name: "totalMax"
-				},
-
-				{
-					name: "editOverlay",
-					content: "Edit Budgets",
-					classes: "enyo-fit text-center header-overlay rounded",
-					showing: false
 				}
 			]
 		},
@@ -134,6 +126,16 @@ enyo.kind({
 									minimum: 0,
 									maximum: 100,
 									position: 0
+								}, {
+									kind: "onyx.Button",
+									ontap: "buttonTapped",
+									classes: "padding-none margin-none",
+									components: [
+										{
+											kind: "onyx.IconButton",
+											src: "assets/menu_icons/settings.png"
+										}
+									]
 								}
 							]
 						}
@@ -250,20 +252,6 @@ enyo.kind({
 				},
 
 				{
-					showing: false,//TEMP
-					kind: "onyx.Button",
-
-					ontap: "toggleEdit",
-
-					components: [
-						{
-							name: "editModeButtonIcon",
-							kind: "onyx.Icon",
-							src: "assets/menu_icons/lock_closed.png",
-							classes: "onyx-icon-button"
-						}
-					]
-				}, {
 					name: "addAccountButton",
 					kind: "onyx.Button",
 
@@ -409,15 +397,6 @@ enyo.kind({
 		Checkbook.budget.manager.fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
 	},
 
-	toggleEdit: function() {
-
-		this.editMode = !this.editMode;
-
-		this.$['editModeButtonIcon'].setSrc( this.editMode ? "assets/menu_icons/lock_open.png" : "assets/menu_icons/lock_closed.png" );
-		this.$['editOverlay'].setShowing( this.editMode );
-		this.$['header'].reflow();
-	},
-
 	addBudget: function() {
 
 		enyo.Signals.send(
@@ -516,41 +495,47 @@ enyo.kind({
 
 		if( row ) {
 
-			if( this.editMode ) {
+			this.log( "NYI" );
+			return true;
 
-				enyo.Signals.send(
-						"showPanePopup",
-						{
-							name: "modifyBudgetItem",
-							kind: "Checkbook.budget.modify",
+			enyo.Signals.send(
+					"showSearch",
+					{
+						"category": row['category'],
+						"category2": row['category2'],
+						"dateStart": this.$['date'].getValue().setStartOfMonth(),
+						"dateEnd": this.$['date'].getValue().setEndOfMonth(),
+						"onFinish": enyo.bind( this, this.dateChanged, null, this.$['date'].getValue() )
+					}
+				);
+		}
 
-							budgetId: row['budgetId'],
-							budgetOrder: row['budgetOrder'],
-							category: row['category'],
-							category2: row['category2'],
-							rollOver: row['rollOver'],
-							span: row['span'],
-							spending_limit: row['spending_limit'],
+		return true;
+	},
 
-							onFinish: this.bound['modifyComplete']
-						}
-					);
-			} else {
+	buttonTapped: function( inSender, inEvent ) {
 
-				this.log( "NYI" );
-				return true;
+		var row = this.budgets[inEvent.index];
 
-				enyo.Signals.send(
-						"showSearch",
-						{
-							"category": row['category'],
-							"category2": row['category2'],
-							"dateStart": this.$['date'].getValue().setStartOfMonth(),
-							"dateEnd": this.$['date'].getValue().setEndOfMonth(),
-							"onFinish": enyo.bind( this, this.dateChanged, null, this.$['date'].getValue() )
-						}
-					);
-			}
+		if( row ) {
+
+			enyo.Signals.send(
+					"showPanePopup",
+					{
+						name: "modifyBudgetItem",
+						kind: "Checkbook.budget.modify",
+
+						budgetId: row['budgetId'],
+						budgetOrder: row['budgetOrder'],
+						category: row['category'],
+						category2: row['category2'],
+						rollOver: row['rollOver'],
+						span: row['span'],
+						spending_limit: row['spending_limit'],
+
+						onFinish: this.bound['modifyComplete']
+					}
+				);
 		}
 
 		return true;
