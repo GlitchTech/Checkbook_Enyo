@@ -43,10 +43,30 @@ enyo.kind({
 					classes: "enyo-text-ellipsis text-left",
 					fit: true
 				}, {
+					kind: "onyx.Button",
+					classes: "padding-none transparent",
+					ontap: "dateChanged",
+					components: [
+						{
+							kind: "onyx.Icon",
+							src: "assets/menu_icons/refresh.png"
+						}
+					]
+				}
+			]
+		},
+
+		{
+			name: "progressHeader",
+			layoutKind: "enyo.FittableColumnsLayout",
+			components: [
+				{
 					name: "totalCurrent"
 				}, {
 					name: "totalProgress",
-					kind: "onyx.ProgressBar",
+					kind: "onyx.ProgressButton",
+
+					fit: true,
 
 					animateStripes: false,
 					showStripes: false,
@@ -55,8 +75,7 @@ enyo.kind({
 					maximum: 100,
 					position: 0,
 
-					classes: "big margin-vert-none",
-					style: "width: 200px; margin-left: 10px; margin-right: 10px;"
+					classes: "margin-vert-none no-cancel"
 				}, {
 					name: "totalMax"
 				}
@@ -85,7 +104,7 @@ enyo.kind({
 				{
 					kind: "gts.Item",
 
-					classes: "bordered",
+					classes: "padding-none",
 
 					tapHighlight: true,//tap
 					holdHighlight: false,//hold
@@ -95,37 +114,44 @@ enyo.kind({
 
 					components: [
 						{
-							classes: "h-box box-align-center",
+							classes: "h-box box-align-center padding-std",
+							style: "background-color: blue; color: white;",
 
 							components: [
 								{
 									name: "category",
 									classes: "box-flex-1"
 								}, {
-									name: "current"
-								}, {
-									content: "of",
-									style: "padding-left: 5px; padding-right: 5px;"
-								}, {
-									name: "total"
+									name: "remaining"
 								}
 							]
 						}, {
-							classes: "h-box box-align-center",
+							classes: "h-box box-align-center padding-half-left padding-half-right",
 
 							components: [
 								{
 									name: "progress",
-									kind: "onyx.ProgressBar",
+									kind: "onyx.ProgressButton",
 
-									classes: "box-flex-1 big margin-right",
+									classes: "box-flex-1 margin-right no-cancel bold",
 
 									animateStripes: false,
 									showStripes: false,
 
 									minimum: 0,
 									maximum: 100,
-									position: 0
+									position: 0,
+
+									components: [
+										{
+											name: "current"
+										}, {
+											content: "of",
+											style: "padding-left: 5px; padding-right: 5px;"
+										}, {
+											name: "total"
+										}
+									]
 								}, {
 									kind: "onyx.Button",
 									ontap: "buttonTapped",
@@ -346,7 +372,7 @@ enyo.kind({
 		this.colorBar( this.$['totalProgress'], progress );
 		this.colorText( this.$['totalCurrent'], progress );
 
-		this.$['header'].reflow();
+		this.$['progressHeader'].reflow();
 
 		this.resetList();
 	},
@@ -559,13 +585,15 @@ enyo.kind({
 
 			this.$['category'].setContent( row['category'] + ( row['category2'] !== "%" ? " >> " + row['category2'] : "" ) );
 
-			this.$['current'].setContent( formatAmount( row['spent'] ) );
-			this.$['total'].setContent( formatAmount( row['spending_limit'] ) );
-
-			this.colorBar( this.$['progress'], progress );
-			this.colorText( this.$['current'], progress );
+			var remaining = row['spending_limit'] - row['spent'];
+			this.$['remaining'].setContent( formatAmount( Math.abs( remaining ) ) + " " + ( remaining >= 0 ? "left" : "over" ) );
+			//this.colorText( this.$['remaining'], progress );
 
 			this.$['progress'].setProgress( progress );
+			this.colorBar( this.$['progress'], progress );
+
+			this.$['current'].setContent( formatAmount( row['spent'] ) );
+			this.$['total'].setContent( formatAmount( row['spending_limit'] ) );
 
 			return true;
 		}
@@ -598,8 +626,6 @@ enyo.kind({
 
 	buildPage: function( offset, results ) {
 		//Parse page data
-
-		this.log( results );
 
 		for( var i = 0; i < results.length; i++ ) {
 /*

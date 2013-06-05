@@ -28,13 +28,13 @@ var budgetSortOptions = [
 			value: 1,
 			query: "category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 		}, {
-			content: "Budget Remaining (Asc)",
+			content: "Percent Remaining",
 			value: 2,
-			query: "( spent / spending_limit ) ASC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
+			query: "( 100.0 * spent / spending_limit ) ASC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 		}, {
-			content: "Budget Remaining (Desc)",
+			content: "Percent Spent",
 			value: 3,
-			query: "( spent / spending_limit ) DESC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
+			query: "( 100.0 * spent / spending_limit ) DESC, category COLLATE NOCASE ASC, category2 COLLATE NOCASE ASC, budgetId ASC"
 		}
 	];
 
