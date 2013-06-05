@@ -49,7 +49,7 @@ enyo.kind({
 					components: [
 						{
 							name: "accounts",
-							//kind: enyo.VirtualRepeater,
+							kind: "enyo.Repeater",
 
 							onSetupRow: "setupRow",
 
