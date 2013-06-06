@@ -152,16 +152,6 @@ enyo.kind({
 		},
 
 		{
-			name: "errorMessage",
-		//	kind: "gts.system_error",
-
-			errTitle: "Budget Error",
-			errMessage: "",
-			errMessage2: "" ,
-			onFinish: "closeErrorMessage"
-		},
-
-		{
 			name: "categorySystem",
 			kind: "Checkbook.transactionCategory.select",
 			entireGeneral: true
@@ -229,12 +219,6 @@ enyo.kind({
 
 		this.spending_limit = ( gts.Object.validNumber( this.$['amount'].getValue() ) ? 0 : Number( Number( this.$['amount'].getValue() ).toFixed( 2 ) ) );
 
-		if( this.spending_limit === 0 ) {
-
-			this.$['errorMessage'].load( null, "Spending limit must not be zero.", null, null );
-			return;
-		}
-
 		var budgetObj = {
 				budgetId: this.budgetId,
 				category: this.category,
@@ -269,10 +253,5 @@ enyo.kind({
 	saveComplete: function() {
 
 		this.doFinish();
-	},
-
-	closeErrorMessage: function() {
-
-		this.$['errorMessage'].close();
 	}
 });
