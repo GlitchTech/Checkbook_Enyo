@@ -6,7 +6,7 @@ enyo.ready( function() {
 	}
 
 	//Logging level based on release status
-	//enyo.setLogLevel( enyo.fetchAppInfo()['id'].match( "beta" ) ? enyo.logging['levels']['log'] : enyo.logging['levels']['error'] );
+	enyo.setLogLevel( enyo.fetchAppInfo()['id'].match( "beta" ) ? enyo.logging['levels']['log'] : enyo.logging['levels']['error'] );
 
 	enyo.log( "Checkbook :: Activating touch scrolling mode" );
 	enyo.Scroller.touchScrolling = true;
