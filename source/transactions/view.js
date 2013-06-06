@@ -59,9 +59,6 @@ enyo.kind( {
 			onLoadingStart: "showLoadingIcon",
 			onLoadingFinish: "hideLoadingIcon",
 
-			onScrimShow: "showLoadingScrim",
-			onScrimHide: "hideLoadingScrim",
-
 			onCloneTransaction: "cloneTransaction"
 		}, {
 			name: "footer",
@@ -282,8 +279,6 @@ enyo.kind( {
 
 		this.adjustViewForScreenSize();
 
-		this.showLoadingScrim();
-
 		if( !this.account['acctId'] ) {
 
 			this.$['header'].show();
@@ -350,8 +345,6 @@ enyo.kind( {
 				this.$['addExpenseButton'].setDisabled( false );
 			}
 		}
-
-		this.hideLoadingScrim();
 
 		this.$['header'].reflow();
 		this.$['footer'].reflow();
@@ -565,16 +558,6 @@ enyo.kind( {
 		this.$['acctTypeIcon'].show();
 	},
 
-	showLoadingScrim: function() {
-
-		this.$['loadingScrim'].show();
-	},
-
-	hideLoadingScrim: function() {
-
-		this.$['loadingScrim'].hide();
-	},
-
 	/* Footer Control */
 
 	fireBack: function() {
@@ -698,7 +681,6 @@ enyo.kind( {
 		if( !( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
 
 			this.toggleCreateButtons();
-			this.showLoadingScrim();
 
 			enyo.Signals.send(
 					"showPanePopup",
@@ -729,7 +711,6 @@ enyo.kind( {
 		}
 
 		this.toggleCreateButtons();
-		enyo.asyncMethod( this, this.hideLoadingScrim );
 	},
 
 	toggleCreateButtons: function() {

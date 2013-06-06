@@ -13,9 +13,6 @@ enyo.kind( {
 		onLoadingStart: "",
 		onLoadingFinish: "",
 
-		onScrimShow: "",
-		onScrimHide: "",
-
 		onCloneTransaction: ""
 	},
 
@@ -602,8 +599,6 @@ results = {
 		if( this.account['frozen'] !== 1 ) {
 			//account not frozen
 
-			this.doScrimShow();
-
 			enyo.Signals.send(
 					"showPanePopup",
 					{
@@ -650,8 +645,6 @@ results = {
 					( rowIndex - 1 )
 				);
 		}
-
-		enyo.asyncMethod( this, this.doScrimHide );
 	},
 
 	transactionHeld: function( inSender, inEvent ) {

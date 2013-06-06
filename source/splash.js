@@ -13,7 +13,8 @@ enyo.kind({
 	autoDismiss: false,
 
 	published: {
-		firstRun: false
+		firstRun: false,
+		startupContainer: true
 	},
 
 	events: {
@@ -27,6 +28,7 @@ enyo.kind({
 			noStretch: true,
 			classes: "transparent"
 		}, {
+			name: "startupContainer",
 			classes: "padding-std light",
 			components: [
 				{
@@ -64,6 +66,26 @@ enyo.kind({
 
 		this.firstRun = false;
 		this.headerBuilt = false;
+	},
+
+	startupContainerChanged: function() {
+
+		if( !this.headerBuilt ) {
+
+			return;
+		}
+
+		if( this.startupContainer ) {
+
+			this.$['startupContainer'].show();
+			this.$['title'].setContent( "Loading Checkbook" );
+		} else {
+
+			this.$['startupContainer'].hide();
+			this.$['title'].setContent( "Loading" );
+		}
+
+		this.reflow();
 	},
 
 	buildHeader: function() {
