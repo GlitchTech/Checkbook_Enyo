@@ -271,6 +271,13 @@ enyo.kind( {
 
 	viewAccount: function( inSender, inEvent ) {
 
+		this.showLoadingScrim();
+
+		enyo.asyncMethod( this, this._viewAccount, inSender, inEvent );
+	},
+
+	_viewAccount: function( inSender, inEvent ) {
+
 		if( !inEvent['account'] || !inEvent['account']['acctId'] ) {
 
 			this.unloadSystem();
@@ -349,6 +356,8 @@ enyo.kind( {
 		this.$['header'].reflow();
 		this.$['footer'].reflow();
 		this.reflow();
+
+		enyo.asyncMethod( this, this.hideLoadingScrim );
 	},
 
 	resized: function() {
@@ -556,6 +565,16 @@ enyo.kind( {
 
 		this.$['loadingSpinner'].hide();
 		this.$['acctTypeIcon'].show();
+	},
+
+	showLoadingScrim: function() {
+
+		this.$['loadingScrim'].show();
+	},
+
+	hideLoadingScrim: function() {
+
+		this.$['loadingScrim'].hide();
 	},
 
 	/* Footer Control */

@@ -26,7 +26,25 @@ enyo.kind({
 			name: "headerWrapper",
 			kind: "onyx.Toolbar",
 			noStretch: true,
-			classes: "transparent"
+			classes: "transparent",
+			components: [
+				{
+					name: "spinner",
+					kind: "onyx.Spinner",
+					classes: "size-half",
+
+					style: "margin: 0 5px 0 0;"
+				}, {
+					name: "icon",
+					kind: "Image",
+					src: "assets/status_icons/warning.png",
+					style: "margin-right: 5px;",
+					showing: false
+				}, {
+					name: "title",
+					classes: "bold"
+				}
+			]
 		}, {
 			name: "startupContainer",
 			classes: "padding-std light",
@@ -65,15 +83,10 @@ enyo.kind({
 		};
 
 		this.firstRun = false;
-		this.headerBuilt = false;
+
 	},
 
 	startupContainerChanged: function() {
-
-		if( !this.headerBuilt ) {
-
-			return;
-		}
 
 		if( this.startupContainer ) {
 
@@ -90,34 +103,9 @@ enyo.kind({
 
 	buildHeader: function() {
 
-		if( !this.headerBuilt ) {
+		if( !this.startupContainer ) {
 
-			this.$['headerWrapper'].createComponents(
-					[
-						{
-							name: "spinner",
-							kind: "onyx.Spinner",
-							classes: "size-half",
-
-							style: "margin: 0 5px 0 0;"
-						}, {
-							name: "icon",
-							kind: "Image",
-							src: "assets/status_icons/warning.png",
-							style: "margin-right: 5px;",
-							showing: false
-						}, {
-							name: "title",
-							classes: "bold"
-						}
-					], {
-						owner: this
-					}
-				);
-
-			this.$['headerWrapper'].render();
-
-			this.headerBuilt = true;
+			return;
 		}
 
 		this.$['spinner'].show();

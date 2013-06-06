@@ -471,10 +471,14 @@ enyo.kind({
 
 	viewAccount: function() {
 
+		this.$['splash'].show();
+
 		if( enyo.Panels.isScreenNarrow() ) {
 
 			this.$['mainViews'].setIndex( 1 );
 		}
+
+		enyo.asyncMethod( this.$['splash'], this.$['splash'].hide );
 	},
 
 	/** Checkbook.search.* **/
