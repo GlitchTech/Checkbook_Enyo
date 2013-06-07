@@ -255,6 +255,11 @@ enyo.kind({
 			});
 
 		this.resized();
+
+		if( this.$['gapi'].isGapiReady() ) {
+
+			this.gapiReady();
+		}
 	},
 
 	gapiReady: function() {
