@@ -2,7 +2,8 @@
 
 enyo.kind( {
 	name: "Checkbook.transactions.view",
-	layoutKind: "FittableRowsLayout",
+//	layoutKind: "FittableRowsLayout",
+	classes: "v-box",//don't want to use this here, but FittableRowsLayout is causing trouble
 
 	account: {},
 
@@ -49,7 +50,7 @@ enyo.kind( {
 			kind: "Checkbook.transactions.list",
 
 			fit: true,
-			classes: "checkbook-stamp",
+			classes: "checkbook-stamp box-flex-1",
 			style: "position: relative;",
 
 			ondragstart: "listDrag",

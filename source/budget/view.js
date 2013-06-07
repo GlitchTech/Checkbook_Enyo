@@ -2,8 +2,8 @@
 
 enyo.kind({
 	name: "Checkbook.budget.view",
-	layoutKind: "FittableRowsLayout",
-	classes: "enyo-fit budget-view",
+//	layoutKind: "FittableRowsLayout",
+	classes: "enyo-fit budget-view v-box",//don't want to use this here, but FittableRowsLayout is causing trouble
 
 	style: "height: 100%;",
 
@@ -113,6 +113,8 @@ enyo.kind({
 		{
 			name: "entries",
 			kind: "gts.LazyList",
+
+			classes: "box-flex-1",
 
 			fit: true,
 			reorderable: true,

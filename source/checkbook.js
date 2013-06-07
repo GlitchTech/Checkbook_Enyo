@@ -83,7 +83,9 @@ enyo.kind({
 
 	/** Start Up Event **/
 
-	deviceReady: function() {
+	rendered: function() {
+
+		this.inherited( arguments );
 
 		if( this.$['splash'].getStartupContainer() ) {
 

@@ -20,6 +20,43 @@
 	<body class="enyo-unselectable">
 		<div class="body-temp">
 			<h1>Loading Checkbook</h1>
+			<script>
+				if( !enyo.platform.touch ) {
+					//Not a mobile device
+
+					enyo.log( "Checkbook :: Touchless environment, launching application" );
+					onDeviceReady();
+				} else {
+
+					enyo.log( "Checkbook :: Applying start up listener" );
+					document.addEventListener( "deviceready", onDeviceReady, false );
+					document.addEventListener( "webworksready", onDeviceReady, false );
+				}
+
+				//PhoneGap is loaded and it is now safe to make calls PhoneGap methods
+				function onDeviceReady() {
+
+					if( !window.Checkbook.app ) {
+
+						alert( "No application build found." );
+						return;
+					}
+
+					//Logging level based on release status
+					enyo.setLogLevel( enyo.fetchAppInfo()['id'].match( "beta" ) ? enyo.logging['levels']['log'] : enyo.logging['levels']['error'] );
+
+					enyo.log( "Checkbook :: Activating touch scrolling mode" );
+					enyo.Scroller.touchScrolling = true;
+
+					enyo.log( "Checkbook :: Binding PhoneGap events" );
+					enyo.dispatcher.listen( document, "backbutton" );
+					enyo.dispatcher.listen( document, "menubutton" );
+					enyo.dispatcher.listen( document, "searchbutton" );
+
+					enyo.log( "Checkbook :: Rendering application" );
+					new Checkbook.app().renderInto( document.body );
+				}
+			</script>
 		</div>
 	</body>
 </html>
