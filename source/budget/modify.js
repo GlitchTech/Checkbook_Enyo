@@ -14,10 +14,10 @@ enyo.kind({
 		budgetId: null,
 		category: "Uncategorized",
 		category2: "%",
-		spending_limit: "",
+		spending_limit: 0,
 		span: 1,
 		rollOver: 0,
-		budgetOrder: null
+		budgetOrder: 0
 	},
 
 	events: {
@@ -228,12 +228,12 @@ enyo.kind({
 				rollOver: this.rollOver
 			};
 
-		if( this.budgetId && this.budgetId >= 0 ) {
+		if( budgetObj.budgetId && budgetObj.budgetId >= 0 ) {
 
 			Checkbook.budget.manager.updateBudget( budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
 		} else {
 
-			delete this.budgetId;
+			delete budgetObj.budgetId;
 
 			Checkbook.budget.manager.createBudget( budgetObj, { "onSuccess": enyo.bind( this, this.saveComplete ) } );
 		}

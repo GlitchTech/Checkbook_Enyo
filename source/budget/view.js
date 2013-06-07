@@ -2,11 +2,12 @@
 
 enyo.kind({
 	name: "Checkbook.budget.view",
-	layoutKind: "FittableRowsLayout",
-	classes: "enyo-fit budget-view",
+//	layoutKind: "FittableRowsLayout",
+	classes: "enyo-fit budget-view v-box",//don't want to use this here, but FittableRowsLayout is causing trouble
 
 	style: "height: 100%;",
 
+	dispDate: "",
 	sort: 0,
 	budgets: [],
 	budgetCount: 0,
@@ -112,6 +113,8 @@ enyo.kind({
 		{
 			name: "entries",
 			kind: "gts.LazyList",
+
+			classes: "box-flex-1",
 
 			fit: true,
 			reorderable: true,
@@ -283,14 +286,10 @@ enyo.kind({
 								}
 							]
 						}, {
-							name: "date",
-							kind: "onyx.DatePicker",
-
-							classes: "padding-none date-picker",
-							style: "display: inline-block;",
-
-							onchange: "dateChanged",
-							dayHidden: true
+							kind: "onyx.Button",
+							ontap: "dateNow",
+							content: "Today",
+							classes: "margin-half-right margin-half-left"
 						}, {
 							kind: "onyx.Button",
 							ontap: "dateForward",
@@ -334,6 +333,8 @@ enyo.kind({
 		this.bound = {
 			modifyComplete: enyo.bind( this, this.modifyComplete )
 		};
+
+		this.dispDate = new Date();
 	},
 
 	rendered: function() {
@@ -388,7 +389,7 @@ enyo.kind({
 
 		this.budgetCount = result['budgetCount'];
 
-		this.$['currentMonth'].setContent( this.$['date'].getValue().format( { date: "MMMM yyyy", time: "" } ) );
+		this.$['currentMonth'].setContent( this.dispDate.format( { date: "MMMM yyyy", time: "" } ) );
 
 		var progress = result['spent'] / result['spending_limit'] * 100;
 		progress = progress || 0;
@@ -425,33 +426,37 @@ enyo.kind({
 
 	dateBack: function() {
 
-		var date = this.$['date'].getValue();
+		this.dispDate.setDate( 5 );
+		this.dispDate.setMonth( this.dispDate.getMonth() - 1 );
 
-		date.setDate( 5 );
-		date.setMonth( date.getMonth() - 1 );
+		this.dateChanged();
+	},
 
-		this.$['date'].setValue( date );
-		this.$['date'].valueChanged();
+	dateNow: function() {
+
+		this.dispDate = new Date();
 
 		this.dateChanged();
 	},
 
 	dateForward: function() {
 
-		var date = this.$['date'].getValue();
-
-		date.setDate( 5 );
-		date.setMonth( date.getMonth() + 1 );
-
-		this.$['date'].setValue( date );
-		this.$['date'].valueChanged();
+		this.dispDate.setDate( 5 );
+		this.dispDate.setMonth( this.dispDate.getMonth() + 1 );
 
 		this.dateChanged();
 	},
 
 	dateChanged: function() {
 
-		Checkbook.budget.manager.fetchOverallBudget( this.$['date'].getValue().setStartOfMonth(), this.$['date'].getValue().setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
+		this.loadingDisplay( true );
+
+		enyo.asyncMethod( this, this._dateChanged );
+	},
+
+	_dateChanged: function() {
+
+		Checkbook.budget.manager.fetchOverallBudget( this.dispDate.setStartOfMonth(), this.dispDate.setEndOfMonth(), { "onSuccess": enyo.bind( this, this.buildHeaderHandler ) } );
 	},
 
 	addBudget: function() {
@@ -465,7 +470,7 @@ enyo.kind({
 					budgetId: null,
 					category: "Uncategorized",
 					category2: "%",
-					spending_limit: "",
+					spending_limit: 0,
 					span: 1,
 					rollOver: 0,
 
@@ -560,9 +565,9 @@ enyo.kind({
 					{
 						"category": row['category'],
 						"category2": row['category2'],
-						"dateStart": this.$['date'].getValue().setStartOfMonth(),
-						"dateEnd": this.$['date'].getValue().setEndOfMonth(),
-						"onFinish": enyo.bind( this, this.dateChanged, null, this.$['date'].getValue() )
+						"dateStart": this.dispDate.setStartOfMonth(),
+						"dateEnd": this.dispDate.setEndOfMonth(),
+						"onFinish": enyo.bind( this, this.dateChanged, null, this.dispDate )
 					}
 				);
 		}
@@ -640,8 +645,8 @@ enyo.kind({
 			this.loadingDisplay( true );
 
 			Checkbook.budget.manager.fetchBudgets(
-					this.$['date'].getValue().setStartOfMonth(),
-					this.$['date'].getValue().setEndOfMonth(),
+					this.dispDate.setStartOfMonth(),
+					this.dispDate.setEndOfMonth(),
 					{
 						"onSuccess": enyo.bind( this, this.buildPage, index )
 					},

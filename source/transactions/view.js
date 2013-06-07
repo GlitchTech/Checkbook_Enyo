@@ -2,7 +2,8 @@
 
 enyo.kind( {
 	name: "Checkbook.transactions.view",
-	layoutKind: "FittableRowsLayout",
+//	layoutKind: "FittableRowsLayout",
+	classes: "v-box",//don't want to use this here, but FittableRowsLayout is causing trouble
 
 	account: {},
 
@@ -49,7 +50,7 @@ enyo.kind( {
 			kind: "Checkbook.transactions.list",
 
 			fit: true,
-			classes: "checkbook-stamp",
+			classes: "checkbook-stamp box-flex-1",
 			style: "position: relative;",
 
 			ondragstart: "listDrag",
@@ -58,9 +59,6 @@ enyo.kind( {
 
 			onLoadingStart: "showLoadingIcon",
 			onLoadingFinish: "hideLoadingIcon",
-
-			onScrimShow: "showLoadingScrim",
-			onScrimHide: "hideLoadingScrim",
 
 			onCloneTransaction: "cloneTransaction"
 		}, {
@@ -274,6 +272,13 @@ enyo.kind( {
 
 	viewAccount: function( inSender, inEvent ) {
 
+		this.showLoadingScrim();
+
+		enyo.asyncMethod( this, this._viewAccount, inSender, inEvent );
+	},
+
+	_viewAccount: function( inSender, inEvent ) {
+
 		if( !inEvent['account'] || !inEvent['account']['acctId'] ) {
 
 			this.unloadSystem();
@@ -281,8 +286,6 @@ enyo.kind( {
 		}
 
 		this.adjustViewForScreenSize();
-
-		this.showLoadingScrim();
 
 		if( !this.account['acctId'] ) {
 
@@ -351,11 +354,11 @@ enyo.kind( {
 			}
 		}
 
-		this.hideLoadingScrim();
-
 		this.$['header'].reflow();
 		this.$['footer'].reflow();
 		this.reflow();
+
+		enyo.asyncMethod( this, this.hideLoadingScrim );
 	},
 
 	resized: function() {
@@ -698,7 +701,6 @@ enyo.kind( {
 		if( !( this.$['addIncomeButton'].getDisabled() || this.$['addTransferButton'].getDisabled() || this.$['addExpenseButton'].getDisabled() ) ) {
 
 			this.toggleCreateButtons();
-			this.showLoadingScrim();
 
 			enyo.Signals.send(
 					"showPanePopup",
@@ -729,7 +731,6 @@ enyo.kind( {
 		}
 
 		this.toggleCreateButtons();
-		enyo.asyncMethod( this, this.hideLoadingScrim );
 	},
 
 	toggleCreateButtons: function() {

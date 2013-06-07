@@ -3,7 +3,7 @@
 enyo.kind({
 	name: "Checkbook.sync.import",
 	kind: "FittableRows",
-	classes: "enyo-fit",
+	classes: "enyo-fit tardis-blue",
 
 	style: "height: 100%;",
 
@@ -39,13 +39,13 @@ enyo.kind({
 		},
 
 		{
+			name: "instructions",
 			kind: "enyo.Scroller",
 			horizontal: "hidden",
 			classes: "tardis-blue",
 			fit: true,
 			components: [
 				{
-					name: "instructions",
 					classes: "light narrow-column padding-half-top",
 					style: "height: 100%;",
 					components: [
@@ -82,44 +82,47 @@ enyo.kind({
 							]
 						}
 					]
-				},
+				}
+			]
+		},
 
+		{
+			showing: false,
+
+			name: "sheetList",
+			kind: "enyo.List",
+
+			horizontal: "hidden",
+			classes: "tardis-blue-gradient margin-left margin-right",
+
+			fit: true,
+
+			onSetupItem: "setupRow",
+
+			components: [
 				{
-					showing: false,
+					kind: "onyx.Item",
 
-					name: "sheetList",
-					kind: "Repeater",
+					tapHighlight: true,
+					ontap: "sheetSelectedChanged",
 
-					classes: "light narrow-column padding-half-top",
-
-					onSetupItem: "setupRow",
+					classes: "bordered light",
 
 					components: [
 						{
-							kind: "onyx.Item",
+							name: "sheetSelected",
+							kind: "onyx.Checkbox",
 
-							tapHighlight: true,
-							ontap: "sheetSelectedChanged",
+							value: false,
+							disabled: true,
 
-							classes: "bordered",
-
-							components: [
-								{
-									name: "sheetSelected",
-									kind: "onyx.Checkbox",
-
-									value: false,
-									disabled: true,
-
-									style: "margin-right: 10px;"
-								}, {
-									name: "sheetName",
-									tag: "span"
-								}, {
-									name: "sheetUpdated",
-									classes: "smaller"
-								}
-							]
+							style: "margin-right: 10px;"
+						}, {
+							name: "sheetName",
+							tag: "span"
+						}, {
+							name: "sheetUpdated",
+							classes: "smaller"
 						}
 					]
 				}
@@ -252,6 +255,11 @@ enyo.kind({
 			});
 
 		this.resized();
+
+		if( this.$['gapi'].isGapiReady() ) {
+
+			this.gapiReady();
+		}
 	},
 
 	gapiReady: function() {
@@ -427,7 +435,7 @@ enyo.kind({
 			return;
 		}
 
-		this.$['progress'].setMessage( "Processing spreadsheets..." );
+		this.$['progress'].setMessage( "Processing files..." );
 		this.$['progress'].setProgress( 75 );
 
 		this.$['sheetListButton'].setDisabled( false );
@@ -439,7 +447,7 @@ enyo.kind({
 
 		for( var i = 0; i < gapiSheetList.length; i++ ) {
 
-			if( gapiSheetList[i]['mimeType'] !== "application/vnd.google-apps.folder" ) {
+			if( gapiSheetList[i]['mimeType'].match( "excel" ) || gapiSheetList[i]['mimeType'].match( "spreadsheet" ) ) {
 
 				this.allSheetsList.push( gapiSheetList[i] );
 			}
@@ -448,6 +456,9 @@ enyo.kind({
 		this.$['progress'].setProgress( 95 );
 
 		this.$['sheetList'].setCount( this.allSheetsList.length );
+		this.$['sheetList'].refresh();
+
+		this.resized();
 
 		this.$['progress'].hide();
 	},
@@ -455,18 +466,17 @@ enyo.kind({
 	setupRow: function( inSender, inEvent ) {
 
 		var index = inEvent.index;
-		var item = inEvent.item;
 
 		var row = this.allSheetsList[index];
 
 		if( row ) {
 
-			item.$['sheetName'].setContent( row['title'] );
+			this.$['sheetName'].setContent( row['title'] );
 
 			var dateObj = new Date( row['modifiedDate'] );
-			item.$['sheetUpdated'].setContent( dateObj.format( { date: "long", time: "short" } ) );
+			this.$['sheetUpdated'].setContent( dateObj.format( { date: "long", time: "short" } ) );
 
-			item.$['sheetSelected'].setValue( row['selectStatus'] );
+			this.$['sheetSelected'].setValue( row['selectStatus'] );
 
 			return true;
 		}
@@ -504,7 +514,7 @@ enyo.kind({
 			}
 		}
 
-		this.$['sheetList'].setCount( this.allSheetsList.length );
+		this.$['sheetList'].refresh();
 	},
 
 	beginImportProcess: function() {
@@ -1139,7 +1149,8 @@ enyo.kind({
 
 				//document done; no more exist;
 				this.$['errorMessage'].setErrTitle( "Import Complete" );
-				this.showErrorMessage( enyo.bind( this, this.closeImport, true ), "Imported " + this.importItems.length + " spreadsheets." );
+				//this.showErrorMessage( enyo.bind( this, this.closeImport, true ), "Imported " + this.importItems.length + " spreadsheets." );
+				this.closeImport( true );
 			}
 		}
 	},
@@ -1213,6 +1224,6 @@ enyo.kind({
 		this.$['progress'].hide();
 
 		//Close & continue
-		enyo.asyncMethod( this, this.doFinish, { "success": success } );
+		this.doFinish( { "success": success } );
 	}
 });

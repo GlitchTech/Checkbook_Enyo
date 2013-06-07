@@ -2,7 +2,7 @@
 
 enyo.singleton({
 	name: "Checkbook.budget.manager",
-	kind: enyo.Component,
+	kind: "enyo.Component",
 
 	/**
 	 * @public

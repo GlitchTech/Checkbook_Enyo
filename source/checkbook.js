@@ -83,9 +83,11 @@ enyo.kind({
 
 	/** Start Up Event **/
 
-	deviceReady: function() {
+	rendered: function() {
 
-		if( this.$['splash'] ) {
+		this.inherited( arguments );
+
+		if( this.$['splash'].getStartupContainer() ) {
 
 			this.$['splash'].show();
 		}
@@ -217,6 +219,11 @@ enyo.kind({
 
 	splashFinisher: function() {
 
+		if( this.$['splash'].getStartupContainer() ) {
+
+			this.$['splash'].onFinish = "";
+		}
+
 		this.notificationType = !this.$['splash'].getFirstRun();
 
 		Checkbook.globals.security = this.$['security'];
@@ -275,7 +282,7 @@ enyo.kind({
 
 	loadCheckbookStage2: function() {
 
-		if( this.$['splash'] ) {
+		if( this.$['splash'].getStartupContainer() ) {
 
 			this.$['splash'].$['message'].setContent( "Loading account information..." );
 		}
@@ -336,11 +343,11 @@ enyo.kind({
 
 		this.appReady = true;
 
-		if( this.$['splash'] ) {
+		if( this.$['splash'].getStartupContainer() ) {
 
-			//Close & remove splash system. Not used again
+			//Close splash system
+			this.$['splash'].setStartupContainer( false );
 			this.$['splash'].hide();
-			this.$['splash'].destroy();
 		}
 
 //		this.openSearch();
@@ -386,6 +393,12 @@ enyo.kind({
 
 	showPanePopup: function( inSender, inPaneArgs ) {
 
+		this.$['splash'].show();
+		enyo.asyncMethod( this, this._showPanePopup, inPaneArgs );
+	},
+
+	_showPanePopup: function( inPaneArgs ) {
+
 		var paneArgs = enyo.mixin(
 				inPaneArgs,
 				{
@@ -413,16 +426,24 @@ enyo.kind({
 		//Add new pane to the display stack
 		this.paneStack.push( paneArgs['name'] );
 
+		enyo.asyncMethod( this.$['splash'], this.$['splash'].hide );
 		return true;
 	},
 
 	hidePanePopup: function( inSender ) {
+
+		this.$['splash'].show();
 
 		//If a prevous callback existed, call it with any arguments applied
 		if( enyo.isFunction( inSender.onFinishFollower ) ) {
 
 			inSender.onFinishFollower.apply( null, arguments );
 		}
+
+		enyo.asyncMethod( this, this._hidePanePopup, inSender );
+	},
+
+	_hidePanePopup: function( inSender ) {
 
 		//Remove pane from the display stack
 		this.paneStack.splice( this.paneStack.indexOf( inSender['name'] ), 1 );
@@ -444,16 +465,22 @@ enyo.kind({
 		}
 
 		this.resized();
+
+		enyo.asyncMethod( this.$['splash'], this.$['splash'].hide );
 	},
 
 	/** Checkbook.accounts.* **/
 
 	viewAccount: function() {
 
+		this.$['splash'].show();
+
 		if( enyo.Panels.isScreenNarrow() ) {
 
 			this.$['mainViews'].setIndex( 1 );
 		}
+
+		enyo.asyncMethod( this.$['splash'], this.$['splash'].hide );
 	},
 
 	/** Checkbook.search.* **/
@@ -485,9 +512,7 @@ enyo.kind({
 
 	openBudget: function( inSender, inEvent ) {
 
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
+		this.showPanePopup(
 				null,
 				enyo.mixin(
 						{
@@ -506,9 +531,7 @@ enyo.kind({
 		this.log( "Report", arguments );
 		return;
 
-		enyo.asyncMethod(
-				this,
-				this.showPanePopup,
+		this.showPanePopup(
 				null,
 				enyo.mixin(
 						{

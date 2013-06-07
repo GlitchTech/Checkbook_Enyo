@@ -5,8 +5,6 @@ enyo.depends(
 	"Theme.less",
 
 	//Scripts
-	"start.js",
-
 	"checkbook.js",
 	"menu.js",
 	"splash.js",
