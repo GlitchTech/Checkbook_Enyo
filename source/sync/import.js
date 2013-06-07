@@ -1149,7 +1149,8 @@ enyo.kind({
 
 				//document done; no more exist;
 				this.$['errorMessage'].setErrTitle( "Import Complete" );
-				this.showErrorMessage( enyo.bind( this, this.closeImport, true ), "Imported " + this.importItems.length + " spreadsheets." );
+				//this.showErrorMessage( enyo.bind( this, this.closeImport, true ), "Imported " + this.importItems.length + " spreadsheets." );
+				this.closeImport( true );
 			}
 		}
 	},
@@ -1223,6 +1224,6 @@ enyo.kind({
 		this.$['progress'].hide();
 
 		//Close & continue
-		enyo.asyncMethod( this, this.doFinish, { "success": success } );
+		this.doFinish( { "success": success } );
 	}
 });
