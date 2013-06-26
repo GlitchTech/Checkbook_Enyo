@@ -104,7 +104,7 @@ enyo.kind( {
 						}
 					]
 				}, {
-					classes: "text-center",
+					classes: "text-center button-group",
 					style: "min-width: 145px;",
 					fit: true,
 					unmoveable: true,
@@ -126,7 +126,7 @@ enyo.kind( {
 							kind: "onyx.Button",
 
 							ontap: "addTransfer",
-							classes: "padding-none margin-half-left margin-half-right transparent",
+							classes: "padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
