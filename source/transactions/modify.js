@@ -61,7 +61,7 @@ enyo.kind( {
 											placeholder: "Enter Description",
 
 											onkeypress: "descKeyPress",
-											autoKeyModifier: "shift-single",
+											autoKeyModifier: "shift-single"
 										}
 									]
 								}, {
