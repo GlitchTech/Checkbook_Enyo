@@ -1,5 +1,5 @@
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/contextual/source/ContextualLayout.css */
+/* lib/layout/contextual/source/ContextualLayout.css */
 
 /* ContextualLayout.css - popup positioning and border radius adjustments */
 
@@ -60,7 +60,7 @@
   border-top-right-radius: 0px;
 }
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/fittable/source/FittableLayout.css */
+/* lib/layout/fittable/source/FittableLayout.css */
 
 .enyo-fittable-rows-layout {
 	position: relative;
@@ -141,7 +141,7 @@
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/list/source/List.css */
+/* lib/layout/list/source/List.css */
 
 .enyo-list {
 	position: relative;
@@ -206,7 +206,7 @@
 	transition: top 0.1s linear, left 0.1s linear;
 }
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/list/source/PulldownList.css */
+/* lib/layout/list/source/PulldownList.css */
 
 .enyo-list-pulldown {
 	position: absolute;
@@ -269,7 +269,7 @@
 	-ms-transform: rotate(180deg);
 }
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/list/source/GridList.css */
+/* lib/layout/list/source/GridList.css */
 
 /*
 	Put anything you reference with "url(../lib/layout/list/source)" in ../assets/
@@ -308,7 +308,7 @@
 	z-index: -1;
 }
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/list/source/GridListImageItem.css */
+/* lib/layout/list/source/GridListImageItem.css */
 
 /*
 	Put anything you reference with "url(../lib/layout/list/source)" in ../assets/
@@ -340,7 +340,7 @@
 	color: #fff;
 }
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/panels/source/arrangers/Arranger.css */
+/* lib/layout/panels/source/arrangers/Arranger.css */
 
 .enyo-arranger {
 	position: relative;
@@ -369,7 +369,7 @@
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/panels/source/Panels.css */
+/* lib/layout/panels/source/Panels.css */
 
 .enyo-panels {
 }
@@ -384,7 +384,7 @@
 	}
 }
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/tree/source/Node.css */
+/* lib/layout/tree/source/Node.css */
 
 .enyo-node {
 	cursor: default;
@@ -418,7 +418,7 @@
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/layout/imageview/source/ImageViewPin.css */
+/* lib/layout/imageview/source/ImageViewPin.css */
 
 
 .pinDebug {
@@ -426,9 +426,12 @@
 	border:1px solid yellow;
 }
 
-/* /home/ryltar/git/gutoc/enyo/../lib/onyx/css/onyx.less */
+/* lib/onyx/css/onyx.less */
 
 /* Onyx default parameters defined here */
+/* Paths */
+/* application importing Onyx Less files will have to override this  */
+/* variable. Otherwise, Onyx image load will fail with a 404 error  */
 /* Fonts */
 /* ---------------------------------------*/
 /* Text Colors */
@@ -936,28 +939,24 @@
   position: relative;
   z-index: 0;
   background-color: #cacaca;
-  padding-top: 3px;
+  padding-top: 1px;
 }
 .onyx-tab-bar-scroller {
   padding-top: 2px;
 }
 .onyx-tab-bar-scroller .enyo-touch-scroller > div {
   padding: 3px 0px 3px 0px;
-  margin: 6px 0px 3px 0px;
   width: 100%;
-}
-.onyx-tab-holder {
-  margin: 3px 0 3px 0;
 }
 .onyx-tab-line {
   position: relative;
-  margin-top: -0.2em;
+  margin-top: -0.1em;
   border-top: 1px solid #646464;
   z-index: 2;
 }
 .onyx-tab-rug {
   position: relative;
-  padding: 0.2em;
+  padding: 0.3em;
   background-color: #cacaca;
   z-index: 4;
 }
@@ -971,8 +970,8 @@
   border-top-left-radius: 5px;
   background-color: #b1b1b1;
   z-index: 1;
-  padding-top: 0.1em;
-  padding-bottom: 0.3em ;
+  padding-top: 0.3em;
+  padding-bottom: 0.7em ;
   vertical-align: baseline;
 }
 .onyx-tab-item.active {
@@ -987,7 +986,6 @@
   overflow: hidden;
   margin: 3px;
   border: 1px solid transparent;
-  tab--space: nowrap;
   background-color: transparent ;
 }
 .onyx-tab-item-dissolve {
@@ -995,7 +993,7 @@
   height: 90%;
   width: 2em;
   top: 2px;
-  right: 0;
+  right: 1em;
   position: absolute;
   background: linear-gradient(to right, #b1b1b1 0%, rgba(177, 177, 177, 0) 100%);
   /* W3C */
@@ -1019,8 +1017,7 @@
   /* IE6-9 */
 
 }
-.onyx-tab-item-dissolve.active,
-.onyx-tab-item-dissolve:hover {
+.onyx-tab-item-dissolve.active {
   background: linear-gradient(to right, #cacaca 0%, rgba(202, 202, 202, 0) 100%);
   /* W3C */
 
@@ -1042,6 +1039,41 @@
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#00cacaca, endColorstr=#ffcacaca, GradientType=1);
   /* IE6-9 */
 
+}
+.onyx-tab-item-hovered {
+  background: linear-gradient(to right, #cacaca 0%, rgba(202, 202, 202, 0) 100%);
+  /* W3C */
+
+  background: -moz-linear-gradient(right, #cacaca 0%, rgba(202, 202, 202, 0) 100%);
+  /* FF3.6+ */
+
+  background: -webkit-linear-gradient(left, rgba(202, 202, 202, 0), #cacaca);
+  /* Chrome10+,Safari5.1+ */
+
+  background: -webkit-gradient(linear, right top, left top, color-stop(0%, #cacaca), color-stop(100%, rgba(202, 202, 202, 0)));
+  /* Chrome,Safari4+ */
+
+  background: -o-linear-gradient(left, #cacaca 0%, rgba(202, 202, 202, 0) 100%);
+  /* Opera 11.10+ */
+
+  background: -ms-linear-gradient(left, rgba(202, 202, 202, 0) 0%, #cacaca 100%);
+  /* IE10+ */
+
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#00cacaca, endColorstr=#ffcacaca, GradientType=1);
+  /* IE6-9 */
+
+}
+.onyx-tab-item-close {
+  display: inline-block;
+  margin-right: 3px;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-image: url(../lib/onyx/images/close-inactive.png);
+}
+.onyx-tab-item-close:hover {
+  background-image: url(../lib/onyx/images/close-active.png);
 }
 /* ToggleButton.css */
 .onyx-toggle-button {
@@ -1692,7 +1724,7 @@
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/SelectorBar/SelectorBar.css */
+/* lib/gts-plugins/SelectorBar/SelectorBar.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -1765,7 +1797,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/ToggleBar/ToggleBar.css */
+/* lib/gts-plugins/ToggleBar/ToggleBar.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -1783,7 +1815,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/Divider/Divider.css */
+/* lib/gts-plugins/Divider/Divider.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -1863,7 +1895,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/DividerDrawer/DividerDrawer.css */
+/* lib/gts-plugins/DividerDrawer/DividerDrawer.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -1933,7 +1965,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/SelectedMenu/SelectedMenu.css */
+/* lib/gts-plugins/SelectedMenu/SelectedMenu.css */
 
 .gts-selectedMenu .onyx-menu-item.selected,
 .gts-selectedMenu .onyx-menu-item.normal {
@@ -1954,7 +1986,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/InlineNotification/InlineNotification.css */
+/* lib/gts-plugins/InlineNotification/InlineNotification.css */
 
 .inline-notification {
 
@@ -2041,13 +2073,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/IntegerPicker/IntegerPicker.css */
+/* lib/gts-plugins/IntegerPicker/IntegerPicker.css */
 
 .gts-integer-picker {
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/IntegerPickerBar/IntegerPickerBar.css */
+/* lib/gts-plugins/IntegerPickerBar/IntegerPickerBar.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -2114,7 +2146,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/DatePicker/DatePicker.css */
+/* lib/gts-plugins/DatePicker/DatePicker.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -2164,7 +2196,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/TimePicker/TimePicker.css */
+/* lib/gts-plugins/TimePicker/TimePicker.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -2188,7 +2220,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/DecimalInput/DecimalInput.css */
+/* lib/gts-plugins/DecimalInput/DecimalInput.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -2206,7 +2238,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/ConfirmDialog/ConfirmDialog.css */
+/* lib/gts-plugins/ConfirmDialog/ConfirmDialog.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -2259,7 +2291,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/ProgressDialog/ProgressDialog.css */
+/* lib/gts-plugins/ProgressDialog/ProgressDialog.css */
 
 /*
 Copyright © 2012, GlitchTech Science
@@ -2303,7 +2335,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/AutoComplete/AutoComplete.css */
+/* lib/gts-plugins/AutoComplete/AutoComplete.css */
 
 .gts-autocomplete {
 	/* Required for proper view setup with icon */
@@ -2313,16 +2345,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 .gts-autocomplete .search-icon {
 	position: absolute;
 	right: 5px;
-
-	height: 32px;
-	width: 32px;
+	top: 3px;
 
 	background-size: cover;
 	background-position: 0px 0px;
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/Item/Item.css */
+/* lib/gts-plugins/Item/Item.css */
 
 .gts-item {
 }
@@ -2332,7 +2362,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 }
 
 
-/* /home/ryltar/git/gutoc/enyo/../lib/gts-plugins/MenuImageItem/MenuImageItem.css */
+/* lib/gts-plugins/MenuImageItem/MenuImageItem.css */
 
 .gts-menuimageitem {
 	white-space: nowrap;
@@ -2361,6 +2391,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 /* source/Theme.less */
 
 /* Variable definitions */
+/* Paths */
+/* application importing Onyx Less files will have to override this  */
+/* variable. Otherwise, Onyx image load will fail with a 404 error  */
 /* Fonts */
 /* ---------------------------------------*/
 /* Text Colors */
@@ -2633,6 +2666,18 @@ body {
 }
 .onyx-red {
   background-color: #c51616;
+}
+/*****************/
+.button-group button:not( :last-child ) {
+  margin-right: 0;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.button-group button:not( :first-child ) {
+  margin-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 /*****************/
 .popup-header .enyo-header-inner {
