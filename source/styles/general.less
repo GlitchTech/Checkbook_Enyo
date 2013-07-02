@@ -311,6 +311,24 @@ html, body {
 
 /*****************/
 
+.button-group {
+//MOVE TO EXTERNAL KIND
+	button:not( :last-child ) {
+		margin-right: 0;
+		border-right: 0;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	button:not( :first-child ) {
+		margin-left: 0;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+}
+
+/*****************/
+
 .popup-header .enyo-header-inner {
 	padding: 0px;
 	min-height: 0px;

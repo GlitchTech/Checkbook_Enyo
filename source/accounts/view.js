@@ -93,7 +93,7 @@ enyo.kind( {
 						}
 					]
 				}, {
-					classes: "text-center",
+					classes: "text-center button-group",
 					fit: true,
 					unmoveable: true,
 					components: [
@@ -103,7 +103,7 @@ enyo.kind( {
 
 							ontap: "addAccount",
 
-							classes: "margin-half-right padding-none transparent",
+							classes: "padding-none transparent",
 							components: [
 								{
 									kind: "onyx.Icon",
@@ -115,13 +115,12 @@ enyo.kind( {
 
 							ontap: "toggleLock",
 
-							classes: "margin-half-left padding-none transparent",
+							classes: "padding-none transparent",
 							components: [
 								{
 									name: "editModeButtonIcon",
 									kind: "onyx.Icon",
-									src: "assets/menu_icons/lock_closed.png",
-									classes: "onyx-icon-button"
+									src: "assets/menu_icons/lock_closed.png"
 								}
 							]
 						}
