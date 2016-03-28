@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/Users/ryltar/Git/checkbook_android_js/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/ic_launcher.png",
+        "source": "/Users/ryltar/Git/checkbook_android_js/app/src/main/res/drawable-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/ryltar/Git/checkbook_android_js/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/ic_action_search.png",
+        "source": "/Users/ryltar/Git/checkbook_android_js/app/src/main/res/drawable-mdpi/ic_action_search.png"
+    }
+]
