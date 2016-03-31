@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.cordova.hellocordova" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.glitchtechscience.gtcheckbook" version="1.5.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <preference name="loglevel" value="DEBUG" />
-    <name>HelloCordova</name>
+    <name>Checkbook</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        GlitchTech Checkbook, a financial management application, allows you to efficiently track your finances on your Android-enabled device. Checkbook allows you to create many different accounts, and each account can hold thousands of transactions. Track incomes, expenses, and transfers between accounts with ease, and back up your data with Google Spreadsheets. Checkbook is currently in development, with new features added often.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="glitchtechscience@gmail.com" href="http://glitchtechscience.com">
+        GlitchTech Science
     </author>
     <content src="index.html" />
     <access origin="*" />
