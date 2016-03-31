@@ -1,21 +1,21 @@
 [submodule "enyo"]
-	path = enyo
+	path = old_a/enyo/
 	url = https://github.com/enyojs/enyo.git
 [submodule "lib/onyx"]
-	path = lib/onyx
+	path = old_a/lib/onyx
 	url = https://github.com/enyojs/onyx.git
 [submodule "lib/layout"]
-	path = lib/layout
+	path = old_a/lib/layout
 	url = https://github.com/enyojs/layout.git
 [submodule "lib/g11n"]
-	path = lib/g11n
+	path = old_a/lib/g11n
 	url = https://github.com/enyojs/g11n.git
 [submodule "lib/gts-plugins"]
-	path = lib/gts-plugins
+	path = old_a/lib/gts-plugins
 	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
 [submodule "lib/private"]
-	path = lib/private
+	path = old_a/lib/private
 	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/checkbook_private.git
 [submodule "lib/MachiApps"]
-	path = lib/MachiApps
+	path = old_a/lib/MachiApps
 	url = https://github.com/MachiApps/Enyo-2-Components.git
