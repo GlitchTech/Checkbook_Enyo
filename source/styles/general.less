@@ -1,0 +1,444 @@
+/* Prevent annoying gray flash on buttons and links on mobile safari */
+* {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* Text Size */
+
+html, body {
+	font-size: 18px;
+}
+
+.big {
+	font-size: 110%;
+}
+
+.bigger {
+	font-size: 125%;
+}
+
+.biggest {
+	font-size: 140%;
+}
+
+.small {
+	font-size: 90%;
+}
+
+.smaller {
+	font-size: 75%;
+}
+
+.smallest {
+	font-size: 60%;
+}
+
+/* Text Alignment */
+
+.text-left {
+	text-align: left;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.text-right {
+	text-align: right;
+}
+
+.text-top > * {
+	vertical-align: top;
+}
+
+.text-middle > * {
+	vertical-align: middle;
+}
+
+.text-bottom > * {
+	vertical-align: bottom;
+}
+
+/* Spacing */
+
+@std-spacing: 1em;
+
+.padding-std {
+	padding: @std-spacing / 2;
+}
+
+.padding-half-std {
+	padding: @std-spacing / 4;
+}
+
+.padding-top {
+	padding-top: @std-spacing;
+}
+
+.padding-half-top {
+	padding-top: @std-spacing / 2;
+}
+
+.padding-bottom {
+	padding-bottom: @std-spacing;
+}
+
+.padding-half-bottom {
+	padding-bottom: @std-spacing / 2;
+}
+
+.padding-left {
+	padding-left: @std-spacing;
+}
+
+.padding-half-left {
+	padding-left: @std-spacing / 2;
+}
+
+.padding-right {
+	padding-right: @std-spacing;
+}
+
+.padding-half-right {
+	padding-right: @std-spacing / 2;
+}
+
+.padding-top-bottom {
+	padding-top: @std-spacing / 2;
+	padding-bottom: @std-spacing / 2;
+}
+
+.padding-left-right {
+	padding-left: @std-spacing / 2;
+	padding-right: @std-spacing / 2;
+}
+
+.padding-none {
+	padding: 0;
+}
+
+.margin-top {
+	margin-top: @std-spacing;
+}
+
+.margin-half-top {
+	margin-top: @std-spacing / 2;
+}
+
+.margin-bottom {
+	margin-bottom: @std-spacing;
+}
+
+.margin-half-bottom {
+	margin-bottom: @std-spacing / 2;
+}
+
+.margin-left {
+	margin-left: @std-spacing;
+}
+
+.margin-half-left {
+	margin-left: @std-spacing / 2;
+}
+
+.margin-double-left {
+	margin-left: @std-spacing * 2;
+}
+
+.margin-right {
+	margin-right: @std-spacing;
+}
+
+.margin-half-right {
+	margin-right: @std-spacing / 2;
+}
+
+.margin-top-bottom {
+	margin-top: @std-spacing / 2;
+	margin-bottom: @std-spacing / 2;
+}
+
+.margin-left-right {
+	margin-left: @std-spacing / 2;
+	margin-right: @std-spacing / 2;
+}
+
+.margin-vert-none {
+	margin-top: 0 !important;
+	margin-bottom: 0 !important;
+}
+
+.margin-horiz-none {
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+}
+
+.margin-none {
+	margin: 0;
+}
+
+/* Float Alignment */
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+.clear {
+	clear: both;
+}
+
+/*****************/
+
+.inline {
+	display: inline-block;
+}
+
+.inline-force {
+	display: inline-block !important;
+}
+
+.label {
+	color: @label-blue;
+	font-size: .8rem;
+	text-transform: uppercase;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.text-ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.small-row-padding {
+	padding: 5px 5px 5px 10px;
+}
+
+.full-width {
+	min-width: 100%;
+}
+
+.invert {
+	-webkit-transform: rotate(180deg);  /* Safari 3.1+, Chrome */
+	-moz-transform: rotate(180deg);  /* Firefox 3.5-15 */
+	-ms-transform: rotate(180deg);  /* IE9 */
+	-o-transform: rotate(180deg);  /* Opera 10.5-12.00 */
+
+	transform: rotate(180deg);  /* Firefox 16+, Opera 12.50+ */
+
+	filter: ~"progid:DXImageTransform.Microsoft.Matrix(M11=-1, M12=-1.2246063538223773e-16, M21=1.2246063538223773e-16, M22=-1, sizingMethod='auto expand')";/* IE6–IE9 */
+	zoom: 1;
+}
+
+.img-icon {
+	height: 32px;
+	width: 32px;
+}
+
+.dark-link a,
+.dark-link a:link,
+.dark-link a:visited,
+.dark-link a:active,
+.dark-link a:hover {
+	color: #99ccff;
+}
+
+.dark-link a:active,
+.dark-link a:hover {
+	color: #ff0000;
+}
+
+.arrow,
+.arrow.active,
+.arrow:active:hover:not( [disabled] ) {
+	height: 32px;
+	padding-right: 32px;
+
+	background-repeat: no-repeat;
+	background-position: center right;
+
+	background-image: url( "../assets/menu-arrow.png" );
+}
+
+.arrow.dark,
+.arrow.dark:active,
+.arrow.dark:active:hover:not( [disabled] ) {
+	background-image: url( "../assets/menu-arrow-light.png" );
+}
+
+/*****************/
+
+.text-onyx-blue {
+	color: @onyx-blue;
+}
+
+.text-onyx-green {
+	color: @onyx-green;
+}
+
+.text-onyx-yellow {
+	color: @onyx-yellow;
+}
+
+.text-onyx-red {
+	color: @onyx-red;
+}
+
+/*****************/
+
+.onyx-blue {
+	background-color: @onyx-blue;
+}
+
+.onyx-green {
+	background-color: @onyx-green;
+}
+
+.onyx-yellow {
+	background-color: @onyx-yellow;
+}
+
+.onyx-red {
+	background-color: @onyx-red;
+}
+
+/*****************/
+
+.button-group {
+//MOVE TO EXTERNAL KIND
+	button:not( :last-child ) {
+		margin-right: 0;
+		border-right: 0;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	button:not( :first-child ) {
+		margin-left: 0;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+}
+
+/*****************/
+
+.popup-header .enyo-header-inner {
+	padding: 0px;
+	min-height: 0px;
+}
+
+.force-left-padding {
+	padding-left: 10px !important;
+}
+
+.onyx-popup .light {
+	background-color: #eeeeee;
+	color: @charcoal;
+
+	.border-radius( 5px );
+}
+
+.rounded {
+	.border-radius( 5px );
+}
+
+.bordered {
+	border-top: 1px solid rgba( 255, 255, 255, 0.5 );
+	border-bottom: 2px solid rgba( 0, 0, 0, 0.2 );
+}
+
+.onyx-item.bordered {
+	font-size: .9rem;
+}
+
+.onyx-menu,
+.enyo-node {
+	.bordered {
+		&:first-child {
+			border-top: 0px;
+		}
+		&:last-child {
+			border-bottom: 0px;
+		}
+	}
+}
+
+.bordered-menu .onyx-menu-item {
+	.bordered;
+
+	&:first-child {
+		border-top: 0px;
+	}
+	&:last-child {
+		border-bottom: 0px;
+	}
+}
+
+.onyx-input-decorator > input {
+	width: 100%;
+}
+
+/*****************/
+
+.onyx-toolbar.transparent {
+	background: transparent;
+	border-width: 0;
+}
+
+/*****************/
+
+.onyx-button.active .onyx-icon,
+.onyx-button.pressed .onyx-icon,
+.onyx-button:active:hover .onyx-icon {
+	background-position: 0 -@onyx-icon-size;
+}
+/*****************/
+
+.enyo-label-fullsize {
+	color: @label-blue;
+	text-transform: uppercase;
+}
+
+/*****************/
+
+.onyx-button.transparent {
+	background-color: transparent;
+}
+
+.onyx-button.small-padding {
+	padding: 2px 6px;
+}
+
+/*****************/
+
+.enyo-modaldialog > * {
+	height:100%;
+}
+
+.enyo-menuitem-icon {
+	height: 32px;
+	width: 32px;
+}
+
+.iconListSelector .enyo-menuitem-icon + div {
+	padding-top: 8px;
+}
+
+.enyo-tool-button-client > .enyo-button-icon {
+	margin: -6px -6px -10px -6px;
+}
+
+/*****************/
+
+.dividerDrawerBlack .enyo-divider-caption {
+	font-size: 18px;
+	font-weight: normal;
+	color: @charcoal;
+}

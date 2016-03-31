@@ -1,0 +1,90 @@
+/** Styles for adaptive screen size **/
+@viewport {
+	width: device-width;
+	height: device-height;
+}
+
+/* Default Styling */
+.app-panels > * {
+	width: 400px;
+	background-color: #EAEAEA;
+	box-shadow: -4px -4px 4px rgba(0,0,0,0.3);
+}
+
+.small-popup {
+	width: 400px;
+}
+
+.large-popup {
+	width: 500px;
+}
+
+.popup-scroller {
+	max-height: 500px;
+}
+
+.two-button-toolbar button {
+	width: 150px;
+}
+
+.two-button-toolbar div {
+	width: 50px;
+}
+
+/* Adjust for smaller screen sizes (width) */
+
+@media all and ( max-width: 800px ) {
+
+	.app-panels > * {
+		min-width: 100%;
+	}
+}
+
+@media all and ( max-width: 500px ) {
+
+	.large-popup {
+		width: 95%;
+	}
+}
+
+@media all and ( max-width: 400px ) {
+
+	body {
+		font-size: 16px !important;
+	}
+
+	.small-popup {
+		width: 95%;
+	}
+
+	.two-button-toolbar button {
+		width: 45%;
+	}
+
+	.two-button-toolbar div {
+		display: none;
+	}
+}
+
+/* Adjust for smaller screen sizes (height) */
+
+@media all and ( max-height: 600px ) {
+
+	.popup-scroller {
+		max-height: 400px;
+	}
+}
+
+@media all and ( max-height: 500px ) {
+
+	.popup-scroller {
+		max-height: 300px;
+	}
+}
+
+@media all and ( max-height: 400px ) {
+
+	.popup-scroller {
+		max-height: 200px;
+	}
+}

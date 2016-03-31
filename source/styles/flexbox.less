@@ -1,0 +1,49 @@
+/** Box Setup **/
+
+.h-box, .v-box {
+	display: inline-block;/* fallback for crappy browsers */
+
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+
+	-webkit-box-align: stretch;
+	-moz-box-align: stretch;
+	box-align: stretch;
+}
+
+.h-box {
+	-webkit-box-orient: horizontal;
+	-moz-box-orient: horizontal;
+	box-orient: horizontal;
+}
+
+.v-box {
+	-webkit-box-orient: vertical;
+	-moz-box-orient: vertical;
+	box-orient: vertical;
+}
+
+.h-box > *, .v-box > * {
+	.box-flex-generator( 0 );
+	display: block;
+}
+
+/** Flexes **/
+
+.box-flex-0 { .box-flex-generator( 0 ); }
+.box-flex-1, .box-flex { .box-flex-generator( 1 ); }
+.box-flex-2 { .box-flex-generator( 2 ); }
+
+/** Packing **/
+.box-pack-start { .box-pack-generator( start ); }
+.box-pack-end { .box-pack-generator( end ); }
+.box-pack-center { .box-pack-generator( center ); }
+.box-pack-justify { .box-pack-generator( justify ); }
+
+/** Alignment **/
+.box-align-start { .box-align-generator( start ); }
+.box-align-end { .box-align-generator( end ); }
+.box-align-center { .box-align-generator( center ); }
+.box-align-baseline { .box-align-generator( baseline ); }
+.box-align-stretch { .box-align-generator( stretch ); }

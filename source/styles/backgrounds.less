@@ -1,0 +1,68 @@
+.narrow-column {
+	max-width: 600px;
+
+	margin-left: auto;
+	margin-right: auto;
+
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+.default,
+.norm-row {
+	background-color: #d8d8d8;
+}
+
+.light,
+.light-row ,
+.light .norm-row {
+	background-color: @light-grey;
+	color: @charcoal;
+}
+
+.alt-row {
+	background-color: @alt-row;/* ccccff old color */
+}
+
+/* Backgrounds/Gradients */
+
+.transparent { background-color: transparent; }
+
+.deep-green { .solid-background( dark, @deep-green ); }
+.deep-green-trans { .solid-background( dark, fadeout( @deep-green, 10% ) ); }
+.deep-green-gradient { .gradient( @deep-green ); }
+
+.rich-brown { .solid-background( dark, @rich-brown ); }
+.rich-brown-trans { .solid-background( dark, fadeout( @rich-brown, 10% ) ); }
+.rich-brown-gradient { .gradient( @rich-brown ); }
+
+.tardis-blue { .solid-background( dark, @tardis-blue ); }
+.tardis-blue-trans { .solid-background( dark, fadeout( @tardis-blue, 10% ) ); }
+.tardis-blue-gradient { .gradient( @tardis-blue ); }
+
+.naka-red { .solid-background( dark, @naka-red ); }
+.naka-red-trans { .solid-background( dark, fadeout( @naka-red, 10% ) ); }
+.naka-red-gradient { .gradient( @naka-red ); }
+
+/* Checkbook Stamp Background */
+
+.checkbook-stamp {
+	background-image: url( "../assets/trans_bg.png" );
+	background-repeat: no-repeat;
+	background-position: center center;
+}
+
+/* Background Colors */
+
+.custom-background {
+
+	&.blue { .color( #dbeaf9, #0d71d7, #02406d, #f4f9ff ); }
+	&.black { .color( #8f8f8f, @black, @charcoal, @charcoal ); }
+	&.green { .color( #e5f3d9, #52b400, #008000, #f0ffe4 ); }
+	&.orange { .color( #ffead9, #ff7200, #ee8e00, #faf0e8 ); }
+	&.pink { .color( #ffd9f1, #ff00a2, #ffc0cb, #fce9f5 ); }
+	&.purple { .color( #f0d9f7, #9a00c7, #480370, #f6eef9 ); }
+	&.red { .color( #ffd9d9, #ff0000, #b22222, #fff3f3 ); }
+	&.teal { .color( #d9f2f7, #00a6c9, #008080, #48d1cc ); }
+	&.yellow { .color( #fdf9d9, #f4d400, #ffef00, #f8e359 ); }
+}
