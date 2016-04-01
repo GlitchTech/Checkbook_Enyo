@@ -16,3 +16,6 @@
 [submodule "www/lib/MachiApps"]
 	path = www/lib/MachiApps
 	url = https://github.com/MachiApps/Enyo-2-Components.git
+[submodule "www/lib/gts-plugins"]
+	path = www/lib/gts-plugins
+	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
