@@ -23,9 +23,9 @@ thumbs.db
 *.class
 
 # generated files - android project subfolder
-Android/bin/
-Android/gen/
-Android/assets/
+platforms/android/bin/
+platforms/android/gen/
+platforms/android/assets/
 
 # generated files
 bin/
