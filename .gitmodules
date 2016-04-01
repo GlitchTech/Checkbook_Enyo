@@ -11,7 +11,7 @@
 	path = www/lib/g11n
 	url = https://github.com/enyojs/g11n.git
 [submodule "www/lib/gts_plugins"]
-	path = www/lib/gts_plugins
+	path = www/lib/gts-plugins
 	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
 [submodule "www/lib/private"]
 	path = www/lib/private
