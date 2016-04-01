@@ -40,7 +40,7 @@
 					/** Application Constructor */
 					initialize: function() {
 
-						if( !enyo.platform.touch ) {
+						if( !enyo.platform.touch || !this.isDeviceReadySupported() ) {
 							//Not a mobile device
 
 							enyo.log( "Checkbook :: Touchless environment, launching application" );
@@ -53,6 +53,24 @@
 							document.addEventListener( 'deviceready', this.onDeviceReady, false );
 							document.addEventListener( "webworksready", this.onDeviceReady, false );
 						}
+					},
+
+					isDeviceReadySupported: function() {
+
+						var eventName = "deviceready";
+						var el = document.createElement( 'div' );
+						eventName = 'on' + eventName;
+						var isSupported = ( eventName in el );
+
+						if( !isSupported ) {
+
+							el.setAttribute(eventName, 'return;');
+							isSupported = typeof el[eventName] == 'function';
+						}
+
+						el = null;
+
+						return isSupported;
 					},
 
 					/** deviceready Event Handler
@@ -68,8 +86,16 @@
 							return;
 						}
 
+						var appInfo = enyo.fetchAppInfo();
+
+						if( appInfo['error'] ) {
+
+							alert( appInfo['error'] );
+							return;
+						}
+
 						//Logging level based on release status
-						enyo.setLogLevel( enyo.fetchAppInfo()['id'].match( "beta" ) ? enyo.logging['levels']['log'] : enyo.logging['levels']['error'] );
+						enyo.setLogLevel( appInfo['id'].match( "beta" ) ? enyo.logging['levels']['log'] : enyo.logging['levels']['error'] );
 
 						enyo.log( "Checkbook :: Activating touch scrolling mode" );
 						enyo.Scroller.touchScrolling = true;
