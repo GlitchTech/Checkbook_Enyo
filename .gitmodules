@@ -10,12 +10,12 @@
 [submodule "www/lib/g11n"]
 	path = www/lib/g11n
 	url = https://github.com/enyojs/g11n.git
-[submodule "www/lib/gts_plugins"]
-	path = www/lib/gts-plugins
-	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
 [submodule "www/lib/private"]
 	path = www/lib/private
 	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/checkbook_private.git
 [submodule "www/lib/MachiApps"]
 	path = www/lib/MachiApps
 	url = https://github.com/MachiApps/Enyo-2-Components.git
+[submodule "www/lib/gts-plugins"]
+	path = www/lib/gts-plugins
+	url = https://GlitchTechScience@bitbucket.org/GlitchTechScience/gts-plugins.git
