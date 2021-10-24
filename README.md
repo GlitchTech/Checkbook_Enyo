@@ -1,7 +1,7 @@
 Checkbook HD
 ============
 
-https://bitbucket.org/GlitchTechScience/checkbook_enyo/
+https://github.com/GlitchTech/Checkbook_Enyo
 
 Customer Support
 ----------------
